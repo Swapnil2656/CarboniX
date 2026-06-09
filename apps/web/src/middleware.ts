@@ -14,9 +14,9 @@ export async function middleware(req: NextRequest) {
   // ── Admin-only prefix guard ────────────────────────────────────────────────
   if (
     pathname.startsWith(authConfig.adminPrefix) &&
-    token?.type !== "ADMIN"
+    (!token || token.type === "USER")
   ) {
-    const fallback = authConfig.roleRedirects[token?.type as string] ?? authConfig.defaultRedirect;
+    const fallback = token ? (authConfig.roleRedirects[token.type as string] ?? authConfig.defaultRedirect) : authConfig.routes.signIn;
     return NextResponse.redirect(new URL(fallback, req.url));
   }
 
