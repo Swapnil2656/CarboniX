@@ -2,7 +2,7 @@ FROM node:20-alpine AS base
 
 FROM base AS builder
 RUN apk update
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 RUN npm install -g turbo
 COPY . .
@@ -10,7 +10,7 @@ RUN turbo prune api --docker
 
 FROM base AS installer
 RUN apk update
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 COPY .gitignore .gitignore
@@ -20,6 +20,7 @@ RUN npm install
 
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
+RUN mkdir -p /app/packages
 
 # Generate Prisma client for api
 RUN npx prisma generate --schema=services/api/prisma/schema.prisma
