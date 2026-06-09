@@ -1,0 +1,21 @@
+/* ─── Carbonix Auth Theme ──────────────────────────────── */
+/* Override these CSS variables to match Carbonix brand     */
+
+:root {
+  --button: #BD93F9;          /* Electric Purple — primary CTA */
+  --button-hover: #C9A4FF;
+  --button-text: #411478;
+
+  --surface: #121212;         /* App background */
+  --surface-card: #1E1E1E;   /* Card surface */
+  --surface-input: #0F0F0F;  /* Input background */
+
+  --border: #2D2D2D;
+  --border-focus: #BD93F9;
+
+  --text-primary: #E5E7EB;
+  --text-secondary: #9CA3AF;
+  --text-error: #FF5555;
+
+  --success: #50FA7B;
+}

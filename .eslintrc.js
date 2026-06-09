@@ -1,0 +1,17 @@
+module.exports = {
+  root: true,
+  env: {
+    node: true,
+    es2022: true,
+  },
+  extends: [
+    'eslint:recommended',
+  ],
+  parserOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+  },
+  rules: {
+    // Custom workspace rules can go here
+  },
+};

@@ -1,0 +1,21 @@
+{
+  "name": "carbonsdk",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "services/*"
+  ],
+  "devDependencies": {
+    "turbo": "^1.13.0",
+    "prettier": "^3.2.5",
+    "eslint": "^8.57.0"
+  }
+}

@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Carbonix Roles ─────────────────────────────────────────
+// Matches roleRedirects in carbonix-auth.config.ts
+enum userType {
+  SUPER_ADMIN
+  ADMIN
+  ANALYST
+  CONTENT_EDITOR
+  USER
+}
+
+// ─── Auth Models (do not remove) ─────────────────────────────────────────────
+
+model User {
+  id                 String              @id @default(cuid())
+  userName           String              @unique
+  email              String              @unique
+  password           String
+  isVerified         Boolean             @default(false)
+  type               userType            @default(USER)
+  profile            Profile?
+  verificationTokens VerificationToken[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+}
+
+// Created automatically on signup. Add app-specific profile fields here.
+model Profile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName    String?
+  avatarUrl   String?
+  phoneNumber String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model VerificationToken {
+  id      String   @id @default(cuid())
+  token   String   @unique
+  expires DateTime
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

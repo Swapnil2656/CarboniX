@@ -1,0 +1,71 @@
+import NextAuth, { type DefaultSession } from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+import { db } from "./lib/carbonix-auth/prisma-db";
+import bcrypt from "bcrypt";
+import { signInSchema } from "./lib/carbonix-auth/zod";
+import { authConfig } from "./carbonix-auth.config";
+
+declare module "next-auth" {
+  interface User {
+    type?: string;
+  }
+  interface Session {
+    user: {
+      id: string;
+      type?: string;
+    } & DefaultSession["user"];
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id: string;
+    type?: string;
+  }
+}
+
+export const { handlers, signIn, signOut, auth } = NextAuth({
+  providers: [
+    Credentials({
+      credentials: {
+        email: { label: "Email", type: "email", placeholder: "you@example.com" },
+        password: { label: "Password", type: "password", placeholder: "••••••••" },
+      },
+      authorize: async credentials => {
+        const { email, password } = await signInSchema.parseAsync(credentials);
+
+        const user = await db.user.findUnique({ email });
+        if (!user) throw new Error("No account found with that email");
+
+        const isValid = await bcrypt.compare(password, user.password);
+        if (!isValid) throw new Error("Invalid password");
+
+        if (!user.isVerified) throw new Error("Please verify your email before logging in");
+
+        return { id: user.id, email: user.email, name: user.userName, type: user.type };
+      },
+    }),
+  ],
+  trustHost: true,
+  pages: {
+    signIn: authConfig.routes.signIn,
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id as string;
+        token.type = user.type;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token?.id) {
+        session.user.id = token.id;
+        session.user.type = token.type as string;
+      }
+      return session;
+    },
+  },
+  session: { strategy: "jwt" },
+  secret: process.env.NEXTAUTH_SECRET,
+});
