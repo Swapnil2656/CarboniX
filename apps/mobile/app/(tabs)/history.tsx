@@ -1,0 +1,31 @@
+import { StyleSheet, Text, View } from 'react-native';
+
+export default function HistoryScreen() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>🕐 Calculation History</Text>
+      <Text style={styles.subtitle}>
+        View and manage your past carbon calculations
+      </Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+  },
+});

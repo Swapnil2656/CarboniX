@@ -1,0 +1,30 @@
+import { StyleSheet, Text, View } from 'react-native';
+
+export default function VerifyScreen() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>✉️ Verify Email</Text>
+      <Text style={styles.subtitle}>Check your inbox for a verification link</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#0A0F1C',
+    padding: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#BD93F9',
+  },
+});
