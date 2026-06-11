@@ -165,13 +165,26 @@ const config = {
         "fromEnvVar": null,
         "value": "darwin-arm64",
         "native": true
+      },
+      {
+        "fromEnvVar": null,
+        "value": "linux-musl-arm64-openssl-3.0.x"
+      },
+      {
+        "fromEnvVar": null,
+        "value": "linux-musl-arm64-openssl-1.1.x"
+      },
+      {
+        "fromEnvVar": null,
+        "value": "linux-musl-openssl-3.0.x"
       }
     ],
     "previewFeatures": [],
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null
+    "rootEnvPath": null,
+    "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../../../prisma",
   "clientVersion": "5.14.0",
@@ -180,7 +193,6 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": true,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -189,8 +201,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\n// ─── Carbonix Roles ─────────────────────────────────────────\n// Matches roleRedirects in carbonix-auth.config.ts\nenum userType {\n  SUPER_ADMIN\n  ADMIN\n  ANALYST\n  CONTENT_EDITOR\n  USER\n}\n\n// ─── Auth Models (do not remove) ─────────────────────────────────────────────\n\nmodel User {\n  id                 String              @id @default(cuid())\n  userName           String              @unique\n  email              String              @unique\n  password           String\n  isVerified         Boolean             @default(false)\n  type               userType            @default(USER)\n  profile            Profile?\n  verificationTokens VerificationToken[]\n  createdAt          DateTime            @default(now())\n  updatedAt          DateTime            @updatedAt\n}\n\n// Created automatically on signup. Add app-specific profile fields here.\nmodel Profile {\n  id          String   @id @default(cuid())\n  userId      String   @unique\n  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n  fullName    String?\n  avatarUrl   String?\n  phoneNumber String?\n  createdAt   DateTime @default(now())\n  updatedAt   DateTime @updatedAt\n}\n\nmodel VerificationToken {\n  id      String   @id @default(cuid())\n  token   String   @unique\n  expires DateTime\n  userId  String\n  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n}\n",
-  "inlineSchemaHash": "24d4155acde395cb053ba31304d5ebc102886b76efca487af97c461766b5379f",
+  "inlineSchema": "generator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../src/generated/prisma\"\n  binaryTargets = [\"native\", \"linux-musl-arm64-openssl-3.0.x\", \"linux-musl-arm64-openssl-1.1.x\", \"linux-musl-openssl-3.0.x\"]\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\n// ─── Carbonix Roles ─────────────────────────────────────────\n// Matches roleRedirects in carbonix-auth.config.ts\nenum userType {\n  SUPER_ADMIN\n  ADMIN\n  ANALYST\n  CONTENT_EDITOR\n  USER\n}\n\n// ─── Auth Models (do not remove) ─────────────────────────────────────────────\n\nmodel User {\n  id                 String              @id @default(cuid())\n  userName           String              @unique\n  email              String              @unique\n  password           String\n  isVerified         Boolean             @default(false)\n  type               userType            @default(USER)\n  profile            Profile?\n  verificationTokens VerificationToken[]\n  createdAt          DateTime            @default(now())\n  updatedAt          DateTime            @updatedAt\n}\n\n// Created automatically on signup. Add app-specific profile fields here.\nmodel Profile {\n  id          String   @id @default(cuid())\n  userId      String   @unique\n  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n  fullName    String?\n  avatarUrl   String?\n  phoneNumber String?\n  createdAt   DateTime @default(now())\n  updatedAt   DateTime @updatedAt\n}\n\nmodel VerificationToken {\n  id      String   @id @default(cuid())\n  token   String   @unique\n  expires DateTime\n  userId  String\n  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n}\n",
+  "inlineSchemaHash": "4efabc69b6e8a47213da50e75c5ed3c81b6ba7b06e8430aa611a73aa8c978119",
   "copyEngine": true
 }
 
@@ -230,6 +242,18 @@ Object.assign(exports, Prisma)
 // file annotations for bundling tools to include these files
 path.join(__dirname, "libquery_engine-darwin-arm64.dylib.node");
 path.join(process.cwd(), "src/generated/prisma/libquery_engine-darwin-arm64.dylib.node")
+
+// file annotations for bundling tools to include these files
+path.join(__dirname, "libquery_engine-linux-musl-arm64-openssl-3.0.x.so.node");
+path.join(process.cwd(), "src/generated/prisma/libquery_engine-linux-musl-arm64-openssl-3.0.x.so.node")
+
+// file annotations for bundling tools to include these files
+path.join(__dirname, "libquery_engine-linux-musl-arm64-openssl-1.1.x.so.node");
+path.join(process.cwd(), "src/generated/prisma/libquery_engine-linux-musl-arm64-openssl-1.1.x.so.node")
+
+// file annotations for bundling tools to include these files
+path.join(__dirname, "libquery_engine-linux-musl-openssl-3.0.x.so.node");
+path.join(process.cwd(), "src/generated/prisma/libquery_engine-linux-musl-openssl-3.0.x.so.node")
 // file annotations for bundling tools to include these files
 path.join(__dirname, "schema.prisma");
 path.join(process.cwd(), "src/generated/prisma/schema.prisma")

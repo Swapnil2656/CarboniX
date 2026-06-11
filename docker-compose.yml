@@ -1,17 +1,4 @@
 services:
-  db:
-    image: postgres:15-alpine
-    container_name: carbonix-db
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: carbonix
-    ports:
-      - '5432:5432'
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
   api:
     build:
       context: .
@@ -23,10 +10,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=4000
-      # Ensure this matches your actual database setup:
-      - DATABASE_URL=postgresql://postgres:password@db:5432/carbonix?schema=public
-    depends_on:
-      - db
+      - DATABASE_URL=${DATABASE_URL}
 
   web:
     build:
@@ -39,10 +23,8 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      # Ensure this matches your actual database setup:
-      - DATABASE_URL=postgresql://postgres:password@db:5432/carbonix?schema=public
+      - DATABASE_URL=${DATABASE_URL}
     depends_on:
-      - db
       - api
 
 volumes:
