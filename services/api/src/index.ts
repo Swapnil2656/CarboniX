@@ -3,6 +3,9 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 
+import carbonRoutes from './modules/carbon/carbon.routes';
+import referenceRoutes from './modules/reference/reference.routes';
+
 dotenv.config();
 
 const app = express();
@@ -12,9 +15,12 @@ app.use(cors());
 app.use(helmet());
 app.use(express.json());
 
-app.get('/', (req, res) => {
+app.get('/api/v1/health', (req, res) => {
   res.json({ message: 'CarboniX API is running!' });
 });
+
+app.use('/api/v1/carbon', carbonRoutes);
+app.use('/api/v1/reference', referenceRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
