@@ -2,15 +2,15 @@ import { apiClient } from './client';
 
 // Carbon API Endpoints
 export const carbonApi = {
-  calculate: async (payload: any) => {
+  calculate: async (payload: Record<string, unknown>) => {
     const response = await apiClient.post('/calculate', payload);
     return response.data;
   },
-  compare: async (payload: any) => {
+  compare: async (payload: Record<string, unknown>) => {
     const response = await apiClient.post('/compare', payload);
     return response.data;
   },
-  recommend: async (payload: any) => {
+  recommend: async (payload: Record<string, unknown>) => {
     const response = await apiClient.post('/recommend', payload);
     return response.data;
   },
@@ -22,11 +22,11 @@ export const carbonApi = {
 
 // Auth Endpoints (if you are using the separate express backend for mobile auth)
 export const authApi = {
-  login: async (credentials: any) => {
+  login: async (credentials: Record<string, unknown>) => {
     const response = await apiClient.post('/auth/login', credentials);
     return response.data;
   },
-  signup: async (credentials: any) => {
+  signup: async (credentials: Record<string, unknown>) => {
     const response = await apiClient.post('/auth/signup', credentials);
     return response.data;
   }

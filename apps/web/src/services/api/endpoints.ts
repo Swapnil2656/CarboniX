@@ -2,19 +2,19 @@ import { fetchClient } from './client';
 
 // Carbon API Endpoints
 export const carbonApi = {
-  calculate: async (payload: any) => {
+  calculate: async (payload: Record<string, unknown>) => {
     return fetchClient('/calculate', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
   },
-  compare: async (payload: any) => {
+  compare: async (payload: Record<string, unknown>) => {
     return fetchClient('/compare', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
   },
-  recommend: async (payload: any) => {
+  recommend: async (payload: Record<string, unknown>) => {
     return fetchClient('/recommend', {
       method: 'POST',
       body: JSON.stringify(payload),
