@@ -2,6 +2,10 @@ import { Request, Response } from 'express';
 import { calculateCarbon, CalculationInput, getCarbonRating, getEquivalent, getRecommendation } from './carbon.engine';
 import { prisma } from '../../lib/prisma';
 import { AuthRequest } from '../../middleware/auth.middleware';
+import { CarbonService } from './services/carbon.service';
+import { logger } from '../../lib/logger';
+
+const carbonService = new CarbonService();
 
 export const calculate = async (req: AuthRequest, res: Response) => {
   try {
@@ -87,6 +91,26 @@ export const recommend = async (req: Request, res: Response) => {
       data: {} 
     });
   } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+export const calculateEmissions = async (req: Request, res: Response) => {
+  try {
+    const { energyKwh, countryCode } = req.body;
+    
+    if (energyKwh === undefined || !countryCode) {
+      return res.status(400).json({ success: false, error: 'Missing energyKwh or countryCode' });
+    }
+
+    const result = await carbonService.calculateCarbon({
+      energyKwh: Number(energyKwh),
+      countryCode: String(countryCode).toUpperCase()
+    });
+
+    res.json(result);
+  } catch (error: any) {
+    logger.error('Error calculating emissions:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 };

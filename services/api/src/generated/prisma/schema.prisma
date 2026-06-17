@@ -1,0 +1,516 @@
+// ═══════════════════════════════════════════════════════════════
+// CARBONIX BACKEND API — Prisma Schema
+// Database: PostgreSQL
+// ORM: Prisma 6.x
+// ═══════════════════════════════════════════════════════════════
+
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../src/generated/prisma"
+  binaryTargets = ["native"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ──────────────────────────────────────────────────
+
+enum CloudProvider {
+  AWS
+  GCP
+  AZURE
+}
+
+enum CarbonRating {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum CalculationSource {
+  MOBILE_APP
+  SDK
+  WEB_PLAYGROUND
+  API_DIRECT
+}
+
+enum ApiKeyStatus {
+  ACTIVE
+  REVOKED
+}
+
+enum FlagCategory {
+  SCREEN
+  FEATURE
+  EXPERIMENT
+  MAINTENANCE
+}
+
+enum ConfigCategory {
+  THRESHOLDS
+  RECOMMENDATIONS
+  CONTENT
+  MAINTENANCE
+}
+
+enum ConfigValueType {
+  NUMBER
+  STRING
+  BOOLEAN
+  JSON
+}
+
+enum NotificationType {
+  BROADCAST
+  TARGETED
+  THRESHOLD_ALERT
+}
+
+enum NotificationStatus {
+  DRAFT
+  SCHEDULED
+  SENDING
+  SENT
+  FAILED
+}
+
+enum TargetAudience {
+  ALL
+  PROVIDER_AWS
+  PROVIDER_GCP
+  PROVIDER_AZURE
+  CUSTOM
+}
+
+enum MobileUserStatus {
+  ACTIVE
+  BANNED
+}
+
+enum InstanceCategory {
+  GENERAL
+  COMPUTE
+  MEMORY
+  STORAGE
+  GPU
+}
+
+enum StorageType {
+  EBS
+  SSD
+  HDD
+  NVME
+}
+
+enum GridIntensitySource {
+  ELECTRICITY_MAPS
+  CCF_DEFAULT
+}
+
+// ─── Mobile Users ───────────────────────────────────────────
+
+model MobileUser {
+  id                   String   @id @default(cuid())
+  email                String   @unique
+  passwordHash         String
+  name                 String
+  deviceId             String?
+  pushToken            String?
+  country              String?  @db.Char(2) // ISO 3166-1 alpha-2
+  lastActiveAt         DateTime @default(now())
+  calculationCount     Int      @default(0)
+  totalCO2Tracked      Float    @default(0) // kg
+  carbonAlertThreshold Float    @default(50) // kg CO₂/month
+
+  // Preferences
+  theme                String         @default("dark") // light | dark | system
+  notificationsEnabled Boolean        @default(true)
+  defaultProvider      CloudProvider?
+
+  // Status
+  status    MobileUserStatus @default(ACTIVE)
+  banReason String?
+  bannedAt  DateTime?
+  bannedBy  String? // Admin user ID (from web DB)
+
+  // Relations
+  calculations Calculation[]
+  sessions     Session[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([deviceId])
+  @@index([status, lastActiveAt(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+}
+
+// ─── Calculations ───────────────────────────────────────────
+
+model Calculation {
+  id     String     @id @default(cuid())
+  userId String
+  user   MobileUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Input parameters
+  provider       CloudProvider
+  region         String
+  regionName     String
+  instanceType   String
+  instanceCount  Int
+  hoursPerMonth  Int
+  cpuUtilization Float // 0.0 to 1.0
+  storageGB      Float         @default(0)
+  ramGB          Float
+
+  // Energy breakdown (kWh)
+  energyComputeKwh Float
+  energyMemoryKwh  Float
+  energyStorageKwh Float
+  energyTotalKwh   Float
+
+  // Carbon results
+  co2GramsMonth       Float
+  co2KgMonth          Float
+  co2GramsHour        Float
+  gridIntensity       Float // gCO₂/kWh used
+  gridIntensitySource GridIntensitySource @default(CCF_DEFAULT)
+
+  // Breakdown percentages
+  computePercentage Float
+  memoryPercentage  Float
+  storagePercentage Float
+
+  // Rating
+  rating      CarbonRating
+  ratingColor String // hex color
+
+  // Context
+  realWorldEquivalent   String
+  recommendation        String
+  recommendedRegion     String?
+  potentialReductionPct Float?
+
+  // Metadata
+  source         CalculationSource @default(MOBILE_APP)
+  apiKeyId       String?
+  responseTimeMs Int
+  sdkVersion     String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([provider])
+  @@index([region])
+  @@index([rating])
+  @@index([source])
+  @@index([createdAt(sort: Desc)])
+}
+
+// ─── Sessions ───────────────────────────────────────────────
+
+model Session {
+  id             String     @id @default(cuid())
+  userId         String
+  user           MobileUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken   String     @unique
+  platform       String?
+  osVersion      String?
+  appVersion     String?
+  deviceModel    String?
+  ip             String?
+  isActive       Boolean    @default(true)
+  lastActivityAt DateTime   @default(now())
+  expiresAt      DateTime
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([refreshToken])
+}
+
+// ─── API Keys ───────────────────────────────────────────────
+
+model ApiKey {
+  id          String   @id @default(cuid())
+  name        String
+  prefix      String   @db.VarChar(12) // First 8 chars for identification
+  hashedKey   String   @unique
+  createdBy   String // Admin user ID (from web DB)
+  permissions String[] // ['calculate', 'compare', 'recommend', 'history']
+
+  // Rate limits
+  requestsPerMinute Int @default(60)
+  requestsPerDay    Int @default(10000)
+
+  // Usage tracking
+  totalRequests Int       @default(0)
+  lastUsedAt    DateTime?
+  todayRequests Int       @default(0)
+  todayResetAt  DateTime  @default(now())
+
+  // Status
+  status       ApiKeyStatus @default(ACTIVE)
+  revokedAt    DateTime?
+  revokedBy    String? // Admin user ID
+  revokeReason String?
+  expiresAt    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([hashedKey])
+  @@index([createdBy])
+  @@index([status])
+}
+
+// ─── Feature Flags ──────────────────────────────────────────
+
+model FeatureFlag {
+  id          String       @id @default(cuid())
+  key         String       @unique // e.g., 'config_builder_screen'
+  displayName String
+  description String       @default("")
+  category    FlagCategory
+  enabled     Boolean      @default(true)
+  value       Json? // Optional payload
+
+  // Metadata
+  lastToggledBy String? // Admin user ID
+  lastToggledAt DateTime @default(now())
+  toggleCount   Int      @default(0)
+  version       Int      @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+}
+
+// ─── Remote Config ──────────────────────────────────────────
+
+model RemoteConfig {
+  id            String          @id @default(cuid())
+  key           String          @unique
+  displayName   String
+  category      ConfigCategory
+  value         Json
+  valueType     ConfigValueType
+  description   String          @default("")
+  lastUpdatedBy String? // Admin user ID
+  version       Int             @default(1)
+
+  // History (stored as JSON array for simplicity)
+  history Json @default("[]") // Array of { value, updatedBy, updatedAt }
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+}
+
+// ─── Audit Logs ─────────────────────────────────────────────
+
+model AuditLog {
+  id         String  @id @default(cuid())
+  actorId    String // Admin user ID
+  actorEmail String
+  actorRole  String
+  action     String // e.g., 'feature_flag.toggle'
+  resource   String // e.g., 'feature_flags'
+  resourceId String?
+
+  // Change details
+  before   Json?
+  after    Json?
+  metadata Json?
+
+  ip        String
+  userAgent String
+
+  createdAt DateTime @default(now())
+
+  @@index([actorId, createdAt(sort: Desc)])
+  @@index([action, createdAt(sort: Desc)])
+  @@index([resource, resourceId])
+}
+
+// ─── Notifications ──────────────────────────────────────────
+
+model Notification {
+  id             String           @id @default(cuid())
+  title          String           @db.VarChar(100)
+  body           String           @db.VarChar(500)
+  data           Json?
+  type           NotificationType
+  targetAudience TargetAudience   @default(ALL)
+  targetUserIds  String[] // Mobile user IDs (for TARGETED)
+
+  // Lifecycle
+  status      NotificationStatus @default(DRAFT)
+  scheduledAt DateTime?
+  sentAt      DateTime?
+
+  // Stats
+  totalRecipients Int @default(0)
+  delivered       Int @default(0)
+  opened          Int @default(0)
+  failed          Int @default(0)
+
+  createdBy String // Admin user ID
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Push Tokens ────────────────────────────────────────────
+
+model PushToken {
+  id         String   @id @default(cuid())
+  userId     String
+  token      String   @unique // Expo push token
+  platform   String // 'ios' | 'android'
+  isActive   Boolean  @default(true)
+  lastUsedAt DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([token])
+}
+
+// ─── Reference Data: Regions (Seeded) ───────────────────────
+
+model Region {
+  id                        String        @id @default(cuid())
+  provider                  CloudProvider
+  code                      String // e.g., 'us-east-1'
+  name                      String // e.g., 'US East (N. Virginia)'
+  country                   String        @db.Char(2)
+  continent                 String
+  gridIntensity             Float // gCO₂/kWh
+  gridIntensitySource       String        @default("ccf_default")
+  renewablePercentage       Float?
+  pue                       Float         @default(1.2) // Power Usage Effectiveness
+  lat                       Float
+  lng                       Float
+  availableInstanceFamilies String[]
+  isPopular                 Boolean       @default(false)
+
+  @@unique([provider, code])
+  @@index([provider, isPopular(sort: Desc)])
+  @@index([gridIntensity])
+}
+
+// ─── Reference Data: Instance Types (Seeded) ────────────────
+
+model InstanceType {
+  id                String           @id @default(cuid())
+  provider          CloudProvider
+  name              String // e.g., 't3.medium'
+  displayName       String // e.g., 'T3 Medium'
+  family            String // e.g., 't3'
+  category          InstanceCategory
+  vCPUs             Int
+  memoryGB          Float
+  cpuTdpWatts       Float // Thermal Design Power
+  storageType       StorageType      @default(SSD)
+  onDemandHourlyUsd Float?
+  isPopular         Boolean          @default(false)
+
+  @@unique([provider, name])
+  @@index([provider, isPopular(sort: Desc)])
+}
+
+// ─── Reference Data: Providers (Seeded) ─────────────────────
+
+model Provider {
+  id            String        @id @default(cuid())
+  key           CloudProvider @unique
+  name          String // e.g., 'Amazon Web Services'
+  shortName     String // e.g., 'AWS'
+  logoUrl       String?
+  regionCount   Int           @default(0)
+  websiteUrl    String?
+  carbonPageUrl String? // Link to provider's sustainability page
+  isActive      Boolean       @default(true)
+
+  createdAt DateTime @default(now())
+}
+
+// ─── Agent System (Phase 6) ─────────────────────────────────
+
+enum AgentType {
+  COLLECTOR
+  ANALYST
+  CICD_GATE
+  REPORTER
+}
+
+enum AgentRunStatus {
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
+model AgentRun {
+  id          String         @id @default(cuid())
+  agentType   AgentType
+  status      AgentRunStatus @default(RUNNING)
+  triggeredBy String         @default("cron") // "cron" | "manual" | "webhook"
+
+  // Results
+  summary          String? // Human-readable one-liner
+  details          Json? // Full structured output
+  recordsProcessed Int     @default(0)
+  errorMessage     String?
+
+  // Timing
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  durationMs  Int?
+
+  createdAt DateTime @default(now())
+
+  @@index([agentType, createdAt(sort: Desc)])
+  @@index([status])
+}
+
+model EmissionRecord {
+  id         String  @id @default(cuid())
+  agentRunId String? // Links to the AgentRun that created this
+
+  // Instance identification
+  instanceId   String // e.g., "i-0abc123def" or mock ID
+  instanceType String // e.g., "t3.medium"
+  provider     CloudProvider
+  region       String // e.g., "ap-south-1"
+  instanceName String? // e.g., "api-server-prod"
+
+  // Utilization metrics
+  cpuUtilization    Float // 0.0 to 1.0
+  memoryUtilization Float? // 0.0 to 1.0
+  networkInGb       Float?
+  networkOutGb      Float?
+
+  // Carbon results
+  energyKwh     Float
+  gridIntensity Float // gCO₂/kWh at time of measurement
+  carbonKg      Float // Final carbon footprint
+
+  // Flags
+  isIdle         Boolean @default(false) // < 5% CPU
+  isOversized    Boolean @default(false) // < 20% CPU
+  recommendation String? // AI-generated suggestion
+
+  timestamp DateTime @default(now())
+
+  @@index([region, timestamp(sort: Desc)])
+  @@index([isIdle])
+  @@index([isOversized])
+  @@index([agentRunId])
+}

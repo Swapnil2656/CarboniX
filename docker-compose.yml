@@ -11,6 +11,10 @@ services:
       - NODE_ENV=production
       - PORT=4000
       - DATABASE_URL=${DATABASE_URL}
+      - EMISSIONS_API_KEY=${EMISSIONS_API_KEY}
+      - USE_STATIC_GRID_DATA=${USE_STATIC_GRID_DATA}
+    env_file:
+      - services/api/.env
 
   web:
     build:
@@ -24,6 +28,8 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - DATABASE_URL=${DATABASE_URL}
+    env_file:
+      - apps/web/.env
     depends_on:
       - api
 
