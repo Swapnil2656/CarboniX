@@ -1,16 +1,12 @@
-FROM node:20-alpine AS base
-
+FROM node:20-bookworm-slim AS base
+RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 FROM base AS builder
-RUN apk update
-RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 RUN npm install -g turbo
 COPY . .
 RUN turbo prune api --docker
 
 FROM base AS installer
-RUN apk update
-RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 COPY .gitignore .gitignore

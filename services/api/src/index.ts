@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 
 import carbonRoutes from './modules/carbon/carbon.routes';
 import referenceRoutes from './modules/reference/reference.routes';
+import authRoutes from './modules/auth/auth.routes';
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.get('/api/v1/health', (req, res) => {
 
 app.use('/api/v1/carbon', carbonRoutes);
 app.use('/api/v1/reference', referenceRoutes);
+app.use('/api/v1/auth', authRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

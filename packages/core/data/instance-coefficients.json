@@ -1,0 +1,11 @@
+[
+  { "provider": "AWS", "name": "t3.micro", "vcpu": 2, "memoryGb": 1, "cpuTdpWatts": 55 },
+  { "provider": "AWS", "name": "t3.medium", "vcpu": 2, "memoryGb": 4, "cpuTdpWatts": 55 },
+  { "provider": "AWS", "name": "t3.large", "vcpu": 2, "memoryGb": 8, "cpuTdpWatts": 55 },
+  { "provider": "AWS", "name": "m5.large", "vcpu": 2, "memoryGb": 8, "cpuTdpWatts": 130 },
+  { "provider": "AWS", "name": "m5.xlarge", "vcpu": 4, "memoryGb": 16, "cpuTdpWatts": 130 },
+  { "provider": "AWS", "name": "m5.2xlarge", "vcpu": 8, "memoryGb": 32, "cpuTdpWatts": 130 },
+  { "provider": "AWS", "name": "c5.xlarge", "vcpu": 4, "memoryGb": 8, "cpuTdpWatts": 130 },
+  { "provider": "GCP", "name": "e2-medium", "vcpu": 2, "memoryGb": 4, "cpuTdpWatts": 55 },
+  { "provider": "AZURE", "name": "Standard_B2s", "vcpu": 2, "memoryGb": 4, "cpuTdpWatts": 55 }
+]

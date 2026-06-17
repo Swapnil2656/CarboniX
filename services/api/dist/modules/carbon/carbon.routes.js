@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const carbon_controller_1 = require("./carbon.controller");
+const history_controller_1 = require("./history.controller");
+const auth_middleware_1 = require("../../middleware/auth.middleware");
+const router = (0, express_1.Router)();
+router.post('/calculate', auth_middleware_1.authenticate, carbon_controller_1.calculate);
+router.post('/compare', auth_middleware_1.authenticate, carbon_controller_1.compare);
+router.post('/recommend', auth_middleware_1.authenticate, carbon_controller_1.recommend);
+router.get('/history', auth_middleware_1.authenticate, history_controller_1.getHistory);
+exports.default = router;
