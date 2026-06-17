@@ -13,6 +13,10 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - EMISSIONS_API_KEY=${EMISSIONS_API_KEY}
       - USE_STATIC_GRID_DATA=${USE_STATIC_GRID_DATA}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - USE_MOCK_AGENTS=${USE_MOCK_AGENTS}
+      - CARBON_BUDGET_KG_DAY=${CARBON_BUDGET_KG_DAY}
     env_file:
       - services/api/.env
 
@@ -33,5 +37,3 @@ services:
     depends_on:
       - api
 
-volumes:
-  postgres_data:

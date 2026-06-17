@@ -104,7 +104,7 @@ cron.schedule('0 * * * *', async () => {
         details: {
           recommendations: analystResult.recommendations,
           totalSavingsKg: analystResult.totalSavingsKg,
-        },
+        } as any,
         recordsProcessed: collectorResult.records.length,
         completedAt: new Date(),
         durationMs: Date.now() - startTime,
