@@ -46,7 +46,6 @@ export default function SignupScreen() {
     // Simulate signup
     setTimeout(() => {
       setAuth({ id: '2', email, name, type: 'user' }, 'mock-token');
-      setIsLoading(false);
       router.replace('/(tabs)/config');
     }, 1500);
   };

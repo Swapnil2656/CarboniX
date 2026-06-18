@@ -34,10 +34,11 @@ export default function AnimatedSplashScreen() {
 
   useEffect(() => {
     // 1. Load auth token in the background, then mark as loaded
+    let isMounted = true;
     loadToken().then(() => {
-      setTokenLoaded(true);
+      if (isMounted) setTokenLoaded(true);
     }).catch(() => {
-      setTokenLoaded(true); // Still mark loaded on error so we proceed to login
+      if (isMounted) setTokenLoaded(true); // Still mark loaded on error so we proceed to login
     });
 
     // 2. Animate the progress bar width
@@ -80,7 +81,10 @@ export default function AnimatedSplashScreen() {
       setPercent(currentPercent);
     }, 100);
 
-    return () => clearInterval(interval);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   const progressWidth = progressAnim.interpolate({

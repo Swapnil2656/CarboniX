@@ -31,7 +31,6 @@ export default function LoginScreen() {
     // Simulate login
     setTimeout(() => {
       setAuth({ id: '1', email, name: email.split('@')[0], type: 'user' }, 'mock-token');
-      setIsLoading(false);
       // Navigate to main app
       router.replace('/(tabs)/config');
     }, 1500);
