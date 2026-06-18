@@ -3,19 +3,19 @@ import { apiClient } from './client';
 // Carbon API Endpoints
 export const carbonApi = {
   calculate: async (payload: Record<string, unknown>) => {
-    const response = await apiClient.post('/calculate', payload);
+    const response = await apiClient.post('/carbon/calculate', payload);
     return response.data;
   },
   compare: async (payload: Record<string, unknown>) => {
-    const response = await apiClient.post('/compare', payload);
+    const response = await apiClient.post('/carbon/compare', payload);
     return response.data;
   },
   recommend: async (payload: Record<string, unknown>) => {
-    const response = await apiClient.post('/recommend', payload);
+    const response = await apiClient.post('/carbon/recommend', payload);
     return response.data;
   },
   getHistory: async () => {
-    const response = await apiClient.get('/history');
+    const response = await apiClient.get('/carbon/history');
     return response.data;
   }
 };
@@ -35,11 +35,11 @@ export const authApi = {
 // Reference Data Endpoints
 export const referenceApi = {
   getRegions: async () => {
-    const response = await apiClient.get('/regions');
+    const response = await apiClient.get('/reference/regions');
     return response.data;
   },
   getInstances: async () => {
-    const response = await apiClient.get('/instances');
+    const response = await apiClient.get('/reference/instances');
     return response.data;
   }
 };

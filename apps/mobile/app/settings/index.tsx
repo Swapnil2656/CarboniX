@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 export default function SettingsScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>⚡ Settings</Text>
+      <Text style={styles.title}>Settings</Text>
       <Text style={styles.subtitle}>Manage your Carbonix preferences</Text>
     </View>
   );

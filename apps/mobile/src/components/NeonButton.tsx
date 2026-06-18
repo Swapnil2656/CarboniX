@@ -9,9 +9,10 @@ interface NeonButtonProps extends TouchableOpacityProps {
   loading?: boolean;
   buttonStyle?: ViewStyle;
   textStyle?: TextStyle;
+  iconColor?: string;
 }
 
-export const NeonButton: React.FC<NeonButtonProps> = ({ title, icon, loading, buttonStyle, textStyle, ...rest }) => {
+export const NeonButton: React.FC<NeonButtonProps> = ({ title, icon, loading, buttonStyle, textStyle, iconColor, ...rest }) => {
   return (
     <TouchableOpacity 
       style={[styles.button, buttonStyle, rest.disabled && styles.disabled]} 
@@ -22,7 +23,7 @@ export const NeonButton: React.FC<NeonButtonProps> = ({ title, icon, loading, bu
         <ActivityIndicator color={colors.onPrimary} />
       ) : (
         <>
-          {icon && <MaterialIcons name={icon} size={20} color={colors.onPrimary} style={styles.icon} />}
+          {icon && <MaterialIcons name={icon} size={20} color={iconColor || colors.onPrimary} style={styles.icon} />}
           <Text style={[styles.text, textStyle]}>{title}</Text>
         </>
       )}

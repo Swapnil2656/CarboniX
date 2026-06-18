@@ -1,89 +1,158 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors } from '../../src/theme/colors';
-import { NeonButton } from '../../src/components/NeonButton';
 
-export default function ResultsScreen() {
-  const { id, data } = useLocalSearchParams<{ id: string; data: string }>();
+export default function CalculationResultsScreen() {
   const router = useRouter();
-
-  let resultData: any = {};
+  const params = useLocalSearchParams();
+  
+  // Parse data (stubbed or using real data if available)
+  let data: any = {};
   try {
-    if (data) resultData = JSON.parse(data);
-  } catch (e) {}
-
-  const rating = resultData.rating || 'LOW';
-  const getRatingColor = () => {
-    switch (rating) {
-      case 'LOW': return colors.success;
-      case 'MEDIUM': return colors.warning;
-      case 'HIGH':
-      case 'CRITICAL': return colors.error;
-      default: return colors.success;
+    if (params.data) {
+      data = JSON.parse(params.data as string);
     }
-  };
+  } catch (e) {
+    console.error(e);
+  }
 
-  const ratingColor = getRatingColor();
+  // Assuming data structure or default to match HTML
+  const emissionLevel = data.co2KgMonth ? data.co2KgMonth.toFixed(1) : '33.8';
+  const provider = data.provider?.toUpperCase() || 'AWS';
+  const instanceType = data.instanceType || 'c5.2xlarge';
+  const region = data.region || 'us-east-1';
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <MaterialIcons name="arrow-back" size={24} color={colors.textHeader} />
+    <View style={styles.container}>
+      <Stack.Screen options={{ headerShown: false }} />
+      
+      {/* TopAppBar */}
+      <View style={styles.topBar}>
+        <View style={styles.topBarLeft}>
+          <Image source={require('../../assets/carbonix-logo.png')} style={styles.logoImage} />
+          <Text style={styles.logo}>CarboniX</Text>
+        </View>
+        <View style={styles.topBarRight}>
+          <TouchableOpacity style={styles.iconBtn}>
+            <MaterialIcons name="notifications" size={24} color={colors.textMuted} />
+            <View style={styles.notificationDot} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.main} showsVerticalScrollIndicator={false}>
+        
+        {/* Task-Specific Sub-Nav Header */}
+        <View style={styles.subNav}>
+          <TouchableOpacity style={styles.subNavLeft} onPress={() => router.back()}>
+            <MaterialIcons name="arrow-back" size={24} color={colors.textHeader} />
+            <Text style={styles.subNavTitle}>Results</Text>
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <MaterialIcons name="ios-share" size={24} color={colors.textMuted} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Config Summary Chips */}
+        <View style={styles.chipsRow}>
+          <View style={styles.chip}>
+            <Text style={styles.chipText}>{provider}</Text>
+          </View>
+          <View style={styles.chip}>
+            <Text style={styles.chipText}>{instanceType}</Text>
+          </View>
+          <View style={styles.chip}>
+            <Text style={styles.chipText}>{region}</Text>
+          </View>
+        </View>
+
+        {/* Hero CO2 Card (High Rating Coral Tint) */}
+        <View style={[styles.card, styles.heroCard]}>
+          <View style={styles.heroWarningBg}>
+            <MaterialIcons name="warning" size={100} color="rgba(255, 180, 171, 0.1)" />
+          </View>
+          <Text style={styles.criticalLabel}>CRITICAL EMISSION LEVEL</Text>
+          <View style={styles.emissionValueRow}>
+            <Text style={styles.emissionValue}>{emissionLevel}</Text>
+            <Text style={styles.emissionUnit}>kg CO₂e</Text>
+          </View>
+          
+          <View style={styles.realWorldStrip}>
+            <MaterialIcons name="directions-car" size={16} color={colors.textMuted} />
+            <Text style={styles.realWorldText}>≈ driving 145 km in a gas-powered vehicle</Text>
+          </View>
+        </View>
+
+        {/* Energy Breakdown Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Energy Breakdown</Text>
+          
+          {/* Stacked Bar Chart */}
+          <View style={styles.stackedBarContainer}>
+            <View style={[styles.barSegment, { width: '60%', backgroundColor: colors.primaryContainer }]} />
+            <View style={[styles.barSegment, { width: '30%', backgroundColor: '#83251b' }]} />
+            <View style={[styles.barSegment, { width: '10%', backgroundColor: colors.surfaceContainerHighest }]} />
+          </View>
+
+          {/* Legend */}
+          <View style={styles.legendRow}>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: colors.primaryContainer }]} />
+              <Text style={styles.legendText}>Compute</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: '#83251b' }]} />
+              <Text style={styles.legendText}>Memory</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: colors.surfaceContainerHighest }]} />
+              <Text style={styles.legendText}>Storage</Text>
+            </View>
+          </View>
+
+          {/* 3-Column Stats Grid */}
+          <View style={styles.statsGrid}>
+            <View style={styles.statBox}>
+              <Text style={styles.statLabel}>Grid Int.</Text>
+              <Text style={styles.statValue}>420 g/kWh</Text>
+            </View>
+            <View style={styles.statBox}>
+              <Text style={styles.statLabel}>PUE</Text>
+              <Text style={styles.statValue}>1.15</Text>
+            </View>
+            <View style={styles.statBox}>
+              <Text style={styles.statLabel}>Total E</Text>
+              <Text style={styles.statValue}>80 kWh</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Recommendation Card */}
+        <View style={[styles.card, styles.recommendationCard]}>
+          <View style={styles.recIconWrap}>
+            <MaterialIcons name="lightbulb" size={24} color={colors.primaryContainer} />
+          </View>
+          <View style={styles.recContent}>
+            <Text style={styles.recTitle}>Optimization Available</Text>
+            <Text style={styles.recDesc}>
+              Switch region to <Text style={styles.recHighlight}>eu-north-1</Text> to instantly reduce carbon footprint.
+            </Text>
+            <View style={styles.recBadge}>
+              <Text style={styles.recBadgeText}>↓ Reduce emissions by 98%</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Ghost Button: Recalculate */}
+        <TouchableOpacity style={styles.ghostBtn} onPress={() => router.back()}>
+          <MaterialIcons name="undo" size={20} color={colors.primaryContainer} />
+          <Text style={styles.ghostBtnText}>Recalculate</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Calculation Results</Text>
-        <View style={{ width: 24 }} />
-      </View>
 
-      <View style={[styles.resultCard, { borderColor: ratingColor }]}>
-        <View style={[styles.ratingBadge, { backgroundColor: `${ratingColor}33`, borderColor: ratingColor }]}>
-          <Text style={[styles.ratingText, { color: ratingColor }]}>● {rating}</Text>
-        </View>
-
-        <Text style={[styles.mainNumber, { color: ratingColor }]}>
-          {resultData.co2KgMonth?.toFixed(2) || '0.00'}
-        </Text>
-        <Text style={styles.unitText}>kg CO₂ / month</Text>
-
-        <View style={styles.divider} />
-
-        <View style={styles.detailsRow}>
-          <View>
-            <Text style={styles.detailLabel}>GRAMS / HOUR</Text>
-            <Text style={styles.detailValue}>{resultData.co2GramsHour?.toFixed(1) || '0.0'} g</Text>
-          </View>
-          <View>
-            <Text style={styles.detailLabel}>ENERGY</Text>
-            <Text style={styles.detailValue}>{resultData.totalEnergyKwh?.toFixed(1) || '0.0'} kWh</Text>
-          </View>
-        </View>
-      </View>
-
-      <View style={styles.equivalentCard}>
-        <MaterialIcons name="directions-car" size={24} color={colors.textMuted} />
-        <Text style={styles.equivalentText}>{resultData.equivalentString || '≈ driving 0 km'}</Text>
-      </View>
-
-      {resultData.recommendation && (
-        <View style={styles.recommendationCard}>
-          <View style={styles.recHeader}>
-            <MaterialIcons name="lightbulb" size={20} color={colors.warning} />
-            <Text style={styles.recTitle}>Optimization Found</Text>
-          </View>
-          <Text style={styles.recText}>{resultData.recommendation}</Text>
-          <Text style={styles.recSubtext}>Potential saving: {resultData.reductionPercent}%</Text>
-        </View>
-      )}
-
-      <NeonButton 
-        title="Compare Providers" 
-        icon="compare-arrows"
-        onPress={() => router.push('/(tabs)/compare')} 
-        buttonStyle={styles.actionBtn}
-      />
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -92,127 +161,300 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  content: {
-    padding: 20,
-    paddingTop: 60,
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    height: 56,
+    backgroundColor: colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.outlineVariant,
+    paddingTop: 8, // Safety for status bar
+  },
+  topBarLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 0,
+    marginLeft: -15,
+  },
+  iconBtn: {
+    padding: 8,
+  },
+  logoImage: {
+    width: 50,
+    height: 60,
+    resizeMode: 'contain',
+  },
+  logo: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 20,
+    fontWeight: '900',
+    color: colors.primary,
+    letterSpacing: -0.5,
+    marginLeft: -6,
+  },
+  topBarRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  notificationDot: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 8,
+    height: 8,
+    borderRadius: 12,
+    backgroundColor: colors.secondary,
+  },
+  main: {
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+    gap: 16,
     paddingBottom: 40,
   },
-  header: {
+  subNav: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 32,
-  },
-  backBtn: {
-    padding: 8,
-    marginLeft: -8,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.textHeader,
-  },
-  resultCard: {
-    backgroundColor: colors.surfaceElevated,
-    borderRadius: 16,
-    padding: 24,
-    borderWidth: 1,
-    borderLeftWidth: 6,
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  ratingBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    borderWidth: 1,
-    marginBottom: 24,
-  },
-  ratingText: {
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 1,
-  },
-  mainNumber: {
-    fontSize: 56,
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  unitText: {
-    fontSize: 16,
-    color: colors.textMuted,
-  },
-  divider: {
-    height: 1,
-    width: '100%',
-    backgroundColor: colors.borderSubtle,
-    marginVertical: 24,
-  },
-  detailsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    paddingHorizontal: 16,
-  },
-  detailLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: colors.textMuted,
-    marginBottom: 4,
-    letterSpacing: 1,
-  },
-  detailValue: {
-    fontSize: 16,
-    color: colors.textHeader,
-  },
-  equivalentCard: {
-    backgroundColor: colors.surfaceContainerLowest,
-    borderColor: colors.borderSubtle,
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  equivalentText: {
-    color: colors.textBody,
-    fontSize: 15,
-    marginLeft: 12,
-    flex: 1,
-  },
-  recommendationCard: {
-    backgroundColor: 'rgba(255, 184, 108, 0.1)',
-    borderColor: colors.warning,
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 32,
-  },
-  recHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderSubtle,
     marginBottom: 8,
   },
-  recTitle: {
-    color: colors.warning,
-    fontWeight: '600',
-    fontSize: 14,
-    marginLeft: 8,
+  subNavLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
-  recText: {
+  subNavTitle: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 20,
+    fontWeight: '700',
     color: colors.textHeader,
-    fontSize: 15,
-    lineHeight: 22,
+  },
+  chipsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
     marginBottom: 4,
   },
-  recSubtext: {
-    color: colors.warning,
-    fontSize: 13,
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+    backgroundColor: colors.surfaceContainerHigh,
   },
-  actionBtn: {
-    marginTop: 'auto',
+  chipText: {
+    fontFamily: 'JetBrains Mono',
+    fontSize: 12,
+    color: colors.textMuted,
+  },
+  card: {
+    backgroundColor: colors.surfaceContainer,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+    padding: 16,
+    gap: 16,
+      borderRadius: 12,
+  },
+  heroCard: {
+    borderLeftWidth: 4,
+    borderLeftColor: colors.error,
+    overflow: 'hidden',
+  },
+  heroWarningBg: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+  },
+  criticalLabel: {
+    fontFamily: 'JetBrainsMono-Medium',
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.error,
+    letterSpacing: 1.1,
+  },
+  emissionValueRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 8,
+  },
+  emissionValue: {
+    fontFamily: 'JetBrainsMono-Bold',
+    fontSize: 48,
+    fontWeight: '700',
+    color: colors.error,
+  },
+  emissionUnit: {
+    fontFamily: 'JetBrains Mono',
+    fontSize: 14,
+    color: colors.error,
+  },
+  realWorldStrip: {
+    marginTop: 8,
+    backgroundColor: colors.surfaceContainerHighest,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+      borderRadius: 12,
+  },
+  realWorldText: {
+    fontFamily: 'JetBrains Mono',
+    fontSize: 12,
+    color: colors.textMuted,
+  },
+  cardTitle: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.textHeader,
+  },
+  stackedBarContainer: {
+    width: '100%',
+    height: 12,
+    backgroundColor: colors.surfaceContainerHighest,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+    flexDirection: 'row',
+    overflow: 'hidden',
+      borderRadius: 12,
+  },
+  barSegment: {
+    height: '100%',
+  },
+  legendRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderSubtle,
+    paddingBottom: 16,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  legendDot: {
+    width: 8,
+    height: 8,
+  },
+  legendText: {
+    fontFamily: 'JetBrains Mono',
+    fontSize: 12,
+    color: colors.textMuted,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  statBox: {
+    flex: 1,
+    backgroundColor: colors.surfaceContainerHigh,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+    padding: 8,
+    flexDirection: 'col',
+      borderRadius: 12,
+  },
+  statLabel: {
+    fontFamily: 'JetBrains Mono',
+    fontSize: 12,
+    color: colors.textMuted,
+    marginBottom: 8,
+  },
+  statValue: {
+    fontFamily: 'JetBrainsMono-Medium',
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.textHeader,
+  },
+  recommendationCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: colors.surface,
+    borderColor: colors.primaryContainer,
+    shadowColor: colors.primaryContainer,
+    shadowOpacity: 0.05,
+    shadowRadius: 15,
+    elevation: 2,
+    gap: 16,
+      borderRadius: 12,
+  },
+  recIconWrap: {
+    backgroundColor: 'rgba(245, 197, 24, 0.1)',
+    padding: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(245, 197, 24, 0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+      borderRadius: 12,
+  },
+  recContent: {
+    flex: 1,
+    gap: 8,
+  },
+  recTitle: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.primaryContainer,
+  },
+  recDesc: {
+    fontFamily: 'Inter',
+    fontSize: 14,
+    color: colors.textMuted,
+  },
+  recHighlight: {
+    fontFamily: 'JetBrains Mono',
+    fontSize: 12,
+    color: colors.textHeader,
+    backgroundColor: colors.surfaceContainerHigh,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+      borderRadius: 12,
+  },
+  recBadge: {
+    marginTop: 8,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(49, 227, 104, 0.1)',
+    borderWidth: 1,
+    borderColor: '#31e368',
+      borderRadius: 12,
+  },
+  recBadgeText: {
+    fontFamily: 'JetBrains Mono',
+    fontSize: 12,
+    color: '#31e368',
+  },
+  ghostBtn: {
+    marginTop: 16,
+    width: '100%',
+    paddingVertical: 16,
+    borderWidth: 1,
+    borderColor: colors.primaryContainer,
+    backgroundColor: 'transparent',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+      borderRadius: 12,
+  },
+  ghostBtnText: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.primaryContainer,
   }
 });
