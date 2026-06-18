@@ -342,6 +342,42 @@ exports.Prisma.ProviderScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.AgentRunScalarFieldEnum = {
+  id: 'id',
+  agentType: 'agentType',
+  status: 'status',
+  triggeredBy: 'triggeredBy',
+  summary: 'summary',
+  details: 'details',
+  recordsProcessed: 'recordsProcessed',
+  errorMessage: 'errorMessage',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  durationMs: 'durationMs',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.EmissionRecordScalarFieldEnum = {
+  id: 'id',
+  agentRunId: 'agentRunId',
+  instanceId: 'instanceId',
+  instanceType: 'instanceType',
+  provider: 'provider',
+  region: 'region',
+  instanceName: 'instanceName',
+  cpuUtilization: 'cpuUtilization',
+  memoryUtilization: 'memoryUtilization',
+  networkInGb: 'networkInGb',
+  networkOutGb: 'networkOutGb',
+  energyKwh: 'energyKwh',
+  gridIntensity: 'gridIntensity',
+  carbonKg: 'carbonKg',
+  isIdle: 'isIdle',
+  isOversized: 'isOversized',
+  recommendation: 'recommendation',
+  timestamp: 'timestamp'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -464,6 +500,19 @@ exports.StorageType = exports.$Enums.StorageType = {
   NVME: 'NVME'
 };
 
+exports.AgentType = exports.$Enums.AgentType = {
+  COLLECTOR: 'COLLECTOR',
+  ANALYST: 'ANALYST',
+  CICD_GATE: 'CICD_GATE',
+  REPORTER: 'REPORTER'
+};
+
+exports.AgentRunStatus = exports.$Enums.AgentRunStatus = {
+  RUNNING: 'RUNNING',
+  SUCCESS: 'SUCCESS',
+  FAILED: 'FAILED'
+};
+
 exports.Prisma.ModelName = {
   MobileUser: 'MobileUser',
   Calculation: 'Calculation',
@@ -476,7 +525,9 @@ exports.Prisma.ModelName = {
   PushToken: 'PushToken',
   Region: 'Region',
   InstanceType: 'InstanceType',
-  Provider: 'Provider'
+  Provider: 'Provider',
+  AgentRun: 'AgentRun',
+  EmissionRecord: 'EmissionRecord'
 };
 
 /**

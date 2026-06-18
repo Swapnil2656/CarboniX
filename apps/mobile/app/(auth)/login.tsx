@@ -273,4 +273,36 @@ const styles = StyleSheet.create({
     color: 'rgba(209, 197, 172, 0.6)',
     letterSpacing: 1,
   },
+  form: {
+    width: '100%',
+    maxWidth: 400,
+  },
+  input: {
+    backgroundColor: '#1C2333',
+    color: '#FFFFFF',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#2A3441',
+  },
+  button: {
+    backgroundColor: '#BD93F9',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  buttonText: {
+    color: '#0A0F1C',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  linkButton: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  linkText: {
+    color: '#8BE9FD',
+  }
 });

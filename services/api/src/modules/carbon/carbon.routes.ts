@@ -1,15 +1,17 @@
 import { Router } from 'express';
-import { calculate, compare, recommend } from './carbon.controller';
+import { calculate, compare, recommend, calculateEmissions } from './carbon.controller';
+import { getHistory } from './history.controller';
+import { authenticate } from '../../middleware/auth.middleware';
 
 const router = Router();
 
-router.post('/calculate', calculate);
-router.post('/compare', compare);
-router.post('/recommend', recommend);
+router.post('/calculate', authenticate, calculate);
+router.post('/compare', authenticate, compare);
+router.post('/recommend', authenticate, recommend);
 
-// Placeholder for history
-router.get('/history', (req, res) => {
-  res.json({ success: true, data: [] });
-});
+// New endpoint for direct emissions calculation
+router.post('/calculate-emissions', calculateEmissions);
+
+router.get('/history', authenticate, getHistory);
 
 export default router;

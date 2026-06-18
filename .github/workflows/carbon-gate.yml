@@ -1,0 +1,74 @@
+# .github/workflows/carbon-gate.yml
+# CarboniX Carbon Gate — Automated PR Carbon Impact Analysis
+#
+# Triggers on PRs that modify infrastructure files (Terraform, Docker, k8s)
+# and posts a carbon impact report as a PR comment.
+
+name: Carbonix Carbon Gate
+
+on:
+  pull_request:
+    paths:
+      - '**/*.tf'
+      - '**/Dockerfile'
+      - '**/docker-compose.yml'
+      - '**/k8s/**'
+      - '**/*.yaml'
+      - '**/*.yml'
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  carbon-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Get infrastructure diff
+        run: |
+          git diff origin/${{ github.base_ref }}...HEAD \
+            -- '*.tf' 'Dockerfile' 'docker-compose.yml' '*.yaml' '*.yml' > infra.diff || true
+          echo "Diff size: $(wc -c < infra.diff) bytes"
+
+      - name: Run Carbonix Carbon Gate
+        id: gate
+        run: |
+          # Call the CarboniX API gate endpoint
+          RESPONSE=$(curl -s -X POST \
+            "${CARBONIX_API_URL:-http://localhost:4000}/api/v1/agents/gate" \
+            -H "Content-Type: application/json" \
+            -d "{\"diff\": $(cat infra.diff | jq -Rs .), \"budget\": ${CARBON_BUDGET_KG_DAY:-10}}")
+
+          echo "$RESPONSE" > result.json
+          echo "passed=$(echo $RESPONSE | jq -r '.data.passed')" >> $GITHUB_OUTPUT
+          echo "comment<<EOF" >> $GITHUB_OUTPUT
+          echo "$(echo $RESPONSE | jq -r '.data.comment')" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Post PR comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comment = `${{ steps.gate.outputs.comment }}`;
+            if (comment && comment !== 'null') {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
+
+      - name: Block if over carbon budget
+        if: steps.gate.outputs.passed == 'false'
+        run: |
+          echo "🚫 Carbon budget exceeded! Deployment blocked."
+          exit 1

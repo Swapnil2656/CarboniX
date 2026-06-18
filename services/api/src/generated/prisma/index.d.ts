@@ -73,6 +73,16 @@ export type InstanceType = $Result.DefaultSelection<Prisma.$InstanceTypePayload>
  * 
  */
 export type Provider = $Result.DefaultSelection<Prisma.$ProviderPayload>
+/**
+ * Model AgentRun
+ * 
+ */
+export type AgentRun = $Result.DefaultSelection<Prisma.$AgentRunPayload>
+/**
+ * Model EmissionRecord
+ * 
+ */
+export type EmissionRecord = $Result.DefaultSelection<Prisma.$EmissionRecordPayload>
 
 /**
  * Enums
@@ -212,6 +222,25 @@ export const StorageType: {
 
 export type StorageType = (typeof StorageType)[keyof typeof StorageType]
 
+
+export const AgentType: {
+  COLLECTOR: 'COLLECTOR',
+  ANALYST: 'ANALYST',
+  CICD_GATE: 'CICD_GATE',
+  REPORTER: 'REPORTER'
+};
+
+export type AgentType = (typeof AgentType)[keyof typeof AgentType]
+
+
+export const AgentRunStatus: {
+  RUNNING: 'RUNNING',
+  SUCCESS: 'SUCCESS',
+  FAILED: 'FAILED'
+};
+
+export type AgentRunStatus = (typeof AgentRunStatus)[keyof typeof AgentRunStatus]
+
 }
 
 export type CloudProvider = $Enums.CloudProvider
@@ -269,6 +298,14 @@ export const InstanceCategory: typeof $Enums.InstanceCategory
 export type StorageType = $Enums.StorageType
 
 export const StorageType: typeof $Enums.StorageType
+
+export type AgentType = $Enums.AgentType
+
+export const AgentType: typeof $Enums.AgentType
+
+export type AgentRunStatus = $Enums.AgentRunStatus
+
+export const AgentRunStatus: typeof $Enums.AgentRunStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -512,6 +549,26 @@ export class PrismaClient<
     * ```
     */
   get provider(): Prisma.ProviderDelegate<ExtArgs>;
+
+  /**
+   * `prisma.agentRun`: Exposes CRUD operations for the **AgentRun** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AgentRuns
+    * const agentRuns = await prisma.agentRun.findMany()
+    * ```
+    */
+  get agentRun(): Prisma.AgentRunDelegate<ExtArgs>;
+
+  /**
+   * `prisma.emissionRecord`: Exposes CRUD operations for the **EmissionRecord** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EmissionRecords
+    * const emissionRecords = await prisma.emissionRecord.findMany()
+    * ```
+    */
+  get emissionRecord(): Prisma.EmissionRecordDelegate<ExtArgs>;
 }
 
 export namespace Prisma {
@@ -964,7 +1021,9 @@ export namespace Prisma {
     PushToken: 'PushToken',
     Region: 'Region',
     InstanceType: 'InstanceType',
-    Provider: 'Provider'
+    Provider: 'Provider',
+    AgentRun: 'AgentRun',
+    EmissionRecord: 'EmissionRecord'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -980,7 +1039,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "mobileUser" | "calculation" | "session" | "apiKey" | "featureFlag" | "remoteConfig" | "auditLog" | "notification" | "pushToken" | "region" | "instanceType" | "provider"
+      modelProps: "mobileUser" | "calculation" | "session" | "apiKey" | "featureFlag" | "remoteConfig" | "auditLog" | "notification" | "pushToken" | "region" | "instanceType" | "provider" | "agentRun" | "emissionRecord"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1821,6 +1880,146 @@ export namespace Prisma {
           count: {
             args: Prisma.ProviderCountArgs<ExtArgs>
             result: $Utils.Optional<ProviderCountAggregateOutputType> | number
+          }
+        }
+      }
+      AgentRun: {
+        payload: Prisma.$AgentRunPayload<ExtArgs>
+        fields: Prisma.AgentRunFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AgentRunFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentRunPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AgentRunFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentRunPayload>
+          }
+          findFirst: {
+            args: Prisma.AgentRunFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentRunPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AgentRunFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentRunPayload>
+          }
+          findMany: {
+            args: Prisma.AgentRunFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentRunPayload>[]
+          }
+          create: {
+            args: Prisma.AgentRunCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentRunPayload>
+          }
+          createMany: {
+            args: Prisma.AgentRunCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AgentRunCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentRunPayload>[]
+          }
+          delete: {
+            args: Prisma.AgentRunDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentRunPayload>
+          }
+          update: {
+            args: Prisma.AgentRunUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentRunPayload>
+          }
+          deleteMany: {
+            args: Prisma.AgentRunDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AgentRunUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.AgentRunUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentRunPayload>
+          }
+          aggregate: {
+            args: Prisma.AgentRunAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAgentRun>
+          }
+          groupBy: {
+            args: Prisma.AgentRunGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AgentRunGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AgentRunCountArgs<ExtArgs>
+            result: $Utils.Optional<AgentRunCountAggregateOutputType> | number
+          }
+        }
+      }
+      EmissionRecord: {
+        payload: Prisma.$EmissionRecordPayload<ExtArgs>
+        fields: Prisma.EmissionRecordFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EmissionRecordFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmissionRecordPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EmissionRecordFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmissionRecordPayload>
+          }
+          findFirst: {
+            args: Prisma.EmissionRecordFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmissionRecordPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EmissionRecordFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmissionRecordPayload>
+          }
+          findMany: {
+            args: Prisma.EmissionRecordFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmissionRecordPayload>[]
+          }
+          create: {
+            args: Prisma.EmissionRecordCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmissionRecordPayload>
+          }
+          createMany: {
+            args: Prisma.EmissionRecordCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.EmissionRecordCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmissionRecordPayload>[]
+          }
+          delete: {
+            args: Prisma.EmissionRecordDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmissionRecordPayload>
+          }
+          update: {
+            args: Prisma.EmissionRecordUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmissionRecordPayload>
+          }
+          deleteMany: {
+            args: Prisma.EmissionRecordDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EmissionRecordUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.EmissionRecordUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmissionRecordPayload>
+          }
+          aggregate: {
+            args: Prisma.EmissionRecordAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEmissionRecord>
+          }
+          groupBy: {
+            args: Prisma.EmissionRecordGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EmissionRecordGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EmissionRecordCountArgs<ExtArgs>
+            result: $Utils.Optional<EmissionRecordCountAggregateOutputType> | number
           }
         }
       }
@@ -14651,6 +14850,2094 @@ export namespace Prisma {
 
 
   /**
+   * Model AgentRun
+   */
+
+  export type AggregateAgentRun = {
+    _count: AgentRunCountAggregateOutputType | null
+    _avg: AgentRunAvgAggregateOutputType | null
+    _sum: AgentRunSumAggregateOutputType | null
+    _min: AgentRunMinAggregateOutputType | null
+    _max: AgentRunMaxAggregateOutputType | null
+  }
+
+  export type AgentRunAvgAggregateOutputType = {
+    recordsProcessed: number | null
+    durationMs: number | null
+  }
+
+  export type AgentRunSumAggregateOutputType = {
+    recordsProcessed: number | null
+    durationMs: number | null
+  }
+
+  export type AgentRunMinAggregateOutputType = {
+    id: string | null
+    agentType: $Enums.AgentType | null
+    status: $Enums.AgentRunStatus | null
+    triggeredBy: string | null
+    summary: string | null
+    recordsProcessed: number | null
+    errorMessage: string | null
+    startedAt: Date | null
+    completedAt: Date | null
+    durationMs: number | null
+    createdAt: Date | null
+  }
+
+  export type AgentRunMaxAggregateOutputType = {
+    id: string | null
+    agentType: $Enums.AgentType | null
+    status: $Enums.AgentRunStatus | null
+    triggeredBy: string | null
+    summary: string | null
+    recordsProcessed: number | null
+    errorMessage: string | null
+    startedAt: Date | null
+    completedAt: Date | null
+    durationMs: number | null
+    createdAt: Date | null
+  }
+
+  export type AgentRunCountAggregateOutputType = {
+    id: number
+    agentType: number
+    status: number
+    triggeredBy: number
+    summary: number
+    details: number
+    recordsProcessed: number
+    errorMessage: number
+    startedAt: number
+    completedAt: number
+    durationMs: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type AgentRunAvgAggregateInputType = {
+    recordsProcessed?: true
+    durationMs?: true
+  }
+
+  export type AgentRunSumAggregateInputType = {
+    recordsProcessed?: true
+    durationMs?: true
+  }
+
+  export type AgentRunMinAggregateInputType = {
+    id?: true
+    agentType?: true
+    status?: true
+    triggeredBy?: true
+    summary?: true
+    recordsProcessed?: true
+    errorMessage?: true
+    startedAt?: true
+    completedAt?: true
+    durationMs?: true
+    createdAt?: true
+  }
+
+  export type AgentRunMaxAggregateInputType = {
+    id?: true
+    agentType?: true
+    status?: true
+    triggeredBy?: true
+    summary?: true
+    recordsProcessed?: true
+    errorMessage?: true
+    startedAt?: true
+    completedAt?: true
+    durationMs?: true
+    createdAt?: true
+  }
+
+  export type AgentRunCountAggregateInputType = {
+    id?: true
+    agentType?: true
+    status?: true
+    triggeredBy?: true
+    summary?: true
+    details?: true
+    recordsProcessed?: true
+    errorMessage?: true
+    startedAt?: true
+    completedAt?: true
+    durationMs?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type AgentRunAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AgentRun to aggregate.
+     */
+    where?: AgentRunWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AgentRuns to fetch.
+     */
+    orderBy?: AgentRunOrderByWithRelationInput | AgentRunOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AgentRunWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AgentRuns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AgentRuns.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AgentRuns
+    **/
+    _count?: true | AgentRunCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: AgentRunAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: AgentRunSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AgentRunMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AgentRunMaxAggregateInputType
+  }
+
+  export type GetAgentRunAggregateType<T extends AgentRunAggregateArgs> = {
+        [P in keyof T & keyof AggregateAgentRun]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAgentRun[P]>
+      : GetScalarType<T[P], AggregateAgentRun[P]>
+  }
+
+
+
+
+  export type AgentRunGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AgentRunWhereInput
+    orderBy?: AgentRunOrderByWithAggregationInput | AgentRunOrderByWithAggregationInput[]
+    by: AgentRunScalarFieldEnum[] | AgentRunScalarFieldEnum
+    having?: AgentRunScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AgentRunCountAggregateInputType | true
+    _avg?: AgentRunAvgAggregateInputType
+    _sum?: AgentRunSumAggregateInputType
+    _min?: AgentRunMinAggregateInputType
+    _max?: AgentRunMaxAggregateInputType
+  }
+
+  export type AgentRunGroupByOutputType = {
+    id: string
+    agentType: $Enums.AgentType
+    status: $Enums.AgentRunStatus
+    triggeredBy: string
+    summary: string | null
+    details: JsonValue | null
+    recordsProcessed: number
+    errorMessage: string | null
+    startedAt: Date
+    completedAt: Date | null
+    durationMs: number | null
+    createdAt: Date
+    _count: AgentRunCountAggregateOutputType | null
+    _avg: AgentRunAvgAggregateOutputType | null
+    _sum: AgentRunSumAggregateOutputType | null
+    _min: AgentRunMinAggregateOutputType | null
+    _max: AgentRunMaxAggregateOutputType | null
+  }
+
+  type GetAgentRunGroupByPayload<T extends AgentRunGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AgentRunGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AgentRunGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AgentRunGroupByOutputType[P]>
+            : GetScalarType<T[P], AgentRunGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AgentRunSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    agentType?: boolean
+    status?: boolean
+    triggeredBy?: boolean
+    summary?: boolean
+    details?: boolean
+    recordsProcessed?: boolean
+    errorMessage?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    durationMs?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["agentRun"]>
+
+  export type AgentRunSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    agentType?: boolean
+    status?: boolean
+    triggeredBy?: boolean
+    summary?: boolean
+    details?: boolean
+    recordsProcessed?: boolean
+    errorMessage?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    durationMs?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["agentRun"]>
+
+  export type AgentRunSelectScalar = {
+    id?: boolean
+    agentType?: boolean
+    status?: boolean
+    triggeredBy?: boolean
+    summary?: boolean
+    details?: boolean
+    recordsProcessed?: boolean
+    errorMessage?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    durationMs?: boolean
+    createdAt?: boolean
+  }
+
+
+  export type $AgentRunPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AgentRun"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      agentType: $Enums.AgentType
+      status: $Enums.AgentRunStatus
+      triggeredBy: string
+      summary: string | null
+      details: Prisma.JsonValue | null
+      recordsProcessed: number
+      errorMessage: string | null
+      startedAt: Date
+      completedAt: Date | null
+      durationMs: number | null
+      createdAt: Date
+    }, ExtArgs["result"]["agentRun"]>
+    composites: {}
+  }
+
+  type AgentRunGetPayload<S extends boolean | null | undefined | AgentRunDefaultArgs> = $Result.GetResult<Prisma.$AgentRunPayload, S>
+
+  type AgentRunCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<AgentRunFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: AgentRunCountAggregateInputType | true
+    }
+
+  export interface AgentRunDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AgentRun'], meta: { name: 'AgentRun' } }
+    /**
+     * Find zero or one AgentRun that matches the filter.
+     * @param {AgentRunFindUniqueArgs} args - Arguments to find a AgentRun
+     * @example
+     * // Get one AgentRun
+     * const agentRun = await prisma.agentRun.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AgentRunFindUniqueArgs>(args: SelectSubset<T, AgentRunFindUniqueArgs<ExtArgs>>): Prisma__AgentRunClient<$Result.GetResult<Prisma.$AgentRunPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one AgentRun that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {AgentRunFindUniqueOrThrowArgs} args - Arguments to find a AgentRun
+     * @example
+     * // Get one AgentRun
+     * const agentRun = await prisma.agentRun.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AgentRunFindUniqueOrThrowArgs>(args: SelectSubset<T, AgentRunFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AgentRunClient<$Result.GetResult<Prisma.$AgentRunPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first AgentRun that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentRunFindFirstArgs} args - Arguments to find a AgentRun
+     * @example
+     * // Get one AgentRun
+     * const agentRun = await prisma.agentRun.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AgentRunFindFirstArgs>(args?: SelectSubset<T, AgentRunFindFirstArgs<ExtArgs>>): Prisma__AgentRunClient<$Result.GetResult<Prisma.$AgentRunPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first AgentRun that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentRunFindFirstOrThrowArgs} args - Arguments to find a AgentRun
+     * @example
+     * // Get one AgentRun
+     * const agentRun = await prisma.agentRun.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AgentRunFindFirstOrThrowArgs>(args?: SelectSubset<T, AgentRunFindFirstOrThrowArgs<ExtArgs>>): Prisma__AgentRunClient<$Result.GetResult<Prisma.$AgentRunPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more AgentRuns that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentRunFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AgentRuns
+     * const agentRuns = await prisma.agentRun.findMany()
+     * 
+     * // Get first 10 AgentRuns
+     * const agentRuns = await prisma.agentRun.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const agentRunWithIdOnly = await prisma.agentRun.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AgentRunFindManyArgs>(args?: SelectSubset<T, AgentRunFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentRunPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a AgentRun.
+     * @param {AgentRunCreateArgs} args - Arguments to create a AgentRun.
+     * @example
+     * // Create one AgentRun
+     * const AgentRun = await prisma.agentRun.create({
+     *   data: {
+     *     // ... data to create a AgentRun
+     *   }
+     * })
+     * 
+     */
+    create<T extends AgentRunCreateArgs>(args: SelectSubset<T, AgentRunCreateArgs<ExtArgs>>): Prisma__AgentRunClient<$Result.GetResult<Prisma.$AgentRunPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many AgentRuns.
+     * @param {AgentRunCreateManyArgs} args - Arguments to create many AgentRuns.
+     * @example
+     * // Create many AgentRuns
+     * const agentRun = await prisma.agentRun.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AgentRunCreateManyArgs>(args?: SelectSubset<T, AgentRunCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AgentRuns and returns the data saved in the database.
+     * @param {AgentRunCreateManyAndReturnArgs} args - Arguments to create many AgentRuns.
+     * @example
+     * // Create many AgentRuns
+     * const agentRun = await prisma.agentRun.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AgentRuns and only return the `id`
+     * const agentRunWithIdOnly = await prisma.agentRun.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AgentRunCreateManyAndReturnArgs>(args?: SelectSubset<T, AgentRunCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentRunPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a AgentRun.
+     * @param {AgentRunDeleteArgs} args - Arguments to delete one AgentRun.
+     * @example
+     * // Delete one AgentRun
+     * const AgentRun = await prisma.agentRun.delete({
+     *   where: {
+     *     // ... filter to delete one AgentRun
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AgentRunDeleteArgs>(args: SelectSubset<T, AgentRunDeleteArgs<ExtArgs>>): Prisma__AgentRunClient<$Result.GetResult<Prisma.$AgentRunPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one AgentRun.
+     * @param {AgentRunUpdateArgs} args - Arguments to update one AgentRun.
+     * @example
+     * // Update one AgentRun
+     * const agentRun = await prisma.agentRun.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AgentRunUpdateArgs>(args: SelectSubset<T, AgentRunUpdateArgs<ExtArgs>>): Prisma__AgentRunClient<$Result.GetResult<Prisma.$AgentRunPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more AgentRuns.
+     * @param {AgentRunDeleteManyArgs} args - Arguments to filter AgentRuns to delete.
+     * @example
+     * // Delete a few AgentRuns
+     * const { count } = await prisma.agentRun.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AgentRunDeleteManyArgs>(args?: SelectSubset<T, AgentRunDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AgentRuns.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentRunUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AgentRuns
+     * const agentRun = await prisma.agentRun.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AgentRunUpdateManyArgs>(args: SelectSubset<T, AgentRunUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one AgentRun.
+     * @param {AgentRunUpsertArgs} args - Arguments to update or create a AgentRun.
+     * @example
+     * // Update or create a AgentRun
+     * const agentRun = await prisma.agentRun.upsert({
+     *   create: {
+     *     // ... data to create a AgentRun
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AgentRun we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AgentRunUpsertArgs>(args: SelectSubset<T, AgentRunUpsertArgs<ExtArgs>>): Prisma__AgentRunClient<$Result.GetResult<Prisma.$AgentRunPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of AgentRuns.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentRunCountArgs} args - Arguments to filter AgentRuns to count.
+     * @example
+     * // Count the number of AgentRuns
+     * const count = await prisma.agentRun.count({
+     *   where: {
+     *     // ... the filter for the AgentRuns we want to count
+     *   }
+     * })
+    **/
+    count<T extends AgentRunCountArgs>(
+      args?: Subset<T, AgentRunCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AgentRunCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AgentRun.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentRunAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AgentRunAggregateArgs>(args: Subset<T, AgentRunAggregateArgs>): Prisma.PrismaPromise<GetAgentRunAggregateType<T>>
+
+    /**
+     * Group by AgentRun.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentRunGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AgentRunGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AgentRunGroupByArgs['orderBy'] }
+        : { orderBy?: AgentRunGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AgentRunGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAgentRunGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AgentRun model
+   */
+  readonly fields: AgentRunFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AgentRun.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AgentRunClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AgentRun model
+   */ 
+  interface AgentRunFieldRefs {
+    readonly id: FieldRef<"AgentRun", 'String'>
+    readonly agentType: FieldRef<"AgentRun", 'AgentType'>
+    readonly status: FieldRef<"AgentRun", 'AgentRunStatus'>
+    readonly triggeredBy: FieldRef<"AgentRun", 'String'>
+    readonly summary: FieldRef<"AgentRun", 'String'>
+    readonly details: FieldRef<"AgentRun", 'Json'>
+    readonly recordsProcessed: FieldRef<"AgentRun", 'Int'>
+    readonly errorMessage: FieldRef<"AgentRun", 'String'>
+    readonly startedAt: FieldRef<"AgentRun", 'DateTime'>
+    readonly completedAt: FieldRef<"AgentRun", 'DateTime'>
+    readonly durationMs: FieldRef<"AgentRun", 'Int'>
+    readonly createdAt: FieldRef<"AgentRun", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AgentRun findUnique
+   */
+  export type AgentRunFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentRun
+     */
+    select?: AgentRunSelect<ExtArgs> | null
+    /**
+     * Filter, which AgentRun to fetch.
+     */
+    where: AgentRunWhereUniqueInput
+  }
+
+  /**
+   * AgentRun findUniqueOrThrow
+   */
+  export type AgentRunFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentRun
+     */
+    select?: AgentRunSelect<ExtArgs> | null
+    /**
+     * Filter, which AgentRun to fetch.
+     */
+    where: AgentRunWhereUniqueInput
+  }
+
+  /**
+   * AgentRun findFirst
+   */
+  export type AgentRunFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentRun
+     */
+    select?: AgentRunSelect<ExtArgs> | null
+    /**
+     * Filter, which AgentRun to fetch.
+     */
+    where?: AgentRunWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AgentRuns to fetch.
+     */
+    orderBy?: AgentRunOrderByWithRelationInput | AgentRunOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AgentRuns.
+     */
+    cursor?: AgentRunWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AgentRuns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AgentRuns.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AgentRuns.
+     */
+    distinct?: AgentRunScalarFieldEnum | AgentRunScalarFieldEnum[]
+  }
+
+  /**
+   * AgentRun findFirstOrThrow
+   */
+  export type AgentRunFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentRun
+     */
+    select?: AgentRunSelect<ExtArgs> | null
+    /**
+     * Filter, which AgentRun to fetch.
+     */
+    where?: AgentRunWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AgentRuns to fetch.
+     */
+    orderBy?: AgentRunOrderByWithRelationInput | AgentRunOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AgentRuns.
+     */
+    cursor?: AgentRunWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AgentRuns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AgentRuns.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AgentRuns.
+     */
+    distinct?: AgentRunScalarFieldEnum | AgentRunScalarFieldEnum[]
+  }
+
+  /**
+   * AgentRun findMany
+   */
+  export type AgentRunFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentRun
+     */
+    select?: AgentRunSelect<ExtArgs> | null
+    /**
+     * Filter, which AgentRuns to fetch.
+     */
+    where?: AgentRunWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AgentRuns to fetch.
+     */
+    orderBy?: AgentRunOrderByWithRelationInput | AgentRunOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AgentRuns.
+     */
+    cursor?: AgentRunWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AgentRuns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AgentRuns.
+     */
+    skip?: number
+    distinct?: AgentRunScalarFieldEnum | AgentRunScalarFieldEnum[]
+  }
+
+  /**
+   * AgentRun create
+   */
+  export type AgentRunCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentRun
+     */
+    select?: AgentRunSelect<ExtArgs> | null
+    /**
+     * The data needed to create a AgentRun.
+     */
+    data: XOR<AgentRunCreateInput, AgentRunUncheckedCreateInput>
+  }
+
+  /**
+   * AgentRun createMany
+   */
+  export type AgentRunCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AgentRuns.
+     */
+    data: AgentRunCreateManyInput | AgentRunCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AgentRun createManyAndReturn
+   */
+  export type AgentRunCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentRun
+     */
+    select?: AgentRunSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many AgentRuns.
+     */
+    data: AgentRunCreateManyInput | AgentRunCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AgentRun update
+   */
+  export type AgentRunUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentRun
+     */
+    select?: AgentRunSelect<ExtArgs> | null
+    /**
+     * The data needed to update a AgentRun.
+     */
+    data: XOR<AgentRunUpdateInput, AgentRunUncheckedUpdateInput>
+    /**
+     * Choose, which AgentRun to update.
+     */
+    where: AgentRunWhereUniqueInput
+  }
+
+  /**
+   * AgentRun updateMany
+   */
+  export type AgentRunUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AgentRuns.
+     */
+    data: XOR<AgentRunUpdateManyMutationInput, AgentRunUncheckedUpdateManyInput>
+    /**
+     * Filter which AgentRuns to update
+     */
+    where?: AgentRunWhereInput
+  }
+
+  /**
+   * AgentRun upsert
+   */
+  export type AgentRunUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentRun
+     */
+    select?: AgentRunSelect<ExtArgs> | null
+    /**
+     * The filter to search for the AgentRun to update in case it exists.
+     */
+    where: AgentRunWhereUniqueInput
+    /**
+     * In case the AgentRun found by the `where` argument doesn't exist, create a new AgentRun with this data.
+     */
+    create: XOR<AgentRunCreateInput, AgentRunUncheckedCreateInput>
+    /**
+     * In case the AgentRun was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AgentRunUpdateInput, AgentRunUncheckedUpdateInput>
+  }
+
+  /**
+   * AgentRun delete
+   */
+  export type AgentRunDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentRun
+     */
+    select?: AgentRunSelect<ExtArgs> | null
+    /**
+     * Filter which AgentRun to delete.
+     */
+    where: AgentRunWhereUniqueInput
+  }
+
+  /**
+   * AgentRun deleteMany
+   */
+  export type AgentRunDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AgentRuns to delete
+     */
+    where?: AgentRunWhereInput
+  }
+
+  /**
+   * AgentRun without action
+   */
+  export type AgentRunDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentRun
+     */
+    select?: AgentRunSelect<ExtArgs> | null
+  }
+
+
+  /**
+   * Model EmissionRecord
+   */
+
+  export type AggregateEmissionRecord = {
+    _count: EmissionRecordCountAggregateOutputType | null
+    _avg: EmissionRecordAvgAggregateOutputType | null
+    _sum: EmissionRecordSumAggregateOutputType | null
+    _min: EmissionRecordMinAggregateOutputType | null
+    _max: EmissionRecordMaxAggregateOutputType | null
+  }
+
+  export type EmissionRecordAvgAggregateOutputType = {
+    cpuUtilization: number | null
+    memoryUtilization: number | null
+    networkInGb: number | null
+    networkOutGb: number | null
+    energyKwh: number | null
+    gridIntensity: number | null
+    carbonKg: number | null
+  }
+
+  export type EmissionRecordSumAggregateOutputType = {
+    cpuUtilization: number | null
+    memoryUtilization: number | null
+    networkInGb: number | null
+    networkOutGb: number | null
+    energyKwh: number | null
+    gridIntensity: number | null
+    carbonKg: number | null
+  }
+
+  export type EmissionRecordMinAggregateOutputType = {
+    id: string | null
+    agentRunId: string | null
+    instanceId: string | null
+    instanceType: string | null
+    provider: $Enums.CloudProvider | null
+    region: string | null
+    instanceName: string | null
+    cpuUtilization: number | null
+    memoryUtilization: number | null
+    networkInGb: number | null
+    networkOutGb: number | null
+    energyKwh: number | null
+    gridIntensity: number | null
+    carbonKg: number | null
+    isIdle: boolean | null
+    isOversized: boolean | null
+    recommendation: string | null
+    timestamp: Date | null
+  }
+
+  export type EmissionRecordMaxAggregateOutputType = {
+    id: string | null
+    agentRunId: string | null
+    instanceId: string | null
+    instanceType: string | null
+    provider: $Enums.CloudProvider | null
+    region: string | null
+    instanceName: string | null
+    cpuUtilization: number | null
+    memoryUtilization: number | null
+    networkInGb: number | null
+    networkOutGb: number | null
+    energyKwh: number | null
+    gridIntensity: number | null
+    carbonKg: number | null
+    isIdle: boolean | null
+    isOversized: boolean | null
+    recommendation: string | null
+    timestamp: Date | null
+  }
+
+  export type EmissionRecordCountAggregateOutputType = {
+    id: number
+    agentRunId: number
+    instanceId: number
+    instanceType: number
+    provider: number
+    region: number
+    instanceName: number
+    cpuUtilization: number
+    memoryUtilization: number
+    networkInGb: number
+    networkOutGb: number
+    energyKwh: number
+    gridIntensity: number
+    carbonKg: number
+    isIdle: number
+    isOversized: number
+    recommendation: number
+    timestamp: number
+    _all: number
+  }
+
+
+  export type EmissionRecordAvgAggregateInputType = {
+    cpuUtilization?: true
+    memoryUtilization?: true
+    networkInGb?: true
+    networkOutGb?: true
+    energyKwh?: true
+    gridIntensity?: true
+    carbonKg?: true
+  }
+
+  export type EmissionRecordSumAggregateInputType = {
+    cpuUtilization?: true
+    memoryUtilization?: true
+    networkInGb?: true
+    networkOutGb?: true
+    energyKwh?: true
+    gridIntensity?: true
+    carbonKg?: true
+  }
+
+  export type EmissionRecordMinAggregateInputType = {
+    id?: true
+    agentRunId?: true
+    instanceId?: true
+    instanceType?: true
+    provider?: true
+    region?: true
+    instanceName?: true
+    cpuUtilization?: true
+    memoryUtilization?: true
+    networkInGb?: true
+    networkOutGb?: true
+    energyKwh?: true
+    gridIntensity?: true
+    carbonKg?: true
+    isIdle?: true
+    isOversized?: true
+    recommendation?: true
+    timestamp?: true
+  }
+
+  export type EmissionRecordMaxAggregateInputType = {
+    id?: true
+    agentRunId?: true
+    instanceId?: true
+    instanceType?: true
+    provider?: true
+    region?: true
+    instanceName?: true
+    cpuUtilization?: true
+    memoryUtilization?: true
+    networkInGb?: true
+    networkOutGb?: true
+    energyKwh?: true
+    gridIntensity?: true
+    carbonKg?: true
+    isIdle?: true
+    isOversized?: true
+    recommendation?: true
+    timestamp?: true
+  }
+
+  export type EmissionRecordCountAggregateInputType = {
+    id?: true
+    agentRunId?: true
+    instanceId?: true
+    instanceType?: true
+    provider?: true
+    region?: true
+    instanceName?: true
+    cpuUtilization?: true
+    memoryUtilization?: true
+    networkInGb?: true
+    networkOutGb?: true
+    energyKwh?: true
+    gridIntensity?: true
+    carbonKg?: true
+    isIdle?: true
+    isOversized?: true
+    recommendation?: true
+    timestamp?: true
+    _all?: true
+  }
+
+  export type EmissionRecordAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EmissionRecord to aggregate.
+     */
+    where?: EmissionRecordWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EmissionRecords to fetch.
+     */
+    orderBy?: EmissionRecordOrderByWithRelationInput | EmissionRecordOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EmissionRecordWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EmissionRecords from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EmissionRecords.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned EmissionRecords
+    **/
+    _count?: true | EmissionRecordCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: EmissionRecordAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: EmissionRecordSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EmissionRecordMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EmissionRecordMaxAggregateInputType
+  }
+
+  export type GetEmissionRecordAggregateType<T extends EmissionRecordAggregateArgs> = {
+        [P in keyof T & keyof AggregateEmissionRecord]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEmissionRecord[P]>
+      : GetScalarType<T[P], AggregateEmissionRecord[P]>
+  }
+
+
+
+
+  export type EmissionRecordGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EmissionRecordWhereInput
+    orderBy?: EmissionRecordOrderByWithAggregationInput | EmissionRecordOrderByWithAggregationInput[]
+    by: EmissionRecordScalarFieldEnum[] | EmissionRecordScalarFieldEnum
+    having?: EmissionRecordScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EmissionRecordCountAggregateInputType | true
+    _avg?: EmissionRecordAvgAggregateInputType
+    _sum?: EmissionRecordSumAggregateInputType
+    _min?: EmissionRecordMinAggregateInputType
+    _max?: EmissionRecordMaxAggregateInputType
+  }
+
+  export type EmissionRecordGroupByOutputType = {
+    id: string
+    agentRunId: string | null
+    instanceId: string
+    instanceType: string
+    provider: $Enums.CloudProvider
+    region: string
+    instanceName: string | null
+    cpuUtilization: number
+    memoryUtilization: number | null
+    networkInGb: number | null
+    networkOutGb: number | null
+    energyKwh: number
+    gridIntensity: number
+    carbonKg: number
+    isIdle: boolean
+    isOversized: boolean
+    recommendation: string | null
+    timestamp: Date
+    _count: EmissionRecordCountAggregateOutputType | null
+    _avg: EmissionRecordAvgAggregateOutputType | null
+    _sum: EmissionRecordSumAggregateOutputType | null
+    _min: EmissionRecordMinAggregateOutputType | null
+    _max: EmissionRecordMaxAggregateOutputType | null
+  }
+
+  type GetEmissionRecordGroupByPayload<T extends EmissionRecordGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EmissionRecordGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EmissionRecordGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EmissionRecordGroupByOutputType[P]>
+            : GetScalarType<T[P], EmissionRecordGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EmissionRecordSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    agentRunId?: boolean
+    instanceId?: boolean
+    instanceType?: boolean
+    provider?: boolean
+    region?: boolean
+    instanceName?: boolean
+    cpuUtilization?: boolean
+    memoryUtilization?: boolean
+    networkInGb?: boolean
+    networkOutGb?: boolean
+    energyKwh?: boolean
+    gridIntensity?: boolean
+    carbonKg?: boolean
+    isIdle?: boolean
+    isOversized?: boolean
+    recommendation?: boolean
+    timestamp?: boolean
+  }, ExtArgs["result"]["emissionRecord"]>
+
+  export type EmissionRecordSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    agentRunId?: boolean
+    instanceId?: boolean
+    instanceType?: boolean
+    provider?: boolean
+    region?: boolean
+    instanceName?: boolean
+    cpuUtilization?: boolean
+    memoryUtilization?: boolean
+    networkInGb?: boolean
+    networkOutGb?: boolean
+    energyKwh?: boolean
+    gridIntensity?: boolean
+    carbonKg?: boolean
+    isIdle?: boolean
+    isOversized?: boolean
+    recommendation?: boolean
+    timestamp?: boolean
+  }, ExtArgs["result"]["emissionRecord"]>
+
+  export type EmissionRecordSelectScalar = {
+    id?: boolean
+    agentRunId?: boolean
+    instanceId?: boolean
+    instanceType?: boolean
+    provider?: boolean
+    region?: boolean
+    instanceName?: boolean
+    cpuUtilization?: boolean
+    memoryUtilization?: boolean
+    networkInGb?: boolean
+    networkOutGb?: boolean
+    energyKwh?: boolean
+    gridIntensity?: boolean
+    carbonKg?: boolean
+    isIdle?: boolean
+    isOversized?: boolean
+    recommendation?: boolean
+    timestamp?: boolean
+  }
+
+
+  export type $EmissionRecordPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "EmissionRecord"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      agentRunId: string | null
+      instanceId: string
+      instanceType: string
+      provider: $Enums.CloudProvider
+      region: string
+      instanceName: string | null
+      cpuUtilization: number
+      memoryUtilization: number | null
+      networkInGb: number | null
+      networkOutGb: number | null
+      energyKwh: number
+      gridIntensity: number
+      carbonKg: number
+      isIdle: boolean
+      isOversized: boolean
+      recommendation: string | null
+      timestamp: Date
+    }, ExtArgs["result"]["emissionRecord"]>
+    composites: {}
+  }
+
+  type EmissionRecordGetPayload<S extends boolean | null | undefined | EmissionRecordDefaultArgs> = $Result.GetResult<Prisma.$EmissionRecordPayload, S>
+
+  type EmissionRecordCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<EmissionRecordFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: EmissionRecordCountAggregateInputType | true
+    }
+
+  export interface EmissionRecordDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EmissionRecord'], meta: { name: 'EmissionRecord' } }
+    /**
+     * Find zero or one EmissionRecord that matches the filter.
+     * @param {EmissionRecordFindUniqueArgs} args - Arguments to find a EmissionRecord
+     * @example
+     * // Get one EmissionRecord
+     * const emissionRecord = await prisma.emissionRecord.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EmissionRecordFindUniqueArgs>(args: SelectSubset<T, EmissionRecordFindUniqueArgs<ExtArgs>>): Prisma__EmissionRecordClient<$Result.GetResult<Prisma.$EmissionRecordPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one EmissionRecord that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {EmissionRecordFindUniqueOrThrowArgs} args - Arguments to find a EmissionRecord
+     * @example
+     * // Get one EmissionRecord
+     * const emissionRecord = await prisma.emissionRecord.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EmissionRecordFindUniqueOrThrowArgs>(args: SelectSubset<T, EmissionRecordFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EmissionRecordClient<$Result.GetResult<Prisma.$EmissionRecordPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first EmissionRecord that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmissionRecordFindFirstArgs} args - Arguments to find a EmissionRecord
+     * @example
+     * // Get one EmissionRecord
+     * const emissionRecord = await prisma.emissionRecord.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EmissionRecordFindFirstArgs>(args?: SelectSubset<T, EmissionRecordFindFirstArgs<ExtArgs>>): Prisma__EmissionRecordClient<$Result.GetResult<Prisma.$EmissionRecordPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first EmissionRecord that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmissionRecordFindFirstOrThrowArgs} args - Arguments to find a EmissionRecord
+     * @example
+     * // Get one EmissionRecord
+     * const emissionRecord = await prisma.emissionRecord.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EmissionRecordFindFirstOrThrowArgs>(args?: SelectSubset<T, EmissionRecordFindFirstOrThrowArgs<ExtArgs>>): Prisma__EmissionRecordClient<$Result.GetResult<Prisma.$EmissionRecordPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more EmissionRecords that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmissionRecordFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all EmissionRecords
+     * const emissionRecords = await prisma.emissionRecord.findMany()
+     * 
+     * // Get first 10 EmissionRecords
+     * const emissionRecords = await prisma.emissionRecord.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const emissionRecordWithIdOnly = await prisma.emissionRecord.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends EmissionRecordFindManyArgs>(args?: SelectSubset<T, EmissionRecordFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmissionRecordPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a EmissionRecord.
+     * @param {EmissionRecordCreateArgs} args - Arguments to create a EmissionRecord.
+     * @example
+     * // Create one EmissionRecord
+     * const EmissionRecord = await prisma.emissionRecord.create({
+     *   data: {
+     *     // ... data to create a EmissionRecord
+     *   }
+     * })
+     * 
+     */
+    create<T extends EmissionRecordCreateArgs>(args: SelectSubset<T, EmissionRecordCreateArgs<ExtArgs>>): Prisma__EmissionRecordClient<$Result.GetResult<Prisma.$EmissionRecordPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many EmissionRecords.
+     * @param {EmissionRecordCreateManyArgs} args - Arguments to create many EmissionRecords.
+     * @example
+     * // Create many EmissionRecords
+     * const emissionRecord = await prisma.emissionRecord.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EmissionRecordCreateManyArgs>(args?: SelectSubset<T, EmissionRecordCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many EmissionRecords and returns the data saved in the database.
+     * @param {EmissionRecordCreateManyAndReturnArgs} args - Arguments to create many EmissionRecords.
+     * @example
+     * // Create many EmissionRecords
+     * const emissionRecord = await prisma.emissionRecord.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many EmissionRecords and only return the `id`
+     * const emissionRecordWithIdOnly = await prisma.emissionRecord.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends EmissionRecordCreateManyAndReturnArgs>(args?: SelectSubset<T, EmissionRecordCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmissionRecordPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a EmissionRecord.
+     * @param {EmissionRecordDeleteArgs} args - Arguments to delete one EmissionRecord.
+     * @example
+     * // Delete one EmissionRecord
+     * const EmissionRecord = await prisma.emissionRecord.delete({
+     *   where: {
+     *     // ... filter to delete one EmissionRecord
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EmissionRecordDeleteArgs>(args: SelectSubset<T, EmissionRecordDeleteArgs<ExtArgs>>): Prisma__EmissionRecordClient<$Result.GetResult<Prisma.$EmissionRecordPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one EmissionRecord.
+     * @param {EmissionRecordUpdateArgs} args - Arguments to update one EmissionRecord.
+     * @example
+     * // Update one EmissionRecord
+     * const emissionRecord = await prisma.emissionRecord.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EmissionRecordUpdateArgs>(args: SelectSubset<T, EmissionRecordUpdateArgs<ExtArgs>>): Prisma__EmissionRecordClient<$Result.GetResult<Prisma.$EmissionRecordPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more EmissionRecords.
+     * @param {EmissionRecordDeleteManyArgs} args - Arguments to filter EmissionRecords to delete.
+     * @example
+     * // Delete a few EmissionRecords
+     * const { count } = await prisma.emissionRecord.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EmissionRecordDeleteManyArgs>(args?: SelectSubset<T, EmissionRecordDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EmissionRecords.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmissionRecordUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many EmissionRecords
+     * const emissionRecord = await prisma.emissionRecord.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EmissionRecordUpdateManyArgs>(args: SelectSubset<T, EmissionRecordUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one EmissionRecord.
+     * @param {EmissionRecordUpsertArgs} args - Arguments to update or create a EmissionRecord.
+     * @example
+     * // Update or create a EmissionRecord
+     * const emissionRecord = await prisma.emissionRecord.upsert({
+     *   create: {
+     *     // ... data to create a EmissionRecord
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the EmissionRecord we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EmissionRecordUpsertArgs>(args: SelectSubset<T, EmissionRecordUpsertArgs<ExtArgs>>): Prisma__EmissionRecordClient<$Result.GetResult<Prisma.$EmissionRecordPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of EmissionRecords.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmissionRecordCountArgs} args - Arguments to filter EmissionRecords to count.
+     * @example
+     * // Count the number of EmissionRecords
+     * const count = await prisma.emissionRecord.count({
+     *   where: {
+     *     // ... the filter for the EmissionRecords we want to count
+     *   }
+     * })
+    **/
+    count<T extends EmissionRecordCountArgs>(
+      args?: Subset<T, EmissionRecordCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EmissionRecordCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a EmissionRecord.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmissionRecordAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EmissionRecordAggregateArgs>(args: Subset<T, EmissionRecordAggregateArgs>): Prisma.PrismaPromise<GetEmissionRecordAggregateType<T>>
+
+    /**
+     * Group by EmissionRecord.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmissionRecordGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EmissionRecordGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EmissionRecordGroupByArgs['orderBy'] }
+        : { orderBy?: EmissionRecordGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EmissionRecordGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEmissionRecordGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the EmissionRecord model
+   */
+  readonly fields: EmissionRecordFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for EmissionRecord.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EmissionRecordClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the EmissionRecord model
+   */ 
+  interface EmissionRecordFieldRefs {
+    readonly id: FieldRef<"EmissionRecord", 'String'>
+    readonly agentRunId: FieldRef<"EmissionRecord", 'String'>
+    readonly instanceId: FieldRef<"EmissionRecord", 'String'>
+    readonly instanceType: FieldRef<"EmissionRecord", 'String'>
+    readonly provider: FieldRef<"EmissionRecord", 'CloudProvider'>
+    readonly region: FieldRef<"EmissionRecord", 'String'>
+    readonly instanceName: FieldRef<"EmissionRecord", 'String'>
+    readonly cpuUtilization: FieldRef<"EmissionRecord", 'Float'>
+    readonly memoryUtilization: FieldRef<"EmissionRecord", 'Float'>
+    readonly networkInGb: FieldRef<"EmissionRecord", 'Float'>
+    readonly networkOutGb: FieldRef<"EmissionRecord", 'Float'>
+    readonly energyKwh: FieldRef<"EmissionRecord", 'Float'>
+    readonly gridIntensity: FieldRef<"EmissionRecord", 'Float'>
+    readonly carbonKg: FieldRef<"EmissionRecord", 'Float'>
+    readonly isIdle: FieldRef<"EmissionRecord", 'Boolean'>
+    readonly isOversized: FieldRef<"EmissionRecord", 'Boolean'>
+    readonly recommendation: FieldRef<"EmissionRecord", 'String'>
+    readonly timestamp: FieldRef<"EmissionRecord", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * EmissionRecord findUnique
+   */
+  export type EmissionRecordFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmissionRecord
+     */
+    select?: EmissionRecordSelect<ExtArgs> | null
+    /**
+     * Filter, which EmissionRecord to fetch.
+     */
+    where: EmissionRecordWhereUniqueInput
+  }
+
+  /**
+   * EmissionRecord findUniqueOrThrow
+   */
+  export type EmissionRecordFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmissionRecord
+     */
+    select?: EmissionRecordSelect<ExtArgs> | null
+    /**
+     * Filter, which EmissionRecord to fetch.
+     */
+    where: EmissionRecordWhereUniqueInput
+  }
+
+  /**
+   * EmissionRecord findFirst
+   */
+  export type EmissionRecordFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmissionRecord
+     */
+    select?: EmissionRecordSelect<ExtArgs> | null
+    /**
+     * Filter, which EmissionRecord to fetch.
+     */
+    where?: EmissionRecordWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EmissionRecords to fetch.
+     */
+    orderBy?: EmissionRecordOrderByWithRelationInput | EmissionRecordOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EmissionRecords.
+     */
+    cursor?: EmissionRecordWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EmissionRecords from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EmissionRecords.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EmissionRecords.
+     */
+    distinct?: EmissionRecordScalarFieldEnum | EmissionRecordScalarFieldEnum[]
+  }
+
+  /**
+   * EmissionRecord findFirstOrThrow
+   */
+  export type EmissionRecordFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmissionRecord
+     */
+    select?: EmissionRecordSelect<ExtArgs> | null
+    /**
+     * Filter, which EmissionRecord to fetch.
+     */
+    where?: EmissionRecordWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EmissionRecords to fetch.
+     */
+    orderBy?: EmissionRecordOrderByWithRelationInput | EmissionRecordOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EmissionRecords.
+     */
+    cursor?: EmissionRecordWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EmissionRecords from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EmissionRecords.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EmissionRecords.
+     */
+    distinct?: EmissionRecordScalarFieldEnum | EmissionRecordScalarFieldEnum[]
+  }
+
+  /**
+   * EmissionRecord findMany
+   */
+  export type EmissionRecordFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmissionRecord
+     */
+    select?: EmissionRecordSelect<ExtArgs> | null
+    /**
+     * Filter, which EmissionRecords to fetch.
+     */
+    where?: EmissionRecordWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EmissionRecords to fetch.
+     */
+    orderBy?: EmissionRecordOrderByWithRelationInput | EmissionRecordOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing EmissionRecords.
+     */
+    cursor?: EmissionRecordWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EmissionRecords from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EmissionRecords.
+     */
+    skip?: number
+    distinct?: EmissionRecordScalarFieldEnum | EmissionRecordScalarFieldEnum[]
+  }
+
+  /**
+   * EmissionRecord create
+   */
+  export type EmissionRecordCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmissionRecord
+     */
+    select?: EmissionRecordSelect<ExtArgs> | null
+    /**
+     * The data needed to create a EmissionRecord.
+     */
+    data: XOR<EmissionRecordCreateInput, EmissionRecordUncheckedCreateInput>
+  }
+
+  /**
+   * EmissionRecord createMany
+   */
+  export type EmissionRecordCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many EmissionRecords.
+     */
+    data: EmissionRecordCreateManyInput | EmissionRecordCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EmissionRecord createManyAndReturn
+   */
+  export type EmissionRecordCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmissionRecord
+     */
+    select?: EmissionRecordSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many EmissionRecords.
+     */
+    data: EmissionRecordCreateManyInput | EmissionRecordCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EmissionRecord update
+   */
+  export type EmissionRecordUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmissionRecord
+     */
+    select?: EmissionRecordSelect<ExtArgs> | null
+    /**
+     * The data needed to update a EmissionRecord.
+     */
+    data: XOR<EmissionRecordUpdateInput, EmissionRecordUncheckedUpdateInput>
+    /**
+     * Choose, which EmissionRecord to update.
+     */
+    where: EmissionRecordWhereUniqueInput
+  }
+
+  /**
+   * EmissionRecord updateMany
+   */
+  export type EmissionRecordUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update EmissionRecords.
+     */
+    data: XOR<EmissionRecordUpdateManyMutationInput, EmissionRecordUncheckedUpdateManyInput>
+    /**
+     * Filter which EmissionRecords to update
+     */
+    where?: EmissionRecordWhereInput
+  }
+
+  /**
+   * EmissionRecord upsert
+   */
+  export type EmissionRecordUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmissionRecord
+     */
+    select?: EmissionRecordSelect<ExtArgs> | null
+    /**
+     * The filter to search for the EmissionRecord to update in case it exists.
+     */
+    where: EmissionRecordWhereUniqueInput
+    /**
+     * In case the EmissionRecord found by the `where` argument doesn't exist, create a new EmissionRecord with this data.
+     */
+    create: XOR<EmissionRecordCreateInput, EmissionRecordUncheckedCreateInput>
+    /**
+     * In case the EmissionRecord was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EmissionRecordUpdateInput, EmissionRecordUncheckedUpdateInput>
+  }
+
+  /**
+   * EmissionRecord delete
+   */
+  export type EmissionRecordDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmissionRecord
+     */
+    select?: EmissionRecordSelect<ExtArgs> | null
+    /**
+     * Filter which EmissionRecord to delete.
+     */
+    where: EmissionRecordWhereUniqueInput
+  }
+
+  /**
+   * EmissionRecord deleteMany
+   */
+  export type EmissionRecordDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EmissionRecords to delete
+     */
+    where?: EmissionRecordWhereInput
+  }
+
+  /**
+   * EmissionRecord without action
+   */
+  export type EmissionRecordDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmissionRecord
+     */
+    select?: EmissionRecordSelect<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -14918,6 +17205,48 @@ export namespace Prisma {
   };
 
   export type ProviderScalarFieldEnum = (typeof ProviderScalarFieldEnum)[keyof typeof ProviderScalarFieldEnum]
+
+
+  export const AgentRunScalarFieldEnum: {
+    id: 'id',
+    agentType: 'agentType',
+    status: 'status',
+    triggeredBy: 'triggeredBy',
+    summary: 'summary',
+    details: 'details',
+    recordsProcessed: 'recordsProcessed',
+    errorMessage: 'errorMessage',
+    startedAt: 'startedAt',
+    completedAt: 'completedAt',
+    durationMs: 'durationMs',
+    createdAt: 'createdAt'
+  };
+
+  export type AgentRunScalarFieldEnum = (typeof AgentRunScalarFieldEnum)[keyof typeof AgentRunScalarFieldEnum]
+
+
+  export const EmissionRecordScalarFieldEnum: {
+    id: 'id',
+    agentRunId: 'agentRunId',
+    instanceId: 'instanceId',
+    instanceType: 'instanceType',
+    provider: 'provider',
+    region: 'region',
+    instanceName: 'instanceName',
+    cpuUtilization: 'cpuUtilization',
+    memoryUtilization: 'memoryUtilization',
+    networkInGb: 'networkInGb',
+    networkOutGb: 'networkOutGb',
+    energyKwh: 'energyKwh',
+    gridIntensity: 'gridIntensity',
+    carbonKg: 'carbonKg',
+    isIdle: 'isIdle',
+    isOversized: 'isOversized',
+    recommendation: 'recommendation',
+    timestamp: 'timestamp'
+  };
+
+  export type EmissionRecordScalarFieldEnum = (typeof EmissionRecordScalarFieldEnum)[keyof typeof EmissionRecordScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -15236,6 +17565,34 @@ export namespace Prisma {
    * Reference to a field of type 'StorageType[]'
    */
   export type ListEnumStorageTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StorageType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'AgentType'
+   */
+  export type EnumAgentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AgentType'>
+    
+
+
+  /**
+   * Reference to a field of type 'AgentType[]'
+   */
+  export type ListEnumAgentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AgentType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'AgentRunStatus'
+   */
+  export type EnumAgentRunStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AgentRunStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'AgentRunStatus[]'
+   */
+  export type ListEnumAgentRunStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AgentRunStatus[]'>
     
   /**
    * Deep Input Types
@@ -16516,6 +18873,214 @@ export namespace Prisma {
     carbonPageUrl?: StringNullableWithAggregatesFilter<"Provider"> | string | null
     isActive?: BoolWithAggregatesFilter<"Provider"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Provider"> | Date | string
+  }
+
+  export type AgentRunWhereInput = {
+    AND?: AgentRunWhereInput | AgentRunWhereInput[]
+    OR?: AgentRunWhereInput[]
+    NOT?: AgentRunWhereInput | AgentRunWhereInput[]
+    id?: StringFilter<"AgentRun"> | string
+    agentType?: EnumAgentTypeFilter<"AgentRun"> | $Enums.AgentType
+    status?: EnumAgentRunStatusFilter<"AgentRun"> | $Enums.AgentRunStatus
+    triggeredBy?: StringFilter<"AgentRun"> | string
+    summary?: StringNullableFilter<"AgentRun"> | string | null
+    details?: JsonNullableFilter<"AgentRun">
+    recordsProcessed?: IntFilter<"AgentRun"> | number
+    errorMessage?: StringNullableFilter<"AgentRun"> | string | null
+    startedAt?: DateTimeFilter<"AgentRun"> | Date | string
+    completedAt?: DateTimeNullableFilter<"AgentRun"> | Date | string | null
+    durationMs?: IntNullableFilter<"AgentRun"> | number | null
+    createdAt?: DateTimeFilter<"AgentRun"> | Date | string
+  }
+
+  export type AgentRunOrderByWithRelationInput = {
+    id?: SortOrder
+    agentType?: SortOrder
+    status?: SortOrder
+    triggeredBy?: SortOrder
+    summary?: SortOrderInput | SortOrder
+    details?: SortOrderInput | SortOrder
+    recordsProcessed?: SortOrder
+    errorMessage?: SortOrderInput | SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrderInput | SortOrder
+    durationMs?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AgentRunWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: AgentRunWhereInput | AgentRunWhereInput[]
+    OR?: AgentRunWhereInput[]
+    NOT?: AgentRunWhereInput | AgentRunWhereInput[]
+    agentType?: EnumAgentTypeFilter<"AgentRun"> | $Enums.AgentType
+    status?: EnumAgentRunStatusFilter<"AgentRun"> | $Enums.AgentRunStatus
+    triggeredBy?: StringFilter<"AgentRun"> | string
+    summary?: StringNullableFilter<"AgentRun"> | string | null
+    details?: JsonNullableFilter<"AgentRun">
+    recordsProcessed?: IntFilter<"AgentRun"> | number
+    errorMessage?: StringNullableFilter<"AgentRun"> | string | null
+    startedAt?: DateTimeFilter<"AgentRun"> | Date | string
+    completedAt?: DateTimeNullableFilter<"AgentRun"> | Date | string | null
+    durationMs?: IntNullableFilter<"AgentRun"> | number | null
+    createdAt?: DateTimeFilter<"AgentRun"> | Date | string
+  }, "id">
+
+  export type AgentRunOrderByWithAggregationInput = {
+    id?: SortOrder
+    agentType?: SortOrder
+    status?: SortOrder
+    triggeredBy?: SortOrder
+    summary?: SortOrderInput | SortOrder
+    details?: SortOrderInput | SortOrder
+    recordsProcessed?: SortOrder
+    errorMessage?: SortOrderInput | SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrderInput | SortOrder
+    durationMs?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: AgentRunCountOrderByAggregateInput
+    _avg?: AgentRunAvgOrderByAggregateInput
+    _max?: AgentRunMaxOrderByAggregateInput
+    _min?: AgentRunMinOrderByAggregateInput
+    _sum?: AgentRunSumOrderByAggregateInput
+  }
+
+  export type AgentRunScalarWhereWithAggregatesInput = {
+    AND?: AgentRunScalarWhereWithAggregatesInput | AgentRunScalarWhereWithAggregatesInput[]
+    OR?: AgentRunScalarWhereWithAggregatesInput[]
+    NOT?: AgentRunScalarWhereWithAggregatesInput | AgentRunScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AgentRun"> | string
+    agentType?: EnumAgentTypeWithAggregatesFilter<"AgentRun"> | $Enums.AgentType
+    status?: EnumAgentRunStatusWithAggregatesFilter<"AgentRun"> | $Enums.AgentRunStatus
+    triggeredBy?: StringWithAggregatesFilter<"AgentRun"> | string
+    summary?: StringNullableWithAggregatesFilter<"AgentRun"> | string | null
+    details?: JsonNullableWithAggregatesFilter<"AgentRun">
+    recordsProcessed?: IntWithAggregatesFilter<"AgentRun"> | number
+    errorMessage?: StringNullableWithAggregatesFilter<"AgentRun"> | string | null
+    startedAt?: DateTimeWithAggregatesFilter<"AgentRun"> | Date | string
+    completedAt?: DateTimeNullableWithAggregatesFilter<"AgentRun"> | Date | string | null
+    durationMs?: IntNullableWithAggregatesFilter<"AgentRun"> | number | null
+    createdAt?: DateTimeWithAggregatesFilter<"AgentRun"> | Date | string
+  }
+
+  export type EmissionRecordWhereInput = {
+    AND?: EmissionRecordWhereInput | EmissionRecordWhereInput[]
+    OR?: EmissionRecordWhereInput[]
+    NOT?: EmissionRecordWhereInput | EmissionRecordWhereInput[]
+    id?: StringFilter<"EmissionRecord"> | string
+    agentRunId?: StringNullableFilter<"EmissionRecord"> | string | null
+    instanceId?: StringFilter<"EmissionRecord"> | string
+    instanceType?: StringFilter<"EmissionRecord"> | string
+    provider?: EnumCloudProviderFilter<"EmissionRecord"> | $Enums.CloudProvider
+    region?: StringFilter<"EmissionRecord"> | string
+    instanceName?: StringNullableFilter<"EmissionRecord"> | string | null
+    cpuUtilization?: FloatFilter<"EmissionRecord"> | number
+    memoryUtilization?: FloatNullableFilter<"EmissionRecord"> | number | null
+    networkInGb?: FloatNullableFilter<"EmissionRecord"> | number | null
+    networkOutGb?: FloatNullableFilter<"EmissionRecord"> | number | null
+    energyKwh?: FloatFilter<"EmissionRecord"> | number
+    gridIntensity?: FloatFilter<"EmissionRecord"> | number
+    carbonKg?: FloatFilter<"EmissionRecord"> | number
+    isIdle?: BoolFilter<"EmissionRecord"> | boolean
+    isOversized?: BoolFilter<"EmissionRecord"> | boolean
+    recommendation?: StringNullableFilter<"EmissionRecord"> | string | null
+    timestamp?: DateTimeFilter<"EmissionRecord"> | Date | string
+  }
+
+  export type EmissionRecordOrderByWithRelationInput = {
+    id?: SortOrder
+    agentRunId?: SortOrderInput | SortOrder
+    instanceId?: SortOrder
+    instanceType?: SortOrder
+    provider?: SortOrder
+    region?: SortOrder
+    instanceName?: SortOrderInput | SortOrder
+    cpuUtilization?: SortOrder
+    memoryUtilization?: SortOrderInput | SortOrder
+    networkInGb?: SortOrderInput | SortOrder
+    networkOutGb?: SortOrderInput | SortOrder
+    energyKwh?: SortOrder
+    gridIntensity?: SortOrder
+    carbonKg?: SortOrder
+    isIdle?: SortOrder
+    isOversized?: SortOrder
+    recommendation?: SortOrderInput | SortOrder
+    timestamp?: SortOrder
+  }
+
+  export type EmissionRecordWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: EmissionRecordWhereInput | EmissionRecordWhereInput[]
+    OR?: EmissionRecordWhereInput[]
+    NOT?: EmissionRecordWhereInput | EmissionRecordWhereInput[]
+    agentRunId?: StringNullableFilter<"EmissionRecord"> | string | null
+    instanceId?: StringFilter<"EmissionRecord"> | string
+    instanceType?: StringFilter<"EmissionRecord"> | string
+    provider?: EnumCloudProviderFilter<"EmissionRecord"> | $Enums.CloudProvider
+    region?: StringFilter<"EmissionRecord"> | string
+    instanceName?: StringNullableFilter<"EmissionRecord"> | string | null
+    cpuUtilization?: FloatFilter<"EmissionRecord"> | number
+    memoryUtilization?: FloatNullableFilter<"EmissionRecord"> | number | null
+    networkInGb?: FloatNullableFilter<"EmissionRecord"> | number | null
+    networkOutGb?: FloatNullableFilter<"EmissionRecord"> | number | null
+    energyKwh?: FloatFilter<"EmissionRecord"> | number
+    gridIntensity?: FloatFilter<"EmissionRecord"> | number
+    carbonKg?: FloatFilter<"EmissionRecord"> | number
+    isIdle?: BoolFilter<"EmissionRecord"> | boolean
+    isOversized?: BoolFilter<"EmissionRecord"> | boolean
+    recommendation?: StringNullableFilter<"EmissionRecord"> | string | null
+    timestamp?: DateTimeFilter<"EmissionRecord"> | Date | string
+  }, "id">
+
+  export type EmissionRecordOrderByWithAggregationInput = {
+    id?: SortOrder
+    agentRunId?: SortOrderInput | SortOrder
+    instanceId?: SortOrder
+    instanceType?: SortOrder
+    provider?: SortOrder
+    region?: SortOrder
+    instanceName?: SortOrderInput | SortOrder
+    cpuUtilization?: SortOrder
+    memoryUtilization?: SortOrderInput | SortOrder
+    networkInGb?: SortOrderInput | SortOrder
+    networkOutGb?: SortOrderInput | SortOrder
+    energyKwh?: SortOrder
+    gridIntensity?: SortOrder
+    carbonKg?: SortOrder
+    isIdle?: SortOrder
+    isOversized?: SortOrder
+    recommendation?: SortOrderInput | SortOrder
+    timestamp?: SortOrder
+    _count?: EmissionRecordCountOrderByAggregateInput
+    _avg?: EmissionRecordAvgOrderByAggregateInput
+    _max?: EmissionRecordMaxOrderByAggregateInput
+    _min?: EmissionRecordMinOrderByAggregateInput
+    _sum?: EmissionRecordSumOrderByAggregateInput
+  }
+
+  export type EmissionRecordScalarWhereWithAggregatesInput = {
+    AND?: EmissionRecordScalarWhereWithAggregatesInput | EmissionRecordScalarWhereWithAggregatesInput[]
+    OR?: EmissionRecordScalarWhereWithAggregatesInput[]
+    NOT?: EmissionRecordScalarWhereWithAggregatesInput | EmissionRecordScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"EmissionRecord"> | string
+    agentRunId?: StringNullableWithAggregatesFilter<"EmissionRecord"> | string | null
+    instanceId?: StringWithAggregatesFilter<"EmissionRecord"> | string
+    instanceType?: StringWithAggregatesFilter<"EmissionRecord"> | string
+    provider?: EnumCloudProviderWithAggregatesFilter<"EmissionRecord"> | $Enums.CloudProvider
+    region?: StringWithAggregatesFilter<"EmissionRecord"> | string
+    instanceName?: StringNullableWithAggregatesFilter<"EmissionRecord"> | string | null
+    cpuUtilization?: FloatWithAggregatesFilter<"EmissionRecord"> | number
+    memoryUtilization?: FloatNullableWithAggregatesFilter<"EmissionRecord"> | number | null
+    networkInGb?: FloatNullableWithAggregatesFilter<"EmissionRecord"> | number | null
+    networkOutGb?: FloatNullableWithAggregatesFilter<"EmissionRecord"> | number | null
+    energyKwh?: FloatWithAggregatesFilter<"EmissionRecord"> | number
+    gridIntensity?: FloatWithAggregatesFilter<"EmissionRecord"> | number
+    carbonKg?: FloatWithAggregatesFilter<"EmissionRecord"> | number
+    isIdle?: BoolWithAggregatesFilter<"EmissionRecord"> | boolean
+    isOversized?: BoolWithAggregatesFilter<"EmissionRecord"> | boolean
+    recommendation?: StringNullableWithAggregatesFilter<"EmissionRecord"> | string | null
+    timestamp?: DateTimeWithAggregatesFilter<"EmissionRecord"> | Date | string
   }
 
   export type MobileUserCreateInput = {
@@ -18064,6 +20629,258 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type AgentRunCreateInput = {
+    id?: string
+    agentType: $Enums.AgentType
+    status?: $Enums.AgentRunStatus
+    triggeredBy?: string
+    summary?: string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    recordsProcessed?: number
+    errorMessage?: string | null
+    startedAt?: Date | string
+    completedAt?: Date | string | null
+    durationMs?: number | null
+    createdAt?: Date | string
+  }
+
+  export type AgentRunUncheckedCreateInput = {
+    id?: string
+    agentType: $Enums.AgentType
+    status?: $Enums.AgentRunStatus
+    triggeredBy?: string
+    summary?: string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    recordsProcessed?: number
+    errorMessage?: string | null
+    startedAt?: Date | string
+    completedAt?: Date | string | null
+    durationMs?: number | null
+    createdAt?: Date | string
+  }
+
+  export type AgentRunUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentType?: EnumAgentTypeFieldUpdateOperationsInput | $Enums.AgentType
+    status?: EnumAgentRunStatusFieldUpdateOperationsInput | $Enums.AgentRunStatus
+    triggeredBy?: StringFieldUpdateOperationsInput | string
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    recordsProcessed?: IntFieldUpdateOperationsInput | number
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationMs?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgentRunUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentType?: EnumAgentTypeFieldUpdateOperationsInput | $Enums.AgentType
+    status?: EnumAgentRunStatusFieldUpdateOperationsInput | $Enums.AgentRunStatus
+    triggeredBy?: StringFieldUpdateOperationsInput | string
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    recordsProcessed?: IntFieldUpdateOperationsInput | number
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationMs?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgentRunCreateManyInput = {
+    id?: string
+    agentType: $Enums.AgentType
+    status?: $Enums.AgentRunStatus
+    triggeredBy?: string
+    summary?: string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    recordsProcessed?: number
+    errorMessage?: string | null
+    startedAt?: Date | string
+    completedAt?: Date | string | null
+    durationMs?: number | null
+    createdAt?: Date | string
+  }
+
+  export type AgentRunUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentType?: EnumAgentTypeFieldUpdateOperationsInput | $Enums.AgentType
+    status?: EnumAgentRunStatusFieldUpdateOperationsInput | $Enums.AgentRunStatus
+    triggeredBy?: StringFieldUpdateOperationsInput | string
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    recordsProcessed?: IntFieldUpdateOperationsInput | number
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationMs?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgentRunUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentType?: EnumAgentTypeFieldUpdateOperationsInput | $Enums.AgentType
+    status?: EnumAgentRunStatusFieldUpdateOperationsInput | $Enums.AgentRunStatus
+    triggeredBy?: StringFieldUpdateOperationsInput | string
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    recordsProcessed?: IntFieldUpdateOperationsInput | number
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationMs?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmissionRecordCreateInput = {
+    id?: string
+    agentRunId?: string | null
+    instanceId: string
+    instanceType: string
+    provider: $Enums.CloudProvider
+    region: string
+    instanceName?: string | null
+    cpuUtilization: number
+    memoryUtilization?: number | null
+    networkInGb?: number | null
+    networkOutGb?: number | null
+    energyKwh: number
+    gridIntensity: number
+    carbonKg: number
+    isIdle?: boolean
+    isOversized?: boolean
+    recommendation?: string | null
+    timestamp?: Date | string
+  }
+
+  export type EmissionRecordUncheckedCreateInput = {
+    id?: string
+    agentRunId?: string | null
+    instanceId: string
+    instanceType: string
+    provider: $Enums.CloudProvider
+    region: string
+    instanceName?: string | null
+    cpuUtilization: number
+    memoryUtilization?: number | null
+    networkInGb?: number | null
+    networkOutGb?: number | null
+    energyKwh: number
+    gridIntensity: number
+    carbonKg: number
+    isIdle?: boolean
+    isOversized?: boolean
+    recommendation?: string | null
+    timestamp?: Date | string
+  }
+
+  export type EmissionRecordUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentRunId?: NullableStringFieldUpdateOperationsInput | string | null
+    instanceId?: StringFieldUpdateOperationsInput | string
+    instanceType?: StringFieldUpdateOperationsInput | string
+    provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
+    region?: StringFieldUpdateOperationsInput | string
+    instanceName?: NullableStringFieldUpdateOperationsInput | string | null
+    cpuUtilization?: FloatFieldUpdateOperationsInput | number
+    memoryUtilization?: NullableFloatFieldUpdateOperationsInput | number | null
+    networkInGb?: NullableFloatFieldUpdateOperationsInput | number | null
+    networkOutGb?: NullableFloatFieldUpdateOperationsInput | number | null
+    energyKwh?: FloatFieldUpdateOperationsInput | number
+    gridIntensity?: FloatFieldUpdateOperationsInput | number
+    carbonKg?: FloatFieldUpdateOperationsInput | number
+    isIdle?: BoolFieldUpdateOperationsInput | boolean
+    isOversized?: BoolFieldUpdateOperationsInput | boolean
+    recommendation?: NullableStringFieldUpdateOperationsInput | string | null
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmissionRecordUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentRunId?: NullableStringFieldUpdateOperationsInput | string | null
+    instanceId?: StringFieldUpdateOperationsInput | string
+    instanceType?: StringFieldUpdateOperationsInput | string
+    provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
+    region?: StringFieldUpdateOperationsInput | string
+    instanceName?: NullableStringFieldUpdateOperationsInput | string | null
+    cpuUtilization?: FloatFieldUpdateOperationsInput | number
+    memoryUtilization?: NullableFloatFieldUpdateOperationsInput | number | null
+    networkInGb?: NullableFloatFieldUpdateOperationsInput | number | null
+    networkOutGb?: NullableFloatFieldUpdateOperationsInput | number | null
+    energyKwh?: FloatFieldUpdateOperationsInput | number
+    gridIntensity?: FloatFieldUpdateOperationsInput | number
+    carbonKg?: FloatFieldUpdateOperationsInput | number
+    isIdle?: BoolFieldUpdateOperationsInput | boolean
+    isOversized?: BoolFieldUpdateOperationsInput | boolean
+    recommendation?: NullableStringFieldUpdateOperationsInput | string | null
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmissionRecordCreateManyInput = {
+    id?: string
+    agentRunId?: string | null
+    instanceId: string
+    instanceType: string
+    provider: $Enums.CloudProvider
+    region: string
+    instanceName?: string | null
+    cpuUtilization: number
+    memoryUtilization?: number | null
+    networkInGb?: number | null
+    networkOutGb?: number | null
+    energyKwh: number
+    gridIntensity: number
+    carbonKg: number
+    isIdle?: boolean
+    isOversized?: boolean
+    recommendation?: string | null
+    timestamp?: Date | string
+  }
+
+  export type EmissionRecordUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentRunId?: NullableStringFieldUpdateOperationsInput | string | null
+    instanceId?: StringFieldUpdateOperationsInput | string
+    instanceType?: StringFieldUpdateOperationsInput | string
+    provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
+    region?: StringFieldUpdateOperationsInput | string
+    instanceName?: NullableStringFieldUpdateOperationsInput | string | null
+    cpuUtilization?: FloatFieldUpdateOperationsInput | number
+    memoryUtilization?: NullableFloatFieldUpdateOperationsInput | number | null
+    networkInGb?: NullableFloatFieldUpdateOperationsInput | number | null
+    networkOutGb?: NullableFloatFieldUpdateOperationsInput | number | null
+    energyKwh?: FloatFieldUpdateOperationsInput | number
+    gridIntensity?: FloatFieldUpdateOperationsInput | number
+    carbonKg?: FloatFieldUpdateOperationsInput | number
+    isIdle?: BoolFieldUpdateOperationsInput | boolean
+    isOversized?: BoolFieldUpdateOperationsInput | boolean
+    recommendation?: NullableStringFieldUpdateOperationsInput | string | null
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmissionRecordUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentRunId?: NullableStringFieldUpdateOperationsInput | string | null
+    instanceId?: StringFieldUpdateOperationsInput | string
+    instanceType?: StringFieldUpdateOperationsInput | string
+    provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
+    region?: StringFieldUpdateOperationsInput | string
+    instanceName?: NullableStringFieldUpdateOperationsInput | string | null
+    cpuUtilization?: FloatFieldUpdateOperationsInput | number
+    memoryUtilization?: NullableFloatFieldUpdateOperationsInput | number | null
+    networkInGb?: NullableFloatFieldUpdateOperationsInput | number | null
+    networkOutGb?: NullableFloatFieldUpdateOperationsInput | number | null
+    energyKwh?: FloatFieldUpdateOperationsInput | number
+    gridIntensity?: FloatFieldUpdateOperationsInput | number
+    carbonKg?: FloatFieldUpdateOperationsInput | number
+    isIdle?: BoolFieldUpdateOperationsInput | boolean
+    isOversized?: BoolFieldUpdateOperationsInput | boolean
+    recommendation?: NullableStringFieldUpdateOperationsInput | string | null
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -19449,6 +22266,203 @@ export namespace Prisma {
     regionCount?: SortOrder
   }
 
+  export type EnumAgentTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.AgentType | EnumAgentTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.AgentType[] | ListEnumAgentTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AgentType[] | ListEnumAgentTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumAgentTypeFilter<$PrismaModel> | $Enums.AgentType
+  }
+
+  export type EnumAgentRunStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AgentRunStatus | EnumAgentRunStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AgentRunStatus[] | ListEnumAgentRunStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AgentRunStatus[] | ListEnumAgentRunStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAgentRunStatusFilter<$PrismaModel> | $Enums.AgentRunStatus
+  }
+
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type AgentRunCountOrderByAggregateInput = {
+    id?: SortOrder
+    agentType?: SortOrder
+    status?: SortOrder
+    triggeredBy?: SortOrder
+    summary?: SortOrder
+    details?: SortOrder
+    recordsProcessed?: SortOrder
+    errorMessage?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    durationMs?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AgentRunAvgOrderByAggregateInput = {
+    recordsProcessed?: SortOrder
+    durationMs?: SortOrder
+  }
+
+  export type AgentRunMaxOrderByAggregateInput = {
+    id?: SortOrder
+    agentType?: SortOrder
+    status?: SortOrder
+    triggeredBy?: SortOrder
+    summary?: SortOrder
+    recordsProcessed?: SortOrder
+    errorMessage?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    durationMs?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AgentRunMinOrderByAggregateInput = {
+    id?: SortOrder
+    agentType?: SortOrder
+    status?: SortOrder
+    triggeredBy?: SortOrder
+    summary?: SortOrder
+    recordsProcessed?: SortOrder
+    errorMessage?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    durationMs?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AgentRunSumOrderByAggregateInput = {
+    recordsProcessed?: SortOrder
+    durationMs?: SortOrder
+  }
+
+  export type EnumAgentTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AgentType | EnumAgentTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.AgentType[] | ListEnumAgentTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AgentType[] | ListEnumAgentTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumAgentTypeWithAggregatesFilter<$PrismaModel> | $Enums.AgentType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAgentTypeFilter<$PrismaModel>
+    _max?: NestedEnumAgentTypeFilter<$PrismaModel>
+  }
+
+  export type EnumAgentRunStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AgentRunStatus | EnumAgentRunStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AgentRunStatus[] | ListEnumAgentRunStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AgentRunStatus[] | ListEnumAgentRunStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAgentRunStatusWithAggregatesFilter<$PrismaModel> | $Enums.AgentRunStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAgentRunStatusFilter<$PrismaModel>
+    _max?: NestedEnumAgentRunStatusFilter<$PrismaModel>
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type EmissionRecordCountOrderByAggregateInput = {
+    id?: SortOrder
+    agentRunId?: SortOrder
+    instanceId?: SortOrder
+    instanceType?: SortOrder
+    provider?: SortOrder
+    region?: SortOrder
+    instanceName?: SortOrder
+    cpuUtilization?: SortOrder
+    memoryUtilization?: SortOrder
+    networkInGb?: SortOrder
+    networkOutGb?: SortOrder
+    energyKwh?: SortOrder
+    gridIntensity?: SortOrder
+    carbonKg?: SortOrder
+    isIdle?: SortOrder
+    isOversized?: SortOrder
+    recommendation?: SortOrder
+    timestamp?: SortOrder
+  }
+
+  export type EmissionRecordAvgOrderByAggregateInput = {
+    cpuUtilization?: SortOrder
+    memoryUtilization?: SortOrder
+    networkInGb?: SortOrder
+    networkOutGb?: SortOrder
+    energyKwh?: SortOrder
+    gridIntensity?: SortOrder
+    carbonKg?: SortOrder
+  }
+
+  export type EmissionRecordMaxOrderByAggregateInput = {
+    id?: SortOrder
+    agentRunId?: SortOrder
+    instanceId?: SortOrder
+    instanceType?: SortOrder
+    provider?: SortOrder
+    region?: SortOrder
+    instanceName?: SortOrder
+    cpuUtilization?: SortOrder
+    memoryUtilization?: SortOrder
+    networkInGb?: SortOrder
+    networkOutGb?: SortOrder
+    energyKwh?: SortOrder
+    gridIntensity?: SortOrder
+    carbonKg?: SortOrder
+    isIdle?: SortOrder
+    isOversized?: SortOrder
+    recommendation?: SortOrder
+    timestamp?: SortOrder
+  }
+
+  export type EmissionRecordMinOrderByAggregateInput = {
+    id?: SortOrder
+    agentRunId?: SortOrder
+    instanceId?: SortOrder
+    instanceType?: SortOrder
+    provider?: SortOrder
+    region?: SortOrder
+    instanceName?: SortOrder
+    cpuUtilization?: SortOrder
+    memoryUtilization?: SortOrder
+    networkInGb?: SortOrder
+    networkOutGb?: SortOrder
+    energyKwh?: SortOrder
+    gridIntensity?: SortOrder
+    carbonKg?: SortOrder
+    isIdle?: SortOrder
+    isOversized?: SortOrder
+    recommendation?: SortOrder
+    timestamp?: SortOrder
+  }
+
+  export type EmissionRecordSumOrderByAggregateInput = {
+    cpuUtilization?: SortOrder
+    memoryUtilization?: SortOrder
+    networkInGb?: SortOrder
+    networkOutGb?: SortOrder
+    energyKwh?: SortOrder
+    gridIntensity?: SortOrder
+    carbonKg?: SortOrder
+  }
+
   export type CalculationCreateNestedManyWithoutUserInput = {
     create?: XOR<CalculationCreateWithoutUserInput, CalculationUncheckedCreateWithoutUserInput> | CalculationCreateWithoutUserInput[] | CalculationUncheckedCreateWithoutUserInput[]
     connectOrCreate?: CalculationCreateOrConnectWithoutUserInput | CalculationCreateOrConnectWithoutUserInput[]
@@ -19690,6 +22704,22 @@ export namespace Prisma {
 
   export type EnumStorageTypeFieldUpdateOperationsInput = {
     set?: $Enums.StorageType
+  }
+
+  export type EnumAgentTypeFieldUpdateOperationsInput = {
+    set?: $Enums.AgentType
+  }
+
+  export type EnumAgentRunStatusFieldUpdateOperationsInput = {
+    set?: $Enums.AgentRunStatus
+  }
+
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -20206,6 +23236,56 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumStorageTypeFilter<$PrismaModel>
     _max?: NestedEnumStorageTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumAgentTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.AgentType | EnumAgentTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.AgentType[] | ListEnumAgentTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AgentType[] | ListEnumAgentTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumAgentTypeFilter<$PrismaModel> | $Enums.AgentType
+  }
+
+  export type NestedEnumAgentRunStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AgentRunStatus | EnumAgentRunStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AgentRunStatus[] | ListEnumAgentRunStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AgentRunStatus[] | ListEnumAgentRunStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAgentRunStatusFilter<$PrismaModel> | $Enums.AgentRunStatus
+  }
+
+  export type NestedEnumAgentTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AgentType | EnumAgentTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.AgentType[] | ListEnumAgentTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AgentType[] | ListEnumAgentTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumAgentTypeWithAggregatesFilter<$PrismaModel> | $Enums.AgentType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAgentTypeFilter<$PrismaModel>
+    _max?: NestedEnumAgentTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumAgentRunStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AgentRunStatus | EnumAgentRunStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AgentRunStatus[] | ListEnumAgentRunStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AgentRunStatus[] | ListEnumAgentRunStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAgentRunStatusWithAggregatesFilter<$PrismaModel> | $Enums.AgentRunStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAgentRunStatusFilter<$PrismaModel>
+    _max?: NestedEnumAgentRunStatusFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type CalculationCreateWithoutUserInput = {
@@ -20899,6 +23979,14 @@ export namespace Prisma {
      * @deprecated Use ProviderDefaultArgs instead
      */
     export type ProviderArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ProviderDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use AgentRunDefaultArgs instead
+     */
+    export type AgentRunArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = AgentRunDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use EmissionRecordDefaultArgs instead
+     */
+    export type EmissionRecordArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = EmissionRecordDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany

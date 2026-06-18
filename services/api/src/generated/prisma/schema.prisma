@@ -7,7 +7,7 @@
 generator client {
   provider      = "prisma-client-js"
   output        = "../src/generated/prisma"
-  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x", "linux-musl-arm64-openssl-1.1.x", "linux-musl-openssl-3.0.x"]
+  binaryTargets = ["native"]
 }
 
 datasource db {
@@ -440,4 +440,77 @@ model Provider {
   isActive      Boolean       @default(true)
 
   createdAt DateTime @default(now())
+}
+
+// ─── Agent System (Phase 6) ─────────────────────────────────
+
+enum AgentType {
+  COLLECTOR
+  ANALYST
+  CICD_GATE
+  REPORTER
+}
+
+enum AgentRunStatus {
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
+model AgentRun {
+  id          String         @id @default(cuid())
+  agentType   AgentType
+  status      AgentRunStatus @default(RUNNING)
+  triggeredBy String         @default("cron") // "cron" | "manual" | "webhook"
+
+  // Results
+  summary          String? // Human-readable one-liner
+  details          Json? // Full structured output
+  recordsProcessed Int     @default(0)
+  errorMessage     String?
+
+  // Timing
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  durationMs  Int?
+
+  createdAt DateTime @default(now())
+
+  @@index([agentType, createdAt(sort: Desc)])
+  @@index([status])
+}
+
+model EmissionRecord {
+  id         String  @id @default(cuid())
+  agentRunId String? // Links to the AgentRun that created this
+
+  // Instance identification
+  instanceId   String // e.g., "i-0abc123def" or mock ID
+  instanceType String // e.g., "t3.medium"
+  provider     CloudProvider
+  region       String // e.g., "ap-south-1"
+  instanceName String? // e.g., "api-server-prod"
+
+  // Utilization metrics
+  cpuUtilization    Float // 0.0 to 1.0
+  memoryUtilization Float? // 0.0 to 1.0
+  networkInGb       Float?
+  networkOutGb      Float?
+
+  // Carbon results
+  energyKwh     Float
+  gridIntensity Float // gCO₂/kWh at time of measurement
+  carbonKg      Float // Final carbon footprint
+
+  // Flags
+  isIdle         Boolean @default(false) // < 5% CPU
+  isOversized    Boolean @default(false) // < 20% CPU
+  recommendation String? // AI-generated suggestion
+
+  timestamp DateTime @default(now())
+
+  @@index([region, timestamp(sort: Desc)])
+  @@index([isIdle])
+  @@index([isOversized])
+  @@index([agentRunId])
 }
