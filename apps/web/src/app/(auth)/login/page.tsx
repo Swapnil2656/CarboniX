@@ -3,20 +3,19 @@ import { authConfig } from "@/carbonix-auth.config";
 import { signInUser } from "@/lib/carbonix-auth/auth-actions";
 import { signInSchema } from "@/lib/carbonix-auth/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaEnvelope, FaLock, FaUserCircle } from "react-icons/fa";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 
 type FormData = z.infer<typeof signInSchema>;
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
@@ -36,126 +35,161 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[var(--card)] p-6">
-      <motion.div
-        className="w-full max-w-4xl flex flex-col md:flex-row border border-[var(--border)] rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.12)] overflow-hidden"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-      >
-        {/* ── Left Panel ─────────────────────────────────────────────────────── */}
-        <motion.div
-          className="md:w-1/2 bg-gradient-to-br from-[var(--accent)]/20 to-[var(--button)]/10 p-8 flex flex-col justify-center items-center text-center"
-          initial={{ x: -20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.15 }}
-        >
-          <motion.div
-            className="relative flex items-center justify-center w-16 h-16 mb-4"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.25 }}
-          >
-            <div className="absolute w-full h-full bg-[var(--button)]/20 rounded-full animate-pulse" />
-            <div className="absolute w-3/4 h-3/4 bg-[var(--accent)]/30 rounded-full" />
-            <FaUserCircle className="text-[var(--button)] text-3xl z-10" />
-          </motion.div>
-
-          <h1 className="text-3xl font-bold text-[var(--foreground)] mb-1">Welcome Back</h1>
-          <h2 className="text-lg text-[var(--foreground)] mb-3 font-medium">{authConfig.app.name}</h2>
-          <p className="text-sm text-[var(--card-foreground)] max-w-xs mb-6">
-            {authConfig.app.description}
-          </p>
-
-          {authConfig.heroImage ? (
-            <div className="hidden md:block relative h-56 w-full rounded-2xl overflow-hidden">
-              <Image
-                src={authConfig.heroImage}
-                alt={authConfig.heroImageAlt}
-                fill
-                style={{ objectFit: "cover" }}
-                className="rounded-2xl"
+    <div className="min-h-screen flex items-center justify-center p-md md:p-margin bg-background font-body-md text-on-surface selection:bg-primary-container selection:text-on-primary">
+      <main className="w-full max-w-[1200px] grid grid-cols-1 md:grid-cols-2 min-h-[720px] rounded-xl overflow-hidden border border-outline-variant shadow-2xl">
+        
+        {/* Left Column: Branding Pane */}
+        <section className="relative bg-surface p-xl md:p-3xl flex flex-col justify-between overflow-hidden hidden md:flex">
+          {/* Background Decorative Element */}
+          <div 
+            className="absolute inset-0 opacity-10 pointer-events-none" 
+            style={{ backgroundImage: "radial-gradient(circle at 2px 2px, #4e4633 1px, transparent 0)", backgroundSize: "24px 24px" }}
+          ></div>
+          
+          <div className="relative z-10">
+            <div className="mb-xl">
+              <img 
+                alt="Carbonix Logo" 
+                className="w-16 h-16 object-contain" 
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlHM2nsbfjGZR9awHPd3zarQz6zsfGRZRkikUV-QmGKtV0UqVHQ3xVru8iEPKNcRnc4xVdziwxPQHLThEtF3USHWZcc6GnRLBgBW46kzR5B_cctRibzkNipQR7yBbwPH0K9yvnhpWze4TjguCDx0E56izXfEgs1gZkIYxILcY7m90FuRaGxi-GIu-uF1GLeb2wj76FDtmvIjvUieCCNUWKnTcAb2wMiKtdT5MMfHUZN0qG_gys39fUAOvEU_nmikyDQoalAP5jGvjp" 
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-              <p className="absolute bottom-4 left-4 text-white font-medium">{authConfig.app.tagline}</p>
             </div>
-          ) : (
-            <p className="text-sm text-[var(--card-foreground)] italic">{authConfig.app.tagline}</p>
-          )}
-        </motion.div>
-
-        {/* ── Right Panel — Form ──────────────────────────────────────────────── */}
-        <motion.div
-          className="md:w-1/2 bg-white p-8 flex flex-col justify-center"
-          initial={{ x: 20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <h2 className="text-2xl font-bold mb-6 text-[var(--foreground)]">Login to Your Account</h2>
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="flex flex-col gap-1">
-              <label className="text-sm text-[var(--foreground)] flex items-center gap-2">
-                <span className="w-6 h-6 bg-[var(--button)]/10 rounded-full flex items-center justify-center">
-                  <FaEnvelope className="text-[var(--button)] text-xs" />
-                </span>
-                Email Address
-              </label>
-              <input
-                type="email"
-                placeholder="you@example.com"
-                className={`p-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--button)]/20 transition-all ${errors.email ? "border-red-400" : "border-[var(--border)]"}`}
-                {...register("email")}
-              />
-              {errors.email && <p className="text-red-500 text-xs">{errors.email.message}</p>}
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="text-sm text-[var(--foreground)] flex items-center gap-2">
-                <span className="w-6 h-6 bg-[var(--button)]/10 rounded-full flex items-center justify-center">
-                  <FaLock className="text-[var(--button)] text-xs" />
-                </span>
-                Password
-              </label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                className={`p-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--button)]/20 transition-all ${errors.password ? "border-red-400" : "border-[var(--border)]"}`}
-                {...register("password")}
-              />
-              {errors.password && <p className="text-red-500 text-xs">{errors.password.message}</p>}
-            </div>
-
-            {error && (
-              <div className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-lg p-3">
-                {error}
-              </div>
-            )}
-
-            <motion.button
-              type="submit"
-              disabled={loading}
-              className={`w-full bg-[var(--button)] text-white py-3 rounded-xl text-sm font-medium mt-1 flex items-center justify-center gap-2 transition-opacity ${loading ? "opacity-60 cursor-not-allowed" : "hover:opacity-90"}`}
-              whileHover={{ scale: loading ? 1 : 1.01 }}
-              whileTap={{ scale: loading ? 1 : 0.98 }}
-            >
-              {loading ? (
-                <>
-                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Signing in...
-                </>
-              ) : "Login"}
-            </motion.button>
-          </form>
-
-          <div className="mt-5 text-center text-sm text-[var(--card-foreground)]">
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-[var(--button)] hover:underline font-medium">
-              Sign up
-            </Link>
+            <h1 className="font-headline text-headline text-on-surface mb-md">
+              Welcome back to <span className="text-primary-container">CarboniX</span>
+            </h1>
+            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-md">
+              Your carbon-aware console for high-scale infrastructure management. Monitor, optimize, and neutralize your digital footprint.
+            </p>
           </div>
-        </motion.div>
-      </motion.div>
+          
+          <div className="relative z-10">
+            <div className="p-lg bg-surface-container-low rounded-lg border border-outline-variant">
+              <div className="flex items-center gap-md mb-sm">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                <span className="font-label-caps text-label-caps text-on-surface-variant">REAL-TIME GRID STATUS</span>
+              </div>
+              <div className="font-code text-code text-primary-container">
+                EMISSIONS: 240g CO2/kWh <br/>
+                LOAD: 84% OPTIMIZED
+              </div>
+            </div>
+            <div className="mt-xl flex items-center gap-md">
+              <div className="flex -space-x-2">
+                <img className="w-8 h-8 rounded-full border-2 border-surface object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtol0xgN956QuJNxYJ5w31FGLcgMWrpB9IrXQY6A3cvKGWks-QsQ4neu031szkwEiX9uVmhvKljyekyN29ZUWNy8W8qwjmfkXAw-FZQa67UnZhleiqK3BfPoSQcxVoBEv2Exsvp3Vq90tsXYjP8gCCOdV2Qw7Oo8TxAi5oBoXR94f_Zpo-jjdDqqYZzdxJRcWu9HMuYGcLxIU5ZKepKmJoSrMeGydVXbE-nvcXF30gzYQA_RpYuGHQ_5NE2VkdMxb0tfBDPneYB_8o" alt="User 1" />
+                <img className="w-8 h-8 rounded-full border-2 border-surface object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABqknmbEO84RuxSOuGQ47c9Hh-2WZPQYa_y-CvCiT2EPBdIdpHHlbjDuVu-lG0gDrftPFkVce5fRalbeuZ4ejwR6OWIP3JBGRWq_iSURSbQLtlCQ11pJLAFxQmZMW_8TsFcWRZxiocqu0gXxJQTsH9o72y0QWqKEmXK7NxuJ8U2DzerdBBK17HRh-CWn5CNfXWDPmX5ptCY41jiqqvG2uXmC1U1Pn2nHkF5r-zmoBek20IX6AclaWRbsLAFUK77ANWC8MdmBkk4kJc" alt="User 2" />
+                <img className="w-8 h-8 rounded-full border-2 border-surface object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaoT-zEoIzA_Pf0we5nCvYBCwcI42JzfWkPVdG2lJmoA_9PUJsu_rv2-iyM-0K_b5_xaAcjZJ7KmBLym0CmNZYVUhJGoe-M0-4X-mt0m2gvPs2dHNlcAIqNIwb4hnrXB_tG2_8dTI86XUm9pzObmOjHTCIDtVkhwhEazNFxKqkr4dDwW9J3vohELbQQqoGEimqhdGke6Tga0gKuSjUCUolHRJ3V6yAnuBDD2zrVxFOHwHlpwGoRCa0C9E7jRjQEHiFJfVknBqtVFZj" alt="User 3" />
+              </div>
+              <span className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Joined by 2k+ Engineers</span>
+            </div>
+          </div>
+          {/* Abstract Visual */}
+          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-primary-container/10 rounded-full blur-3xl"></div>
+        </section>
+
+        {/* Right Column: Form Pane */}
+        <section className="bg-surface-container p-xl md:p-3xl flex flex-col justify-center">
+          <div className="w-full max-w-sm mx-auto">
+            <header className="mb-xl">
+              <h2 className="font-section-header text-section-header text-on-surface mb-xs">Log in</h2>
+              <p className="font-body-md text-body-md text-on-surface-variant">Enter your credentials to access the console.</p>
+            </header>
+
+            <form className="space-y-lg" onSubmit={handleSubmit(onSubmit)}>
+              {/* Email Field */}
+              <div className="space-y-sm">
+                <label className={`font-label-caps text-label-caps flex items-center gap-xs transition-colors ${errors.email ? 'text-error' : 'text-on-surface-variant'}`} htmlFor="email">
+                  <FaEnvelope className="text-[14px]" /> EMAIL ADDRESS
+                </label>
+                <input 
+                  id="email"
+                  type="email" 
+                  placeholder="engineer@carbonix.io" 
+                  className={`w-full bg-surface-dim border rounded-lg p-md text-on-surface placeholder:text-on-surface-variant/40 focus:ring-1 focus:ring-primary-container focus:border-primary-container transition-all outline-none font-body-md ${errors.email ? 'border-error' : 'border-outline-variant'}`}
+                  {...register("email")}
+                />
+                {errors.email && <p className="text-error text-xs">{errors.email.message}</p>}
+              </div>
+
+              {/* Password Field */}
+              <div className="space-y-sm">
+                <div className="flex justify-between items-end">
+                  <label className={`font-label-caps text-label-caps flex items-center gap-xs transition-colors ${errors.password ? 'text-error' : 'text-on-surface-variant'}`} htmlFor="password">
+                    <FaLock className="text-[14px]" /> PASSWORD
+                  </label>
+                  <a className="font-label-caps text-label-caps text-primary-container hover:underline underline-offset-4" href="#">Forgot Password?</a>
+                </div>
+                <div className="relative">
+                  <input 
+                    id="password"
+                    type={showPassword ? "text" : "password"} 
+                    placeholder="••••••••••••" 
+                    className={`w-full bg-surface-dim border rounded-lg p-md text-on-surface placeholder:text-on-surface-variant/40 focus:ring-1 focus:ring-primary-container focus:border-primary-container transition-all outline-none font-body-md ${errors.password ? 'border-error' : 'border-outline-variant'}`}
+                    {...register("password")}
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-md top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors"
+                  >
+                    {showPassword ? <FaEyeSlash className="text-[18px] opacity-80" /> : <FaEye className="text-[18px] opacity-80" />}
+                  </button>
+                </div>
+                {errors.password && <p className="text-error text-xs">{errors.password.message}</p>}
+              </div>
+
+              {error && (
+                <div className="text-error text-sm bg-error-container/20 border border-error-container rounded-lg p-3">
+                  {error}
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="pt-md space-y-md">
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className={`w-full py-md bg-primary-container text-on-primary font-bold rounded-[10px] hover:bg-primary-fixed-dim transition-all active:scale-95 glow-hover flex items-center justify-center gap-2 ${loading ? 'opacity-70' : ''}`}
+                >
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5 text-on-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg> 
+                      Signing In...
+                    </>
+                  ) : "Sign In"}
+                </button>
+
+                <div className="relative flex items-center py-sm">
+                  <div className="flex-grow border-t border-outline-variant"></div>
+                  <span className="flex-shrink mx-md font-label-caps text-label-caps text-on-surface-variant">OR CONTINUE WITH</span>
+                  <div className="flex-grow border-t border-outline-variant"></div>
+                </div>
+
+                <button 
+                  type="button" 
+                  className="w-full py-md bg-transparent border border-outline-variant text-on-surface font-semibold rounded-[10px] hover:bg-surface-variant/20 transition-all flex items-center justify-center gap-md"
+                >
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path>
+                  </svg>
+                  Continue with GitHub
+                </button>
+              </div>
+
+              <footer className="mt-xl pt-lg border-t border-outline-variant text-center">
+                <p className="font-body-md text-on-surface-variant">
+                  Don&apos;t have an account?{" "}
+                  <Link href="/signup" className="text-primary-container font-bold hover:underline underline-offset-4">
+                    Sign up
+                  </Link>
+                </p>
+              </footer>
+            </form>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }

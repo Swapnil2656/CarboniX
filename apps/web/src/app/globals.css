@@ -1,27 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Base ──────────────────────────────────────────────────── */
+html {
+  color-scheme: dark;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #171309;
+  color: #ebe1d1;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
+/* ─── Material Symbols ──────────────────────────────────────── */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-family: 'Material Symbols Outlined', sans-serif;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Custom Scrollbar ──────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #171309;
+}
+::-webkit-scrollbar-thumb {
+  background: #4e4633;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #f5c518;
+}
+
+/* ─── Glassmorphism ─────────────────────────────────────────── */
+.glass-panel {
+  background: rgba(30, 30, 30, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid #2A2A2A;
+}
+
+.glass-card {
+  background: rgba(30, 30, 30, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid #2A2A2A;
+}
+
+/* ─── Radial Burst (hero background) ───────────────────────── */
+.radial-burst {
+  background: radial-gradient(circle at center, rgba(245, 197, 24, 0.15) 0%, transparent 70%);
+}
+
+/* ─── Code Syntax Highlight ─────────────────────────────────── */
+.code-syntax  { color: #d1c5ac; }
+.code-keyword { color: #f5c518; }
+.code-string  { color: #49dbff; }
+.code-comment { color: #584400; }
+
+/* ─── Carbon Rating Badges (Users page) ─────────────────────── */
+.rating-low      { color: #4ade80; background: rgba(74,  222, 128, 0.15); }
+.rating-medium   { color: #f5c518; background: rgba(245, 197,  24, 0.15); }
+.rating-high     { color: #fb923c; background: rgba(251, 146,  60, 0.15); }
+.rating-critical { color: #f87171; background: rgba(248, 113, 113, 0.15); }
+
+/* ─── iOS Toggle ─────────────────────────────────────────────── */
+.ios-toggle:checked + .toggle-bg {
+  background-color: #f5c518;
+}
+.ios-toggle:checked + .toggle-bg .toggle-dot {
+  transform: translateX(20px);
+  background-color: #141414;
+}
+
+/* ─── Utility ────────────────────────────────────────────────── */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  .tech-noir-glow {
+    box-shadow: 0 0 20px rgba(245, 197, 24, 0.05);
+  }
+  .chart-container {
+    mask-image: linear-gradient(to top, transparent 0%, black 100%);
   }
 }

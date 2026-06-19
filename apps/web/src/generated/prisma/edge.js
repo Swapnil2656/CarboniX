@@ -153,7 +153,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/home/vishall_vortex/CarboniX/apps/web/src/generated/prisma",
+      "value": "D:\\CODES\\CarboniX\\apps\\web\\src\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -162,7 +162,7 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "rhel-openssl-3.0.x",
+        "value": "windows",
         "native": true
       },
       {
