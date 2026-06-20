@@ -61,3 +61,16 @@ export const login = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
+export const subscribe = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, error: 'Email is required' });
+    }
+    // Mock subscription logic
+    res.json({ success: true, message: 'Subscribed successfully' });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};

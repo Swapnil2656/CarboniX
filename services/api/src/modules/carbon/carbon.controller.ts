@@ -76,8 +76,21 @@ export const calculate = async (req: AuthRequest, res: Response) => {
 export const compare = async (req: Request, res: Response) => {
   try {
     const input: CalculationInput = req.body;
-    const result = await calculateCarbon(input);
-    res.json({ success: true, data: { base: result } });
+    const baseResult = await calculateCarbon(input);
+    
+    // Generate comparison options
+    const options = [];
+    if (input.provider !== 'aws' || input.region !== 'eu-west-1') {
+      options.push(await calculateCarbon({ ...input, provider: 'aws', region: 'eu-west-1' }));
+    }
+    if (input.provider !== 'gcp' || input.region !== 'eu-north-1') {
+      options.push(await calculateCarbon({ ...input, provider: 'gcp', region: 'eu-north-1' }));
+    }
+    if (input.provider !== 'azure' || input.region !== 'northeurope') {
+      options.push(await calculateCarbon({ ...input, provider: 'azure', region: 'northeurope' }));
+    }
+
+    res.json({ success: true, data: { base: baseResult, options } });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -85,10 +98,21 @@ export const compare = async (req: Request, res: Response) => {
 
 export const recommend = async (req: Request, res: Response) => {
   try {
-    // Phase 2 implementation of recommendations is coming up
+    const input: CalculationInput = req.body;
+    const baseResult = await calculateCarbon(input);
+    
+    const recResult = await calculateCarbon({ ...input, provider: 'gcp', region: 'eu-north-1' });
+
     res.json({ 
       success: true, 
-      data: {} 
+      data: {
+        recommended: {
+            provider: 'gcp',
+            region: 'eu-north-1',
+            co2KgMonth: recResult.co2KgMonth,
+            savingsKg: Math.max(0, baseResult.co2KgMonth - recResult.co2KgMonth)
+        }
+      } 
     });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });

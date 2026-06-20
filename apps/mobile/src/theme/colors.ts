@@ -20,5 +20,8 @@ export const colors = {
   success: '#50FA7B',
   warning: '#E8904A',
   error: '#ffb4ab',
+  errorContainer: '#93000a',
+  onErrorContainer: '#ffdad6',
+  outline: '#968f81',
   info: '#8BE9FD',
 };

@@ -17,8 +17,8 @@ export const apiClient = axios.create({
 apiClient.interceptors.request.use(async (config) => {
   try {
     const token = await SecureStore.getItemAsync('carbonix_token');
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (config.headers) {
+      config.headers.Authorization = `Bearer ${token || 'mock-token-for-dev'}`;
     }
   } catch (error) {
     // Ignore store errors

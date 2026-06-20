@@ -1,51 +1,42 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors } from '../../src/theme/colors';
-
-const HISTORY_DATA = [
-  {
-    id: 1,
-    time: "Today, 2:14 PM",
-    title: "prod-analytics-cluster",
-    provider: "AWS",
-    icon: "cloud",
-    region: "us-east-1",
-    total: "28.2 kg",
-    level: "HIGH",
-    levelColor: colors.error,
-    levelBg: 'rgba(255, 180, 171, 0.1)',
-  },
-  {
-    id: 2,
-    time: "Yesterday, 9:45 AM",
-    title: "dev-db-replica",
-    provider: "GCP",
-    icon: "cloud-queue",
-    region: "europe-west3",
-    total: "2.4 kg",
-    level: "LOW",
-    levelColor: '#90ff9e',
-    levelBg: 'rgba(144, 255, 158, 0.1)',
-  },
-  {
-    id: 3,
-    time: "Oct 24, 4:20 PM",
-    title: "staging-api-nodes",
-    provider: "Azure",
-    icon: "filter-drama",
-    region: "eastus2",
-    total: "14.7 kg",
-    level: "MED",
-    levelColor: colors.primary,
-    levelBg: 'rgba(255, 229, 160, 0.1)',
-  }
-];
+import { carbonApi } from '../../src/services/api/endpoints';
 
 const TREND_DATA = [30, 25, 40, 45, 60, 50, 70, 65, 80, 75, 90, 85, 100, 95];
 
 export default function HistoryScreen() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [historyData, setHistoryData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const res = await carbonApi.getHistory();
+        if (res.data) {
+          setHistoryData(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch history:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchHistory();
+  }, []);
+
+  const getLevelInfo = (co2: number) => {
+    if (co2 > 20) return { level: 'HIGH', color: colors.error, bg: 'rgba(255, 180, 171, 0.1)' };
+    if (co2 > 5) return { level: 'MED', color: colors.primary, bg: 'rgba(255, 229, 160, 0.1)' };
+    return { level: 'LOW', color: '#90ff9e', bg: 'rgba(144, 255, 158, 0.1)' };
+  };
+
+  const filteredData = historyData.filter(item => 
+    item.provider.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    item.region.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <View style={styles.container}>
@@ -104,36 +95,45 @@ export default function HistoryScreen() {
 
         {/* History List */}
         <View style={styles.listContainer}>
-          {HISTORY_DATA.map((item) => (
-            <View key={item.id} style={[styles.card, { borderLeftColor: item.levelColor }]}>
-              <View style={styles.cardHeader}>
-                <Text style={styles.timeText}>{item.time}</Text>
-                <TouchableOpacity>
-                  <MaterialIcons name="share" size={18} color={colors.textMuted} />
-                </TouchableOpacity>
-              </View>
+          {loading ? (
+            <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 32 }} />
+          ) : filteredData.length === 0 ? (
+            <Text style={{ color: colors.textMuted, textAlign: 'center', marginTop: 32 }}>No calculations found.</Text>
+          ) : (
+            filteredData.map((item) => {
+              const info = getLevelInfo(item.co2KgMonth);
+              return (
+                <View key={item.id} style={[styles.card, { borderLeftColor: info.color }]}>
+                  <View style={styles.cardHeader}>
+                    <Text style={styles.timeText}>{new Date(item.createdAt).toLocaleString()}</Text>
+                    <TouchableOpacity>
+                      <MaterialIcons name="share" size={18} color={colors.textMuted} />
+                    </TouchableOpacity>
+                  </View>
 
-              <View style={styles.cardBody}>
-                <Text style={styles.cardTitle}>{item.title}</Text>
-                <View style={styles.providerInfo}>
-                  <MaterialIcons name={item.icon as any} size={14} color={colors.textMuted} />
-                  <Text style={styles.providerText}>{item.provider}</Text>
-                  <Text style={styles.dotSeparator}>•</Text>
-                  <Text style={styles.regionText}>{item.region}</Text>
-                </View>
-              </View>
+                  <View style={styles.cardBody}>
+                    <Text style={styles.cardTitle}>Run #{item.id.slice(0, 8)}</Text>
+                    <View style={styles.providerInfo}>
+                      <MaterialIcons name="cloud" size={14} color={colors.textMuted} />
+                      <Text style={styles.providerText}>{item.provider.toUpperCase()}</Text>
+                      <Text style={styles.dotSeparator}>•</Text>
+                      <Text style={styles.regionText}>{item.region}</Text>
+                    </View>
+                  </View>
 
-              <View style={styles.cardFooter}>
-                <View>
-                  <Text style={styles.totalLabel}>TOTAL CO2E</Text>
-                  <Text style={[styles.totalValue, { color: item.levelColor }]}>{item.total}</Text>
+                  <View style={styles.cardFooter}>
+                    <View>
+                      <Text style={styles.totalLabel}>TOTAL CO2E</Text>
+                      <Text style={[styles.totalValue, { color: info.color }]}>{item.co2KgMonth.toFixed(2)} kg</Text>
+                    </View>
+                    <View style={[styles.badge, { backgroundColor: info.bg, borderColor: info.color }]}>
+                      <Text style={[styles.badgeText, { color: info.color }]}>{info.level}</Text>
+                    </View>
+                  </View>
                 </View>
-                <View style={[styles.badge, { backgroundColor: item.levelBg, borderColor: item.levelColor }]}>
-                  <Text style={[styles.badgeText, { color: item.levelColor }]}>{item.level}</Text>
-                </View>
-              </View>
-            </View>
-          ))}
+              );
+            })
+          )}
         </View>
 
       </ScrollView>

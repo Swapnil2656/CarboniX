@@ -138,7 +138,7 @@ export default function ApiKeysPage() {
             <h3 className="text-lg font-semibold">Key Generated Successfully</h3>
           </div>
           <p className="text-on-surface-variant mb-4 text-sm">
-            Please copy your new API key for <strong>{newlyCreatedKey.name}</strong> now. You won't be able to see it again!
+            Please copy your new API key for <strong>{newlyCreatedKey.name}</strong> now. You won&apos;t be able to see it again!
           </p>
           <div className="flex items-center gap-3">
             <code className="flex-1 bg-surface-container-high border border-outline-variant px-4 py-3 rounded-lg text-primary font-code select-all">

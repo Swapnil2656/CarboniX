@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.borderSubtle,
     padding: 8,
-    flexDirection: 'col',
+    flexDirection: 'column',
       borderRadius: 12,
   },
   statLabel: {

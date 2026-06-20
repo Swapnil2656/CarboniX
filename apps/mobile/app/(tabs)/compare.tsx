@@ -1,9 +1,58 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors } from '../../src/theme/colors';
+import { carbonApi } from '../../src/services/api/endpoints';
 
 export default function CompareProvidersScreen() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCompare = async () => {
+      try {
+        const payload = {
+          provider: 'aws',
+          region: 'us-east-1',
+          cpuCores: 8,
+          memoryGb: 32,
+          storageGb: 500,
+          durationHours: 730
+        };
+        const res = await carbonApi.compare(payload);
+        setData(res.data);
+      } catch (err) {
+        console.error('Failed to compare:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCompare();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  if (!data || !data.options || data.options.length === 0) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text style={{ color: colors.error }}>Failed to load comparison data</Text>
+      </View>
+    );
+  }
+
+  const allResults = [data.base, ...data.options].sort((a, b) => a.co2KgMonth - b.co2KgMonth);
+  const best = allResults[0];
+  const worst = allResults[allResults.length - 1];
+  const base = data.base;
+
+  const multiplier = Math.round(worst.co2KgMonth / best.co2KgMonth);
+
   return (
     <View style={styles.container}>
       {/* TopAppBar */}
@@ -29,63 +78,49 @@ export default function CompareProvidersScreen() {
         <View style={styles.insightBanner}>
           <MaterialIcons name="info" size={24} color={colors.onPrimaryContainer} />
           <View style={styles.insightTextCol}>
-            <Text style={styles.insightTitle}>GCP eu-north-1 emits 98% less</Text>
-            <Text style={styles.insightDesc}>Based on isolated 1hr compute simulation vs AWS equivalent.</Text>
+            <Text style={styles.insightTitle}>{best.provider.toUpperCase()} {best.region} emits {(100 - (best.co2KgMonth/worst.co2KgMonth)*100).toFixed(0)}% less</Text>
+            <Text style={styles.insightDesc}>Based on your target compute simulation vs worst equivalent.</Text>
           </View>
         </View>
 
         {/* Provider Cards Container */}
         <View style={styles.cardsContainer}>
           
-          {/* Card 1: AWS */}
-          <View style={[styles.card, styles.cardAws]}>
-            <View>
-              <Text style={styles.providerName}>AWS</Text>
-              <Text style={styles.providerRegion}>eu-west-1</Text>
-            </View>
-            <View style={styles.providerStats}>
-              <View style={styles.emissionRow}>
-                <Text style={[styles.emissionVal, { color: colors.error }]}>33.8</Text>
-                <Text style={styles.emissionUnit}>kg</Text>
-              </View>
-              <View style={styles.awsBadge}>
-                <Text style={styles.awsBadgeText}>↑ 51× vs GCP</Text>
-              </View>
-            </View>
-          </View>
+          {allResults.map((res: any, index: number) => {
+            const isWinner = index === 0;
+            const isWorst = index === allResults.length - 1;
+            
+            let cardStyle = styles.cardAws;
+            if (res.provider === 'gcp') cardStyle = styles.cardGcp;
+            if (res.provider === 'azure') cardStyle = styles.cardAzure;
 
-          {/* Card 2: GCP (Winner) */}
-          <View style={[styles.card, styles.cardGcp]}>
-            <View>
-              <View style={styles.gcpTitleRow}>
-                <Text style={[styles.providerName, { color: '#90ff9e' }]}>GCP</Text>
-                <View style={styles.gcpBadge}>
-                  <Text style={styles.gcpBadgeText}>🏆 LOWEST</Text>
+            return (
+              <View key={res.provider} style={[styles.card, cardStyle]}>
+                <View>
+                  <View style={styles.gcpTitleRow}>
+                    <Text style={[styles.providerName, isWinner && { color: '#90ff9e' }]}>{res.provider.toUpperCase()}</Text>
+                    {isWinner && (
+                      <View style={styles.gcpBadge}>
+                        <Text style={styles.gcpBadgeText}>🏆 LOWEST</Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text style={styles.providerRegion}>{res.region}</Text>
+                </View>
+                <View style={styles.providerStats}>
+                  <View style={styles.emissionRow}>
+                    <Text style={[styles.emissionVal, isWinner ? { color: '#90ff9e' } : { color: colors.error }]}>{res.co2KgMonth.toFixed(2)}</Text>
+                    <Text style={[styles.emissionUnit, isWinner && { color: 'rgba(144,255,158,0.7)' }]}>kg</Text>
+                  </View>
+                  {isWorst && (
+                    <View style={styles.awsBadge}>
+                      <Text style={styles.awsBadgeText}>↑ {multiplier}× vs {best.provider.toUpperCase()}</Text>
+                    </View>
+                  )}
                 </View>
               </View>
-              <Text style={styles.providerRegion}>eu-north-1</Text>
-            </View>
-            <View style={styles.providerStats}>
-              <View style={styles.emissionRow}>
-                <Text style={[styles.emissionVal, { color: '#90ff9e' }]}>0.67</Text>
-                <Text style={[styles.emissionUnit, { color: 'rgba(144,255,158,0.7)' }]}>kg</Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Card 3: Azure */}
-          <View style={[styles.card, styles.cardAzure]}>
-            <View>
-              <Text style={styles.providerName}>Azure</Text>
-              <Text style={styles.providerRegion}>northeurope</Text>
-            </View>
-            <View style={styles.providerStats}>
-              <View style={styles.emissionRow}>
-                <Text style={[styles.emissionVal, { color: colors.error }]}>28.1</Text>
-                <Text style={styles.emissionUnit}>kg</Text>
-              </View>
-            </View>
-          </View>
+            );
+          })}
 
         </View>
 
@@ -94,38 +129,28 @@ export default function CompareProvidersScreen() {
           <Text style={styles.chartTitle}>CO₂ EMISSION COMPARISON (kg)</Text>
           <View style={styles.chartRows}>
             
-            {/* AWS Bar */}
-            <View style={styles.barGroup}>
-              <View style={styles.barHeader}>
-                <Text style={styles.barProvider}>AWS</Text>
-                <Text style={[styles.barVal, { color: colors.error }]}>33.8</Text>
-              </View>
-              <View style={styles.barTrack}>
-                <View style={[styles.barFill, { width: '100%', backgroundColor: colors.error }]} />
-              </View>
-            </View>
+            {allResults.map((res: any, index: number) => {
+              const isWinner = index === 0;
+              const widthPct = Math.max(2, (res.co2KgMonth / worst.co2KgMonth) * 100);
 
-            {/* Azure Bar */}
-            <View style={styles.barGroup}>
-              <View style={styles.barHeader}>
-                <Text style={styles.barProvider}>Azure</Text>
-                <Text style={[styles.barVal, { color: colors.error }]}>28.1</Text>
-              </View>
-              <View style={styles.barTrack}>
-                <View style={[styles.barFill, { width: '83%', backgroundColor: colors.error }]} />
-              </View>
-            </View>
-
-            {/* GCP Bar */}
-            <View style={styles.barGroup}>
-              <View style={styles.barHeader}>
-                <Text style={[styles.barProvider, { color: '#90ff9e' }]}>GCP</Text>
-                <Text style={[styles.barVal, { color: '#90ff9e' }]}>0.67</Text>
-              </View>
-              <View style={styles.barTrack}>
-                <View style={[styles.barFill, { width: '2%', minWidth: 4, backgroundColor: '#90ff9e', shadowColor: '#90ff9e', shadowOpacity: 0.5, shadowRadius: 10, elevation: 4 }]} />
-              </View>
-            </View>
+              return (
+                <View key={`chart-${res.provider}`} style={styles.barGroup}>
+                  <View style={styles.barHeader}>
+                    <Text style={[styles.barProvider, isWinner && { color: '#90ff9e' }]}>{res.provider.toUpperCase()}</Text>
+                    <Text style={[styles.barVal, isWinner ? { color: '#90ff9e' } : { color: colors.error }]}>{res.co2KgMonth.toFixed(2)}</Text>
+                  </View>
+                  <View style={styles.barTrack}>
+                    <View style={[
+                      styles.barFill, 
+                      { width: `${widthPct}%` },
+                      isWinner 
+                        ? { minWidth: 4, backgroundColor: '#90ff9e', shadowColor: '#90ff9e', shadowOpacity: 0.5, shadowRadius: 10, elevation: 4 }
+                        : { backgroundColor: colors.error }
+                    ]} />
+                  </View>
+                </View>
+              );
+            })}
 
           </View>
         </View>

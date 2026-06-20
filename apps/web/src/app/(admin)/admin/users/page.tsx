@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/Badge';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { adminApi } from '@/services/api/endpoints';
-import type { DeviceAsset, UsersResponse } from '@/types/admin';
+import type { UsersResponse } from '@/types/admin';
 
 export default function UsersPage() {
   const [data, setData] = useState<UsersResponse | null>(null);

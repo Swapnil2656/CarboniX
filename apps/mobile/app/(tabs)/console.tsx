@@ -1,9 +1,38 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors } from '../../src/theme/colors';
+import { carbonApi } from '../../src/services/api/endpoints';
+
+const INITIAL_PAYLOAD = {
+  provider: "aws",
+  region: "us-east-1",
+  cpuCores: 8,
+  memoryGb: 32,
+  storageGb: 500,
+  durationHours: 730
+};
 
 export default function ConsoleScreen() {
+  const [response, setResponse] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [timeMs, setTimeMs] = useState(0);
+
+  const handleFire = async () => {
+    setLoading(true);
+    setResponse(null);
+    const start = Date.now();
+    try {
+      const res = await carbonApi.calculate(INITIAL_PAYLOAD);
+      setResponse(res);
+    } catch (err: any) {
+      setResponse({ error: err.message || 'Failed' });
+    } finally {
+      setTimeMs(Date.now() - start);
+      setLoading(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* TopAppBar */}
@@ -31,11 +60,17 @@ export default function ConsoleScreen() {
             <Text style={styles.methodText}>POST</Text>
           </View>
           <Text style={styles.endpointUrl} numberOfLines={1}>
-            https://api.carbonix.io/v1/calculate
+            /api/v1/carbon/calculate
           </Text>
-          <TouchableOpacity style={styles.fireBtn}>
-            <MaterialIcons name="play-arrow" size={20} color={colors.onPrimaryContainer} />
-            <Text style={styles.fireBtnText}>Fire Request</Text>
+          <TouchableOpacity style={styles.fireBtn} onPress={handleFire} disabled={loading}>
+            {loading ? (
+              <ActivityIndicator size="small" color="#695200" />
+            ) : (
+              <>
+                <MaterialIcons name="play-arrow" size={20} color={colors.onPrimaryContainer} />
+                <Text style={styles.fireBtnText}>Fire Request</Text>
+              </>
+            )}
           </TouchableOpacity>
         </View>
 
@@ -48,20 +83,7 @@ export default function ConsoleScreen() {
           <View style={styles.codeBlock}>
             <ScrollView horizontal>
               <Text style={styles.codeText}>
-                <Text style={styles.punct}>{'{'}</Text>{'\n'}
-                <Text style={styles.key}>  "facility_id"</Text><Text style={styles.punct}>: </Text><Text style={styles.string}>"FAC-84729"</Text><Text style={styles.punct}>,</Text>{'\n'}
-                <Text style={styles.key}>  "timestamp"</Text><Text style={styles.punct}>: </Text><Text style={styles.string}>"2023-10-27T14:32:00Z"</Text><Text style={styles.punct}>,</Text>{'\n'}
-                <Text style={styles.key}>  "metrics"</Text><Text style={styles.punct}>: {'{'}</Text>{'\n'}
-                <Text style={styles.key}>    "power_usage_kwh"</Text><Text style={styles.punct}>: </Text><Text style={styles.number}>1450.5</Text><Text style={styles.punct}>,</Text>{'\n'}
-                <Text style={styles.key}>    "cooling_water_liters"</Text><Text style={styles.punct}>: </Text><Text style={styles.number}>8200</Text><Text style={styles.punct}>,</Text>{'\n'}
-                <Text style={styles.key}>    "generator_fuel_liters"</Text><Text style={styles.punct}>: </Text><Text style={styles.number}>0</Text>{'\n'}
-                <Text style={styles.punct}>  {'},'}</Text>{'\n'}
-                <Text style={styles.key}>  "grid_mix"</Text><Text style={styles.punct}>: {'{'}</Text>{'\n'}
-                <Text style={styles.key}>    "solar_pct"</Text><Text style={styles.punct}>: </Text><Text style={styles.number}>25</Text><Text style={styles.punct}>,</Text>{'\n'}
-                <Text style={styles.key}>    "wind_pct"</Text><Text style={styles.punct}>: </Text><Text style={styles.number}>15</Text><Text style={styles.punct}>,</Text>{'\n'}
-                <Text style={styles.key}>    "fossil_pct"</Text><Text style={styles.punct}>: </Text><Text style={styles.number}>60</Text>{'\n'}
-                <Text style={styles.punct}>  {'}'}</Text>{'\n'}
-                <Text style={styles.punct}>{'}'}</Text>
+                {JSON.stringify(INITIAL_PAYLOAD, null, 2)}
               </Text>
             </ScrollView>
             <TouchableOpacity style={styles.copyBtn}>
@@ -74,32 +96,30 @@ export default function ConsoleScreen() {
         <View style={styles.editorSection}>
           <View style={styles.editorHeader}>
             <Text style={styles.editorTitle}>RESPONSE</Text>
-            <View style={styles.responseTags}>
-              <View style={styles.tagSuccess}>
-                <MaterialIcons name="check" size={12} color="#002108" />
-                <Text style={styles.tagSuccessText}>200 OK</Text>
+            {response && !response.error && (
+              <View style={styles.responseTags}>
+                <View style={styles.tagSuccess}>
+                  <MaterialIcons name="check" size={12} color="#002108" />
+                  <Text style={styles.tagSuccessText}>200 OK</Text>
+                </View>
+                <View style={styles.tagTime}>
+                  <Text style={styles.tagTimeText}>{timeMs}ms</Text>
+                </View>
               </View>
-              <View style={styles.tagTime}>
-                <Text style={styles.tagTimeText}>234ms</Text>
+            )}
+            {response && response.error && (
+              <View style={styles.responseTags}>
+                <View style={[styles.tagSuccess, { backgroundColor: colors.errorContainer }]}>
+                  <MaterialIcons name="error" size={12} color={colors.onErrorContainer} />
+                  <Text style={[styles.tagSuccessText, { color: colors.onErrorContainer }]}>ERROR</Text>
+                </View>
               </View>
-            </View>
+            )}
           </View>
           <View style={styles.codeBlock}>
             <ScrollView horizontal>
               <Text style={styles.codeText}>
-                <Text style={styles.punct}>{'{'}</Text>{'\n'}
-                <Text style={styles.key}>  "status"</Text><Text style={styles.punct}>: </Text><Text style={styles.string}>"success"</Text><Text style={styles.punct}>,</Text>{'\n'}
-                <Text style={styles.key}>  "calculation_id"</Text><Text style={styles.punct}>: </Text><Text style={styles.string}>"CALC-993821"</Text><Text style={styles.punct}>,</Text>{'\n'}
-                <Text style={styles.key}>  "data"</Text><Text style={styles.punct}>: {'{'}</Text>{'\n'}
-                <Text style={styles.key}>    "total_emissions_kgco2e"</Text><Text style={styles.punct}>: </Text><Text style={styles.number}>684.2</Text><Text style={styles.punct}>,</Text>{'\n'}
-                <Text style={styles.key}>    "breakdown"</Text><Text style={styles.punct}>: {'{'}</Text>{'\n'}
-                <Text style={styles.key}>      "scope_2"</Text><Text style={styles.punct}>: </Text><Text style={styles.number}>684.2</Text><Text style={styles.punct}>,</Text>{'\n'}
-                <Text style={styles.key}>      "scope_1"</Text><Text style={styles.punct}>: </Text><Text style={styles.number}>0</Text>{'\n'}
-                <Text style={styles.punct}>    {'},'}</Text>{'\n'}
-                <Text style={styles.key}>    "intensity_factor"</Text><Text style={styles.punct}>: </Text><Text style={styles.number}>0.471</Text><Text style={styles.punct}>,</Text>{'\n'}
-                <Text style={styles.key}>    "rating"</Text><Text style={styles.punct}>: </Text><Text style={styles.string}>"B"</Text>{'\n'}
-                <Text style={styles.punct}>  {'}'}</Text>{'\n'}
-                <Text style={styles.punct}>{'}'}</Text>
+                {response ? JSON.stringify(response, null, 2) : '// Click Fire Request to see response...'}
               </Text>
             </ScrollView>
             <TouchableOpacity style={styles.copyBtn}>

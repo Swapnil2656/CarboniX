@@ -1,5 +1,5 @@
 "use client";
-import { authConfig } from "@/carbonix-auth.config";
+
 import { signInUser } from "@/lib/carbonix-auth/auth-actions";
 import { signInSchema } from "@/lib/carbonix-auth/zod";
 import { zodResolver } from "@hookform/resolvers/zod";

@@ -8,6 +8,7 @@ import carbonRoutes from './modules/carbon/carbon.routes';
 import referenceRoutes from './modules/reference/reference.routes';
 import authRoutes from './modules/auth/auth.routes';
 import agentRoutes from './modules/agents/agents.routes';
+import adminRoutes from './modules/admin/admin.routes';
 
 import { runCollector } from '@carbonix/agents';
 import { runAnalyst } from '@carbonix/agents';
@@ -34,6 +35,7 @@ app.use('/api/v1/carbon', carbonRoutes);
 app.use('/api/v1/reference', referenceRoutes);
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/agents', agentRoutes);
+app.use('/api/v1/admin', adminRoutes);
 
 // ─── Agent Cron Scheduling ───────────────────────────────────
 

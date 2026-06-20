@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { NewsletterForm } from './components/NewsletterForm';
+import { RegionsTable } from './components/RegionsTable';
 
 export const metadata: Metadata = {
   title: 'Carbonix | The Carbon Cost of Your Cloud',
@@ -54,7 +56,7 @@ export default function LandingPage() {
                 <br />In 5 lines of code.
               </h1>
               <p className="font-body-lg text-body-lg text-on-surface-variant mb-xl max-w-[540px]">
-                Quantify, monitor, and gate your infrastructure's environmental impact
+                Quantify, monitor, and gate your infrastructure&apos;s environmental impact
                 directly in the IDE and CI/CD pipelines. Industrial-grade carbon
                 intelligence for modern dev teams.
               </p>
@@ -248,7 +250,7 @@ export default function LandingPage() {
                 {/* Code */}
                 <div className="p-lg font-code text-code leading-[1.8]">
                   <p><span className="code-keyword">import</span> &#123; Carbonix &#125; <span className="code-keyword">from</span> <span className="code-string">&apos;@carbonix/sdk&apos;</span>;</p>
-                  <p><span className="code-comment">// Initialize real-time tracking</span></p>
+                  <p><span className="code-comment">{`// Initialize real-time tracking`}</span></p>
                   <p><span className="code-keyword">const</span> analyzer = <span className="code-keyword">new</span> Carbonix(&#123;</p>
                   <p>&nbsp;&nbsp;apiKey: process.env.CX_KEY,</p>
                   <p>&nbsp;&nbsp;strictMode: <span className="code-keyword">true</span></p>
@@ -297,85 +299,7 @@ export default function LandingPage() {
         {/* ── Regional Carbon Intensity ─────────────────────── */}
         <section id="network" className="px-margin py-3xl max-w-[1440px] mx-auto">
           <h2 className="font-display text-headline text-center mb-2xl text-on-surface">Regional Carbon Intensity</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="border-b border-outline-variant">
-                  <th className="text-left font-label-caps text-label-caps text-on-surface-variant py-lg">REGION</th>
-                  <th className="text-left font-label-caps text-label-caps text-on-surface-variant py-lg">GRID INTENSITY</th>
-                  <th className="text-left font-label-caps text-label-caps text-on-surface-variant py-lg">ENERGY MIX</th>
-                  <th className="text-right font-label-caps text-label-caps text-on-surface-variant py-lg">RATING</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-outline-variant">
-                {/* Mumbai */}
-                <tr className="hover:bg-surface-container transition-colors group">
-                  <td className="py-lg">
-                    <div className="flex items-center gap-md">
-                      <div className="w-8 h-5 rounded-sm bg-surface-container-highest overflow-hidden">
-                        <img alt="Flag of India" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2IU2AbHqdfuGBAWGuh6Tj4QPR398D2d7N0QgHb3DVYF3pnO9fxvxEvY54RoRHoOdn46VdIn7mdTsY7QuS2-ehG8jjJAlnguHhWjZgPv6vl44iKCjt8SUC-QFqFsv_JYuMgJN0hTht_0DmXekw1hJInTdHdSBvf_mNeoKpwnitDjTCupNAQWkEMr8z9FfDKqWWQQEe1QRfw_qJh5TQ4_RLAetKmXChBp2YrWzd-PXJHIFTV_GnD-v3Jvqlsj2fcS0yimu5mpNuthzj" />
-                      </div>
-                      <span className="font-display font-bold text-on-surface">Mumbai (ap-south-1)</span>
-                    </div>
-                  </td>
-                  <td className="py-lg font-code text-error">750 gCO2/kWh</td>
-                  <td className="py-lg">
-                    <div className="flex h-3 w-48 bg-surface-container-highest rounded-full overflow-hidden">
-                      <div className="w-[78%] h-full bg-error" title="Coal" />
-                      <div className="w-[12%] h-full bg-primary-container/40" title="Gas" />
-                      <div className="w-[10%] h-full bg-tertiary-container" title="Renewables" />
-                    </div>
-                  </td>
-                  <td className="py-lg text-right">
-                    <span className="bg-error/20 text-error px-md py-xs rounded-full font-label-caps text-[10px]">CRITICAL</span>
-                  </td>
-                </tr>
-                {/* Virginia */}
-                <tr className="hover:bg-surface-container transition-colors">
-                  <td className="py-lg">
-                    <div className="flex items-center gap-md">
-                      <div className="w-8 h-5 rounded-sm bg-surface-container-highest overflow-hidden">
-                        <img alt="Flag of USA" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMc8xximJjpF30mznsoZr7oJTa6-eZvOf40HSbNTxcEGcvnPRjV-ZT0YiHsgc4jZ3La5n3NqAJ8iBZAkc3vqzAwOvKzVxfFKrGyuc2M2IYEvM0XQAQp35WPm-7Hqy5Su3m2xF0hq_DvUqMruYCeD4mHRPJbqTsbj7GAuVKGdzW4tzvgyM8488N3TXU_2WS-ZZ71f1wBh3YGh3HbFuJerh04T1NxB-Bgm3j8MD4rUaXO_mOqH61Z01ToZeCBEE6ojEBwyrrKz9qh0ej" />
-                      </div>
-                      <span className="font-display font-bold text-on-surface">Virginia (us-east-1)</span>
-                    </div>
-                  </td>
-                  <td className="py-lg font-code text-on-surface-variant">380 gCO2/kWh</td>
-                  <td className="py-lg">
-                    <div className="flex h-3 w-48 bg-surface-container-highest rounded-full overflow-hidden">
-                      <div className="w-[45%] h-full bg-error-container" title="Fossil Fuels" />
-                      <div className="w-[30%] h-full bg-primary-container/60" title="Nuclear" />
-                      <div className="w-[25%] h-full bg-tertiary-container" title="Renewables" />
-                    </div>
-                  </td>
-                  <td className="py-lg text-right">
-                    <span className="bg-surface-container-highest text-on-surface-variant px-md py-xs rounded-full font-label-caps text-[10px]">MODERATE</span>
-                  </td>
-                </tr>
-                {/* Stockholm — best in class */}
-                <tr className="bg-primary-container/5 border-l-4 border-primary-container">
-                  <td className="py-lg pl-lg">
-                    <div className="flex items-center gap-md">
-                      <div className="w-8 h-5 rounded-sm bg-surface-container-highest overflow-hidden">
-                        <img alt="Flag of Sweden" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMP4LPdH3yNVrimNbx_aaBo6RSE1n7ysIOuR0l9F4RRQo1G0fy2FcH-_c1qcH_x8_ON-iCJaffz6h4WW8frmy9-Ti1-fQIsy3MGej6AWFNR6cfLte5xxrR_bLPS2VBb61rS1AXHHgiwMtS3SBPMd7tRhP6_ukAZLG13YhJVytmb_CBIlN3HCabuq-HFnUpdSHjDBp3lqxl44Y7faGx4NlDJAjhr2CbOCKRTZxY5jJOYpaLw5riBXL7WZW1wd3VHZU4r5b7CnxHNYUv" />
-                      </div>
-                      <span className="font-display font-bold text-primary-container">Stockholm (eu-north-1)</span>
-                    </div>
-                  </td>
-                  <td className="py-lg font-code text-primary-container">12 gCO2/kWh</td>
-                  <td className="py-lg">
-                    <div className="flex h-3 w-48 bg-surface-container-highest rounded-full overflow-hidden">
-                      <div className="w-[5%]  h-full bg-error-container" title="Others" />
-                      <div className="w-[95%] h-full bg-primary-container" title="Renewables" />
-                    </div>
-                  </td>
-                  <td className="py-lg text-right pr-lg">
-                    <span className="bg-primary-container text-on-primary-fixed px-md py-xs rounded-full font-label-caps text-[10px]">BEST IN CLASS</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <RegionsTable />
         </section>
 
         {/* ── Automated Carbon Gates ───────────────────────── */}
@@ -525,19 +449,7 @@ export default function LandingPage() {
             </div>
             <div className="p-lg bg-surface-container rounded-lg border border-outline-variant">
               <p className="font-label-caps text-[10px] text-on-surface-variant mb-sm">NEWSLETTER</p>
-              <form className="flex gap-sm" action="#">
-                <input
-                  type="email"
-                  placeholder="dev@company.com"
-                  className="bg-background border border-outline-variant rounded px-md py-xs font-code w-full focus:border-primary-container focus:ring-0 outline-none text-on-surface"
-                />
-                <button
-                  type="submit"
-                  className="bg-primary-container text-on-primary-fixed px-md py-xs rounded font-bold hover:opacity-80 transition-opacity"
-                >
-                  →
-                </button>
-              </form>
+              <NewsletterForm />
             </div>
           </div>
         </div>
