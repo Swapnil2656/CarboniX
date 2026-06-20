@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import 'react-native-reanimated';
 
-import {
+import { 
   Inter_400Regular,
   Inter_500Medium,
   Inter_600SemiBold,
