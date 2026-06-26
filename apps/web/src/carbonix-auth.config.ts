@@ -24,10 +24,10 @@ export const authConfig = {
     ADMIN: "/admin/dashboard",
     ANALYST: "/admin/analytics",
     CONTENT_EDITOR: "/admin/content",
-    USER: "/",  // regular users redirect to landing page
+    USER: "/admin/dashboard",  // regular users redirect to dashboard
   } as Record<string, string>,
 
-  defaultRedirect: "/",
+  defaultRedirect: "/admin/dashboard",
 
   // ─── Routes ────────────────────────────────────────────────
   routes: {

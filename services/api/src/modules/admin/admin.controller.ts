@@ -1,9 +1,16 @@
 import { Request, Response } from 'express';
 import { prisma } from '../../lib/prisma';
 import crypto from 'crypto';
+import { redis } from '../../lib/redis';
 
 export const getDashboard = async (req: Request, res: Response) => {
   try {
+    const cacheKey = 'admin:dashboard_stats';
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      return res.json({ ...JSON.parse(cached), cached: true });
+    }
+
     const apiKeys = await prisma.apiKey.findMany();
     const totalApiCalls = apiKeys.reduce((acc, key) => acc + key.totalRequests, 0);
 
@@ -42,7 +49,7 @@ export const getDashboard = async (req: Request, res: Response) => {
       { path: '/v1/auth/session', calls: 3100 },
     ];
 
-    res.json({
+    const responseData = {
       totalApiCalls,
       activeSessions: activeSessions || 125, // fallback if no sessions
       avgCo2Kg,
@@ -55,7 +62,11 @@ export const getDashboard = async (req: Request, res: Response) => {
         { provider: 'Azure', percent: 20 }
       ],
       liveApiStream: []
-    });
+    };
+
+    await redis.setex(cacheKey, 30, JSON.stringify(responseData));
+
+    res.json(responseData);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

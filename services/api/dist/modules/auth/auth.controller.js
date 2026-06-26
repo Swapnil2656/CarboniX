@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = exports.register = void 0;
+exports.subscribe = exports.login = exports.register = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const prisma_1 = require("../../lib/prisma");
@@ -56,3 +56,17 @@ const login = async (req, res) => {
     }
 };
 exports.login = login;
+const subscribe = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ success: false, error: 'Email is required' });
+        }
+        // Mock subscription logic
+        res.json({ success: true, message: 'Subscribed successfully' });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+exports.subscribe = subscribe;

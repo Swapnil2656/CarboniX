@@ -181,11 +181,17 @@ export default function FeatureFlagsPage() {
             <p className="text-sm text-on-surface-variant mb-6">Tools for local testing and configuration management.</p>
             
             <div className="flex flex-col gap-3">
-              <button className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-surface-container border border-outline-variant text-on-surface hover:bg-surface-container-high transition-colors font-medium text-sm">
+              <button 
+                onClick={() => alert('Global cache flushed (dummy)')}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-surface-container border border-outline-variant text-on-surface hover:bg-surface-container-high transition-colors font-medium text-sm"
+              >
                 <span className="material-symbols-outlined text-[18px]">delete_sweep</span>
                 Flush Global Cache
               </button>
-              <button className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-surface border border-outline-variant text-on-surface hover:bg-surface-container transition-colors font-medium text-sm">
+              <button 
+                onClick={() => alert('View JSON Config coming soon')}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-surface border border-outline-variant text-on-surface hover:bg-surface-container transition-colors font-medium text-sm"
+              >
                 <span className="material-symbols-outlined text-[18px]">data_object</span>
                 View JSON Config
               </button>

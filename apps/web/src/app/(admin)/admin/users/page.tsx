@@ -13,12 +13,15 @@ export default function UsersPage() {
   const [error, setError] = useState<string | null>(null);
   const [filterCloud, setFilterCloud] = useState('All');
   const [filterRating, setFilterRating] = useState('All');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'BANNED'>('ALL');
+  const [page, setPage] = useState(1);
+  const pageSize = 20;
   
   const fetchData = async () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await adminApi.getUsers();
+      const res = await adminApi.getUsers(page, pageSize);
       setData(res);
     } catch (err) {
       console.error(err);
@@ -30,7 +33,7 @@ export default function UsersPage() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [page]);
 
   const getRatingVariant = (co2: number) => {
     if (co2 < 50) return 'success';
@@ -38,6 +41,22 @@ export default function UsersPage() {
     if (co2 < 300) return 'error';
     return 'critical';
   };
+
+  const filteredUsers = data?.users?.filter((user) => {
+    if (filterCloud !== 'All' && user.cloud !== filterCloud) return false;
+    if (statusFilter !== 'ALL' && user.status !== statusFilter) return false;
+    
+    if (filterRating !== 'All') {
+      const rating = getRatingVariant(user.avgCo2KgPerHour);
+      if (filterRating === 'Low' && rating !== 'success') return false;
+      if (filterRating === 'Medium' && rating !== 'warning') return false;
+      if (filterRating === 'High' && rating !== 'error') return false;
+      if (filterRating === 'Critical' && rating !== 'critical') return false;
+    }
+    return true;
+  }) || [];
+
+  const totalPages = data ? Math.ceil(data.total / data.pageSize) : 0;
 
   return (
     <div className="flex flex-col gap-6">
@@ -85,8 +104,24 @@ export default function UsersPage() {
           </div>
           <div className="h-6 w-px bg-outline-variant mx-2 hidden sm:block"></div>
           <div className="flex bg-surface-container rounded-lg p-1 border border-outline-variant">
-            <button className="px-3 py-1 rounded bg-surface text-on-surface shadow-sm text-sm font-medium">Active</button>
-            <button className="px-3 py-1 rounded text-on-surface-variant hover:text-on-surface text-sm font-medium">Banned</button>
+            <button 
+              onClick={() => setStatusFilter('ALL')}
+              className={`px-3 py-1 rounded shadow-sm text-sm font-medium transition-colors ${statusFilter === 'ALL' ? 'bg-surface text-on-surface' : 'text-on-surface-variant hover:text-on-surface'}`}
+            >
+              All
+            </button>
+            <button 
+              onClick={() => setStatusFilter('ACTIVE')}
+              className={`px-3 py-1 rounded shadow-sm text-sm font-medium transition-colors ${statusFilter === 'ACTIVE' ? 'bg-surface text-on-surface' : 'text-on-surface-variant hover:text-on-surface'}`}
+            >
+              Active
+            </button>
+            <button 
+              onClick={() => setStatusFilter('BANNED')}
+              className={`px-3 py-1 rounded shadow-sm text-sm font-medium transition-colors ${statusFilter === 'BANNED' ? 'bg-surface text-on-surface' : 'text-on-surface-variant hover:text-on-surface'}`}
+            >
+              Banned
+            </button>
           </div>
         </div>
         
@@ -128,8 +163,8 @@ export default function UsersPage() {
                     <td className="px-6 py-4"><Skeleton className="h-6 w-6" /></td>
                   </tr>
                 ))
-              ) : data && data.users && data.users.length > 0 ? (
-                data.users.map((user) => (
+              ) : filteredUsers.length > 0 ? (
+                filteredUsers.map((user) => (
                   <tr key={user.id} className="hover:bg-surface-container-low transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
@@ -183,17 +218,39 @@ export default function UsersPage() {
         {/* Pagination */}
         <div className="px-6 py-4 border-t border-outline-variant flex items-center justify-between bg-surface-container-lowest">
           <span className="text-sm text-on-surface-variant">
-            Showing {data?.users?.length || 0} of {data?.total || 0} results
+            Showing {filteredUsers.length} of {data?.total || 0} results
           </span>
           <div className="flex items-center gap-1">
-            <button className="p-1 rounded bg-surface border border-outline-variant text-on-surface-variant hover:text-on-surface disabled:opacity-50" disabled>
+            <button 
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="p-1 rounded bg-surface border border-outline-variant text-on-surface-variant hover:text-on-surface disabled:opacity-50"
+            >
               <span className="material-symbols-outlined text-[20px]">chevron_left</span>
             </button>
-            <button className="px-3 py-1 rounded bg-[rgba(245,197,24,0.1)] text-primary border border-primary font-medium text-sm">1</button>
-            <button className="px-3 py-1 rounded bg-surface border border-outline-variant text-on-surface hover:bg-surface-container font-medium text-sm">2</button>
-            <button className="px-3 py-1 rounded bg-surface border border-outline-variant text-on-surface hover:bg-surface-container font-medium text-sm">3</button>
-            <span className="px-2 text-on-surface-variant">...</span>
-            <button className="p-1 rounded bg-surface border border-outline-variant text-on-surface-variant hover:text-on-surface">
+            
+            <button className="px-3 py-1 rounded bg-[rgba(245,197,24,0.1)] text-primary border border-primary font-medium text-sm">
+              {page}
+            </button>
+            
+            {page < totalPages && (
+              <button 
+                onClick={() => setPage(page + 1)}
+                className="px-3 py-1 rounded bg-surface border border-outline-variant text-on-surface hover:bg-surface-container font-medium text-sm"
+              >
+                {page + 1}
+              </button>
+            )}
+            
+            {page < totalPages - 1 && (
+              <span className="px-2 text-on-surface-variant">...</span>
+            )}
+            
+            <button 
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages || totalPages === 0}
+              className="p-1 rounded bg-surface border border-outline-variant text-on-surface-variant hover:text-on-surface disabled:opacity-50"
+            >
               <span className="material-symbols-outlined text-[20px]">chevron_right</span>
             </button>
           </div>

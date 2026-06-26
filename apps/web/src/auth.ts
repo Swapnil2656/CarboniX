@@ -1,19 +1,23 @@
 import NextAuth, { type DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { db } from "./lib/carbonix-auth/prisma-db";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import { signInSchema } from "./lib/carbonix-auth/zod";
 import { authConfig } from "./carbonix-auth.config";
 
 declare module "next-auth" {
   interface User {
     type?: string;
+    isOnboarded?: boolean;
   }
   interface Session {
     user: {
       id: string;
       type?: string;
+      isOnboarded?: boolean;
     } & DefaultSession["user"];
+    accessToken?: string;
   }
 }
 
@@ -21,10 +25,12 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     type?: string;
+    isOnboarded?: boolean;
+    accessToken?: string;
   }
 }
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
   providers: [
     Credentials({
       credentials: {
@@ -42,7 +48,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         if (!user.isVerified) throw new Error("Please verify your email before logging in");
 
-        return { id: user.id, email: user.email, name: user.userName, type: user.type };
+        return { id: user.id, email: user.email, name: user.userName, type: user.type, isOnboarded: user.isOnboarded };
       },
     }),
   ],
@@ -51,10 +57,34 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: authConfig.routes.signIn,
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id as string;
         token.type = user.type;
+        token.isOnboarded = user.isOnboarded;
+        
+        // Generate a standard JWT compatible with the Express API middleware
+        token.accessToken = jwt.sign(
+          { id: user.id, email: user.email }, 
+          process.env.JWT_SECRET || 'super-secret-key-for-dev',
+          { expiresIn: '1d' }
+        );
+      } else if (token?.id) {
+        // Verify the user still exists in the database
+        try {
+          const existingUser = await db.user.findUnique({ id: token.id as string });
+          if (!existingUser) {
+            // If the user was definitively deleted, destroy the session
+            return null as any;
+          }
+        } catch (error) {
+          // If the database is unreachable (e.g. serverless sleep), do not log out the user!
+          console.error("Database error during session validation:", error);
+        }
+      }
+
+      if (trigger === "update" && session) {
+        token.isOnboarded = session.isOnboarded;
       }
       return token;
     },
@@ -62,6 +92,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token?.id) {
         session.user.id = token.id;
         session.user.type = token.type as string;
+        session.user.isOnboarded = token.isOnboarded as boolean;
+        session.accessToken = token.accessToken as string;
       }
       return session;
     },

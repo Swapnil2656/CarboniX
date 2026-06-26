@@ -1,3 +1,5 @@
+import { getSession } from 'next-auth/react';
+
 // 1. Fetch wrapper for API calls to the Express backend (services/api)
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
 
@@ -11,9 +13,11 @@ export async function fetchClient(endpoint: string, options: RequestInit = {}) {
     'Content-Type': 'application/json',
   };
 
-  // If you need to attach a JWT token for the backend, you can pull it from cookies/session here.
-  // const session = await getSession(); // Example NextAuth session
-  // if (session?.accessToken) defaultHeaders['Authorization'] = `Bearer ${session.accessToken}`;
+  // Attach a JWT token for the backend from NextAuth session
+  const session = await getSession();
+  if ((session as any)?.accessToken) {
+    defaultHeaders['Authorization'] = `Bearer ${(session as any).accessToken}`;
+  }
 
   const config: RequestInit = {
     ...options,

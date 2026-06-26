@@ -35,9 +35,9 @@ function VerifyContent() {
   }, [token, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[var(--card)] p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-surface to-surface-container p-6">
       <motion.div
-        className="bg-white border border-[var(--border)] rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] p-10 max-w-sm w-full text-center"
+        className="bg-surface border border-outline-variant rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] p-10 max-w-sm w-full text-center"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -45,13 +45,13 @@ function VerifyContent() {
         {status === "verifying" && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <div className="w-16 h-16 mx-auto mb-6 relative">
-              <div className="absolute inset-0 bg-[var(--button)]/10 rounded-full animate-ping" />
-              <div className="relative w-full h-full bg-[var(--button)]/20 rounded-full flex items-center justify-center">
-                <span className="w-7 h-7 border-[3px] border-[var(--button)] border-t-transparent rounded-full animate-spin block" />
+              <div className="absolute inset-0 bg-primary/10 rounded-full animate-ping" />
+              <div className="relative w-full h-full bg-primary/20 rounded-full flex items-center justify-center">
+                <span className="w-7 h-7 border-[3px] border-primary border-t-transparent rounded-full animate-spin block" />
               </div>
             </div>
-            <h2 className="text-xl font-bold text-[var(--foreground)] mb-2">Verifying your email</h2>
-            <p className="text-sm text-[var(--card-foreground)]">Just a moment…</p>
+            <h2 className="text-xl font-bold text-on-surface mb-2">Verifying your email</h2>
+            <p className="text-sm text-on-surface-variant">Just a moment…</p>
           </motion.div>
         )}
 
@@ -63,7 +63,7 @@ function VerifyContent() {
               </svg>
             </div>
             <h2 className="text-xl font-bold text-green-600 mb-2">Email Verified!</h2>
-            <p className="text-sm text-[var(--card-foreground)]">
+            <p className="text-sm text-on-surface-variant">
               Your account is active. Redirecting to login…
             </p>
           </motion.div>
@@ -77,10 +77,10 @@ function VerifyContent() {
               </svg>
             </div>
             <h2 className="text-xl font-bold text-red-600 mb-2">Verification Failed</h2>
-            <p className="text-sm text-[var(--card-foreground)] mb-6">{error}</p>
+            <p className="text-sm text-on-surface-variant mb-6">{error}</p>
             <Link
               href="/signup"
-              className="inline-block bg-[var(--button)] text-white text-sm font-medium px-6 py-2.5 rounded-xl hover:opacity-90 transition-opacity"
+              className="inline-block bg-primary text-on-primary text-sm font-medium px-6 py-2.5 rounded-xl hover:opacity-90 transition-opacity"
             >
               Back to Sign Up
             </Link>
@@ -95,8 +95,8 @@ export default function VerifyPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center">
-          <span className="w-8 h-8 border-4 border-[var(--button)] border-t-transparent rounded-full animate-spin" />
+        <div className="min-h-screen flex items-center justify-center bg-surface">
+          <span className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
         </div>
       }
     >

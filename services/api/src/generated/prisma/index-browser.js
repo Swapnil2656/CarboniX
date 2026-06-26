@@ -378,6 +378,44 @@ exports.Prisma.EmissionRecordScalarFieldEnum = {
   timestamp: 'timestamp'
 };
 
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
+  userName: 'userName',
+  email: 'email',
+  password: 'password',
+  isVerified: 'isVerified',
+  isOnboarded: 'isOnboarded',
+  type: 'type',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ProjectScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  region: 'region',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  fullName: 'fullName',
+  avatarUrl: 'avatarUrl',
+  phoneNumber: 'phoneNumber',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.VerificationTokenScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  expires: 'expires',
+  userId: 'userId'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -513,6 +551,14 @@ exports.AgentRunStatus = exports.$Enums.AgentRunStatus = {
   FAILED: 'FAILED'
 };
 
+exports.userType = exports.$Enums.userType = {
+  SUPER_ADMIN: 'SUPER_ADMIN',
+  ADMIN: 'ADMIN',
+  ANALYST: 'ANALYST',
+  CONTENT_EDITOR: 'CONTENT_EDITOR',
+  USER: 'USER'
+};
+
 exports.Prisma.ModelName = {
   MobileUser: 'MobileUser',
   Calculation: 'Calculation',
@@ -527,7 +573,11 @@ exports.Prisma.ModelName = {
   InstanceType: 'InstanceType',
   Provider: 'Provider',
   AgentRun: 'AgentRun',
-  EmissionRecord: 'EmissionRecord'
+  EmissionRecord: 'EmissionRecord',
+  User: 'User',
+  Project: 'Project',
+  Profile: 'Profile',
+  VerificationToken: 'VerificationToken'
 };
 
 /**

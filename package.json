@@ -1,5 +1,5 @@
 {
-  "name": "carbonsdk",
+  "name": "carbonix",
   "version": "1.0.0",
   "private": true,
   "packageManager": "npm@10.8.2",
@@ -7,16 +7,24 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "db:studio": "cd services/api && npx prisma studio"
   },
   "workspaces": [
     "apps/*",
     "packages/*",
     "services/*"
   ],
+  "prisma": {
+    "schema": "services/api/prisma/schema.prisma"
+  },
   "devDependencies": {
-    "turbo": "^1.13.0",
+    "eslint": "^8.57.0",
     "prettier": "^3.2.5",
-    "eslint": "^8.57.0"
+    "prisma": "^5.22.0",
+    "turbo": "^1.13.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0"
   }
 }

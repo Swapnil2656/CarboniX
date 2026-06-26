@@ -1,6 +1,6 @@
 "use server";
 import { signIn } from "@/auth";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { AuthError } from "next-auth";
 import { db } from "./prisma-db";
 import { createUserSchema, signInSchema } from "./zod";

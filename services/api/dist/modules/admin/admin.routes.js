@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_middleware_1 = require("../../middleware/auth.middleware");
+const admin_controller_1 = require("./admin.controller");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.authenticate);
+router.get('/dashboard', admin_controller_1.getDashboard);
+router.get('/users', admin_controller_1.getUsers);
+router.get('/feature-flags', admin_controller_1.getFeatureFlags);
+router.patch('/feature-flags/:id', admin_controller_1.toggleFeatureFlag);
+router.get('/api-keys', admin_controller_1.getApiKeys);
+router.post('/api-keys', admin_controller_1.createApiKey);
+router.delete('/api-keys/:id', admin_controller_1.revokeApiKey);
+exports.default = router;

@@ -3558,3 +3558,58 @@
 {"_e":"metro:bundling:failed","_t":1781777225331,"id":"5","message":"Unable to resolve \"../src/context/LoadingContext\" from \"apps/mobile/app/_layout.tsx\"\n   8 | import 'react-native-reanimated';\n   9 |\n> 10 | import { LoadingProvider, useLoading } from '../src/context/LoadingContext';\n     |                                              ^\n  11 | import { AnimatedLogoLoader } from '../src/components/AnimatedLogoLoader';\n  12 |\n  13 | import {","importStack":"\u001b[1mImport stack:\u001b[22m\n\n\u001b[90m \u001b[39mapps/mobile/app/_layout.tsx\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"../src/context/LoadingContext\"\u001b[39m\n\n\u001b[90m \u001b[39mapps/mobile/app\u001b[2m (require.context)\u001b[22m\n","filename":null,"targetModuleName":"../src/context/LoadingContext","originModulePath":"apps/mobile/app/_layout.tsx"}
 {"_e":"metro:server_log","_t":1781777978006,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","RMX2161 - 12 - API 31","60"]}
 {"_e":"metro:server_log","_t":1781778134175,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","RMX2161 - 12 - API 31","60"]}
+{"_e":"root:init","_t":1782104682824,"format":"v0-jsonl","version":"56.1.14"}
+{"_e":"env:mode","_t":1782104682825,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1782104682826,"mode":"development","files":["../../../.env"],"env":{"EXPO_PUBLIC_API_URL":"http://localhost:4000/api/v1","EXPO_PUBLIC_APP_VERSION":"1.0.0","EXPO_PUBLIC_ENVIRONMENT":"development"}}
+{"_e":"devserver:start","_t":1782104683023,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1782104683401,"serverRoot":"../../../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":true,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1782104683742,"atlas":false,"workers":7,"host":"::","port":8081}
+{"_e":"root:init","_t":1782156995532,"format":"v0-jsonl","version":"56.1.14"}
+{"_e":"env:mode","_t":1782156995532,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1782156995537,"mode":"development","files":["../../../.env"],"env":{"EXPO_PUBLIC_API_URL":"http://localhost:4000/api/v1","EXPO_PUBLIC_APP_VERSION":"1.0.0","EXPO_PUBLIC_ENVIRONMENT":"development"}}
+{"_e":"devserver:start","_t":1782156995725,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1782156996143,"serverRoot":"../../../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":true,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1782156996543,"atlas":false,"workers":7,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1782157010049,"id":"3","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1782157010049,"id":"3","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1782157010052,"id":"3","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1782157010286,"id":"3","progress":0.010000000000000002,"total":1,"current":1}
+{"_e":"metro:bundling:progress","_t":1782157010388,"id":"3","progress":0.21301775147928997,"total":13,"current":6}
+{"_e":"metro:bundling:progress","_t":1782157010508,"id":"3","progress":0.28994082840236685,"total":13,"current":7}
+{"_e":"metro:bundling:progress","_t":1782157010525,"id":"3","progress":0.37869822485207105,"total":13,"current":8}
+{"_e":"metro:bundling:progress","_t":1782157010629,"id":"3","progress":0.37869822485207105,"total":206,"current":37}
+{"_e":"metro:bundling:progress","_t":1782157010731,"id":"3","progress":0.37869822485207105,"total":275,"current":62}
+{"_e":"metro:bundling:progress","_t":1782157010831,"id":"3","progress":0.37869822485207105,"total":332,"current":100}
+{"_e":"metro:bundling:progress","_t":1782157010931,"id":"3","progress":0.37869822485207105,"total":378,"current":132}
+{"_e":"metro:bundling:progress","_t":1782157011033,"id":"3","progress":0.37869822485207105,"total":479,"current":238}
+{"_e":"metro:bundling:progress","_t":1782157011132,"id":"3","progress":0.37869822485207105,"total":745,"current":324}
+{"_e":"metro:bundling:progress","_t":1782157011232,"id":"3","progress":0.37869822485207105,"total":863,"current":440}
+{"_e":"metro:bundling:progress","_t":1782157011332,"id":"3","progress":0.37869822485207105,"total":967,"current":545}
+{"_e":"metro:bundling:progress","_t":1782157011432,"id":"3","progress":0.37869822485207105,"total":1138,"current":652}
+{"_e":"metro:bundling:progress","_t":1782157011532,"id":"3","progress":0.37869822485207105,"total":1179,"current":710}
+{"_e":"metro:bundling:progress","_t":1782157011632,"id":"3","progress":0.396243594096489,"total":1228,"current":773}
+{"_e":"metro:bundling:progress","_t":1782157011732,"id":"3","progress":0.4680867492084106,"total":1257,"current":860}
+{"_e":"metro:bundling:progress","_t":1782157011832,"id":"3","progress":0.5503193864297652,"total":1286,"current":954}
+{"_e":"metro:bundling:progress","_t":1782157011932,"id":"3","progress":0.667414227900561,"total":1333,"current":1089}
+{"_e":"metro:bundling:progress","_t":1782157012032,"id":"3","progress":0.667414227900561,"total":1393,"current":1126}
+{"_e":"metro:bundling:progress","_t":1782157012132,"id":"3","progress":0.6694214876033059,"total":1441,"current":1179}
+{"_e":"metro:bundling:progress","_t":1782157012235,"id":"3","progress":0.7220955698685809,"total":1471,"current":1250}
+{"_e":"metro:bundling:progress","_t":1782157012335,"id":"3","progress":0.7319502266066096,"total":1516,"current":1297}
+{"_e":"metro:bundling:progress","_t":1782157012435,"id":"3","progress":0.7869406867845994,"total":1550,"current":1375}
+{"_e":"metro:bundling:progress","_t":1782157012536,"id":"3","progress":0.7883630167552437,"total":1570,"current":1394}
+{"_e":"metro:bundling:progress","_t":1782157012635,"id":"3","progress":0.8182652526076569,"total":1572,"current":1422}
+{"_e":"metro:bundling:progress","_t":1782157012735,"id":"3","progress":0.8533913295836155,"total":1614,"current":1491}
+{"_e":"metro:bundling:progress","_t":1782157012835,"id":"3","progress":0.8737689619274243,"total":1640,"current":1533}
+{"_e":"metro:bundling:progress","_t":1782157012935,"id":"3","progress":0.8882981203463749,"total":1739,"current":1639}
+{"_e":"metro:bundling:progress","_t":1782157013035,"id":"3","progress":0.9033104163919968,"total":1876,"current":1783}
+{"_e":"metro:bundling:progress","_t":1782157013135,"id":"3","progress":0.9795819566203453,"total":1949,"current":1929}
+{"_e":"metro:bundling:progress","_t":1782157013235,"id":"3","progress":0.999,"total":1954,"current":1954}
+{"_e":"metro:bundling:done","_t":1782157013285,"id":"3","total":1954,"ms":3235.687667}
+{"_e":"metro:client_log","_t":1782157051862,"level":"error","data":["Failed to compare:","[AxiosError: Network Error]"]}
+{"_e":"metro:client_log","_t":1782157058548,"level":"error","data":["Failed to fetch history:","[AxiosError: Network Error]"]}
+{"_e":"metro:server_log","_t":1782157127574,"level":"info","data":["Launching DevTools..."]}
+{"_e":"metro:bundling:started","_t":1782157341363,"id":"h","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1782157341363,"id":"h","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1782157341427,"id":"h","total":1,"ms":63.868625}
+{"_e":"metro:client_log","_t":1782157424302,"level":"error","data":["Failed to compare:","[AxiosError: Network Error]"]}
+{"_e":"metro:client_log","_t":1782157435307,"level":"error","data":["Failed to fetch history:","[AxiosError: Network Error]"]}

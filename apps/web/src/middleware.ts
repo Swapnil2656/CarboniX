@@ -14,14 +14,26 @@ export async function middleware(req: NextRequest) {
   // ── Admin-only prefix guard ────────────────────────────────────────────────
   if (
     pathname.startsWith(authConfig.adminPrefix) &&
-    (!token || token.type === "USER")
+    !token
   ) {
-    const fallback = token ? (authConfig.roleRedirects[token.type as string] ?? authConfig.defaultRedirect) : authConfig.routes.signIn;
+    const fallback = authConfig.routes.signIn;
     return NextResponse.redirect(new URL(fallback, req.url));
   }
 
+  // ── Onboarding Guard ───────────────────────────────────────────────────────
+  if (
+    token && 
+    !token.isOnboarded && 
+    pathname !== "/" &&
+    !pathname.startsWith('/onboarding') && 
+    !pathname.startsWith('/api/onboarding')
+  ) {
+    return NextResponse.redirect(new URL("/onboarding", req.url));
+  }
+
   // ── Redirect logged-in users away from auth pages ─────────────────────────
-  if (token && authConfig.publicRoutes.includes(pathname) && pathname !== "/" && pathname !== authConfig.routes.verify) {
+  if (token && authConfig.publicRoutes.includes(pathname) && pathname !== "/" && pathname !== authConfig.routes.verify && pathname !== "/onboarding") {
+    // If they are on an auth page like /login but they are logged in, send them to dashboard
     const destination = authConfig.roleRedirects[token.type as string] ?? authConfig.defaultRedirect;
     return NextResponse.redirect(new URL(destination, req.url));
   }

@@ -31,7 +31,6 @@ export default function SignupPage() {
     try {
       await signUp(data);
       setSuccess(true);
-      setTimeout(() => router.push(authConfig.routes.afterSignUp), 2500);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred. Please try again.");
     } finally {
@@ -102,9 +101,15 @@ export default function SignupPage() {
                   </svg>
                 </div>
                 <h3 className="text-xl font-headline text-on-surface mb-2">Account Created!</h3>
-                <p className="text-sm text-on-surface-variant">
-                  Check your email for a verification link. Redirecting to login...
+                <p className="text-sm text-on-surface-variant mb-6">
+                  Check your email for a verification link. You must verify your email before logging in.
                 </p>
+                <Link
+                  href="/login"
+                  className="inline-block bg-primary text-on-primary font-bold py-2 px-6 rounded-[10px] hover:opacity-90 transition-opacity"
+                >
+                  Go to Login
+                </Link>
               </div>
             ) : (
               <>

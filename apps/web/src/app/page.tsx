@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { NewsletterForm } from './components/NewsletterForm';
 import { RegionsTable } from './components/RegionsTable';
+import { auth } from '@/auth';
+import { SignOutButton } from './components/SignOutButton';
 
 export const metadata: Metadata = {
   title: 'Carbonix | The Carbon Cost of Your Cloud',
@@ -9,7 +11,9 @@ export const metadata: Metadata = {
     'Quantify, monitor, and gate your infrastructure\'s environmental impact directly in the IDE and CI/CD pipelines. Industrial-grade carbon intelligence for modern dev teams.',
 };
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const session = await auth();
+
   return (
     <div className="bg-background text-on-surface font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-fixed">
       {/* ── Navigation ──────────────────────────────────────── */}
@@ -31,15 +35,29 @@ export default function LandingPage() {
               <span className="font-code text-code text-on-surface-variant mr-sm">$</span>
               <span className="font-code text-code text-primary-container">npm install carbonix</span>
             </div>
-            <Link href="/login" className="text-on-surface-variant hover:text-primary transition-colors font-body-md">
-              Log In
-            </Link>
-            <Link
-              href="/signup"
-              className="bg-primary-container text-on-primary-fixed px-lg py-sm rounded-lg font-bold hover:opacity-80 active:scale-95 transition-all"
-            >
-              Get Started
-            </Link>
+            {session ? (
+              <>
+                <SignOutButton />
+                <Link
+                  href="/admin/dashboard"
+                  className="bg-primary-container text-on-primary-fixed px-lg py-sm rounded-lg font-bold hover:opacity-80 active:scale-95 transition-all"
+                >
+                  Dashboard
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/login" className="text-on-surface-variant hover:text-primary transition-colors font-body-md">
+                  Log In
+                </Link>
+                <Link
+                  href="/signup"
+                  className="bg-primary-container text-on-primary-fixed px-lg py-sm rounded-lg font-bold hover:opacity-80 active:scale-95 transition-all"
+                >
+                  Get Started
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>
