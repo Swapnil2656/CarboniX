@@ -210,7 +210,7 @@ export default function ApiKeysPage() {
             <div className="glass-card rounded-xl border border-outline-variant p-12 flex flex-col items-center text-center">
               <span className="material-symbols-outlined text-[48px] text-outline mb-4">key_off</span>
               <h3 className="text-lg font-medium text-on-surface mb-2">No API Keys</h3>
-              <p className="text-on-surface-variant text-sm max-w-md">Generate your first API key to start authenticating requests to the Carbonix API.</p>
+              <p className="text-on-surface-variant text-sm max-w-md">Generate your first API key to start authenticating requests to the CarboniX API.</p>
             </div>
           )}
         </div>

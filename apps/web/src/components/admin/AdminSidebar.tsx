@@ -26,8 +26,8 @@ export const AdminSidebar = () => {
   return (
     <aside className="w-64 h-screen fixed left-0 top-0 bg-surface border-r border-outline-variant flex flex-col pt-6 pb-6">
       <div className="px-6 mb-8 flex items-center gap-3">
-        <img src="/carbonix-logo.png" alt="Carbonix" className="w-8 h-8 object-contain" />
-        <span className="font-display font-semibold text-xl tracking-tight text-on-surface">Carbonix</span>
+        <img src="/carbonix-logo.png" alt="CarboniX" className="w-8 h-8 object-contain" />
+        <span className="font-display font-semibold text-xl tracking-tight text-on-surface">CarboniX</span>
       </div>
 
       <nav className="flex-1 px-4 flex flex-col gap-1">

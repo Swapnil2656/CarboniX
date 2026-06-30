@@ -3,7 +3,7 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
-  title: "Carbonix | The Carbon Cost of Your Cloud",
+  title: "CarboniX | The Carbon Cost of Your Cloud",
   description:
     "Quantify, monitor, and gate your infrastructure's environmental impact. Industrial-grade carbon intelligence for modern dev teams.",
 };

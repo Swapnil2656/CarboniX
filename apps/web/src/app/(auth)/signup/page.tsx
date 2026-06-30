@@ -53,7 +53,7 @@ export default function SignupPage() {
           <div className="relative z-10">
             <div className="mb-xl">
               <img 
-                alt="Carbonix Logo" 
+                alt="CarboniX Logo" 
                 className="w-16 h-16 object-contain" 
                 src="/carbonix-logo.png" 
               />

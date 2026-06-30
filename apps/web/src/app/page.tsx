@@ -6,7 +6,7 @@ import { auth } from '@/auth';
 import { SignOutButton } from './components/SignOutButton';
 
 export const metadata: Metadata = {
-  title: 'Carbonix | The Carbon Cost of Your Cloud',
+  title: 'CarboniX | The Carbon Cost of Your Cloud',
   description:
     'Quantify, monitor, and gate your infrastructure\'s environmental impact directly in the IDE and CI/CD pipelines. Industrial-grade carbon intelligence for modern dev teams.',
 };
@@ -21,9 +21,9 @@ export default async function LandingPage() {
         <div className="flex justify-between items-center px-margin py-md max-w-[1440px] mx-auto">
           <div className="flex items-center gap-xl">
             <div className="flex items-center gap-sm">
-              <img src="/carbonix-logo.png" alt="Carbonix" className="w-8 h-8 object-contain" />
+              <img src="/carbonix-logo.png" alt="CarboniX" className="w-8 h-8 object-contain" />
               <span className="text-section-header font-display font-black text-primary-container">
-                Carbonix
+                CarboniX
               </span>
             </div>
             <div className="hidden md:flex gap-lg">
@@ -121,7 +121,7 @@ export default async function LandingPage() {
               />
               <div className="relative w-[320px] aspect-[1/2] rounded-[48px] border-[8px] border-surface-container-highest bg-background overflow-hidden shadow-2xl">
                 <img
-                  alt="Carbonix App UI"
+                  alt="CarboniX App UI"
                   className="w-full h-full object-cover"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiTM61uvx1ZjhbXPi3GkqxhZnNvbeI4LlEyXwR1dlc-OUVnK1dhxhFQu1OE2QpXYP8IoAIPBCCIH5fz4nRNFDUuQhcXLRly0Sagzd5_FVB2aZQwCjWImQ-hINGnvOGXno1G_m0pWNFSb7h-LfMAF4KXS_aciKqIO0l4p8WFMaMYS4rSKDPbsU0ELL3Nw3AVVhjOBvSVfoosFbgEc8Tb6cekCM1NmUqaACFmYWsQ0EBEEekrgXVP1xAucUfRbhcas6Hp8s22NDOSkjv"
                 />
@@ -190,7 +190,7 @@ export default async function LandingPage() {
                 step: '1',
                 icon: 'download',
                 title: 'Install SDK',
-                desc: 'Add Carbonix to your project via npm, pip, or go get.',
+                desc: 'Add CarboniX to your project via npm, pip, or go get.',
                 code: (
                   <p className="font-code text-code text-on-surface-variant">
                     <span className="code-keyword">npm</span> i carbonix
@@ -266,9 +266,9 @@ export default async function LandingPage() {
                 </div>
                 {/* Code */}
                 <div className="p-lg font-code text-code leading-[1.8]">
-                  <p><span className="code-keyword">import</span> &#123; Carbonix &#125; <span className="code-keyword">from</span> <span className="code-string">&apos;carbonix&apos;</span>;</p>
+                  <p><span className="code-keyword">import</span> &#123; CarboniX &#125; <span className="code-keyword">from</span> <span className="code-string">&apos;carbonix&apos;</span>;</p>
                   <p><span className="code-comment">{`// Initialize real-time tracking`}</span></p>
-                  <p><span className="code-keyword">const</span> analyzer = <span className="code-keyword">new</span> Carbonix(&#123;</p>
+                  <p><span className="code-keyword">const</span> analyzer = <span className="code-keyword">new</span> CarboniX(&#123;</p>
                   <p>&nbsp;&nbsp;apiKey: process.env.CX_KEY,</p>
                   <p>&nbsp;&nbsp;strictMode: <span className="code-keyword">true</span></p>
                   <p>&#125;);</p>
@@ -486,7 +486,7 @@ export default async function LandingPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin max-w-[1440px] mx-auto">
           {/* Brand */}
           <div className="space-y-lg">
-            <span className="text-section-header font-display font-black text-primary-container">Carbonix</span>
+            <span className="text-section-header font-display font-black text-primary-container">CarboniX</span>
             <p className="text-on-surface-variant font-body-md pr-lg">
               Standardizing the environmental impact of software engineering. High-performance
               intelligence for a sustainable cloud.
@@ -555,7 +555,7 @@ export default async function LandingPage() {
         {/* Bottom bar */}
         <div className="mt-3xl pt-xl px-margin max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-md">
           <p className="text-on-surface-variant font-body-md text-[14px]">
-            © 2024 Carbonix Cloud Intelligence. All rights reserved.
+            © 2024 CarboniX Cloud Intelligence. All rights reserved.
           </p>
           <div className="flex items-center gap-md">
             <span className="w-2 h-2 rounded-full bg-primary-container animate-pulse" />
