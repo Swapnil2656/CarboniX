@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import dynamic from "next/dynamic";
 import { NewsletterForm } from './components/NewsletterForm';
 import { RegionsTable } from './components/RegionsTable';
 import { auth } from '@/auth';
 import { SignOutButton } from './components/SignOutButton';
+
+const CarbonAtom = dynamic(() => import("@/components/3d/CarbonAtom"), { ssr: false });
 
 export const metadata: Metadata = {
   title: 'CarboniX | The Carbon Cost of Your Cloud',
@@ -63,10 +66,15 @@ export default async function LandingPage() {
 
       <main className="pt-[80px]">
         {/* ── Hero ─────────────────────────────────────────── */}
-        <section id="platform" className="relative overflow-hidden min-h-[90vh] flex items-center px-margin py-3xl max-w-[1440px] mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3xl items-center relative z-10 w-full">
+        <section id="platform" className="relative overflow-hidden min-h-[90vh] flex items-center py-3xl w-full">
+          {/* Ambient 3D Background (Full Bleed) */}
+          <div className="absolute inset-0 z-0 pointer-events-none flex justify-center items-center opacity-80 mix-blend-screen md:-translate-x-[15%]">
+            <CarbonAtom />
+          </div>
+          {/* Content Wrapper */}
+          <div className="max-w-[1440px] mx-auto px-margin w-full grid grid-cols-1 md:grid-cols-2 gap-3xl items-center relative z-10">
             {/* Left col */}
-            <div>
+            <div className="opacity-80">
               <h1 className="font-display text-display mb-lg leading-[1.05]">
                 The carbon cost of{' '}
                 <span className="text-primary-container">your cloud</span>.{' '}
@@ -114,7 +122,7 @@ export default async function LandingPage() {
             </div>
 
             {/* Right col — phone mockup */}
-            <div className="relative flex justify-center items-center h-full">
+            <div className="relative flex justify-center items-center h-full min-h-[500px]">
               <div
                 className="absolute inset-0 -z-10"
                 style={{ background: 'radial-gradient(circle at 99.7% 8%, rgba(245,197,24,0.15) 0%, transparent 70%)' }}
