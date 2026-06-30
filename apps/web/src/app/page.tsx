@@ -20,9 +20,12 @@ export default async function LandingPage() {
       <nav className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
         <div className="flex justify-between items-center px-margin py-md max-w-[1440px] mx-auto">
           <div className="flex items-center gap-xl">
-            <span className="text-section-header font-display font-black text-primary-container">
-              Carbonix
-            </span>
+            <div className="flex items-center gap-sm">
+              <img src="/carbonix-logo.png" alt="Carbonix" className="w-8 h-8 object-contain" />
+              <span className="text-section-header font-display font-black text-primary-container">
+                Carbonix
+              </span>
+            </div>
             <div className="hidden md:flex gap-lg">
               <a href="#platform" className="text-primary font-bold border-b-2 border-primary pb-1 font-body-md transition-colors">Platform</a>
               <a href="#solutions" className="text-on-surface-variant hover:text-primary transition-colors font-body-md">Solutions</a>

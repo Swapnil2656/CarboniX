@@ -51,7 +51,7 @@ export default function LoginPage() {
               <img 
                 alt="Carbonix Logo" 
                 className="w-16 h-16 object-contain" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlHM2nsbfjGZR9awHPd3zarQz6zsfGRZRkikUV-QmGKtV0UqVHQ3xVru8iEPKNcRnc4xVdziwxPQHLThEtF3USHWZcc6GnRLBgBW46kzR5B_cctRibzkNipQR7yBbwPH0K9yvnhpWze4TjguCDx0E56izXfEgs1gZkIYxILcY7m90FuRaGxi-GIu-uF1GLeb2wj76FDtmvIjvUieCCNUWKnTcAb2wMiKtdT5MMfHUZN0qG_gys39fUAOvEU_nmikyDQoalAP5jGvjp" 
+                src="/carbonix-logo.png" 
               />
             </div>
             <h1 className="font-headline text-headline text-on-surface mb-md">
