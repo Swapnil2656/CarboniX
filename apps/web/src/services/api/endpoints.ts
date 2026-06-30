@@ -64,6 +64,12 @@ export const adminApi = {
     });
   },
 
+  getTeamMembers: async (): Promise<{ team: any[] }> => {
+    return fetchClient('/admin/team', {
+      method: 'GET',
+    });
+  },
+
   // TODO: implement GET /api/v1/admin/feature-flags on the backend
   getFeatureFlags: async (): Promise<FeatureFlagsResponse> => {
     return fetchClient('/admin/feature-flags', {

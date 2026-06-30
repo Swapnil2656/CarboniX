@@ -238,3 +238,29 @@ export const revokeApiKey = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const getTeamMembers = async (req: Request, res: Response) => {
+  try {
+    const team = await prisma.user.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        userName: true,
+        email: true,
+        type: true,
+        isVerified: true,
+        createdAt: true,
+        profile: {
+          select: {
+            fullName: true,
+            avatarUrl: true
+          }
+        }
+      }
+    });
+
+    res.json({ team });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};

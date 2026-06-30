@@ -7,7 +7,8 @@ import {
   toggleFeatureFlag,
   getApiKeys,
   createApiKey,
-  revokeApiKey
+  revokeApiKey,
+  getTeamMembers
 } from './admin.controller';
 
 const router = Router();
@@ -16,6 +17,7 @@ router.use(authenticate);
 
 router.get('/dashboard', getDashboard);
 router.get('/users', getUsers);
+router.get('/team', getTeamMembers);
 router.get('/feature-flags', getFeatureFlags);
 router.patch('/feature-flags/:id', toggleFeatureFlag);
 router.get('/api-keys', getApiKeys);
