@@ -6,7 +6,12 @@ import { redis } from '../../lib/redis';
 export const getDashboard = async (req: Request, res: Response) => {
   try {
     const cacheKey = 'admin:dashboard_stats';
-    const cached = await redis.get(cacheKey);
+    let cached = null;
+    try {
+      cached = await redis.get(cacheKey);
+    } catch (e) {
+      console.warn('[REDIS] Cache read failed, falling back to DB');
+    }
     if (cached) {
       return res.json({ ...JSON.parse(cached), cached: true });
     }
@@ -64,7 +69,11 @@ export const getDashboard = async (req: Request, res: Response) => {
       liveApiStream: []
     };
 
-    await redis.setex(cacheKey, 30, JSON.stringify(responseData));
+    try {
+      await redis.setex(cacheKey, 30, JSON.stringify(responseData));
+    } catch (e) {
+      console.warn('[REDIS] Cache write failed');
+    }
 
     res.json(responseData);
   } catch (error: any) {
