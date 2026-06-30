@@ -19,11 +19,7 @@ export class EmissionsDevProvider implements GridProvider {
 
     const data = await response.json();
     
-    // We expect the API to return something that contains the grid intensity.
-    // If the API returns different fields, this would need adjusting.
-    // Assuming it returns { carbonIntensity: 708, ... } based on the previous ElectricityMaps pattern.
-    // If it returns { gridIntensity: ... }, we use that.
-    const intensity = data.gridIntensity || data.carbonIntensity || data.value;
+    const intensity = data.data?.attributes?.carbon_intensity;
 
     if (intensity === undefined || intensity === null) {
       throw new Error("Unexpected response format from Emissions.dev API.");
