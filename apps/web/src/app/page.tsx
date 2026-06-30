@@ -122,10 +122,10 @@ export default async function LandingPage() {
             </div>
 
             {/* Right col — phone mockup */}
-            <div className="relative flex justify-center items-center h-full min-h-[500px]">
+            <div className="relative flex justify-center items-center h-full min-h-[500px] md:translate-x-8 lg:translate-x-16">
               <div
-                className="absolute inset-0 -z-10"
-                style={{ background: 'radial-gradient(circle at 99.7% 8%, rgba(245,197,24,0.15) 0%, transparent 70%)' }}
+                className="absolute -top-[150px] -bottom-[150px] -left-1/2 -right-1/2 -z-10 pointer-events-none"
+                style={{ background: 'radial-gradient(circle at 50% 0%, rgba(245,197,24,0.08) 0%, transparent 70%)' }}
               />
               <div className="relative w-[320px] aspect-[1/2] rounded-[48px] border-[8px] border-surface-container-highest bg-background overflow-hidden shadow-2xl">
                 <img
