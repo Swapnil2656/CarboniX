@@ -398,6 +398,87 @@ export default async function LandingPage() {
             </div>
           </div>
         </section>
+        {/* ── Documentation ─────────────────────────────────── */}
+        <section id="docs" className="px-margin py-3xl max-w-[1440px] mx-auto">
+          <div className="text-center mb-2xl">
+            <h2 className="font-display text-headline mb-md text-on-surface">Documentation</h2>
+            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-[600px] mx-auto">
+              Everything you need to integrate CarboniX into your tech stack.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2xl">
+            {/* Quick Start */}
+            <div className="bg-surface-container border border-outline-variant rounded-xl p-xl">
+              <div className="flex items-center gap-md mb-lg">
+                <span className="material-symbols-outlined text-primary text-[28px]">rocket_launch</span>
+                <h3 className="font-display text-section-header text-on-surface">Quick Start</h3>
+              </div>
+              <p className="font-body-md text-on-surface-variant mb-lg">
+                Get up and running with the CarboniX SDK in Node.js or TypeScript projects.
+              </p>
+              <div className="bg-surface-container-lowest p-md rounded border border-outline-variant font-code text-code text-on-surface-variant space-y-sm">
+                <p><span className="code-keyword">npm</span> install carbonix</p>
+                <div className="h-px bg-outline-variant/50 my-sm"></div>
+                <p><span className="code-keyword">import</span> &#123; CarboniX &#125; <span className="code-keyword">from</span> <span className="code-string">&apos;carbonix&apos;</span>;</p>
+                <p><span className="code-keyword">const</span> cx = <span className="code-keyword">new</span> CarboniX(&#123; apiKey: <span className="code-string">&apos;YOUR_KEY&apos;</span> &#125;);</p>
+                <p><span className="code-keyword">await</span> cx.measure(<span className="code-string">&apos;compute-job-1&apos;</span>);</p>
+              </div>
+            </div>
+
+            {/* REST API */}
+            <div className="bg-surface-container border border-outline-variant rounded-xl p-xl">
+              <div className="flex items-center gap-md mb-lg">
+                <span className="material-symbols-outlined text-primary text-[28px]">api</span>
+                <h3 className="font-display text-section-header text-on-surface">REST API Reference</h3>
+              </div>
+              <p className="font-body-md text-on-surface-variant mb-lg">
+                Directly query regional carbon intensity and build custom integrations using our HTTP endpoints.
+              </p>
+              <div className="bg-surface-container-lowest p-md rounded border border-outline-variant font-code text-code text-on-surface-variant space-y-sm">
+                <div className="flex items-center gap-sm">
+                  <span className="bg-primary/20 text-primary px-2 py-0.5 rounded text-[10px] font-bold">GET</span>
+                  <span className="text-on-surface">/api/v1/reference/regions</span>
+                </div>
+                <div className="flex items-center gap-sm">
+                  <span className="bg-primary/20 text-primary px-2 py-0.5 rounded text-[10px] font-bold">POST</span>
+                  <span className="text-on-surface">/api/v1/carbon/measure</span>
+                </div>
+                <p className="text-[12px] text-on-surface-variant italic mt-sm">Requires Authorization: Bearer &lt;token&gt;</p>
+              </div>
+            </div>
+            
+            {/* CI/CD Integration */}
+            <div className="bg-surface-container border border-outline-variant rounded-xl p-xl">
+              <div className="flex items-center gap-md mb-lg">
+                <span className="material-symbols-outlined text-primary text-[28px]">account_tree</span>
+                <h3 className="font-display text-section-header text-on-surface">CI/CD Gating</h3>
+              </div>
+              <p className="font-body-md text-on-surface-variant mb-lg">
+                Block deployments that exceed your carbon budget using GitHub Actions.
+              </p>
+              <div className="bg-surface-container-lowest p-md rounded border border-outline-variant font-code text-code text-on-surface-variant space-y-sm">
+                <p className="text-primary-container">- name: <span className="text-on-surface">Check Carbon Budget</span></p>
+                <p>&nbsp;&nbsp;uses: <span className="text-on-surface">carbonix/action@v1</span></p>
+                <p>&nbsp;&nbsp;with:</p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;max-emissions: <span className="text-on-surface">5.0kg</span></p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;api-key: <span className="text-on-surface">$&#123;&#123; secrets.CARBONIX_KEY &#125;&#125;</span></p>
+              </div>
+            </div>
+
+            {/* Support */}
+            <div className="bg-surface-container border border-outline-variant rounded-xl p-xl flex flex-col justify-center items-center text-center">
+              <span className="material-symbols-outlined text-outline text-[48px] mb-md">help</span>
+              <h3 className="font-display text-section-header text-on-surface mb-sm">Need Help?</h3>
+              <p className="font-body-md text-on-surface-variant mb-lg">
+                Can&apos;t find what you&apos;re looking for? Reach out to our engineering team.
+              </p>
+              <button className="bg-primary text-on-primary px-xl py-sm rounded-full font-bold hover:bg-primary-fixed-dim transition-colors">
+                Contact Support
+              </button>
+            </div>
+          </div>
+        </section>
       </main>
 
       {/* ── Footer ──────────────────────────────────────────── */}
