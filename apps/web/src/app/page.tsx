@@ -33,11 +33,7 @@ export default async function LandingPage() {
               <a href="#docs"      className="text-on-surface-variant hover:text-primary transition-colors font-body-md">Documentation</a>
             </div>
           </div>
-          <div className="flex items-center gap-md">
-            <div className="hidden lg:flex items-center bg-surface-container-high px-md py-xs rounded-full border border-outline-variant">
-              <span className="font-code text-code text-on-surface-variant mr-sm">$</span>
-              <span className="font-code text-code text-primary-container">npm install carbonix</span>
-            </div>
+            <div className="flex items-center gap-md">
             {session ? (
               <>
                 <SignOutButton />
