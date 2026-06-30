@@ -76,25 +76,7 @@ export function Step1Project({ onNext, onSkip }: Props) {
           </p>
         </div>
 
-        <div>
-          <label className="block text-label-caps text-on-surface-variant mb-2">
-            Preferred region <span className="text-error">*</span>
-          </label>
-          <select 
-            value={region}
-            onChange={(e) => setRegion(e.target.value)}
-            className="w-full bg-surface-container-lowest border border-outline-variant rounded-md px-4 py-3 text-on-surface font-body-md focus:border-secondary focus:outline-none focus:ring-1 focus:ring-secondary transition-colors appearance-none"
-            required
-          >
-            <option value="ap-south-1">Asia Pacific (Mumbai)</option>
-            <option value="us-east-1">US East (N. Virginia)</option>
-            <option value="eu-north-1">Europe (Stockholm)</option>
-            <option value="eu-west-1">Europe (Ireland)</option>
-          </select>
-          <p className="text-xs text-on-surface-variant mt-2 opacity-70">
-            Where your primary carbon telemetry will be tracked.
-          </p>
-        </div>
+
 
         <div className="pt-4 flex flex-col gap-4 items-center">
           <button 

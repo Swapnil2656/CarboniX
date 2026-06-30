@@ -34,11 +34,11 @@
   --cx-primary-fixed-dim:           #f5c518;
   --cx-on-primary-fixed:            #241a00;
 
-  /* Secondary (salmon — matches mobile) */
-  --cx-secondary:                   #ffb4a8;
-  --cx-on-secondary:                #3d1510;
-  --cx-secondary-container:         #5c2b24;
-  --cx-on-secondary-container:      #ffdad6;
+  /* Secondary (emerald green - eco theme) */
+  --cx-secondary:                   #10b981;
+  --cx-on-secondary:                #ffffff;
+  --cx-secondary-container:         #065f46;
+  --cx-on-secondary-container:      #d1fae5;
 
   /* Tertiary (cyan — matches mobile info) */
   --cx-tertiary:                    #8BE9FD;
