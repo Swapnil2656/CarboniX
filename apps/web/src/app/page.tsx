@@ -150,7 +150,7 @@ export default async function LandingPage() {
         </section>
 
         {/* ── Problem Strip (marquee) ──────────────────────── */}
-        <section className="bg-surface-container-lowest border-y border-outline-variant py-md overflow-hidden flex items-center">
+        <section className="bg-surface-container-lowest py-md overflow-hidden flex items-center">
           <div className="flex whitespace-nowrap animate-scroll gap-xl">
             {[...Array(2)].map((_, i) => (
               <div key={i} className="flex gap-xl">
@@ -193,7 +193,7 @@ export default async function LandingPage() {
                 desc: 'Add Carbonix to your project via npm, pip, or go get.',
                 code: (
                   <p className="font-code text-code text-on-surface-variant">
-                    <span className="code-keyword">npm</span> i @carbonix/core
+                    <span className="code-keyword">npm</span> i carbonix
                   </p>
                 ),
               },
@@ -204,7 +204,7 @@ export default async function LandingPage() {
                 desc: 'Define your cloud provider and region preferences.',
                 code: (
                   <p className="font-code text-code leading-relaxed">
-                    <span className="code-keyword">carbonix</span>.init(&#123;<br />
+                    <span className="code-keyword">const</span> cx = <span className="code-keyword">new</span> CarboniX(&#123;<br />
                     &nbsp;&nbsp;provider: <span className="code-string">&apos;aws&apos;</span>,<br />
                     &nbsp;&nbsp;region: <span className="code-string">&apos;us-east-1&apos;</span><br />
                     &#125;)
@@ -247,7 +247,7 @@ export default async function LandingPage() {
         </section>
 
         {/* ── SDK Demo / Predictive Observability ──────────── */}
-        <section className="px-margin py-3xl bg-surface-container-lowest border-y border-outline-variant">
+        <section className="px-margin py-3xl bg-surface-container-lowest">
           <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-3xl items-center">
             {/* Code editor */}
             <div className="lg:col-span-7">
@@ -266,7 +266,7 @@ export default async function LandingPage() {
                 </div>
                 {/* Code */}
                 <div className="p-lg font-code text-code leading-[1.8]">
-                  <p><span className="code-keyword">import</span> &#123; Carbonix &#125; <span className="code-keyword">from</span> <span className="code-string">&apos;@carbonix/sdk&apos;</span>;</p>
+                  <p><span className="code-keyword">import</span> &#123; Carbonix &#125; <span className="code-keyword">from</span> <span className="code-string">&apos;carbonix&apos;</span>;</p>
                   <p><span className="code-comment">{`// Initialize real-time tracking`}</span></p>
                   <p><span className="code-keyword">const</span> analyzer = <span className="code-keyword">new</span> Carbonix(&#123;</p>
                   <p>&nbsp;&nbsp;apiKey: process.env.CX_KEY,</p>
@@ -401,7 +401,7 @@ export default async function LandingPage() {
       </main>
 
       {/* ── Footer ──────────────────────────────────────────── */}
-      <footer className="bg-surface-container-lowest border-t border-outline-variant py-3xl">
+      <footer className="bg-surface-container-lowest py-3xl">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin max-w-[1440px] mx-auto">
           {/* Brand */}
           <div className="space-y-lg">
@@ -472,7 +472,7 @@ export default async function LandingPage() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-3xl pt-xl border-t border-outline-variant px-margin max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-md">
+        <div className="mt-3xl pt-xl px-margin max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-md">
           <p className="text-on-surface-variant font-body-md text-[14px]">
             © 2024 Carbonix Cloud Intelligence. All rights reserved.
           </p>
