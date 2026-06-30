@@ -74,8 +74,8 @@ export default function FeatureFlagsPage() {
           <h1 className="text-section-header text-on-surface">Feature Flags</h1>
           <p className="text-on-surface-variant mt-1">Control platform capabilities and UI rollouts without deploying.</p>
         </div>
-        <div className="flex items-center gap-2 bg-[rgba(74,222,128,0.1)] px-3 py-1.5 rounded-full border border-[#4ade80]/30 text-sm font-medium text-[#4ade80]">
-          <span className="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse"></span>
+        <div className="flex items-center gap-2 bg-[rgba(80,250,123,0.1)] px-3 py-1.5 rounded-full border border-[#50FA7B]/30 text-sm font-medium text-[#50FA7B]">
+          <span className="w-2 h-2 rounded-full bg-[#50FA7B] animate-pulse"></span>
           Live Sync Active
         </div>
       </div>

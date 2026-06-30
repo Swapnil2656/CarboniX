@@ -126,14 +126,14 @@ export default function ApiKeysPage() {
       {error && <ErrorBanner message={error} onRetry={fetchData} />}
 
       {newlyCreatedKey && (
-        <div className="bg-[rgba(74,222,128,0.1)] border border-[#4ade80]/30 rounded-xl p-6 relative">
+        <div className="bg-[rgba(80,250,123,0.1)] border border-[#50FA7B]/30 rounded-xl p-6 relative">
           <button 
             onClick={() => setNewlyCreatedKey(null)}
-            className="absolute top-4 right-4 text-[#4ade80] hover:text-[#22c55e]"
+            className="absolute top-4 right-4 text-[#50FA7B] hover:text-[#3ad86e]"
           >
             <span className="material-symbols-outlined">close</span>
           </button>
-          <div className="flex items-center gap-3 text-[#4ade80] mb-4">
+          <div className="flex items-center gap-3 text-[#50FA7B] mb-4">
             <span className="material-symbols-outlined text-3xl">check_circle</span>
             <h3 className="text-lg font-semibold">Key Generated Successfully</h3>
           </div>

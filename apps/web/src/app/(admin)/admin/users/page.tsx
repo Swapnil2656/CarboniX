@@ -128,7 +128,7 @@ export default function UsersPage() {
         <div className="flex items-center gap-4 bg-surface-container px-4 py-2 rounded-lg border border-outline-variant">
           <div className="text-sm text-on-surface-variant">Fleet Avg:</div>
           <div className="text-lg font-semibold text-primary">124 kg/h</div>
-          <div className="flex items-center text-xs font-medium text-[#4ade80]">
+          <div className="flex items-center text-xs font-medium text-[#50FA7B]">
             <span className="material-symbols-outlined text-[14px]">trending_down</span>
             2.4%
           </div>
@@ -279,14 +279,14 @@ export default function UsersPage() {
         </div>
         
         <div className="glass-card p-6 rounded-xl border border-outline-variant flex flex-col justify-center items-center text-center">
-          <span className="material-symbols-outlined text-[32px] text-[#fb923c] mb-2">warning</span>
+          <span className="material-symbols-outlined text-[32px] text-[#E8904A] mb-2">warning</span>
           <h3 className="text-lg font-semibold text-on-surface mb-1">3 Anomalies Detected</h3>
           <p className="text-sm text-on-surface-variant mb-3">Spike in eu-central-1 compute instances over last 4 hours.</p>
           <button className="text-sm text-primary hover:underline font-medium">View Details</button>
         </div>
 
         <div className="glass-card p-6 rounded-xl border border-outline-variant flex flex-col justify-center items-center text-center">
-          <div className="w-16 h-16 rounded-full bg-[rgba(74,222,128,0.1)] flex items-center justify-center text-[#4ade80] border border-[#4ade80]/30 mb-3">
+          <div className="w-16 h-16 rounded-full bg-[rgba(80,250,123,0.1)] flex items-center justify-center text-[#50FA7B] border border-[#50FA7B]/30 mb-3">
             <span className="material-symbols-outlined text-[32px]">check_circle</span>
           </div>
           <h3 className="text-lg font-semibold text-on-surface mb-1">System Healthy</h3>

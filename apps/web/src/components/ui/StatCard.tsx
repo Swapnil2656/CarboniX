@@ -38,7 +38,7 @@ export const StatCard: React.FC<StatCardProps> = ({ title, value, icon, trend, i
         {trend && (
           <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
             isPositiveTrend 
-              ? 'bg-[rgba(74,222,128,0.15)] text-[#4ade80]' 
+              ? 'bg-[rgba(80,250,123,0.15)] text-[#50FA7B]' 
               : 'bg-[rgba(248,113,113,0.15)] text-[#f87171]'
           }`}>
             <span className="material-symbols-outlined text-[14px]">
