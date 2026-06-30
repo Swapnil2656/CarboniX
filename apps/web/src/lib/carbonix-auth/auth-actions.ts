@@ -67,21 +67,26 @@ export async function signUp(data: {
 
   const verifyUrl = `${process.env.NEXTAUTH_URL}${authConfig.routes.verify}?token=${token}`;
 
-  await sendEmail(
-    user.email,
-    `Verify your ${authConfig.app.name} account`,
-    `<div style="font-family:sans-serif;max-width:480px;margin:auto">
-      <h2>Hi ${user.userName},</h2>
-      <p>Welcome to <strong>${authConfig.app.name}</strong>! Please verify your email to activate your account:</p>
-      <p>
-        <a href="${verifyUrl}" style="
-          display:inline-block;padding:12px 24px;background:${process.env.BRAND_COLOR ?? '#4f46e5'};
-          color:white;text-decoration:none;border-radius:8px;font-weight:600
-        ">Verify Email</a>
-      </p>
-      <p style="color:#6b7280;font-size:13px">Link expires in 1 hour. If you didn't sign up, ignore this email.</p>
-    </div>`
-  );
+  try {
+    await sendEmail(
+      user.email,
+      `Verify your ${authConfig.app.name} account`,
+      `<div style="font-family:sans-serif;max-width:480px;margin:auto">
+        <h2>Hi ${user.userName},</h2>
+        <p>Welcome to <strong>${authConfig.app.name}</strong>! Please verify your email to activate your account:</p>
+        <p>
+          <a href="${verifyUrl}" style="
+            display:inline-block;padding:12px 24px;background:${process.env.BRAND_COLOR ?? '#4f46e5'};
+            color:white;text-decoration:none;border-radius:8px;font-weight:600
+          ">Verify Email</a>
+        </p>
+        <p style="color:#6b7280;font-size:13px">Link expires in 1 hour. If you didn't sign up, ignore this email.</p>
+      </div>`
+    );
+  } catch (error) {
+    console.error("⚠️ Failed to send verification email (Missing MAIL_USER / MAIL_PASS in .env?):", error);
+    console.log(`\n\n🔗 [DEV] VERIFICATION LINK: ${verifyUrl}\n\n`);
+  }
 }
 
 export async function verifyEmail(token: string) {
