@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import dynamic from "next/dynamic";
-import { NewsletterForm } from './components/NewsletterForm';
+import { AnimatedFooter } from './components/AnimatedFooter';
 import { RegionsTable } from './components/RegionsTable';
 import { auth } from '@/auth';
 import { SignOutButton } from './components/SignOutButton';
@@ -20,7 +20,7 @@ export default async function LandingPage() {
   return (
     <div className="bg-background text-on-surface font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-fixed">
       {/* ── Navigation ──────────────────────────────────────── */}
-      <nav className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+      <nav className="fixed top-0 w-screen z-50 bg-background/50 backdrop-blur-xl border-b border-outline-variant/50 shadow-sm">
         <div className="flex justify-between items-center px-margin py-md max-w-[1440px] mx-auto">
           <div className="flex items-center gap-xl">
             <div className="flex items-center gap-sm">
@@ -64,7 +64,7 @@ export default async function LandingPage() {
         </div>
       </nav>
 
-      <main className="pt-[80px]">
+      <main className="pt-[80px] relative z-10 bg-background rounded-b-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
         {/* ── Hero ─────────────────────────────────────────── */}
         <section id="platform" className="relative overflow-hidden min-h-[90vh] flex items-center py-3xl w-full">
           {/* Ambient 3D Background (Full Bleed) */}
@@ -155,6 +155,8 @@ export default async function LandingPage() {
               </div>
             </div>
           </div>
+          {/* Gradient transition to next section */}
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-surface-container-lowest to-transparent pointer-events-none z-20" />
         </section>
 
         {/* ── Problem Strip (marquee) ──────────────────────── */}
@@ -183,6 +185,9 @@ export default async function LandingPage() {
             ))}
           </div>
         </section>
+
+        {/* Gradient fade to next section */}
+        <div className="w-full h-32 bg-gradient-to-b from-surface-container-lowest to-background pointer-events-none" />
 
         {/* ── How It Works ─────────────────────────────────── */}
         <section id="solutions" className="px-margin py-3xl max-w-[1440px] mx-auto">
@@ -254,6 +259,9 @@ export default async function LandingPage() {
           </div>
         </section>
 
+        {/* Gradient fade to next section */}
+        <div className="w-full h-32 bg-gradient-to-b from-background to-surface-container-lowest pointer-events-none" />
+
         {/* ── SDK Demo / Predictive Observability ──────────── */}
         <section className="px-margin py-3xl bg-surface-container-lowest">
           <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-3xl items-center">
@@ -320,6 +328,9 @@ export default async function LandingPage() {
             </div>
           </div>
         </section>
+
+        {/* Gradient fade to next section */}
+        <div className="w-full h-32 bg-gradient-to-b from-surface-container-lowest to-background pointer-events-none" />
 
         {/* ── Regional Carbon Intensity ─────────────────────── */}
         <section id="network" className="px-margin py-3xl max-w-[1440px] mx-auto">
@@ -489,88 +500,7 @@ export default async function LandingPage() {
         </section>
       </main>
 
-      {/* ── Footer ──────────────────────────────────────────── */}
-      <footer className="bg-surface-container-lowest py-3xl">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin max-w-[1440px] mx-auto">
-          {/* Brand */}
-          <div className="space-y-lg">
-            <span className="text-section-header font-display font-black text-primary-container">CarboniX</span>
-            <p className="text-on-surface-variant font-body-md pr-lg">
-              Standardizing the environmental impact of software engineering. High-performance
-              intelligence for a sustainable cloud.
-            </p>
-            <div className="flex gap-md">
-              {[
-                { icon: 'alternate_email', label: 'Email' },
-                { icon: 'hub',            label: 'GitHub' },
-                { icon: 'forum',          label: 'Discord' },
-              ].map((s) => (
-                <a
-                  key={s.icon}
-                  href="#"
-                  aria-label={s.label}
-                  className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container border border-outline-variant text-on-surface-variant hover:text-primary transition-colors"
-                >
-                  <span className="material-symbols-outlined">{s.icon}</span>
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Product links */}
-          <div>
-            <h4 className="font-label-caps text-label-caps text-on-surface mb-xl">PRODUCT</h4>
-            <ul className="space-y-md">
-              {['Core SDK', 'CI/CD Gating', 'Regional Explorer', 'Compliance Engine'].map((l) => (
-                <li key={l}>
-                  <a href="#" className="text-on-surface-variant hover:text-primary transition-colors font-body-md">{l}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Resources links */}
-          <div>
-            <h4 className="font-label-caps text-label-caps text-on-surface mb-xl">RESOURCES</h4>
-            <ul className="space-y-md">
-              {['Documentation', 'API Reference', 'Case Studies', 'Carbon Blog'].map((l) => (
-                <li key={l}>
-                  <a href="#" className="text-on-surface-variant hover:text-primary transition-colors font-body-md">{l}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Trust + newsletter */}
-          <div className="space-y-xl">
-            <div>
-              <h4 className="font-label-caps text-label-caps text-on-surface mb-xl">TRUST</h4>
-              <ul className="space-y-md">
-                {['Privacy Policy', 'Terms of Service', 'Security (SOC2)', 'Status'].map((l) => (
-                  <li key={l}>
-                    <a href="#" className="text-on-surface-variant hover:text-primary transition-colors font-body-md">{l}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="p-lg bg-surface-container rounded-lg border border-outline-variant">
-              <p className="font-label-caps text-[10px] text-on-surface-variant mb-sm">NEWSLETTER</p>
-              <NewsletterForm />
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom bar */}
-        <div className="mt-3xl pt-xl px-margin max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-md">
-          <p className="text-on-surface-variant font-body-md text-[14px]">
-            © 2024 CarboniX Cloud Intelligence. All rights reserved.
-          </p>
-          <div className="flex items-center gap-md">
-            <span className="w-2 h-2 rounded-full bg-primary-container animate-pulse" />
-            <span className="font-label-caps text-[12px] text-on-surface-variant">SYSTEMS OPERATIONAL</span>
-          </div>
-        </div>
-      </footer>
+      <AnimatedFooter />
     </div>
   );
 }
