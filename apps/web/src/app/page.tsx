@@ -20,7 +20,7 @@ export default async function LandingPage() {
   return (
     <div className="bg-background text-on-surface font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-fixed">
       {/* ── Navigation ──────────────────────────────────────── */}
-      <nav className="fixed top-0 w-screen z-50 bg-background/50 backdrop-blur-xl border-b border-outline-variant/50 shadow-sm">
+      <nav className="fixed top-0 w-full z-50 bg-background/50 backdrop-blur-md border-b border-outline-variant/50 shadow-sm">
         <div className="flex justify-between items-center px-margin py-md max-w-[1440px] mx-auto">
           <div className="flex items-center gap-xl">
             <div className="flex items-center gap-sm">
@@ -68,13 +68,13 @@ export default async function LandingPage() {
         {/* ── Hero ─────────────────────────────────────────── */}
         <section id="platform" className="relative overflow-hidden min-h-[90vh] flex items-center py-3xl w-full">
           {/* Ambient 3D Background (Full Bleed) */}
-          <div className="absolute inset-0 z-0 pointer-events-none flex justify-center items-center opacity-80 mix-blend-screen md:-translate-x-[15%]">
+          <div className="absolute inset-0 z-0 pointer-events-none flex justify-center items-center opacity-80 md:-translate-x-[15%]">
             <CarbonAtom />
           </div>
           {/* Content Wrapper */}
           <div className="max-w-[1440px] mx-auto px-margin w-full grid grid-cols-1 md:grid-cols-2 gap-3xl items-center relative z-10">
             {/* Left col */}
-            <div className="opacity-60 mix-blend-lighten">
+            <div className="opacity-60">
               <h1 className="font-display text-display mb-lg leading-[1.05]">
                 The carbon cost of{' '}
                 <span className="text-primary-container">your cloud</span>.{' '}
