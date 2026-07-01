@@ -74,7 +74,7 @@ export default async function LandingPage() {
           {/* Content Wrapper */}
           <div className="max-w-[1440px] mx-auto px-margin w-full grid grid-cols-1 md:grid-cols-2 gap-3xl items-center relative z-10">
             {/* Left col */}
-            <div className="opacity-80">
+            <div className="opacity-60 mix-blend-lighten">
               <h1 className="font-display text-display mb-lg leading-[1.05]">
                 The carbon cost of{' '}
                 <span className="text-primary-container">your cloud</span>.{' '}
