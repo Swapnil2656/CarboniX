@@ -6,36 +6,6 @@ import { NewsletterForm } from "./NewsletterForm";
 export function AnimatedFooter() {
   const footerRef = useRef<HTMLElement>(null);
   const [height, setHeight] = useState(0);
-  const [isReveal, setIsReveal] = useState(true);
-
-  useEffect(() => {
-    if (!footerRef.current) return;
-
-    const updateMeasurements = () => {
-      if (footerRef.current) {
-        const fh = footerRef.current.offsetHeight;
-        setHeight(fh);
-        setIsReveal(prev => {
-          // Add 50px hysteresis to prevent infinite loop layout thrashing
-          if (prev && fh >= window.innerHeight + 50) return false;
-          if (!prev && fh <= window.innerHeight - 50) return true;
-          return prev;
-        });
-      }
-    };
-
-    const obs = new ResizeObserver(updateMeasurements);
-    obs.observe(footerRef.current);
-    window.addEventListener('resize', updateMeasurements);
-    
-    // Initial call
-    updateMeasurements();
-
-    return () => {
-      obs.disconnect();
-      window.removeEventListener('resize', updateMeasurements);
-    };
-  }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     if (!footerRef.current) return;
@@ -48,11 +18,10 @@ export function AnimatedFooter() {
 
   return (
     <>
-      {isReveal && <div style={{ height }} className="w-full pointer-events-none" />}
       <footer
         ref={footerRef}
         onMouseMove={handleMouseMove}
-        className={`${isReveal ? 'fixed bottom-0 left-0 w-full' : 'relative'} z-0 bg-surface-container-lowest text-on-surface py-3xl overflow-hidden group`}
+        className="relative z-0 bg-white/[0.03] backdrop-blur-md border-t border-outline-variant/30 text-on-surface py-3xl overflow-hidden group"
       >
         {/* Inner glow border to give it a premium feel */}
         <div className="pointer-events-none absolute inset-0 z-0 border-t border-white/[0.02]" />

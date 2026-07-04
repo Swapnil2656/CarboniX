@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import dynamic from "next/dynamic";
+import { Navbar } from './components/Navbar';
 import { AnimatedFooter } from './components/AnimatedFooter';
 import { RegionsTable } from './components/RegionsTable';
 import { auth } from '@/auth';
 import { SignOutButton } from './components/SignOutButton';
 
-const CarbonAtom = dynamic(() => import("@/components/3d/CarbonAtom"), { ssr: false });
+import { MagicDust } from '@/components/ui/magic-dust-shader';
 
 export const metadata: Metadata = {
   title: 'CarboniX | The Carbon Cost of Your Cloud',
@@ -18,63 +19,20 @@ export default async function LandingPage() {
   const session = await auth();
 
   return (
-    <div className="bg-background text-on-surface font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-fixed">
-      {/* ── Navigation ──────────────────────────────────────── */}
-      <nav className="fixed top-0 w-full z-50 bg-background/50 backdrop-blur-md border-b border-outline-variant/50 shadow-sm">
-        <div className="flex justify-between items-center px-margin py-md max-w-[1440px] mx-auto">
-          <div className="flex items-center gap-xl">
-            <div className="flex items-center gap-sm">
-              <img src="/carbonix-logo.png" alt="CarboniX" className="w-8 h-8 object-contain" />
-              <span className="text-section-header font-display font-black text-primary-container">
-                CarboniX
-              </span>
-            </div>
-            <div className="hidden md:flex gap-lg">
-              <a href="#platform" className="text-primary font-bold border-b-2 border-primary pb-1 font-body-md transition-colors">Platform</a>
-              <a href="#solutions" className="text-on-surface-variant hover:text-primary transition-colors font-body-md">Solutions</a>
-              <a href="#network"   className="text-on-surface-variant hover:text-primary transition-colors font-body-md">Network</a>
-              <a href="#docs"      className="text-on-surface-variant hover:text-primary transition-colors font-body-md">Documentation</a>
-            </div>
-          </div>
-            <div className="flex items-center gap-md">
-            {session ? (
-              <>
-                <SignOutButton />
-                <Link
-                  href="/admin/dashboard"
-                  className="bg-primary-container text-on-primary-fixed px-lg py-sm rounded-lg font-bold hover:opacity-80 active:scale-95 transition-all"
-                >
-                  Dashboard
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link href="/login" className="text-on-surface-variant hover:text-primary transition-colors font-body-md">
-                  Log In
-                </Link>
-                <Link
-                  href="/signup"
-                  className="bg-primary-container text-on-primary-fixed px-lg py-sm rounded-lg font-bold hover:opacity-80 active:scale-95 transition-all"
-                >
-                  Get Started
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
+    <div className="bg-black text-on-surface font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-fixed">
+      {/* ── Ambient 3D Background ───────────────────────────── */}
+      <div className="fixed inset-0 z-0 pointer-events-none flex justify-center items-center opacity-80 overflow-hidden">
+        <MagicDust />
+      </div>
+      <Navbar session={session} />
 
-      <main className="pt-[80px] relative z-10 bg-background rounded-b-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
+      <main className="pt-[80px] relative z-10 rounded-b-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
         {/* ── Hero ─────────────────────────────────────────── */}
         <section id="platform" className="relative overflow-hidden min-h-[90vh] flex items-center py-3xl w-full">
-          {/* Ambient 3D Background (Full Bleed) */}
-          <div className="absolute inset-0 z-0 pointer-events-none flex justify-center items-center opacity-80 md:-translate-x-[15%]">
-            <CarbonAtom />
-          </div>
           {/* Content Wrapper */}
-          <div className="max-w-[1440px] mx-auto px-margin w-full grid grid-cols-1 md:grid-cols-2 gap-3xl items-center relative z-10">
-            {/* Left col */}
-            <div className="opacity-60">
+          <div className="max-w-[1440px] mx-auto px-margin w-full flex flex-col items-center text-center relative z-10">
+            {/* Center col */}
+            <div className="flex flex-col items-center">
               <h1 className="font-display text-display mb-lg leading-[1.05]">
                 The carbon cost of{' '}
                 <span className="text-primary-container">your cloud</span>.{' '}
@@ -85,7 +43,7 @@ export default async function LandingPage() {
                 directly in the IDE and CI/CD pipelines. Industrial-grade carbon
                 intelligence for modern dev teams.
               </p>
-              <div className="flex gap-md flex-wrap">
+              <div className="flex justify-center gap-md flex-wrap">
                 <Link
                   href="/signup"
                   className="bg-primary-container text-on-primary-fixed px-xl py-md rounded-lg font-bold text-body-lg hover:opacity-90 transition-all"
@@ -99,68 +57,13 @@ export default async function LandingPage() {
                   Read SDK Docs
                 </a>
               </div>
-              <div className="mt-2xl flex items-center gap-md">
-                <div className="flex -space-x-md">
-                  {[
-                    { alt: 'Tech lead developer', src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA4jMT2-ooSLzuF_hoM9A5mIrK3iTDFHWmQP5S1Fz1IWMmdxc2K0OfQgLmbo2LTmN4wtWcjldNXymrrcCOEK44WFpQG-jvWpUnjtvaH8HsMa7VA9dH8JHV52-gQLO6I4p4yx7OKYUIaNUe_0mp1iSWSyip6-L4ImlXa5oBS8eJ9NkPgcLXl12ZoWWSK8ZSpckx_2EF8YkO-Ngc4dg8aba4FueJOZkHm4slujdr9vPEPXyGiX4zQfyl6JUzrkzVS-O9MhIPOj6MQOILX' },
-                    { alt: 'Software engineer', src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAxefuangvR__vyb_zSePz_wRj2hfv1h7wFgYh0SKVokmlo1lA3zjyTawtZf4_yzYYnHIkBVWlGE2PXBCakT3vKO2rdmisu_mg7VvXeamCbIG7_s0gsh_rRRDN5Z3gyNubmUz194W8DmM9qqZ8PJ-Ig4J3dVhKNlx-EDszm8paJ7vo-XN-Hf_VTCMlqVFIfnACDlCM2lQNJzwUDgKBJnjSu8ZZghhceeiV7qXKxQAGiWHuiaor0Un1kWe0w6N-9FA-ZTDlh3qVbkP-K' },
-                    { alt: 'Diverse developer', src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCT3VM2L89yEVmobwjMnQiKo2z-R04gYhpngs8b_a1o0Ixod5SrbRxJPKjX_SOhBGewT0HllYPRFFG0DtOKPwWTKjkq4stJJS52WtadTFLAEuNOjBi_QExugbcjgy9GkgySbJo8xoJN5JRGs91SS33aRaCf6TOQ8QrkPirUinQpagqAGA5dV8YlkaZfUGRmic2fFwcy0EiH-qehEFIEsqLcOGALl1ItpXQ0_F7KdXtBBacEgSiPfvPeQNFeYKqn-f_rYOxKjSA74Yfx' },
-                  ].map((a) => (
-                    <div
-                      key={a.alt}
-                      className="w-10 h-10 rounded-full border-2 border-background bg-surface-container-highest flex items-center justify-center overflow-hidden"
-                    >
-                      <img src={a.src} alt={a.alt} className="w-full h-full object-cover" />
-                    </div>
-                  ))}
-                </div>
-                <p className="text-on-surface-variant font-body-md">
-                  <span className="text-on-surface font-bold">2,400+</span> engineering teams
-                  monitoring carbon intensity
-                </p>
-              </div>
-            </div>
 
-            {/* Right col — phone mockup */}
-            <div className="relative flex justify-center items-center h-full min-h-[500px] md:translate-x-8 lg:translate-x-16">
-              <div
-                className="absolute -top-[150px] -bottom-[150px] -left-1/2 -right-1/2 -z-10 pointer-events-none"
-                style={{ background: 'radial-gradient(circle at 50% 0%, rgba(245,197,24,0.08) 0%, transparent 70%)' }}
-              />
-              <div className="relative w-[320px] aspect-[1/2] rounded-[48px] border-[8px] border-surface-container-highest bg-background overflow-hidden shadow-2xl">
-                <img
-                  alt="CarboniX App UI"
-                  className="w-full h-full object-cover"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiTM61uvx1ZjhbXPi3GkqxhZnNvbeI4LlEyXwR1dlc-OUVnK1dhxhFQu1OE2QpXYP8IoAIPBCCIH5fz4nRNFDUuQhcXLRly0Sagzd5_FVB2aZQwCjWImQ-hINGnvOGXno1G_m0pWNFSb7h-LfMAF4KXS_aciKqIO0l4p8WFMaMYS4rSKDPbsU0ELL3Nw3AVVhjOBvSVfoosFbgEc8Tb6cekCM1NmUqaACFmYWsQ0EBEEekrgXVP1xAucUfRbhcas6Hp8s22NDOSkjv"
-                />
-              </div>
-              {/* Floating card — CO2 */}
-              <div className="absolute bottom-[20%] -left-12 glass-panel p-lg rounded-xl shadow-xl w-48 animate-pulse">
-                <div className="flex items-center gap-sm mb-sm text-primary-container">
-                  <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>eco</span>
-                  <span className="font-label-caps text-label-caps">OPTIMIZED</span>
-                </div>
-                <div className="text-[24px] leading-none mb-xs font-black text-primary-container font-display">
-                  0.65<span className="text-[12px] ml-1 text-on-surface font-normal">kg</span>
-                </div>
-                <div className="text-on-surface-variant font-label-caps text-[10px]">STOCKHOLM REGION (LOW)</div>
-              </div>
-              {/* Floating card — CI/CD gate */}
-              <div className="absolute -bottom-8 right-0 glass-panel px-lg py-md rounded-lg shadow-xl border border-primary-container/30 flex items-center gap-md">
-                <span className="material-symbols-outlined text-primary-container">lock</span>
-                <div>
-                  <p className="font-label-caps text-[11px] leading-tight text-on-surface">CI/CD GATE</p>
-                  <p className="font-code text-[11px] text-primary-container">Build Passed: Impact &lt; 50kg</p>
-                </div>
-              </div>
             </div>
           </div>
-          {/* Gradient transition to next section */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-surface-container-lowest to-transparent pointer-events-none z-20" />
         </section>
 
         {/* ── Problem Strip (marquee) ──────────────────────── */}
-        <section className="bg-surface-container-lowest py-md overflow-hidden flex items-center">
+        <section className="py-md overflow-hidden flex items-center">
           <div className="flex whitespace-nowrap animate-scroll gap-xl">
             {[...Array(2)].map((_, i) => (
               <div key={i} className="flex gap-xl">
@@ -185,9 +88,6 @@ export default async function LandingPage() {
             ))}
           </div>
         </section>
-
-        {/* Gradient fade to next section */}
-        <div className="w-full h-32 bg-gradient-to-b from-surface-container-lowest to-background pointer-events-none" />
 
         {/* ── How It Works ─────────────────────────────────── */}
         <section id="solutions" className="px-margin py-3xl max-w-[1440px] mx-auto">
@@ -259,11 +159,8 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        {/* Gradient fade to next section */}
-        <div className="w-full h-32 bg-gradient-to-b from-background to-surface-container-lowest pointer-events-none" />
-
         {/* ── SDK Demo / Predictive Observability ──────────── */}
-        <section className="px-margin py-3xl bg-surface-container-lowest">
+        <section className="px-margin py-3xl">
           <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-3xl items-center">
             {/* Code editor */}
             <div className="lg:col-span-7">
@@ -329,9 +226,6 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        {/* Gradient fade to next section */}
-        <div className="w-full h-32 bg-gradient-to-b from-surface-container-lowest to-background pointer-events-none" />
-
         {/* ── Regional Carbon Intensity ─────────────────────── */}
         <section id="network" className="px-margin py-3xl max-w-[1440px] mx-auto">
           <h2 className="font-display text-headline text-center mb-2xl text-on-surface">Regional Carbon Intensity</h2>
@@ -339,7 +233,7 @@ export default async function LandingPage() {
         </section>
 
         {/* ── Automated Carbon Gates ───────────────────────── */}
-        <section className="px-margin py-3xl bg-surface">
+        <section className="px-margin py-3xl">
           <div className="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-3xl items-center">
             <div>
               <h2 className="font-display text-headline mb-lg text-on-surface">

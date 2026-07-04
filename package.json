@@ -8,7 +8,7 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "db:studio": "cd services/api && npx prisma studio"
+    "db:studio": "dotenv -e .env -- prisma studio --schema=services/api/prisma/schema.prisma"
   },
   "workspaces": [
     "apps/*",
@@ -19,6 +19,7 @@
     "schema": "services/api/prisma/schema.prisma"
   },
   "devDependencies": {
+    "dotenv-cli": "^11.0.0",
     "eslint": "^8.57.0",
     "prettier": "^3.2.5",
     "prisma": "^5.22.0",
