@@ -46,3 +46,4 @@ Thumbs.db
 
 # Expo
 .expo/
+*.apk

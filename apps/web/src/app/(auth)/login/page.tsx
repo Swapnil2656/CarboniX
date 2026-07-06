@@ -4,11 +4,13 @@ import { signInUser } from "@/lib/carbonix-auth/auth-actions";
 import { signInSchema } from "@/lib/carbonix-auth/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import { MagicDust } from "@/components/ui/magic-dust-shader";
 
 type FormData = z.infer<typeof signInSchema>;
 
@@ -35,59 +37,42 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-md md:p-margin bg-background font-body-md text-on-surface selection:bg-primary-container selection:text-on-primary">
-      <main className="w-full max-w-[1200px] grid grid-cols-1 md:grid-cols-2 min-h-[720px] rounded-xl overflow-hidden border border-outline-variant shadow-2xl">
+    <div className="min-h-screen flex items-center justify-center p-md md:p-margin bg-black font-body-md text-on-surface selection:bg-primary-container selection:text-on-primary relative overflow-hidden">
+      <div className="fixed inset-0 z-0 pointer-events-none flex justify-center items-center opacity-80 overflow-hidden">
+        <MagicDust />
+      </div>
+      <main className="relative z-10 w-full max-w-[1200px] grid grid-cols-1 md:grid-cols-2 min-h-[720px] rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-transparent">
         
         {/* Left Column: Branding Pane */}
-        <section className="relative bg-surface p-xl md:p-3xl flex flex-col justify-between overflow-hidden hidden md:flex">
+        <section className="relative bg-white/[0.03] backdrop-blur-md border-r border-outline-variant/30 p-xl md:p-3xl flex flex-col justify-center items-center text-center overflow-hidden hidden md:flex">
           {/* Background Decorative Element */}
           <div 
             className="absolute inset-0 opacity-10 pointer-events-none" 
             style={{ backgroundImage: "radial-gradient(circle at 2px 2px, #4e4633 1px, transparent 0)", backgroundSize: "24px 24px" }}
           ></div>
           
-          <div className="relative z-10">
+          <div className="relative z-10 flex flex-col items-center">
             <div className="mb-xl">
-              <img 
+              <Image 
                 alt="CarboniX Logo" 
-                className="w-16 h-16 object-contain" 
-                src="/carbonix-logo.png" 
+                className="w-20 h-20 object-contain drop-shadow-xl" 
+                src="/carbonix-logo.png"
+                width={80}
+                height={80}
               />
             </div>
             <h1 className="font-headline text-headline text-on-surface mb-md">
               Welcome back to <span className="text-primary-container">CarboniX</span>
             </h1>
+
             <p className="font-body-lg text-body-lg text-on-surface-variant max-w-md">
               Your carbon-aware console for high-scale infrastructure management. Monitor, optimize, and neutralize your digital footprint.
             </p>
           </div>
-          
-          <div className="relative z-10">
-            <div className="p-lg bg-surface-container-low rounded-lg border border-outline-variant">
-              <div className="flex items-center gap-md mb-sm">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                <span className="font-label-caps text-label-caps text-on-surface-variant">REAL-TIME GRID STATUS</span>
-              </div>
-              <div className="font-code text-code text-primary-container">
-                EMISSIONS: 240g CO2/kWh <br/>
-                LOAD: 84% OPTIMIZED
-              </div>
-            </div>
-            <div className="mt-xl flex items-center gap-md">
-              <div className="flex -space-x-2">
-                <img className="w-8 h-8 rounded-full border-2 border-surface object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtol0xgN956QuJNxYJ5w31FGLcgMWrpB9IrXQY6A3cvKGWks-QsQ4neu031szkwEiX9uVmhvKljyekyN29ZUWNy8W8qwjmfkXAw-FZQa67UnZhleiqK3BfPoSQcxVoBEv2Exsvp3Vq90tsXYjP8gCCOdV2Qw7Oo8TxAi5oBoXR94f_Zpo-jjdDqqYZzdxJRcWu9HMuYGcLxIU5ZKepKmJoSrMeGydVXbE-nvcXF30gzYQA_RpYuGHQ_5NE2VkdMxb0tfBDPneYB_8o" alt="User 1" />
-                <img className="w-8 h-8 rounded-full border-2 border-surface object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABqknmbEO84RuxSOuGQ47c9Hh-2WZPQYa_y-CvCiT2EPBdIdpHHlbjDuVu-lG0gDrftPFkVce5fRalbeuZ4ejwR6OWIP3JBGRWq_iSURSbQLtlCQ11pJLAFxQmZMW_8TsFcWRZxiocqu0gXxJQTsH9o72y0QWqKEmXK7NxuJ8U2DzerdBBK17HRh-CWn5CNfXWDPmX5ptCY41jiqqvG2uXmC1U1Pn2nHkF5r-zmoBek20IX6AclaWRbsLAFUK77ANWC8MdmBkk4kJc" alt="User 2" />
-                <img className="w-8 h-8 rounded-full border-2 border-surface object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaoT-zEoIzA_Pf0we5nCvYBCwcI42JzfWkPVdG2lJmoA_9PUJsu_rv2-iyM-0K_b5_xaAcjZJ7KmBLym0CmNZYVUhJGoe-M0-4X-mt0m2gvPs2dHNlcAIqNIwb4hnrXB_tG2_8dTI86XUm9pzObmOjHTCIDtVkhwhEazNFxKqkr4dDwW9J3vohELbQQqoGEimqhdGke6Tga0gKuSjUCUolHRJ3V6yAnuBDD2zrVxFOHwHlpwGoRCa0C9E7jRjQEHiFJfVknBqtVFZj" alt="User 3" />
-              </div>
-              <span className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Joined by 2k+ Engineers</span>
-            </div>
-          </div>
-          {/* Abstract Visual */}
-          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-primary-container/10 rounded-full blur-3xl"></div>
         </section>
 
         {/* Right Column: Form Pane */}
-        <section className="bg-surface-container p-xl md:p-3xl flex flex-col justify-center">
+        <section className="bg-black/40 backdrop-blur-xl p-xl md:p-3xl flex flex-col justify-center">
           <div className="w-full max-w-sm mx-auto">
             <header className="mb-xl">
               <h2 className="font-section-header text-section-header text-on-surface mb-xs">Log in</h2>

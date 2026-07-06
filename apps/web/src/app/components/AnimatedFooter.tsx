@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
-import { NewsletterForm } from "./NewsletterForm";
+import React, { useRef, useState } from "react";
 
 export function AnimatedFooter() {
   const footerRef = useRef<HTMLElement>(null);
@@ -26,7 +25,7 @@ export function AnimatedFooter() {
         {/* Inner glow border to give it a premium feel */}
         <div className="pointer-events-none absolute inset-0 z-0 border-t border-white/[0.02]" />
 
-        <div className="relative z-10 grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin max-w-[1440px] mx-auto">
+        <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-gutter px-margin max-w-[1440px] mx-auto">
           {/* Brand */}
           <div className="space-y-lg">
             <span className="text-section-header font-display font-black text-primary-container">CarboniX</span>
@@ -35,20 +34,32 @@ export function AnimatedFooter() {
               intelligence for a sustainable cloud.
             </p>
             <div className="flex gap-md">
-              {[
-                { icon: 'alternate_email', label: 'Email' },
-                { icon: 'hub',            label: 'GitHub' },
-                { icon: 'forum',          label: 'Discord' },
-              ].map((s) => (
-                <a
-                  key={s.icon}
-                  href="#"
-                  aria-label={s.label}
-                  className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container border border-outline-variant text-on-surface-variant hover:text-primary transition-colors hover:shadow-[0_0_15px_rgba(245,197,24,0.2)]"
+              <a
+                href="mailto:swapnilsen2656@gmail.com"
+                aria-label="Email"
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container border border-outline-variant text-on-surface-variant hover:text-primary transition-colors hover:shadow-[0_0_15px_rgba(245,197,24,0.2)]"
+              >
+                <span className="material-symbols-outlined">alternate_email</span>
+              </a>
+              <a
+                href="https://github.com/Swapnil2656/CarboniX"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GitHub"
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container border border-outline-variant text-on-surface-variant hover:text-primary transition-colors hover:shadow-[0_0_15px_rgba(245,197,24,0.2)]"
+              >
+                <svg 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  className="w-5 h-5"
                 >
-                  <span className="material-symbols-outlined">{s.icon}</span>
-                </a>
-              ))}
+                  <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.02c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A4.8 4.8 0 0 0 8 18v4"></path>
+                </svg>
+              </a>
             </div>
           </div>
 
@@ -76,43 +87,9 @@ export function AnimatedFooter() {
             </ul>
           </div>
 
-          {/* Trust + newsletter */}
-          <div className="space-y-xl">
-            <div>
-              <h4 className="font-label-caps text-label-caps text-on-surface mb-xl">TRUST</h4>
-              <ul className="space-y-md">
-                {['Privacy Policy', 'Terms of Service', 'Security (SOC2)', 'Status'].map((l) => (
-                  <li key={l}>
-                    <a href="#" className="text-on-surface-variant hover:text-primary transition-colors font-body-md">{l}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="p-lg bg-surface-container rounded-lg border border-outline-variant relative overflow-hidden group/card">
-              <div 
-                className="pointer-events-none absolute inset-0 z-0 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500"
-                style={{
-                  background: `radial-gradient(circle 300px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.03), transparent 80%)`
-                }}
-              />
-              <div className="relative z-10">
-                <p className="font-label-caps text-[10px] text-on-surface-variant mb-sm">NEWSLETTER</p>
-                <NewsletterForm />
-              </div>
-            </div>
-          </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="mt-3xl pt-xl px-margin max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-md relative z-10 border-t border-outline-variant/30">
-          <p className="text-on-surface-variant font-body-md text-[14px]">
-            © 2024 CarboniX Cloud Intelligence. All rights reserved.
-          </p>
-          <div className="flex items-center gap-md">
-            <span className="w-2 h-2 rounded-full bg-primary-container animate-pulse" />
-            <span className="font-label-caps text-[12px] text-on-surface-variant">SYSTEMS OPERATIONAL</span>
-          </div>
-        </div>
+
       </footer>
     </>
   );

@@ -50,16 +50,44 @@ export default async function LandingPage() {
                 >
                   Connect Provider
                 </Link>
-                <a
-                  href="#docs"
+                <Link
+                  href="/docs"
                   className="border border-primary-container text-primary-container px-xl py-md rounded-lg font-bold text-body-lg hover:bg-primary-container/10 transition-all"
                 >
                   Read SDK Docs
-                </a>
+                </Link>
               </div>
-
             </div>
           </div>
+        </section>
+
+        {/* ── Carbon Intelligence on the Go (Mobile App) ───────── */}
+        <section className="px-margin py-3xl bg-transparent max-w-[800px] mx-auto flex flex-col items-center text-center space-y-xl">
+          <div>
+            <div className="w-16 h-16 rounded-2xl bg-primary-container/20 flex items-center justify-center text-primary-container mb-lg mx-auto">
+              <span className="material-symbols-outlined text-[32px]">smartphone</span>
+            </div>
+            <h2 className="font-display text-headline mb-lg text-on-surface">
+              Carbon Intelligence <span className="text-primary-container">On The Go</span>
+            </h2>
+            <div className="font-body-lg text-body-lg text-on-surface-variant mb-xl space-y-md">
+              <p>
+                Take your infrastructure's environmental metrics with you anywhere. The <strong>CarboniX Mobile App</strong> provides real-time alerts, live grid intensity tracking, and fleet-wide carbon monitoring right from your pocket.
+              </p>
+              <p>
+                Whether you're commuting or away from your desk, instantly monitor high-emission deployments and track your monthly carbon budget on the fly.
+              </p>
+            </div>
+          </div>
+          
+          <a
+            href="/carbonix.apk"
+            download
+            className="bg-primary-container text-on-primary-fixed px-2xl py-lg rounded-full font-bold text-body-lg hover:opacity-90 transition-all flex items-center gap-md shadow-lg shadow-primary-container/20 hover:shadow-primary-container/40"
+          >
+            <span className="material-symbols-outlined text-[24px]">android</span>
+            Download Android APK
+          </a>
         </section>
 
         {/* ── Problem Strip (marquee) ──────────────────────── */}
@@ -94,45 +122,48 @@ export default async function LandingPage() {
           <div className="text-center mb-3xl">
             <h2 className="font-display text-headline text-primary mb-md">How It Works</h2>
             <p className="font-body-lg text-body-lg text-on-surface-variant max-w-[600px] mx-auto">
-              From terminal to global observability in three steps.
+              From raw server metrics to actionable carbon intelligence in three steps.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-xl">
             {[
               {
                 step: '1',
-                icon: 'download',
-                title: 'Install SDK',
-                desc: 'Add CarboniX to your project via npm, pip, or go get.',
+                icon: 'memory',
+                title: 'Telemetry Collection',
+                desc: 'Our Collector agent runs in your cluster, silently gathering CPU, RAM, and Storage utilization data from your cloud instances.',
                 code: (
-                  <p className="font-code text-code text-on-surface-variant">
-                    <span className="code-keyword">npm</span> i carbonix
+                  <p className="font-code text-code text-on-surface-variant leading-relaxed">
+                    <span className="code-keyword text-primary-container">[Agent: Collector]</span><br/>
+                    Instance: <span className="text-on-surface">t3.large</span><br/>
+                    CPU_Util: <span className="text-on-surface">42.5%</span><br/>
+                    Status: <span className="text-on-surface">ACTIVE</span>
                   </p>
                 ),
               },
               {
                 step: '2',
-                icon: 'settings',
-                title: 'Configure',
-                desc: 'Define your cloud provider and region preferences.',
+                icon: 'functions',
+                title: 'Core Math Engine',
+                desc: 'Utilization metrics are cross-referenced with live regional power grid carbon intensity and data center PUE to calculate exact CO2e.',
                 code: (
-                  <p className="font-code text-code leading-relaxed">
-                    <span className="code-keyword">const</span> cx = <span className="code-keyword">new</span> CarboniX(&#123;<br />
-                    &nbsp;&nbsp;provider: <span className="code-string">&apos;aws&apos;</span>,<br />
-                    &nbsp;&nbsp;region: <span className="code-string">&apos;us-east-1&apos;</span><br />
-                    &#125;)
+                  <p className="font-code text-code text-on-surface-variant leading-relaxed">
+                    <span className="code-keyword text-primary-container">[GridCache Engine]</span><br/>
+                    GridIntensity: <span className="text-on-surface">255 gCO2/kWh</span><br/>
+                    PUE: <span className="text-on-surface">1.2</span><br/>
+                    Calc: <span className="text-on-surface">(E * Grid * PUE)</span>
                   </p>
                 ),
               },
               {
                 step: '3',
-                icon: 'analytics',
-                title: 'Get Results',
-                desc: 'Real-time carbon telemetry and CI/CD gating.',
+                icon: 'auto_awesome',
+                title: 'Actionable Insights',
+                desc: 'AI Agents transform raw math into action. The Analyst finds inefficiencies, while the GateAgent blocks carbon-heavy deployments.',
                 code: (
                   <>
-                    <p className="font-code text-code text-primary-container">&gt;&gt; Impact: 0.12kg CO2e</p>
-                    <p className="font-code text-code text-primary-container">&gt;&gt; Score: Optimal (A+)</p>
+                    <p className="font-code text-code text-error leading-relaxed">&gt; GateAgent: BLOCK DEPLOY</p>
+                    <p className="font-code text-code text-on-surface-variant leading-relaxed">&gt; Reason: Budget Exceeded (+12kg)</p>
                   </>
                 ),
               },
@@ -161,66 +192,35 @@ export default async function LandingPage() {
 
         {/* ── SDK Demo / Predictive Observability ──────────── */}
         <section className="px-margin py-3xl">
-          <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-3xl items-center">
-            {/* Code editor */}
-            <div className="lg:col-span-7">
-              <div className="bg-[#1e1e1e] rounded-xl border border-outline-variant shadow-2xl overflow-hidden">
-                {/* Title bar */}
-                <div className="bg-surface-container-high px-lg py-sm flex items-center justify-between border-b border-outline-variant">
-                  <div className="flex items-center gap-sm">
-                    <div className="flex gap-xs">
-                      <div className="w-3 h-3 rounded-full bg-error-container" />
-                      <div className="w-3 h-3 rounded-full bg-primary-container/50" />
-                      <div className="w-3 h-3 rounded-full bg-tertiary-container/50" />
-                    </div>
-                    <span className="ml-md font-code text-code text-on-surface-variant">src/metrics/compute.ts</span>
-                  </div>
-                  <span className="material-symbols-outlined text-on-surface-variant text-[18px]">terminal</span>
-                </div>
-                {/* Code */}
-                <div className="p-lg font-code text-code leading-[1.8]">
-                  <p><span className="code-keyword">import</span> &#123; CarboniX &#125; <span className="code-keyword">from</span> <span className="code-string">&apos;carbonix&apos;</span>;</p>
-                  <p><span className="code-comment">{`// Initialize real-time tracking`}</span></p>
-                  <p><span className="code-keyword">const</span> analyzer = <span className="code-keyword">new</span> CarboniX(&#123;</p>
-                  <p>&nbsp;&nbsp;apiKey: process.env.CX_KEY,</p>
-                  <p>&nbsp;&nbsp;strictMode: <span className="code-keyword">true</span></p>
-                  <p>&#125;);</p>
-                  <br />
-                  <p><span className="code-keyword">const</span> metrics = <span className="code-keyword">await</span> analyzer.checkCarbon(&#123;</p>
-                  <p>&nbsp;&nbsp;instances: [<span className="code-string">&apos;p3.2xlarge&apos;</span>, <span className="code-string">&apos;p3.2xlarge&apos;</span>],</p>
-                  <p>&nbsp;&nbsp;region: <span className="code-string">&apos;ap-south-1&apos;</span>,</p>
-                  <p>&nbsp;&nbsp;runtime_hours: <span className="code-keyword">24</span></p>
-                  <p>&#125;);</p>
-                  <br />
-                  <p>console.log(<span className="code-string">`CO2 Projection: $&#123;metrics.totalKg&#125;kg`</span>);</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Right panel */}
-            <div className="lg:col-span-5 space-y-lg">
+          <div className="max-w-[800px] mx-auto flex flex-col items-center text-center space-y-xl">
+            <div>
               <h2 className="font-display text-headline mb-md leading-tight text-on-surface">
                 Predictive <span className="text-primary-container">Observability</span>
               </h2>
-              <p className="font-body-lg text-body-lg text-on-surface-variant">
-                Don&apos;t wait for the monthly bill to see your impact. Predict carbon intensity
-                based on instance type and region grid-mix before you hit deploy.
-              </p>
-              <div className="bg-surface p-lg rounded-xl border border-outline-variant space-y-md">
-                <div className="flex justify-between items-end">
-                  <span className="font-label-caps text-label-caps text-on-surface-variant">PROJECTED IMPACT</span>
-                  <span className="font-display text-[32px] font-black text-error leading-none">33.8kg</span>
-                </div>
-                <div className="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
-                  <div className="w-[85%] h-full bg-error" />
-                </div>
-                <div className="flex items-center gap-md bg-error/10 p-md rounded-lg border border-error/30">
-                  <span className="material-symbols-outlined text-error">priority_high</span>
-                  <p className="font-body-md text-error text-[14px]">
-                    <strong>Warning:</strong> Mumbai grid is currently 78% coal-powered. Switching to{' '}
-                    <strong>Stockholm</strong> could save 33.1kg CO2e.
-                  </p>
-                </div>
+              <div className="font-body-lg text-body-lg text-on-surface-variant max-w-[700px] mx-auto space-y-md">
+                <p>
+                  Don&apos;t wait for the monthly bill to see your impact. <strong>Predictive Observability</strong> shifts carbon awareness left by intercepting your infrastructure-as-code (Terraform, Kubernetes) during the Pull Request phase.
+                </p>
+                <p>
+                  CarboniX mathematically models the exact CO2e cost of your proposed architecture changes against live regional grid intensities. Set hard carbon budgets for your teams and let our GateAgent automatically block deployments that exceed them, empowering developers to make greener routing decisions before a single server is provisioned.
+                </p>
+              </div>
+            </div>
+            
+            <div className="bg-surface p-lg rounded-xl border border-outline-variant space-y-md text-left w-full max-w-[500px]">
+              <div className="flex justify-between items-end">
+                <span className="font-label-caps text-label-caps text-on-surface-variant">PROJECTED IMPACT</span>
+                <span className="font-display text-[32px] font-black text-error leading-none">33.8kg</span>
+              </div>
+              <div className="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
+                <div className="w-[85%] h-full bg-error" />
+              </div>
+              <div className="flex items-center gap-md bg-error/10 p-md rounded-lg border border-error/30">
+                <span className="material-symbols-outlined text-error">priority_high</span>
+                <p className="font-body-md text-error text-[14px]">
+                  <strong>Warning:</strong> Mumbai grid is currently 78% coal-powered. Switching to{' '}
+                  <strong>Stockholm</strong> could save 33.1kg CO2e.
+                </p>
               </div>
             </div>
           </div>
@@ -234,21 +234,29 @@ export default async function LandingPage() {
 
         {/* ── Automated Carbon Gates ───────────────────────── */}
         <section className="px-margin py-3xl">
-          <div className="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-3xl items-center">
+          <div className="max-w-[800px] mx-auto flex flex-col items-center text-center space-y-xl">
             <div>
               <h2 className="font-display text-headline mb-lg text-on-surface">
                 Automated <span className="text-primary-container">Carbon Gates</span>
               </h2>
-              <p className="font-body-lg text-body-lg text-on-surface-variant mb-xl">
-                Treat carbon like a security vulnerability. Set hard limits in your CI
-                pipeline and block deployments that exceed your team&apos;s environmental
-                budget.
-              </p>
+              <div className="font-body-lg text-body-lg text-on-surface-variant mb-xl space-y-md">
+                <p>
+                  Treat carbon like a security vulnerability. CarboniX introduces the <strong>GateAgent</strong>, an AI-driven sentinel that resides in your CI/CD pipelines (GitHub Actions, GitLab CI).
+                </p>
+                <p>
+                  Before any code is merged, the GateAgent analyzes the proposed infrastructure changes, calculates the net-new CO2e emissions, and automatically blocks the deployment if it exceeds your pre-defined carbon budget. It ensures that &quot;Dirty&quot; regional drift never makes it to production, keeping your infrastructure green and compliant by design.
+                </p>
+              </div>
+            </div>
+            
+            <div className="bg-surface-container border border-outline-variant rounded-xl p-xl shadow-lg w-full text-left">
+              <h3 className="font-display font-bold text-on-surface mb-md text-section-header">Key Capabilities</h3>
               <ul className="space-y-md">
                 {[
-                  'Prevent "Dirty" Region drift in production.',
-                  'Auto-suggest cleaner instance alternatives in PRs.',
-                  'Standardize reporting for CSRD compliance.',
+                  'Intercepts Terraform & Kubernetes manifests in PRs.',
+                  'Prevents "Dirty" Region drift in production environments.',
+                  'Auto-suggests cleaner instance alternatives automatically.',
+                  'Standardizes automated reporting for CSRD compliance.',
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-md">
                     <span className="material-symbols-outlined text-primary-container mt-1">check_circle</span>
@@ -257,141 +265,10 @@ export default async function LandingPage() {
                 ))}
               </ul>
             </div>
-            {/* PR mockup */}
-            <div>
-              <div className="bg-surface-container border border-outline-variant rounded-xl shadow-2xl overflow-hidden">
-                <div className="bg-surface-container-high px-lg py-md border-b border-outline-variant flex items-center justify-between">
-                  <div className="flex items-center gap-md">
-                    <span className="material-symbols-outlined text-on-surface-variant">merge</span>
-                    <span className="font-display font-bold text-on-surface">PR #482: Scale search API</span>
-                  </div>
-                  <span className="font-label-caps text-label-caps text-on-surface-variant">OPEN</span>
-                </div>
-                <div className="p-lg space-y-lg">
-                  <div className="flex items-center gap-md">
-                    <div className="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden flex-shrink-0">
-                      <img
-                        alt="carbonix-bot avatar"
-                        className="w-full h-full object-cover"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHBMUCk_ZRK2aSBvKXV-uZEbAsq8vK7kLRKC3B7s0o5XPWvKa3r_hFPrncQW5QQ-Z712MOs-1a6FXnkVfmwY_XK4fVJsnas8aBbiNta2oF6uoERf9cAhtEePJCCW2beQCQFWgpTWiJeK8aHnaO8ube4Y7xykgsdVG1f0bAOAwp5RuflwHwOxp48MYUW8zxnelmr4O34DlW03U06Hc9PhiuyhIsFuWajR-VsjOhrLwRA8RBoSjMV0JswYY9y4dVGb7yWuS6MdfZvugf"
-                      />
-                    </div>
-                    <p className="font-body-md text-on-surface-variant">
-                      <span className="text-on-surface font-bold">carbonix-bot</span> commented 14 mins ago
-                    </p>
-                  </div>
-                  <div className="bg-surface p-lg rounded-lg border-l-4 border-error space-y-md">
-                    <div className="flex items-center gap-md">
-                      <span className="material-symbols-outlined text-error">dangerous</span>
-                      <h4 className="font-display font-bold text-on-surface">Carbon Budget Exceeded</h4>
-                    </div>
-                    <p className="font-body-md text-on-surface-variant">
-                      This PR increases the infrastructure carbon footprint by{' '}
-                      <span className="text-error font-bold">+12.4kg / month</span>.
-                    </p>
-                    <div className="grid grid-cols-2 gap-md">
-                      <div className="p-md bg-surface-container-highest rounded border border-outline-variant">
-                        <p className="text-[10px] font-label-caps text-on-surface-variant mb-xs">LIMIT</p>
-                        <p className="font-code text-on-surface">5.0 kg</p>
-                      </div>
-                      <div className="p-md bg-surface-container-highest rounded border border-outline-variant">
-                        <p className="text-[10px] font-label-caps text-on-surface-variant mb-xs">ESTIMATED</p>
-                        <p className="font-code text-error">17.4 kg</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-md bg-primary-container/10 p-md rounded border border-primary-container/30">
-                      <span className="material-symbols-outlined text-primary-container text-[20px]">lightbulb</span>
-                      <p className="text-[12px] text-on-surface">
-                        Recommendation: Use <strong>Graviton3</strong> (t4g) instances to reduce impact by 40%.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </section>
-        {/* ── Documentation ─────────────────────────────────── */}
-        <section id="docs" className="px-margin py-3xl max-w-[1440px] mx-auto">
-          <div className="text-center mb-2xl">
-            <h2 className="font-display text-headline mb-md text-on-surface">Documentation</h2>
-            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-[600px] mx-auto">
-              Everything you need to integrate CarboniX into your tech stack.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2xl">
-            {/* Quick Start */}
-            <div className="bg-surface-container border border-outline-variant rounded-xl p-xl">
-              <div className="flex items-center gap-md mb-lg">
-                <span className="material-symbols-outlined text-primary text-[28px]">rocket_launch</span>
-                <h3 className="font-display text-section-header text-on-surface">Quick Start</h3>
-              </div>
-              <p className="font-body-md text-on-surface-variant mb-lg">
-                Get up and running with the CarboniX SDK in Node.js or TypeScript projects.
-              </p>
-              <div className="bg-surface-container-lowest p-md rounded border border-outline-variant font-code text-code text-on-surface-variant space-y-sm">
-                <p><span className="code-keyword">npm</span> install carbonix</p>
-                <div className="h-px bg-outline-variant/50 my-sm"></div>
-                <p><span className="code-keyword">import</span> &#123; CarboniX &#125; <span className="code-keyword">from</span> <span className="code-string">&apos;carbonix&apos;</span>;</p>
-                <p><span className="code-keyword">const</span> cx = <span className="code-keyword">new</span> CarboniX(&#123; apiKey: <span className="code-string">&apos;YOUR_KEY&apos;</span> &#125;);</p>
-                <p><span className="code-keyword">await</span> cx.measure(<span className="code-string">&apos;compute-job-1&apos;</span>);</p>
-              </div>
-            </div>
 
-            {/* REST API */}
-            <div className="bg-surface-container border border-outline-variant rounded-xl p-xl">
-              <div className="flex items-center gap-md mb-lg">
-                <span className="material-symbols-outlined text-primary text-[28px]">api</span>
-                <h3 className="font-display text-section-header text-on-surface">REST API Reference</h3>
-              </div>
-              <p className="font-body-md text-on-surface-variant mb-lg">
-                Directly query regional carbon intensity and build custom integrations using our HTTP endpoints.
-              </p>
-              <div className="bg-surface-container-lowest p-md rounded border border-outline-variant font-code text-code text-on-surface-variant space-y-sm">
-                <div className="flex items-center gap-sm">
-                  <span className="bg-primary/20 text-primary px-2 py-0.5 rounded text-[10px] font-bold">GET</span>
-                  <span className="text-on-surface">/api/v1/reference/regions</span>
-                </div>
-                <div className="flex items-center gap-sm">
-                  <span className="bg-primary/20 text-primary px-2 py-0.5 rounded text-[10px] font-bold">POST</span>
-                  <span className="text-on-surface">/api/v1/carbon/measure</span>
-                </div>
-                <p className="text-[12px] text-on-surface-variant italic mt-sm">Requires Authorization: Bearer &lt;token&gt;</p>
-              </div>
-            </div>
-            
-            {/* CI/CD Integration */}
-            <div className="bg-surface-container border border-outline-variant rounded-xl p-xl">
-              <div className="flex items-center gap-md mb-lg">
-                <span className="material-symbols-outlined text-primary text-[28px]">account_tree</span>
-                <h3 className="font-display text-section-header text-on-surface">CI/CD Gating</h3>
-              </div>
-              <p className="font-body-md text-on-surface-variant mb-lg">
-                Block deployments that exceed your carbon budget using GitHub Actions.
-              </p>
-              <div className="bg-surface-container-lowest p-md rounded border border-outline-variant font-code text-code text-on-surface-variant space-y-sm">
-                <p className="text-primary-container">- name: <span className="text-on-surface">Check Carbon Budget</span></p>
-                <p>&nbsp;&nbsp;uses: <span className="text-on-surface">carbonix/action@v1</span></p>
-                <p>&nbsp;&nbsp;with:</p>
-                <p>&nbsp;&nbsp;&nbsp;&nbsp;max-emissions: <span className="text-on-surface">5.0kg</span></p>
-                <p>&nbsp;&nbsp;&nbsp;&nbsp;api-key: <span className="text-on-surface">$&#123;&#123; secrets.CARBONIX_KEY &#125;&#125;</span></p>
-              </div>
-            </div>
 
-            {/* Support */}
-            <div className="bg-surface-container border border-outline-variant rounded-xl p-xl flex flex-col justify-center items-center text-center">
-              <span className="material-symbols-outlined text-outline text-[48px] mb-md">help</span>
-              <h3 className="font-display text-section-header text-on-surface mb-sm">Need Help?</h3>
-              <p className="font-body-md text-on-surface-variant mb-lg">
-                Can&apos;t find what you&apos;re looking for? Reach out to our engineering team.
-              </p>
-              <button className="bg-primary text-on-primary px-xl py-sm rounded-full font-bold hover:bg-primary-fixed-dim transition-colors">
-                Contact Support
-              </button>
-            </div>
-          </div>
-        </section>
       </main>
 
       <AnimatedFooter />

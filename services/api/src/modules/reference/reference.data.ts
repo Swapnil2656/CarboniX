@@ -6,7 +6,7 @@ export const regions = [
     name: 'Asia Pacific (Mumbai)',
     country: 'IN',
     continent: 'Asia',
-    gridIntensity: 750, // gCO2/kWh
+    gridIntensity: 708, // gCO2/kWh
     pue: 1.2,
     isPopular: false
   },
@@ -17,7 +17,7 @@ export const regions = [
     name: 'US East (N. Virginia)',
     country: 'US',
     continent: 'North America',
-    gridIntensity: 415,
+    gridIntensity: 370,
     pue: 1.2,
     isPopular: true
   },
@@ -28,7 +28,7 @@ export const regions = [
     name: 'Europe (Ireland)',
     country: 'IE',
     continent: 'Europe',
-    gridIntensity: 316,
+    gridIntensity: 255,
     pue: 1.2,
     isPopular: false
   },
@@ -39,7 +39,7 @@ export const regions = [
     name: 'US West (Oregon)',
     country: 'US',
     continent: 'North America',
-    gridIntensity: 130,
+    gridIntensity: 206, 
     pue: 1.2,
     isPopular: true
   },
@@ -50,7 +50,7 @@ export const regions = [
     name: 'Europe (Stockholm)',
     country: 'SE',
     continent: 'Europe',
-    gridIntensity: 8, // Very clean
+    gridIntensity: 20, // Very clean
     pue: 1.07,
     isPopular: true
   },
@@ -61,7 +61,7 @@ export const regions = [
     name: 'Finland',
     country: 'FI',
     continent: 'Europe',
-    gridIntensity: 10,
+    gridIntensity: 38,
     pue: 1.1,
     isPopular: false
   }

@@ -8,8 +8,8 @@ export const GRID_INTENSITY: Record<string, { country: string; value: number; so
   },
   US: {
     country: "United States",
-    value: 386,
-    source: "Static Grid Dataset"
+    value: 370,
+    source: "2023 National Average"
   },
   UK: {
     country: "United Kingdom",
@@ -20,6 +20,21 @@ export const GRID_INTENSITY: Record<string, { country: string; value: number; so
     country: "Germany",
     value: 380,
     source: "Static Grid Dataset"
+  },
+  IE: {
+    country: "Ireland",
+    value: 255,
+    source: "Irish EPA 2023"
+  },
+  SE: {
+    country: "Sweden",
+    value: 20,
+    source: "2023 National Average"
+  },
+  FI: {
+    country: "Finland",
+    value: 38,
+    source: "Fingrid 2023"
   }
 };
 
