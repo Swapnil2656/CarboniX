@@ -240,11 +240,10 @@ export default function SettingsPage() {
               <div className="space-y-6">
                 <div>
                   <h3 className="text-sm font-medium text-on-surface mb-3">Interface Theme</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {[
                       { id: 'light', label: 'Light', icon: 'light_mode' },
-                      { id: 'dark', label: 'Dark', icon: 'dark_mode' },
-                      { id: 'system', label: 'System', icon: 'desktop_windows' }
+                      { id: 'dark', label: 'Dark', icon: 'dark_mode' }
                     ].map((t) => {
                       const isActive = isMounted && theme === t.id;
                       return (
