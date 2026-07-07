@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
-import { AtomCursor } from "@/app/components/AtomCursor";
 
 export const metadata: Metadata = {
   title: "CarboniX | The Carbon Cost of Your Cloud",
@@ -17,7 +16,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased">
-        <AtomCursor />
         <Providers>{children}</Providers>
       </body>
     </html>
