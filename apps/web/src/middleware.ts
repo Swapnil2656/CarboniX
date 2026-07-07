@@ -32,7 +32,8 @@ export async function middleware(req: NextRequest) {
   }
 
   // ── Redirect logged-in users away from auth pages ─────────────────────────
-  if (token && authConfig.publicRoutes.includes(pathname) && pathname !== "/" && pathname !== authConfig.routes.verify && pathname !== "/onboarding") {
+  const authRoutes = ["/login", "/signup", "/analyst/signup", "/content_editor/signup"];
+  if (token && authRoutes.includes(pathname)) {
     // If they are on an auth page like /login but they are logged in, send them to dashboard
     const destination = authConfig.roleRedirects[token.type as string] ?? authConfig.defaultRedirect;
     return NextResponse.redirect(new URL(destination, req.url));
