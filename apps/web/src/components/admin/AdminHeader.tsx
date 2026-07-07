@@ -139,8 +139,12 @@ export const AdminHeader = () => {
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="flex items-center gap-3 hover:bg-surface-container rounded-full py-1 pl-1 pr-3 transition-colors"
           >
-            <div className="w-8 h-8 rounded-full bg-[rgba(245,197,24,0.15)] flex items-center justify-center text-primary border border-[rgba(245,197,24,0.3)] font-semibold text-sm">
-              {userInitial}
+            <div className="w-8 h-8 rounded-full bg-[rgba(245,197,24,0.15)] flex items-center justify-center text-primary border border-[rgba(245,197,24,0.3)] font-semibold text-sm overflow-hidden relative">
+              {session?.user?.avatarUrl ? (
+                <img src={session.user.avatarUrl} alt={userName} className="w-full h-full object-cover" />
+              ) : (
+                userInitial
+              )}
             </div>
             <div className="flex flex-col items-start">
               <span className="text-sm font-medium text-on-surface leading-tight">{userName}</span>

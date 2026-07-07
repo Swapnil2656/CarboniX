@@ -10,12 +10,14 @@ declare module "next-auth" {
   interface User {
     type?: string;
     isOnboarded?: boolean;
+    avatarUrl?: string;
   }
   interface Session {
     user: {
       id: string;
       type?: string;
       isOnboarded?: boolean;
+      avatarUrl?: string;
     } & DefaultSession["user"];
     accessToken?: string;
   }
@@ -27,6 +29,7 @@ declare module "next-auth/jwt" {
     type?: string;
     isOnboarded?: boolean;
     accessToken?: string;
+    avatarUrl?: string;
   }
 }
 
@@ -40,7 +43,10 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
       authorize: async credentials => {
         const { email, password } = await signInSchema.parseAsync(credentials);
 
-        const user = await db.user.findUnique({ email });
+        const user = await db.user.findUnique({ 
+          where: { email },
+          include: { profile: true }
+        });
         if (!user) throw new Error("No account found with that email");
 
         const isValid = await bcrypt.compare(password, user.password);
@@ -48,7 +54,14 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
 
         if (!user.isVerified) throw new Error("Please verify your email before logging in");
 
-        return { id: user.id, email: user.email, name: user.userName, type: user.type, isOnboarded: user.isOnboarded };
+        return { 
+          id: user.id, 
+          email: user.email, 
+          name: user.profile?.fullName || user.userName, 
+          type: user.type, 
+          isOnboarded: user.isOnboarded,
+          avatarUrl: user.profile?.avatarUrl || undefined
+        };
       },
     }),
   ],
@@ -62,6 +75,7 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
         token.id = user.id as string;
         token.type = user.type;
         token.isOnboarded = user.isOnboarded;
+        if (user.avatarUrl) token.avatarUrl = user.avatarUrl;
         
         // Generate a standard JWT compatible with the Express API middleware
         token.accessToken = jwt.sign(
@@ -84,7 +98,15 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
       }
 
       if (trigger === "update" && session) {
-        token.isOnboarded = session.isOnboarded;
+        if (session.isOnboarded !== undefined) {
+          token.isOnboarded = session.isOnboarded;
+        }
+        if (session.name !== undefined) {
+          token.name = session.name;
+        }
+        if (session.avatarUrl !== undefined) {
+          token.avatarUrl = session.avatarUrl;
+        }
       }
       return token;
     },
@@ -94,6 +116,12 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
         session.user.type = token.type as string;
         session.user.isOnboarded = token.isOnboarded as boolean;
         session.accessToken = token.accessToken as string;
+        if (token.name) {
+          session.user.name = token.name;
+        }
+        if (token.avatarUrl) {
+          session.user.avatarUrl = token.avatarUrl;
+        }
       }
       return session;
     },

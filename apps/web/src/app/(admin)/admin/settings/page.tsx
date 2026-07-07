@@ -1,19 +1,28 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { ToggleSwitch } from '@/components/ui/ToggleSwitch';
+import { getProfile, updateProfile } from '@/app/actions/settings-actions';
+import Image from 'next/image';
 
 type Tab = 'profile' | 'appearance' | 'security' | 'notifications';
 
 export default function SettingsPage() {
-  const { data: session } = useSession();
+  const { data: session, update: updateSession } = useSession();
   const [activeTab, setActiveTab] = useState<Tab>('profile');
   const [isMounted, setIsMounted] = useState(false);
 
-  // Form states (mocked for now)
+  // Form states
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState({ type: '', text: '' });
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Mocked settings
   const [theme, setTheme] = useState<'dark' | 'light' | 'system'>('dark');
   const [twoFactorAuth, setTwoFactorAuth] = useState(false);
   const [emailAlerts, setEmailAlerts] = useState(true);
@@ -23,10 +32,17 @@ export default function SettingsPage() {
   useEffect(() => {
     setIsMounted(true);
     
-    // Initialize profile data
+    // Load profile
     if (session?.user) {
-      setName(session.user.name || '');
       setEmail(session.user.email || '');
+      getProfile().then(res => {
+        if (res.success && res.profile) {
+          setName(res.profile.fullName || session.user.name || '');
+          setAvatarUrl(res.profile.avatarUrl || '');
+        } else {
+          setName(session.user.name || '');
+        }
+      });
     }
 
     // Handle deep linking based on hash
@@ -54,16 +70,48 @@ export default function SettingsPage() {
     window.location.hash = tab;
   };
 
-  const handleSaveProfile = (e: React.FormEvent) => {
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (file.size > 800 * 1024) {
+      setSaveMessage({ type: 'error', text: 'Image must be under 800KB' });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      setAvatarUrl(base64String);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock save
-    alert('Profile saved successfully!');
+    setIsSaving(true);
+    setSaveMessage({ type: '', text: '' });
+
+    try {
+      const res = await updateProfile({ name, avatarUrl });
+      if (res.success) {
+        setSaveMessage({ type: 'success', text: 'Profile saved successfully!' });
+        // Attempt to update session to reflect new name and avatar
+        await updateSession({ name, avatarUrl });
+      } else {
+        setSaveMessage({ type: 'error', text: res.error || 'Failed to save' });
+      }
+    } catch (err) {
+      setSaveMessage({ type: 'error', text: 'An unexpected error occurred.' });
+    } finally {
+      setIsSaving(false);
+      setTimeout(() => setSaveMessage({ type: '', text: '' }), 3000);
+    }
   };
 
   const handleUpdatePassword = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock save
-    alert('Password update link sent to email.');
+    alert('Password update flow is mocked.');
   };
 
   if (!isMounted) return null;
@@ -109,12 +157,34 @@ export default function SettingsPage() {
             <section className="animate-in fade-in slide-in-from-bottom-2 duration-300">
               <h2 className="text-xl font-semibold text-on-surface mb-6">Profile Information</h2>
               <form onSubmit={handleSaveProfile} className="space-y-6">
+                
+                {saveMessage.text && (
+                  <div className={`p-3 rounded-lg text-sm border ${saveMessage.type === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
+                    {saveMessage.text}
+                  </div>
+                )}
+
                 <div className="flex items-center gap-6">
-                  <div className="w-20 h-20 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant border border-outline-variant">
-                    <span className="material-symbols-outlined text-[40px]">person</span>
+                  <div className="w-20 h-20 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant border border-outline-variant overflow-hidden relative">
+                    {avatarUrl ? (
+                      <Image src={avatarUrl} alt="Avatar" fill className="object-cover" />
+                    ) : (
+                      <span className="material-symbols-outlined text-[40px]">person</span>
+                    )}
                   </div>
                   <div>
-                    <button type="button" className="bg-surface-container hover:bg-surface-container-high text-on-surface px-4 py-2 rounded-lg text-sm transition-colors border border-outline-variant">
+                    <input 
+                      type="file" 
+                      accept="image/png, image/jpeg, image/gif" 
+                      className="hidden" 
+                      ref={fileInputRef}
+                      onChange={handleAvatarUpload}
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => fileInputRef.current?.click()}
+                      className="bg-surface-container hover:bg-surface-container-high text-on-surface px-4 py-2 rounded-lg text-sm transition-colors border border-outline-variant"
+                    >
                       Upload Avatar
                     </button>
                     <p className="text-xs text-on-surface-variant mt-2">JPG, GIF or PNG. Max size of 800K</p>
@@ -128,6 +198,7 @@ export default function SettingsPage() {
                       type="text" 
                       value={name}
                       onChange={(e) => setName(e.target.value)}
+                      required
                       className="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                     />
                   </div>
@@ -144,8 +215,13 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="pt-4 border-t border-outline-variant flex justify-end">
-                  <button type="submit" className="bg-primary hover:bg-primary-hover text-on-primary px-6 py-2 rounded-lg text-sm font-medium transition-colors">
-                    Save Changes
+                  <button 
+                    type="submit" 
+                    disabled={isSaving}
+                    className="bg-primary hover:bg-primary-hover text-on-primary px-6 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+                  >
+                    {isSaving && <span className="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>}
+                    {isSaving ? 'Saving...' : 'Save Changes'}
                   </button>
                 </div>
               </form>
