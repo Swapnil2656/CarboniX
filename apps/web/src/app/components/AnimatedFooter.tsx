@@ -20,15 +20,23 @@ export function AnimatedFooter() {
       <footer
         ref={footerRef}
         onMouseMove={handleMouseMove}
-        className="relative z-0 bg-white/[0.03] backdrop-blur-md border-t border-outline-variant/30 text-on-surface py-3xl overflow-hidden group"
+        className="relative z-0 bg-surface-container-lowest dark:bg-white/[0.02] border-t border-outline-variant/30 text-on-surface py-3xl overflow-hidden group"
       >
+        {/* Dynamic Mouse Spotlight Glow */}
+        <div 
+          className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"
+          style={{
+            background: 'radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(245,158,11,0.08), transparent 40%)'
+          }}
+        />
+
         {/* Inner glow border to give it a premium feel */}
-        <div className="pointer-events-none absolute inset-0 z-0 border-t border-white/[0.02]" />
+        <div className="pointer-events-none absolute inset-0 z-0 border-t border-white/[0.05]" />
 
         <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-gutter px-margin max-w-[1440px] mx-auto">
           {/* Brand */}
           <div className="space-y-lg">
-            <span className="text-section-header font-display font-black text-primary-container">CarboniX</span>
+            <span className="text-section-header font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-400 dark:from-primary dark:to-primary-fixed">CarboniX</span>
             <p className="text-on-surface-variant font-body-md pr-lg">
               Standardizing the environmental impact of software engineering. High-performance
               intelligence for a sustainable cloud.
@@ -37,7 +45,7 @@ export function AnimatedFooter() {
               <a
                 href="mailto:swapnilsen2656@gmail.com"
                 aria-label="Email"
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container border border-outline-variant text-on-surface-variant hover:text-primary transition-colors hover:shadow-[0_0_15px_rgba(245,197,24,0.2)]"
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container border border-outline-variant text-on-surface-variant hover:text-amber-600 dark:hover:text-primary transition-colors hover:shadow-[0_0_15px_rgba(217,119,6,0.2)] dark:hover:shadow-[0_0_15px_rgba(245,197,24,0.2)]"
               >
                 <span className="material-symbols-outlined">alternate_email</span>
               </a>
@@ -46,7 +54,7 @@ export function AnimatedFooter() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub"
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container border border-outline-variant text-on-surface-variant hover:text-primary transition-colors hover:shadow-[0_0_15px_rgba(245,197,24,0.2)]"
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container border border-outline-variant text-on-surface-variant hover:text-amber-600 dark:hover:text-primary transition-colors hover:shadow-[0_0_15px_rgba(217,119,6,0.2)] dark:hover:shadow-[0_0_15px_rgba(245,197,24,0.2)]"
               >
                 <svg 
                   viewBox="0 0 24 24" 
@@ -69,7 +77,7 @@ export function AnimatedFooter() {
             <ul className="space-y-md">
               {['Core SDK', 'CI/CD Gating', 'Regional Explorer', 'Compliance Engine'].map((l) => (
                 <li key={l}>
-                  <a href="#" className="text-on-surface-variant hover:text-primary transition-colors font-body-md">{l}</a>
+                  <a href="#" className="text-on-surface-variant hover:text-amber-600 dark:hover:text-primary transition-colors font-body-md">{l}</a>
                 </li>
               ))}
             </ul>
@@ -81,7 +89,7 @@ export function AnimatedFooter() {
             <ul className="space-y-md">
               {['Documentation', 'API Reference', 'Case Studies', 'Carbon Blog'].map((l) => (
                 <li key={l}>
-                  <a href="#" className="text-on-surface-variant hover:text-primary transition-colors font-body-md">{l}</a>
+                  <a href="#" className="text-on-surface-variant hover:text-amber-600 dark:hover:text-primary transition-colors font-body-md">{l}</a>
                 </li>
               ))}
             </ul>
