@@ -1,5 +1,6 @@
 "use client";
 
+import { useTheme } from "next-themes";
 import React, { useRef, useState, useEffect } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -215,23 +216,32 @@ void main() {
     float r = dot(cxy, cxy);
     if (r > 1.0) discard;
     
-    float alpha = 1.0 - smoothstep(0.7, 1.0, r);
-    gl_FragColor = vec4(uColor, alpha * vAlpha * 0.5); 
+    float alpha = 1.0 - smoothstep(0.5, 1.0, r);
+    gl_FragColor = vec4(uColor, alpha * vAlpha * 1.5); 
 }
 `;
 
 export function MagicDustCore({
     sequence = DEFAULT_SEQUENCE,
     particleCount = 10000,
-    particleColor = "#ffff00", // Bright proper yellow
+    particleColor, 
     particleSize = 0.02,
     fontFamily = "sans-serif",
     holdDuration = 3.0,
     animationSpeed = 1.0,
     scatterRadius = 12
 }: MagicDustProps) {
+    const { resolvedTheme } = useTheme();
+    // Default to a dark primary color in light mode for contrast, bright yellow in dark mode
+    const activeColor = particleColor || (resolvedTheme === 'light' ? "#d97706" : "#ffff00");
+    
     // We'll use a dynamic primary-ish color for CarboniX
-    const colorObj = useState(() => new THREE.Color(particleColor || "#ffff00"))[0];
+    const colorObj = useState(() => new THREE.Color(activeColor))[0];
+    
+    // Update color when theme changes
+    useEffect(() => {
+        colorObj.set(activeColor);
+    }, [activeColor, colorObj]);
 
     const [{ origin, targets, sizes }] = useState(() => {
         const origin = getScatteredPositions(particleCount, scatterRadius);
@@ -361,7 +371,7 @@ export function MagicDustCore({
                 }}
                 transparent={true}
                 depthWrite={false}
-                blending={THREE.AdditiveBlending} 
+                blending={resolvedTheme === 'light' ? THREE.NormalBlending : THREE.AdditiveBlending} 
             />
         </points>
     );

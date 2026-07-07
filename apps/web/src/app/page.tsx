@@ -19,7 +19,7 @@ export default async function LandingPage() {
   const session = await auth();
 
   return (
-    <div className="bg-black text-on-surface font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-fixed">
+    <div className="bg-background text-on-surface font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-fixed">
       {/* ── Ambient 3D Background ───────────────────────────── */}
       <div className="fixed inset-0 z-0 pointer-events-none flex justify-center items-center opacity-80 overflow-hidden">
         <MagicDust />
@@ -29,13 +29,16 @@ export default async function LandingPage() {
       <main className="pt-[80px] relative z-10 rounded-b-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
         {/* ── Hero ─────────────────────────────────────────── */}
         <section id="platform" className="relative overflow-hidden min-h-[90vh] flex items-center py-3xl w-full">
+          {/* Subtle background glow for extra visual appeal in light mode */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-amber-500/10 dark:bg-primary/10 blur-[120px] rounded-full pointer-events-none -z-10" />
+          
           {/* Content Wrapper */}
           <div className="max-w-[1440px] mx-auto px-margin w-full flex flex-col items-center text-center relative z-10">
             {/* Center col */}
             <div className="flex flex-col items-center">
               <h1 className="font-display text-display mb-lg leading-[1.05]">
                 The carbon cost of{' '}
-                <span className="text-primary-container">your cloud</span>.{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-400 dark:from-primary dark:to-primary-fixed">your cloud</span>.{' '}
                 <br />In 5 lines of code.
               </h1>
               <p className="font-body-lg text-body-lg text-on-surface-variant mb-xl max-w-[540px]">
@@ -46,13 +49,13 @@ export default async function LandingPage() {
               <div className="flex justify-center gap-md flex-wrap">
                 <Link
                   href="/signup"
-                  className="bg-primary-container text-on-primary-fixed px-xl py-md rounded-lg font-bold text-body-lg hover:opacity-90 transition-all"
+                  className="bg-gradient-to-r from-amber-500 to-orange-500 dark:from-primary dark:to-primary-fixed text-white dark:text-on-primary-fixed px-xl py-md rounded-lg font-bold text-body-lg hover:shadow-lg hover:shadow-amber-500/25 transition-all transform hover:-translate-y-0.5"
                 >
                   Connect Provider
                 </Link>
                 <Link
                   href="/docs"
-                  className="border border-primary-container text-primary-container px-xl py-md rounded-lg font-bold text-body-lg hover:bg-primary-container/10 transition-all"
+                  className="border-2 border-amber-500/20 dark:border-primary-container text-amber-700 dark:text-primary-container px-xl py-md rounded-lg font-bold text-body-lg hover:bg-amber-500/10 dark:hover:bg-primary-container/10 transition-all"
                 >
                   Read SDK Docs
                 </Link>

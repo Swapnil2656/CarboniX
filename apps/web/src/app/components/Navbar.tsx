@@ -40,7 +40,7 @@ export function Navbar({ session }: { session: any }) {
         <div className="flex items-center gap-xl">
           <Link href="/" className="flex items-center gap-sm">
             <img src="/carbonix-logo.png" alt="CarboniX" className="w-8 h-8 object-contain" />
-            <span className="text-section-header font-display font-black text-primary-container">
+            <span className="text-section-header font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-400 dark:from-primary dark:to-primary-fixed">
               CarboniX
             </span>
           </Link>
@@ -55,7 +55,7 @@ export function Navbar({ session }: { session: any }) {
               <SignOutButton />
               <Link
                 href="/admin/dashboard"
-                className="bg-primary-container text-on-primary-fixed px-lg py-sm rounded-lg font-bold hover:opacity-80 active:scale-95 transition-all"
+                className="bg-gradient-to-r from-amber-500 to-orange-500 dark:from-primary dark:to-primary-fixed text-white dark:text-on-primary-fixed px-lg py-sm rounded-lg font-bold text-body-md hover:shadow-md hover:shadow-amber-500/20 transition-all"
               >
                 Dashboard
               </Link>
