@@ -6,9 +6,15 @@ import { redis } from '@/lib/redis';
 export async function getProjects() {
   try {
     const CACHE_KEY = 'dashboard:projects_list';
-    const cached = await redis.get(CACHE_KEY);
-    if (cached) {
-      return { success: true, projects: JSON.parse(cached) };
+    
+    // Try to get from cache, but don't fail if Redis is down
+    try {
+      const cached = await redis.get(CACHE_KEY);
+      if (cached) {
+        return { success: true, projects: JSON.parse(cached) };
+      }
+    } catch (cacheErr) {
+      console.warn('Redis cache get failed, falling back to DB:', cacheErr);
     }
 
     const projects = await prisma.project.findMany({
@@ -21,8 +27,12 @@ export async function getProjects() {
       createdAt: p.createdAt.toISOString(),
     }));
 
-    // Cache the result for 5 seconds to reduce DB load from polling
-    await redis.setex(CACHE_KEY, 5, JSON.stringify(serializedProjects));
+    // Cache the result, but don't fail if Redis is down
+    try {
+      await redis.setex(CACHE_KEY, 5, JSON.stringify(serializedProjects));
+    } catch (cacheErr) {
+      console.warn('Redis cache set failed:', cacheErr);
+    }
 
     return {
       success: true,

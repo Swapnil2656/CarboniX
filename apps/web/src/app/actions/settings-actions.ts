@@ -59,13 +59,8 @@ export async function updateProfile(data: { name?: string; avatarUrl?: string })
       },
     });
 
-    // Also update User table name for consistency
-    if (data.name) {
-      await prisma.user.update({
-        where: { id: userId },
-        data: { userName: data.name },
-      });
-    }
+    // The userName field on the User model is a unique handle and should not be 
+    // overwritten with the user's Full Name (which can contain spaces or duplicates).
 
     return { success: true };
   } catch (error: any) {

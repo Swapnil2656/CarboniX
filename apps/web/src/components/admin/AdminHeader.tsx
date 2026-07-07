@@ -18,12 +18,12 @@ const searchTargets = [
   { label: 'Documentation', keywords: ['docs', 'documentation', 'guide', 'tutorial', 'reference', 'sdk'], path: '/docs' },
 
   // Deep / Hidden Features (Mobile-Style Search)
-  { label: 'Developer Options', keywords: ['developer', 'options', 'dev', 'api', 'webhooks', 'integration', 'sdk'], path: '/admin/api-keys' },
+  { label: 'Developer Options', keywords: ['developer', 'options', 'dev', 'api', 'webhooks', 'integration', 'sdk'], path: '/admin/settings#developer' },
   { label: 'Appearance & Theme', keywords: ['dark mode', 'light mode', 'theme', 'color', 'appearance', 'ui'], path: '/admin/settings#appearance' },
   { label: 'Account Security (2FA)', keywords: ['security', 'password', '2fa', 'authentication', 'mfa', 'login'], path: '/admin/settings#security' },
   { label: 'Notification Preferences', keywords: ['notifications', 'alerts', 'emails', 'push'], path: '/admin/settings#notifications' },
   { label: 'Billing & Invoices', keywords: ['payment', 'card', 'credit', 'invoice', 'billing', 'receipts'], path: '/upgrade#billing' },
-  { label: 'Permissions & Roles', keywords: ['permissions', 'roles', 'access control', 'rbac'], path: '/admin/team', requireAdmin: true },
+  { label: 'Team & Roles', keywords: ['permissions', 'roles', 'access control', 'rbac'], path: '/admin/team', requireAdmin: true },
   { label: 'Carbon Alert Thresholds', keywords: ['alerts', 'thresholds', 'limits', 'warning', 'cap'], path: '/admin/emissions#alerts' },
   { label: 'CI/CD Integrations', keywords: ['ci', 'cd', 'github actions', 'pipeline', 'deployment', 'automation'], path: '/docs/ci-cd' },
 ];

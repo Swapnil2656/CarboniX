@@ -146,8 +146,11 @@ async function executeTool(name: string, args: any, adminUserId: string) {
         data: { region },
       });
       // Invalidate the cache to immediately show the new region
-      await redis.del('dashboard:projects_list');
-      
+      try {
+        await redis.del('dashboard:projects_list');
+      } catch (e) {
+        console.warn('Redis cache invalidation failed:', e);
+      }
       return `Successfully switched project '${project.name}' to region '${region}'.`;
     }
     case 'pushMobileNotification': {

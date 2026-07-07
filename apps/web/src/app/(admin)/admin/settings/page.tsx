@@ -2,14 +2,16 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
+import { useTheme } from 'next-themes';
 import { ToggleSwitch } from '@/components/ui/ToggleSwitch';
 import { getProfile, updateProfile } from '@/app/actions/settings-actions';
 import Image from 'next/image';
 
-type Tab = 'profile' | 'appearance' | 'security' | 'notifications';
+type Tab = 'profile' | 'appearance' | 'security' | 'notifications' | 'developer';
 
 export default function SettingsPage() {
   const { data: session, update: updateSession } = useSession();
+  const { theme, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<Tab>('profile');
   const [isMounted, setIsMounted] = useState(false);
 
@@ -23,7 +25,6 @@ export default function SettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Mocked settings
-  const [theme, setTheme] = useState<'dark' | 'light' | 'system'>('dark');
   const [twoFactorAuth, setTwoFactorAuth] = useState(false);
   const [emailAlerts, setEmailAlerts] = useState(true);
   const [pushAlerts, setPushAlerts] = useState(false);
@@ -47,7 +48,7 @@ export default function SettingsPage() {
 
     // Handle deep linking based on hash
     const hash = window.location.hash.replace('#', '');
-    if (['profile', 'appearance', 'security', 'notifications'].includes(hash)) {
+    if (['profile', 'appearance', 'security', 'notifications', 'developer'].includes(hash)) {
       setActiveTab(hash as Tab);
     }
   }, [session]);
@@ -56,7 +57,7 @@ export default function SettingsPage() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      if (['profile', 'appearance', 'security', 'notifications'].includes(hash)) {
+      if (['profile', 'appearance', 'security', 'notifications', 'developer'].includes(hash)) {
         setActiveTab(hash as Tab);
       }
     };
@@ -244,30 +245,26 @@ export default function SettingsPage() {
                       { id: 'light', label: 'Light', icon: 'light_mode' },
                       { id: 'dark', label: 'Dark', icon: 'dark_mode' },
                       { id: 'system', label: 'System', icon: 'desktop_windows' }
-                    ].map((t) => (
-                      <button
-                        key={t.id}
-                        onClick={() => setTheme(t.id as any)}
-                        className={`p-4 rounded-xl border flex flex-col items-center gap-3 transition-all ${
-                          theme === t.id 
-                            ? 'border-primary bg-primary-container/10' 
-                            : 'border-outline-variant hover:border-outline bg-surface-container-low'
-                        }`}
-                      >
-                        <span className={`material-symbols-outlined text-[32px] ${theme === t.id ? 'text-primary' : 'text-on-surface-variant'}`}>
-                          {t.icon}
-                        </span>
-                        <span className={`text-sm font-medium ${theme === t.id ? 'text-primary' : 'text-on-surface'}`}>{t.label}</span>
-                      </button>
-                    ))}
+                    ].map((t) => {
+                      const isActive = isMounted && theme === t.id;
+                      return (
+                        <button
+                          key={t.id}
+                          onClick={() => setTheme(t.id)}
+                          className={`p-4 rounded-xl border flex flex-col items-center gap-3 transition-all ${
+                            isActive 
+                              ? 'border-primary bg-primary-container/10' 
+                              : 'border-outline-variant hover:border-outline bg-surface-container-low'
+                          }`}
+                        >
+                          <span className={`material-symbols-outlined text-[32px] ${isActive ? 'text-primary' : 'text-on-surface-variant'}`}>
+                            {t.icon}
+                          </span>
+                          <span className={`text-sm font-medium ${isActive ? 'text-primary' : 'text-on-surface'}`}>{t.label}</span>
+                        </button>
+                      );
+                    })}
                   </div>
-                </div>
-
-                <div className="bg-surface-container/50 rounded-lg p-4 border border-outline-variant mt-4">
-                  <p className="text-sm text-on-surface-variant flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[18px]">info</span>
-                    CarboniX currently enforces dark mode globally to save energy on OLED screens. Light mode toggle is a mockup.
-                  </p>
                 </div>
               </div>
             </section>
@@ -369,6 +366,48 @@ export default function SettingsPage() {
                   <div className="pt-1">
                     <ToggleSwitch checked={thresholdAlerts} onChange={setThresholdAlerts} />
                   </div>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* DEVELOPER OPTIONS TAB (HIDDEN FROM SIDEBAR) */}
+          {activeTab === 'developer' && (
+            <section className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="flex items-center gap-2 mb-6">
+                <span className="material-symbols-outlined text-primary text-[28px]">terminal</span>
+                <h2 className="text-xl font-semibold text-on-surface">Developer Options</h2>
+              </div>
+              
+              <div className="p-4 rounded-lg bg-primary-container/10 border border-primary/20 mb-8">
+                <p className="text-sm text-on-surface-variant leading-relaxed">
+                  You have discovered the hidden developer options! These settings are intended for power users and developers. Proceed with caution.
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                <div className="flex items-center justify-between p-4 rounded-lg border border-outline-variant hover:border-outline transition-colors group">
+                  <div>
+                    <h3 className="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">Enable API Access</h3>
+                    <p className="text-xs text-on-surface-variant mt-1">Allow programmatic access via API tokens.</p>
+                  </div>
+                  <ToggleSwitch checked={true} onChange={() => {}} />
+                </div>
+
+                <div className="flex items-center justify-between p-4 rounded-lg border border-outline-variant hover:border-outline transition-colors group">
+                  <div>
+                    <h3 className="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">Webhooks (Beta)</h3>
+                    <p className="text-xs text-on-surface-variant mt-1">Send event payloads to external URLs.</p>
+                  </div>
+                  <ToggleSwitch checked={false} onChange={() => {}} />
+                </div>
+
+                <div className="flex items-center justify-between p-4 rounded-lg border border-outline-variant hover:border-outline transition-colors group">
+                  <div>
+                    <h3 className="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">Verbose Logging</h3>
+                    <p className="text-xs text-on-surface-variant mt-1">Output detailed debug information to console.</p>
+                  </div>
+                  <ToggleSwitch checked={false} onChange={() => {}} />
                 </div>
               </div>
             </section>
