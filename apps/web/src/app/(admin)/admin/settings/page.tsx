@@ -199,6 +199,9 @@ export default function SettingsPage() {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       required
+                      maxLength={50}
+                      pattern="^[A-Za-z\s\-']+$"
+                      title="Name can only contain letters, spaces, hyphens, and apostrophes."
                       className="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                     />
                   </div>

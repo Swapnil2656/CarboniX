@@ -34,6 +34,15 @@ export async function updateProfile(data: { name?: string; avatarUrl?: string })
   }
 
   try {
+    if (data.name) {
+      if (!/^[A-Za-z\s\-']+$/.test(data.name)) {
+        return { success: false, error: "Name can only contain letters, spaces, hyphens, and apostrophes." };
+      }
+      if (data.name.length > 50) {
+        return { success: false, error: "Name must be 50 characters or less." };
+      }
+    }
+
     const userId = session.user.id;
 
     // Update the Profile table
