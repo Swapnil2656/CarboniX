@@ -1,6 +1,7 @@
 import NextAuth, { type DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { db } from "./lib/carbonix-auth/prisma-db";
+import { prisma } from "./lib/carbonix-auth/prisma";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { signInSchema } from "./lib/carbonix-auth/zod";
@@ -43,7 +44,7 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
       authorize: async credentials => {
         const { email, password } = await signInSchema.parseAsync(credentials);
 
-        const user = await db.user.findUnique({ 
+        const user = await prisma.user.findUnique({ 
           where: { email },
           include: { profile: true }
         });

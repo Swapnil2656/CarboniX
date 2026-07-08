@@ -1,37 +1,18 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 
 export function AnimatedFooter() {
   const footerRef = useRef<HTMLElement>(null);
-  const [height, setHeight] = useState(0);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    if (!footerRef.current) return;
-    const rect = footerRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    footerRef.current.style.setProperty("--mouse-x", `${x}px`);
-    footerRef.current.style.setProperty("--mouse-y", `${y}px`);
-  };
 
   return (
     <>
       <footer
         ref={footerRef}
-        onMouseMove={handleMouseMove}
-        className="relative z-0 bg-surface-container-lowest dark:bg-white/[0.02] border-t border-outline-variant/30 text-on-surface py-3xl overflow-hidden group"
+        className="relative z-0 bg-surface-container-lowest/50 dark:bg-black/20 backdrop-blur-lg text-on-surface py-3xl overflow-hidden group"
       >
-        {/* Dynamic Mouse Spotlight Glow */}
-        <div 
-          className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"
-          style={{
-            background: 'radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(245,158,11,0.08), transparent 40%)'
-          }}
-        />
 
-        {/* Inner glow border to give it a premium feel */}
-        <div className="pointer-events-none absolute inset-0 z-0 border-t border-white/[0.05]" />
+
 
         <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-gutter px-margin max-w-[1440px] mx-auto">
           {/* Brand */}
