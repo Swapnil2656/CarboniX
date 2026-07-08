@@ -3,25 +3,32 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 
+import { submitSupportTicket } from '@/app/actions/support-actions';
+
 export default function SupportPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
-    // Mock API call
-    setTimeout(() => {
+    const formData = new FormData(e.currentTarget);
+
+    try {
+      const result = await submitSupportTicket(formData);
+      if (result.success) {
+        setSubmitStatus('success');
+        setTimeout(() => setSubmitStatus('idle'), 3000);
+      } else {
+        setSubmitStatus('error');
+      }
+    } catch (err) {
+      setSubmitStatus('error');
+    } finally {
       setIsSubmitting(false);
-      setSubmitStatus('success');
-      
-      // Reset form status after 3 seconds
-      setTimeout(() => {
-        setSubmitStatus('idle');
-      }, 3000);
-    }, 1500);
+    }
   };
 
   return (
@@ -59,7 +66,7 @@ export default function SupportPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-on-surface-variant">Category</label>
-                  <select required className="w-full bg-surface-container border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none">
+                  <select name="category" required className="w-full bg-surface-container border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none">
                     <option value="" disabled selected>Select a category...</option>
                     <option value="email_change">Email Address Change</option>
                     <option value="technical">Technical Support</option>
@@ -71,7 +78,7 @@ export default function SupportPage() {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-on-surface-variant">Priority</label>
-                  <select required className="w-full bg-surface-container border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none">
+                  <select name="priority" required className="w-full bg-surface-container border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none">
                     <option value="low">Low - General Question</option>
                     <option value="medium">Medium - Non-critical issue</option>
                     <option value="high">High - System degraded</option>
@@ -84,6 +91,7 @@ export default function SupportPage() {
                 <label className="text-sm font-medium text-on-surface-variant">Subject</label>
                 <input 
                   type="text" 
+                  name="subject"
                   required
                   placeholder="Brief summary of your issue"
                   className="w-full bg-surface-container border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
@@ -93,6 +101,7 @@ export default function SupportPage() {
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-on-surface-variant">Message</label>
                 <textarea 
+                  name="message"
                   required
                   rows={5}
                   placeholder="Please provide as much detail as possible..."
