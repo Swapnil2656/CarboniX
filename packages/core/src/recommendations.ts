@@ -1,4 +1,4 @@
-import { getGridIntensity, DEFAULT_GRID_INTENSITIES } from './gridCache';
+import { getGridIntensity, DEFAULT_GRID_INTENSITIES, PROVIDER_REGIONS } from './gridCache';
 
 export interface RecommendationResult {
   recommendedRegion?: string;
@@ -14,8 +14,7 @@ export async function getRecommendation(
   totalFinalEnergyKwh: number
 ): Promise<RecommendationResult> {
   // Find all regions for this provider (from our hardcoded list or DB later)
-  // For now, we use the keys in DEFAULT_GRID_INTENSITIES as a proxy for available regions
-  const allRegions = Object.keys(DEFAULT_GRID_INTENSITIES);
+  const allRegions = PROVIDER_REGIONS[provider.toUpperCase()] || Object.keys(DEFAULT_GRID_INTENSITIES);
   
   // Find the cleanest region
   let cleanestRegion = currentRegion;

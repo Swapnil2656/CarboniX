@@ -394,6 +394,9 @@ exports.Prisma.ProjectScalarFieldEnum = {
   id: 'id',
   name: 'name',
   region: 'region',
+  sdkConnected: 'sdkConnected',
+  connectedAt: 'connectedAt',
+  lastPingAt: 'lastPingAt',
   userId: 'userId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -448,7 +451,12 @@ exports.Prisma.JsonNullValueFilter = {
 exports.CloudProvider = exports.$Enums.CloudProvider = {
   AWS: 'AWS',
   GCP: 'GCP',
-  AZURE: 'AZURE'
+  AZURE: 'AZURE',
+  VERCEL: 'VERCEL',
+  NETLIFY: 'NETLIFY',
+  RAILWAY: 'RAILWAY',
+  RENDER: 'RENDER',
+  OTHER: 'OTHER'
 };
 
 exports.MobileUserStatus = exports.$Enums.MobileUserStatus = {

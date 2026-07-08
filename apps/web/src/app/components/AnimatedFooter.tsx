@@ -17,7 +17,7 @@ export function AnimatedFooter() {
         <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-gutter px-margin max-w-[1440px] mx-auto">
           {/* Brand */}
           <div className="space-y-lg">
-            <span className="text-section-header font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-400 dark:from-primary dark:to-primary-fixed">CarboniX</span>
+            <span className="text-section-header font-display font-black text-amber-500 dark:text-primary">CarboniX</span>
             <p className="text-on-surface-variant font-body-md pr-lg">
               Standardizing the environmental impact of software engineering. High-performance
               intelligence for a sustainable cloud.

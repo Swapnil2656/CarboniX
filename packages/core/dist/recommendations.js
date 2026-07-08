@@ -4,8 +4,7 @@ exports.getRecommendation = getRecommendation;
 const gridCache_1 = require("./gridCache");
 async function getRecommendation(provider, currentRegion, currentCo2KgMonth, totalFinalEnergyKwh) {
     // Find all regions for this provider (from our hardcoded list or DB later)
-    // For now, we use the keys in DEFAULT_GRID_INTENSITIES as a proxy for available regions
-    const allRegions = Object.keys(gridCache_1.DEFAULT_GRID_INTENSITIES);
+    const allRegions = gridCache_1.PROVIDER_REGIONS[provider.toUpperCase()] || Object.keys(gridCache_1.DEFAULT_GRID_INTENSITIES);
     // Find the cleanest region
     let cleanestRegion = currentRegion;
     let lowestIntensity = await (0, gridCache_1.getGridIntensity)(currentRegion);

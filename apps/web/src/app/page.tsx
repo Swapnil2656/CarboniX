@@ -3,7 +3,10 @@ import Link from 'next/link';
 import dynamic from "next/dynamic";
 import { Navbar } from './components/Navbar';
 import { AnimatedFooter } from './components/AnimatedFooter';
-import { RegionsTable } from './components/RegionsTable';
+import { CiCdMockup } from './components/features/CiCdMockup';
+import { ImpactChart } from './components/features/ImpactChart';
+import { IdeSnippet } from './components/features/IdeSnippet';
+import { SavingsCalculator } from './components/features/SavingsCalculator';
 import { auth } from '@/auth';
 import { SignOutButton } from './components/SignOutButton';
 
@@ -26,7 +29,7 @@ export default async function LandingPage() {
       </div>
       <Navbar session={session} />
 
-      <main className="pt-[80px] relative z-10 rounded-b-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
+      <main className="pt-[80px] relative z-10 rounded-b-[40px]">
         {/* ── Hero ─────────────────────────────────────────── */}
         <section id="platform" className="relative overflow-hidden min-h-[90vh] flex items-center py-3xl w-full">
 
@@ -191,84 +194,61 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        {/* ── SDK Demo / Predictive Observability ──────────── */}
-        <section className="px-margin py-3xl">
-          <div className="max-w-[800px] mx-auto flex flex-col items-center text-center space-y-xl">
-            <div>
-              <h2 className="font-display text-headline mb-md leading-tight text-on-surface">
-                Predictive <span className="text-primary-container">Observability</span>
-              </h2>
-              <div className="font-body-lg text-body-lg text-on-surface-variant max-w-[700px] mx-auto space-y-md">
-                <p>
-                  Don&apos;t wait for the monthly bill to see your impact. <strong>Predictive Observability</strong> shifts carbon awareness left by intercepting your infrastructure-as-code (Terraform, Kubernetes) during the Pull Request phase.
-                </p>
-                <p>
-                  CarboniX mathematically models the exact CO2e cost of your proposed architecture changes against live regional grid intensities. Set hard carbon budgets for your teams and let our GateAgent automatically block deployments that exceed them, empowering developers to make greener routing decisions before a single server is provisioned.
-                </p>
-              </div>
+        {/* ── Predictive Observability (IDE Snippet) ────────── */}
+        <section className="px-margin py-3xl max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-2xl items-center">
+          <div>
+            <h2 className="font-display text-headline mb-md leading-tight text-on-surface">
+              Predictive <span className="text-primary-container">Observability</span>
+            </h2>
+            <div className="font-body-lg text-body-lg text-on-surface-variant space-y-md">
+              <p>
+                Don&apos;t wait for the monthly bill to see your impact. <strong>Predictive Observability</strong> shifts carbon awareness left right into your IDE.
+              </p>
+              <p>
+                CarboniX mathematically models the exact CO2e cost of your proposed architecture changes against live regional grid intensities before a single server is provisioned.
+              </p>
             </div>
-            
-            <div className="bg-surface p-lg rounded-xl border border-outline-variant space-y-md text-left w-full max-w-[500px]">
-              <div className="flex justify-between items-end">
-                <span className="font-label-caps text-label-caps text-on-surface-variant">PROJECTED IMPACT</span>
-                <span className="font-display text-[32px] font-black text-error leading-none">33.8kg</span>
-              </div>
-              <div className="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
-                <div className="w-[85%] h-full bg-error" />
-              </div>
-              <div className="flex items-center gap-md bg-error/10 p-md rounded-lg border border-error/30">
-                <span className="material-symbols-outlined text-error">priority_high</span>
-                <p className="font-body-md text-error text-[14px]">
-                  <strong>Warning:</strong> Mumbai grid is currently 78% coal-powered. Switching to{' '}
-                  <strong>Stockholm</strong> could save 33.1kg CO2e.
-                </p>
-              </div>
+          </div>
+          <div className="w-full mt-10 lg:mt-0">
+            <IdeSnippet />
+          </div>
+        </section>
+
+        {/* ── Automated Carbon Gates (CI/CD) ───────────────── */}
+        <section className="px-margin py-3xl max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-2xl items-center">
+          <div className="order-last lg:order-first w-full mt-10 lg:mt-0">
+            <CiCdMockup />
+          </div>
+          <div>
+            <h2 className="font-display text-headline mb-md text-on-surface">
+              Automated <span className="text-primary-container">Carbon Gates</span>
+            </h2>
+            <div className="font-body-lg text-body-lg text-on-surface-variant space-y-md">
+              <p>
+                Treat carbon like a security vulnerability. CarboniX introduces the <strong>GateAgent</strong>, an AI-driven sentinel that resides in your CI/CD pipelines.
+              </p>
+              <p>
+                Before any code is merged, the GateAgent analyzes proposed infrastructure changes and automatically blocks the deployment if it exceeds your pre-defined budget, ensuring "Dirty" regional drift never makes it to production.
+              </p>
             </div>
           </div>
         </section>
 
-        {/* ── Regional Carbon Intensity ─────────────────────── */}
-        <section id="network" className="px-margin py-3xl max-w-[1440px] mx-auto">
-          <h2 className="font-display text-headline text-center mb-2xl text-on-surface">Regional Carbon Intensity</h2>
-          <RegionsTable />
-        </section>
-
-        {/* ── Automated Carbon Gates ───────────────────────── */}
-        <section className="px-margin py-3xl">
-          <div className="max-w-[800px] mx-auto flex flex-col items-center text-center space-y-xl">
-            <div>
-              <h2 className="font-display text-headline mb-lg text-on-surface">
-                Automated <span className="text-primary-container">Carbon Gates</span>
-              </h2>
-              <div className="font-body-lg text-body-lg text-on-surface-variant mb-xl space-y-md">
-                <p>
-                  Treat carbon like a security vulnerability. CarboniX introduces the <strong>GateAgent</strong>, an AI-driven sentinel that resides in your CI/CD pipelines (GitHub Actions, GitLab CI).
-                </p>
-                <p>
-                  Before any code is merged, the GateAgent analyzes the proposed infrastructure changes, calculates the net-new CO2e emissions, and automatically blocks the deployment if it exceeds your pre-defined carbon budget. It ensures that &quot;Dirty&quot; regional drift never makes it to production, keeping your infrastructure green and compliant by design.
-                </p>
-              </div>
-            </div>
-            
-            <div className="bg-surface-container border border-outline-variant rounded-xl p-xl shadow-lg w-full text-left">
-              <h3 className="font-display font-bold text-on-surface mb-md text-section-header">Key Capabilities</h3>
-              <ul className="space-y-md">
-                {[
-                  'Intercepts Terraform & Kubernetes manifests in PRs.',
-                  'Prevents "Dirty" Region drift in production environments.',
-                  'Auto-suggests cleaner instance alternatives automatically.',
-                  'Standardizes automated reporting for CSRD compliance.',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-md">
-                    <span className="material-symbols-outlined text-primary-container mt-1">check_circle</span>
-                    <span className="font-body-md text-on-surface">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+        {/* ── Real-Time Impact Chart ────────────────────────── */}
+        <section className="px-margin py-3xl max-w-[1440px] mx-auto">
+          <div className="text-center mb-xl">
+            <h2 className="font-display text-headline text-on-surface mb-md">Watch Emissions Plummet</h2>
+            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-[600px] mx-auto">
+              Once CarboniX is activated, it continuously optimizes workload placement and scaling, drastically reducing your baseline emissions.
+            </p>
           </div>
+          <ImpactChart />
         </section>
 
+        {/* ── Savings Calculator ───────────────────────────── */}
+        <section className="px-margin py-3xl mb-3xl">
+          <SavingsCalculator />
+        </section>
 
       </main>
 

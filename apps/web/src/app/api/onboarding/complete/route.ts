@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { name, region, skip } = await req.json();
+    const { name, skip } = await req.json();
 
     // If skip is true, just update isOnboarded
     if (skip) {
@@ -21,15 +21,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, message: "Onboarding skipped" });
     }
 
-    if (!name || !region) {
-      return NextResponse.json({ error: "Name and region are required" }, { status: 400 });
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+      return NextResponse.json({ error: "Project name is required" }, { status: 400 });
     }
 
-    // 1. Create the project
+    // 1. Create the project (region is optional — AI will determine optimal region)
     const project = await prisma.project.create({
       data: {
-        name,
-        region,
+        name: name.trim(),
         userId: session.user.id
       }
     });
@@ -41,7 +40,7 @@ export async function POST(req: NextRequest) {
 
     await prisma.apiKey.create({
       data: {
-        name: `${name} Default Key`,
+        name: `${name.trim()} Default Key`,
         prefix,
         hashedKey,
         createdBy: session.user.id,
@@ -56,14 +55,26 @@ export async function POST(req: NextRequest) {
       data: { isOnboarded: true }
     });
 
-    return NextResponse.json({ 
-      success: true, 
-      project,
+    // Serialize all Date fields to ISO strings for client components
+    return NextResponse.json({
+      success: true,
+      project: {
+        ...project,
+        createdAt: project.createdAt.toISOString(),
+        updatedAt: project.updatedAt.toISOString(),
+        connectedAt: project.connectedAt?.toISOString() ?? null,
+        lastPingAt: project.lastPingAt?.toISOString() ?? null,
+      },
       apiKey: rawKey // Only shown once!
     });
 
-  } catch (error) {
-    console.error("Onboarding error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  } catch (error: any) {
+    // Log full error detail so we can debug
+    console.error("Onboarding error:", error?.message, error?.code, error?.meta);
+    return NextResponse.json(
+      { error: error?.message || "Internal server error" },
+      { status: 500 }
+    );
   }
 }
+

@@ -30,11 +30,11 @@ export interface MagicDustProps {
 
 const DEFAULT_SEQUENCE: SequenceItem[] = [
     { type: 'text', text: 'CARBON', offset: [0, 0, 0] },
-    { type: 'shape', shape: 'sphere', offset: [0, 0, 0] },
     { type: 'text', text: 'COST', offset: [0, 0, 0] },
-    { type: 'shape', shape: 'torus', offset: [0, 0, 0] },
     { type: 'text', text: 'CLOUD', offset: [0, 0, 0] },
-    { type: 'shape', shape: 'box', offset: [0, 0, 0] }
+    { type: 'text', text: 'OPTIMIZE', offset: [0, 0, 0] },
+    { type: 'text', text: 'CARBONIX', offset: [0, 0, 0] },
+    { type: 'text', text: 'CI/CD', offset: [0, 0, 0] }
 ];
 
 function getScatteredPositions(count: number, radius: number) {
@@ -290,7 +290,7 @@ export function MagicDustCore({
     useFrame((state, delta) => {
         if (phase.current === 'CONSTRUCTING') {
             targetProgress.current = Math.min(1.5, targetProgress.current + delta * 0.4 * animationSpeed);
-            if (targetProgress.current === 1.5) {
+            if (targetProgress.current >= 1.5) {
                 phase.current = 'HOLDING';
                 timer.current = 0;
             }
@@ -303,7 +303,7 @@ export function MagicDustCore({
         } 
         else if (phase.current === 'DECONSTRUCTING') {
             targetProgress.current = Math.max(0.0, targetProgress.current - delta * 0.6 * animationSpeed); 
-            if (targetProgress.current === 0.0) {
+            if (targetProgress.current <= 0.0) {
                 const nextTarget = (currentTargetIndex.current + 1) % targets.length;
                 currentTargetIndex.current = nextTarget;
                 
@@ -319,6 +319,8 @@ export function MagicDustCore({
                     delayAttr.needsUpdate = true;
                 }
                 
+                // Prevent particle flicker glitch by fully resetting progress
+                currentProgress.current = 0.0;
                 phase.current = 'CONSTRUCTING';
             }
         }

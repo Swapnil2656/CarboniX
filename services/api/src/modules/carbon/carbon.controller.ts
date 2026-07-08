@@ -108,19 +108,36 @@ export const recommend = async (req: Request, res: Response) => {
     const input: CalculationInput = req.body;
     const baseResult = await calculateCarbon(input);
     
-    const recResult = await calculateCarbon({ ...input, provider: 'gcp', region: 'eu-north-1' });
+    // Get the recommendation from the engine (scoped to the requested provider)
+    const recommendation = await getRecommendation(
+      input.provider,
+      input.region,
+      baseResult.co2KgMonth,
+      baseResult.totalFinalEnergyKwh
+    );
 
-    res.json({ 
-      success: true, 
-      data: {
-        recommended: {
-            provider: 'gcp',
-            region: 'eu-north-1',
-            co2KgMonth: recResult.co2KgMonth,
-            savingsKg: Math.max(0, baseResult.co2KgMonth - recResult.co2KgMonth)
+    if (recommendation.recommendedRegion) {
+      res.json({ 
+        success: true, 
+        data: {
+          recommended: {
+              provider: input.provider,
+              region: recommendation.recommendedRegion,
+              co2KgMonth: recommendation.recommendedCo2Kg,
+              savingsKg: Math.max(0, baseResult.co2KgMonth - (recommendation.recommendedCo2Kg || 0)),
+              reductionPercent: recommendation.reductionPercent,
+              message: recommendation.recommendation
+          }
+        } 
+      });
+    } else {
+      res.json({
+        success: true,
+        data: {
+          message: 'You are already in the greenest region for your provider.'
         }
-      } 
-    });
+      });
+    }
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
   }

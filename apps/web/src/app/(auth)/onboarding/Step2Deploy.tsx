@@ -13,7 +13,23 @@ type Props = {
 export function Step2Deploy({ apiKey, projectName, projectRegion, onNext, onSkip }: Props) {
   const [copied, setCopied] = useState(false);
 
-  const promptText = `Deploy this app to CarboniX with carbonix-cli. Run \`npx @carbonix/cli init --key ${apiKey}\`, then \`npx @carbonix/cli app deploy --project proj_${apiKey.slice(4) || "default"}\` from the app repo. Project display name: "${projectName}", region ${projectRegion}. Connect the codebase and wire the primary TELEMETRY_URL. Provide data to the dashboard and the mobile application. Ensure Agentic AI is present in the dashboard to switch regions based on requirements, track the deployment, and send notifications to the user in the mobile application.`;
+  const promptText = `Please integrate CarboniX into this codebase to enable intelligent carbon tracking and deployment gating.
+
+Follow these steps:
+1. Initialize the CarboniX CLI by running:
+   \`npx @carbonix/cli init --key ${apiKey}\`
+
+2. Deploy the application to CarboniX by running:
+   \`npx @carbonix/cli app deploy --project proj_${apiKey.slice(4) || "default"}\`
+
+Project Details for the CLI:
+- Name: "${projectName}"
+- Target Region: "${projectRegion}"
+
+3. Codebase Integration:
+   - Scan our infrastructure and deployment scripts (e.g., GitHub Actions, Terraform, Docker).
+   - Hook up the CarboniX SDK or CLI to intercept deployments.
+   - Configure the application to route its metrics to CarboniX telemetry so we can track carbon intensity and cost savings.`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(promptText);
@@ -24,7 +40,7 @@ export function Step2Deploy({ apiKey, projectName, projectRegion, onNext, onSkip
   return (
     <div className="w-full max-w-3xl mx-auto space-y-6">
       <div className="text-center mb-10">
-        <div className="inline-flex items-center justify-center space-x-2 text-secondary mb-4 font-label-caps text-xs">
+        <div className="inline-flex items-center justify-center space-x-2 text-amber-500 dark:text-primary mb-4 font-label-caps text-xs">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
@@ -68,8 +84,8 @@ export function Step2Deploy({ apiKey, projectName, projectRegion, onNext, onSkip
 
             <div className="mb-6">
               <p className="text-[10px] text-on-surface-variant font-label-caps mb-2 uppercase">OR RUN IT YOURSELF</p>
-              <div className="bg-surface-container-lowest border border-outline-variant rounded-lg p-4 relative group">
-                <code className="text-secondary font-code text-sm block">
+              <div className="w-full mt-4 bg-surface-container-highest rounded p-4 overflow-x-auto relative group">
+                <code className="text-amber-500 dark:text-primary font-code text-sm block">
                   <span className="text-on-surface-variant">$</span> npx @carbonix/cli init --key <br />
                   <span className="pl-4 text-on-surface">{apiKey}</span>
                 </code>
@@ -88,9 +104,9 @@ export function Step2Deploy({ apiKey, projectName, projectRegion, onNext, onSkip
               </div>
             </div>
 
-            <div className="flex items-center justify-between border-t border-outline-variant pt-4 mt-2">
+            <div className="flex items-center justify-between border-t border-outline-variant pt-6 mt-4">
               <p className="text-sm text-on-surface-variant">After your first deploy, continue from the dashboard.</p>
-              <button onClick={onNext} className="text-on-surface font-semibold text-sm hover:text-secondary transition-colors">
+              <button onClick={onNext} className="bg-amber-500 hover:bg-amber-600 dark:bg-primary dark:hover:bg-primary-container text-white dark:text-on-primary-fixed px-6 py-2.5 rounded-lg font-bold text-sm transition-all shadow-md hover:shadow-lg">
                 Go to dashboard
               </button>
             </div>
