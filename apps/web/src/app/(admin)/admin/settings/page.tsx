@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { ToggleSwitch } from '@/components/ui/ToggleSwitch';
 import { getProfile, updateProfile } from '@/app/actions/settings-actions';
 import Image from 'next/image';
+import { ImageCropModal } from '@/components/ui/ImageCropModal';
 
 type Tab = 'profile' | 'security' | 'notifications' | 'developer';
 
@@ -19,6 +20,10 @@ export default function SettingsPage() {
   const [avatarUrl, setAvatarUrl] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState({ type: '', text: '' });
+  
+  // Crop modal state
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [tempImageSrc, setTempImageSrc] = useState('');
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -81,9 +86,20 @@ export default function SettingsPage() {
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64String = reader.result as string;
-      setAvatarUrl(base64String);
+      setTempImageSrc(base64String);
+      setShowCropModal(true);
+      // Reset input so the same file can be selected again
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleCropComplete = (croppedBase64: string) => {
+    setAvatarUrl(croppedBase64);
+    setShowCropModal(false);
+    setTempImageSrc('');
   };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
@@ -121,6 +137,17 @@ export default function SettingsPage() {
         <h1 className="text-section-header text-on-surface">Settings</h1>
         <p className="text-on-surface-variant mt-1">Manage your account preferences and security.</p>
       </div>
+
+      {showCropModal && (
+        <ImageCropModal
+          imageSrc={tempImageSrc}
+          onClose={() => {
+            setShowCropModal(false);
+            setTempImageSrc('');
+          }}
+          onCropComplete={handleCropComplete}
+        />
+      )}
 
       <div className="flex flex-col md:flex-row gap-8">
         {/* Sidebar Tabs */}
