@@ -14,6 +14,7 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<Tab>('profile');
   const [isMounted, setIsMounted] = useState(false);
   const [deviceInfo, setDeviceInfo] = useState({ os: 'Unknown OS', browser: 'Unknown Browser', icon: 'devices' });
+  const [location, setLocation] = useState('Detecting location...');
 
   // Form states
   const [name, setName] = useState('');
@@ -56,6 +57,20 @@ export default function SettingsPage() {
     else if (ua.indexOf('Safari') !== -1) browser = 'Safari';
 
     setDeviceInfo({ os, browser, icon });
+
+    // Clever trick: Get approximate location from browser timezone without any API calls!
+    // e.g., "Asia/Kolkata" -> "Kolkata, Asia" or "America/New_York" -> "New York, America"
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (tz) {
+        const formattedTz = tz.split('/').reverse().join(', ').replace(/_/g, ' ');
+        setLocation(formattedTz);
+      } else {
+        setLocation('Local Device');
+      }
+    } catch (e) {
+      setLocation('Local Device');
+    }
 
     // Load profile
     if (session?.user) {
@@ -331,7 +346,7 @@ export default function SettingsPage() {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-on-surface">{deviceInfo.os} • {deviceInfo.browser}</p>
-                        <p className="text-xs text-on-surface-variant">Mumbai, India • Current Session</p>
+                        <p className="text-xs text-on-surface-variant">{location} • Current Session</p>
                       </div>
                     </div>
                     <span className="text-xs font-medium bg-green-500/10 text-green-400 px-2 py-1 rounded">Active Now</span>
