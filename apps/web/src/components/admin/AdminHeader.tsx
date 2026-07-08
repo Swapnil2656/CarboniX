@@ -9,7 +9,6 @@ const searchTargets = [
   { label: 'Dashboard', keywords: ['dashboard', 'home', 'main', 'overview', 'compute', 'resources', 'infrastructure', 'servers', 'nodes', 'deployments'], path: '/admin/dashboard' },
   { label: 'Emissions', keywords: ['emissions', 'carbon', 'co2', 'footprint', 'energy', 'sustainability', 'intensity'], path: '/admin/emissions' },
   { label: 'Users & Assets', keywords: ['users', 'assets', 'people', 'customers', 'clients', 'accounts', 'mobile'], path: '/admin/users', requireAdmin: true },
-  { label: 'Team Members', keywords: ['team', 'members', 'staff', 'admin', 'roles', 'access', 'invites'], path: '/admin/team', requireAdmin: true },
   { label: 'API Keys', keywords: ['api', 'key', 'keys', 'tokens', 'integration', 'webhooks'], path: '/admin/api-keys' },
   { label: 'Feature Flags', keywords: ['feature', 'flag', 'flags', 'toggles', 'experiments', 'beta'], path: '/admin/feature-flags' },
   { label: 'Settings', keywords: ['settings', 'config', 'preferences'], path: '/admin/settings' },
@@ -22,7 +21,6 @@ const searchTargets = [
   { label: 'Account Security (2FA)', keywords: ['security', 'password', '2fa', 'authentication', 'mfa', 'login'], path: '/admin/settings#security' },
   { label: 'Notification Preferences', keywords: ['notifications', 'alerts', 'emails', 'push'], path: '/admin/settings#notifications' },
   { label: 'Billing & Invoices', keywords: ['payment', 'card', 'credit', 'invoice', 'billing', 'receipts'], path: '/upgrade#billing' },
-  { label: 'Team & Roles', keywords: ['permissions', 'roles', 'access control', 'rbac'], path: '/admin/team', requireAdmin: true },
   { label: 'Carbon Alert Thresholds', keywords: ['alerts', 'thresholds', 'limits', 'warning', 'cap'], path: '/admin/emissions#alerts' },
   { label: 'CI/CD Integrations', keywords: ['ci', 'cd', 'github actions', 'pipeline', 'deployment', 'automation'], path: '/docs/ci-cd' },
 ];

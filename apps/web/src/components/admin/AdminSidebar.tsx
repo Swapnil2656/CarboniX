@@ -11,7 +11,6 @@ export const AdminSidebar = () => {
     { label: 'Dashboard', path: '/admin/dashboard', icon: 'dashboard' },
     { label: 'Emissions', path: '/admin/emissions', icon: 'co2' },
     { label: 'Users & Assets', path: '/admin/users', icon: 'group' },
-    { label: 'Team Members', path: '/admin/team', icon: 'shield_person' },
     { label: 'API Keys', path: '/admin/api-keys', icon: 'key' },
     { label: 'Feature Flags', path: '/admin/feature-flags', icon: 'toggle_on' },
     { label: 'Settings', path: '/admin/settings', icon: 'settings' },
