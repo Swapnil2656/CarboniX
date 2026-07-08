@@ -83,6 +83,7 @@ export default function LoginPage() {
               {/* Email Field */}
               <div className="space-y-sm">
                 <label className={`font-label-caps text-label-caps flex items-center gap-xs transition-colors ${errors.email ? 'text-error' : 'text-on-surface-variant'}`} htmlFor="email">
+                  {/* @ts-ignore react-icons typescript definition mismatch */}
                   <FaEnvelope className="text-[14px]" /> EMAIL ADDRESS
                 </label>
                 <input 
@@ -99,6 +100,7 @@ export default function LoginPage() {
               <div className="space-y-sm">
                 <div className="flex justify-between items-end">
                   <label className={`font-label-caps text-label-caps flex items-center gap-xs transition-colors ${errors.password ? 'text-error' : 'text-on-surface-variant'}`} htmlFor="password">
+                    {/* @ts-ignore react-icons typescript definition mismatch */}
                     <FaLock className="text-[14px]" /> PASSWORD
                   </label>
                   <a className="font-label-caps text-label-caps text-primary-container hover:underline underline-offset-4" href="#">Forgot Password?</a>
@@ -114,8 +116,9 @@ export default function LoginPage() {
                   <button 
                     type="button" 
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-md top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 p-2 px-3 text-on-surface-variant hover:text-on-surface transition-colors"
                   >
+                    {/* @ts-ignore react-icons typescript definition mismatch */}
                     {showPassword ? <FaEyeSlash className="text-[18px] opacity-80" /> : <FaEye className="text-[18px] opacity-80" />}
                   </button>
                 </div>

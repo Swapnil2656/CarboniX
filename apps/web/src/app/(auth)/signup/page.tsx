@@ -109,6 +109,7 @@ export default function SignupPage() {
                       USERNAME
                     </label>
                     <div className="relative group">
+                      {/* @ts-ignore react-icons typescript definition mismatch */}
                       <FaUser className={`absolute left-md top-1/2 -translate-y-1/2 transition-colors ${errors.userName ? 'text-error' : 'text-outline group-focus-within:text-primary-container'}`} />
                       <input 
                         id="userName"
@@ -127,6 +128,7 @@ export default function SignupPage() {
                       WORK EMAIL
                     </label>
                     <div className="relative group">
+                      {/* @ts-ignore react-icons typescript definition mismatch */}
                       <FaEnvelope className={`absolute left-md top-1/2 -translate-y-1/2 transition-colors ${errors.email ? 'text-error' : 'text-outline group-focus-within:text-primary-container'}`} />
                       <input 
                         id="email"
@@ -145,6 +147,7 @@ export default function SignupPage() {
                       PASSWORD
                     </label>
                     <div className="relative group">
+                      {/* @ts-ignore react-icons typescript definition mismatch */}
                       <FaLock className={`absolute left-md top-1/2 -translate-y-1/2 transition-colors ${errors.password ? 'text-error' : 'text-outline group-focus-within:text-primary-container'}`} />
                       <input 
                         id="password"
@@ -158,6 +161,7 @@ export default function SignupPage() {
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-md top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors"
                       >
+                        {/* @ts-ignore react-icons typescript definition mismatch */}
                         {showPassword ? <FaEyeSlash className="text-[18px]" /> : <FaEye className="text-[18px]" />}
                       </button>
                     </div>
@@ -170,6 +174,7 @@ export default function SignupPage() {
                       CONFIRM PASSWORD
                     </label>
                     <div className="relative group">
+                      {/* @ts-ignore react-icons typescript definition mismatch */}
                       <FaLock className={`absolute left-md top-1/2 -translate-y-1/2 transition-colors ${errors.confirmPassword ? 'text-error' : 'text-outline group-focus-within:text-primary-container'}`} />
                       <input 
                         id="confirmPassword"
@@ -183,6 +188,7 @@ export default function SignupPage() {
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                         className="absolute right-md top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors"
                       >
+                        {/* @ts-ignore react-icons typescript definition mismatch */}
                         {showConfirmPassword ? <FaEyeSlash className="text-[18px]" /> : <FaEye className="text-[18px]" />}
                       </button>
                     </div>

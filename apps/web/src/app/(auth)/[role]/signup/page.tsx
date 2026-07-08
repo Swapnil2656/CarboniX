@@ -97,6 +97,7 @@ export default function RoleSignupPage() {
             {/* Header */}
             <div className="flex items-center gap-3 mb-7">
               <div className="w-10 h-10 bg-[var(--button)]/10 rounded-full flex items-center justify-center">
+                {/* @ts-ignore react-icons typescript definition mismatch */}
                 <FaUserPlus className="text-[var(--button)]" />
               </div>
               <div>
@@ -111,6 +112,7 @@ export default function RoleSignupPage() {
               {/* Username */}
               <div className="flex flex-col gap-1">
                 <label className="text-sm text-[var(--foreground)] flex items-center gap-2">
+                  {/* @ts-ignore react-icons typescript definition mismatch */}
                   <FaUser className="text-[var(--button)] text-xs" /> Username
                 </label>
                 <input
@@ -125,6 +127,7 @@ export default function RoleSignupPage() {
               {/* Email */}
               <div className="flex flex-col gap-1">
                 <label className="text-sm text-[var(--foreground)] flex items-center gap-2">
+                  {/* @ts-ignore react-icons typescript definition mismatch */}
                   <FaEnvelope className="text-[var(--button)] text-xs" /> Email
                 </label>
                 <input
@@ -139,6 +142,7 @@ export default function RoleSignupPage() {
               {/* Password */}
               <div className="flex flex-col gap-1">
                 <label className="text-sm text-[var(--foreground)] flex items-center gap-2">
+                  {/* @ts-ignore react-icons typescript definition mismatch */}
                   <FaLock className="text-[var(--button)] text-xs" /> Password
                 </label>
                 <input
@@ -153,6 +157,7 @@ export default function RoleSignupPage() {
               {/* Confirm Password */}
               <div className="flex flex-col gap-1">
                 <label className="text-sm text-[var(--foreground)] flex items-center gap-2">
+                  {/* @ts-ignore react-icons typescript definition mismatch */}
                   <FaLock className="text-[var(--button)] text-xs" /> Confirm Password
                 </label>
                 <input
