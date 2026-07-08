@@ -47,7 +47,7 @@ export default function SupportPage() {
                 <p className="text-sm text-on-surface-variant mt-1">Submit a ticket directly to the core infrastructure team.</p>
               </div>
               <a 
-                href="mailto:support@carbonix.io" 
+                href="mailto:kumarikhushi24168@gmail.com" 
                 className="hidden sm:flex items-center gap-2 bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
               >
                 <span className="material-symbols-outlined text-[18px]">mail</span>
@@ -61,6 +61,7 @@ export default function SupportPage() {
                   <label className="text-sm font-medium text-on-surface-variant">Category</label>
                   <select required className="w-full bg-surface-container border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none">
                     <option value="" disabled selected>Select a category...</option>
+                    <option value="email_change">Email Address Change</option>
                     <option value="technical">Technical Support</option>
                     <option value="billing">Billing & Subscriptions</option>
                     <option value="feature">Feature Request</option>
