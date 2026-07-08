@@ -92,7 +92,6 @@ body {
 }
 ::-webkit-scrollbar-track {
   background: transparent;
-  margin-top: 80px; /* Offset to stay below the fixed navbar */
 }
 ::-webkit-scrollbar-thumb {
   background: #4e4633;
