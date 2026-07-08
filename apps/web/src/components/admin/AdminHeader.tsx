@@ -19,7 +19,6 @@ const searchTargets = [
 
   // Deep / Hidden Features (Mobile-Style Search)
   { label: 'Developer Options', keywords: ['developer', 'options', 'dev', 'api', 'webhooks', 'integration', 'sdk'], path: '/admin/settings#developer' },
-  { label: 'Appearance & Theme', keywords: ['dark mode', 'light mode', 'theme', 'color', 'appearance', 'ui'], path: '/admin/settings#appearance' },
   { label: 'Account Security (2FA)', keywords: ['security', 'password', '2fa', 'authentication', 'mfa', 'login'], path: '/admin/settings#security' },
   { label: 'Notification Preferences', keywords: ['notifications', 'alerts', 'emails', 'push'], path: '/admin/settings#notifications' },
   { label: 'Billing & Invoices', keywords: ['payment', 'card', 'credit', 'invoice', 'billing', 'receipts'], path: '/upgrade#billing' },

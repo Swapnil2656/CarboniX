@@ -6,7 +6,7 @@ import { ThemeProvider } from 'next-themes';
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ReactLenis root options={{ lerp: 0.1 }}>
-      <ThemeProvider attribute="class" defaultTheme="dark">
+      <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark">
         <SessionProvider>{children}</SessionProvider>
       </ThemeProvider>
     </ReactLenis>

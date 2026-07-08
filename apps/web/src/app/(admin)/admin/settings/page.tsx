@@ -2,16 +2,14 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
-import { useTheme } from 'next-themes';
 import { ToggleSwitch } from '@/components/ui/ToggleSwitch';
 import { getProfile, updateProfile } from '@/app/actions/settings-actions';
 import Image from 'next/image';
 
-type Tab = 'profile' | 'appearance' | 'security' | 'notifications' | 'developer';
+type Tab = 'profile' | 'security' | 'notifications' | 'developer';
 
 export default function SettingsPage() {
   const { data: session, update: updateSession } = useSession();
-  const { theme, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<Tab>('profile');
   const [isMounted, setIsMounted] = useState(false);
 
@@ -48,7 +46,7 @@ export default function SettingsPage() {
 
     // Handle deep linking based on hash
     const hash = window.location.hash.replace('#', '');
-    if (['profile', 'appearance', 'security', 'notifications', 'developer'].includes(hash)) {
+    if (['profile', 'security', 'notifications', 'developer'].includes(hash)) {
       setActiveTab(hash as Tab);
     }
   }, [session]);
@@ -57,7 +55,7 @@ export default function SettingsPage() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      if (['profile', 'appearance', 'security', 'notifications', 'developer'].includes(hash)) {
+      if (['profile', 'security', 'notifications', 'developer'].includes(hash)) {
         setActiveTab(hash as Tab);
       }
     };
@@ -130,7 +128,6 @@ export default function SettingsPage() {
           <nav className="flex flex-col gap-1">
             {[
               { id: 'profile', label: 'Profile', icon: 'person' },
-              { id: 'appearance', label: 'Appearance', icon: 'palette' },
               { id: 'security', label: 'Security', icon: 'lock' },
               { id: 'notifications', label: 'Notifications', icon: 'notifications' },
             ].map((tab) => (
@@ -232,42 +229,6 @@ export default function SettingsPage() {
             </section>
           )}
 
-          {/* APPEARANCE TAB */}
-          {activeTab === 'appearance' && (
-            <section className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-              <h2 className="text-xl font-semibold text-on-surface mb-6">Appearance Settings</h2>
-              
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-sm font-medium text-on-surface mb-3">Interface Theme</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {[
-                      { id: 'light', label: 'Light', icon: 'light_mode' },
-                      { id: 'dark', label: 'Dark', icon: 'dark_mode' }
-                    ].map((t) => {
-                      const isActive = isMounted && theme === t.id;
-                      return (
-                        <button
-                          key={t.id}
-                          onClick={() => setTheme(t.id)}
-                          className={`p-4 rounded-xl border flex flex-col items-center gap-3 transition-all ${
-                            isActive 
-                              ? 'border-primary bg-primary-container/10' 
-                              : 'border-outline-variant hover:border-outline bg-surface-container-low'
-                          }`}
-                        >
-                          <span className={`material-symbols-outlined text-[32px] ${isActive ? 'text-primary' : 'text-on-surface-variant'}`}>
-                            {t.icon}
-                          </span>
-                          <span className={`text-sm font-medium ${isActive ? 'text-primary' : 'text-on-surface'}`}>{t.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </section>
-          )}
 
           {/* SECURITY TAB */}
           {activeTab === 'security' && (
