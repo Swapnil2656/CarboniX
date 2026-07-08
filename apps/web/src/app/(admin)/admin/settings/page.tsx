@@ -28,7 +28,6 @@ export default function SettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Mocked settings
-  const [twoFactorAuth, setTwoFactorAuth] = useState(false);
   const [emailAlerts, setEmailAlerts] = useState(true);
   const [pushAlerts, setPushAlerts] = useState(false);
   const [thresholdAlerts, setThresholdAlerts] = useState(true);
@@ -274,15 +273,6 @@ export default function SettingsPage() {
               <h2 className="text-xl font-semibold text-on-surface mb-6">Security & Authentication</h2>
               
               <div className="space-y-8">
-                {/* 2FA Section */}
-                <div className="flex items-center justify-between pb-6 border-b border-outline-variant">
-                  <div>
-                    <h3 className="text-base font-medium text-on-surface mb-1">Two-Factor Authentication (2FA)</h3>
-                    <p className="text-sm text-on-surface-variant">Add an extra layer of security to your account.</p>
-                  </div>
-                  <ToggleSwitch checked={twoFactorAuth} onChange={setTwoFactorAuth} />
-                </div>
-
                 {/* Password Section */}
                 <div>
                   <h3 className="text-base font-medium text-on-surface mb-4">Update Password</h3>
