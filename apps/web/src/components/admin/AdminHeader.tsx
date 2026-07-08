@@ -29,11 +29,22 @@ export const AdminHeader = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState('');
   
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
+  const notificationsRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  // Mock Notifications
+  const [notifications, setNotifications] = useState([
+    { id: 1, title: 'Carbon threshold warning', description: 'Server group US-East has exceeded the 500kg CO2 limit.', time: '10 min ago', isRead: false, type: 'warning', icon: 'warning' },
+    { id: 2, title: 'Weekly report ready', description: 'Your emissions summary for last week is ready to view.', time: '2 hours ago', isRead: false, type: 'info', icon: 'bar_chart' },
+    { id: 3, title: 'New team member', description: 'Jane Doe joined your workspace.', time: '1 day ago', isRead: true, type: 'success', icon: 'person_add' },
+  ]);
+
+  const unreadCount = notifications.filter(n => !n.isRead).length;
 
   const userName = session?.user?.name || session?.user?.email?.split('@')[0] || 'User';
   const userInitial = userName.charAt(0).toUpperCase();
@@ -58,6 +69,9 @@ export const AdminHeader = () => {
       }
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setIsSearchFocused(false);
+      }
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        setIsNotificationsOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -132,10 +146,70 @@ export const AdminHeader = () => {
       </div>
 
       <div className="flex items-center gap-4">
-        <button className="w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors relative">
-          <span className="material-symbols-outlined text-[20px]">notifications</span>
-          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary ring-2 ring-surface"></span>
-        </button>
+        <div className="relative" ref={notificationsRef}>
+          <button 
+            onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+            className="w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors relative"
+          >
+            <span className="material-symbols-outlined text-[20px]">notifications</span>
+            {unreadCount > 0 && (
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary ring-2 ring-surface"></span>
+            )}
+          </button>
+
+          {isNotificationsOpen && (
+            <div className="absolute right-0 mt-2 w-80 rounded-lg bg-surface border border-outline-variant shadow-lg py-1 z-50 overflow-hidden flex flex-col max-h-[400px]">
+              <div className="px-4 py-3 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+                <h3 className="font-semibold text-on-surface text-sm">Notifications</h3>
+                {unreadCount > 0 && (
+                  <button 
+                    onClick={() => setNotifications(notifications.map(n => ({ ...n, isRead: true })))}
+                    className="text-xs text-primary hover:text-primary-hover font-medium transition-colors"
+                  >
+                    Mark all as read
+                  </button>
+                )}
+              </div>
+              <div className="overflow-y-auto flex-1">
+                {notifications.length > 0 ? (
+                  <ul className="divide-y divide-outline-variant/50">
+                    {notifications.map((notification) => (
+                      <li key={notification.id} className={`p-4 hover:bg-surface-container transition-colors cursor-pointer ${!notification.isRead ? 'bg-primary-container/5' : ''}`}>
+                        <div className="flex gap-3">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                            notification.type === 'warning' ? 'bg-orange-500/10 text-orange-500' :
+                            notification.type === 'success' ? 'bg-green-500/10 text-green-500' :
+                            'bg-blue-500/10 text-blue-500'
+                          }`}>
+                            <span className="material-symbols-outlined text-[16px]">{notification.icon}</span>
+                          </div>
+                          <div>
+                            <p className={`text-sm ${!notification.isRead ? 'font-semibold text-on-surface' : 'font-medium text-on-surface-variant'}`}>
+                              {notification.title}
+                            </p>
+                            <p className="text-xs text-on-surface-variant mt-0.5 leading-relaxed">{notification.description}</p>
+                            <p className="text-[10px] font-medium text-outline mt-1.5">{notification.time}</p>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="p-8 text-center flex flex-col items-center justify-center">
+                    <span className="material-symbols-outlined text-outline text-[40px] mb-2 opacity-50">notifications_off</span>
+                    <p className="text-sm text-on-surface-variant">No notifications yet</p>
+                  </div>
+                )}
+              </div>
+              <div className="p-2 border-t border-outline-variant bg-surface-container-lowest">
+                <button className="w-full py-1.5 text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors text-center">
+                  View all notifications
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
         <button className="w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">
           <span className="material-symbols-outlined text-[20px]">history</span>
         </button>
