@@ -13,6 +13,7 @@ export default function SettingsPage() {
   const { data: session, update: updateSession } = useSession();
   const [activeTab, setActiveTab] = useState<Tab>('profile');
   const [isMounted, setIsMounted] = useState(false);
+  const [deviceInfo, setDeviceInfo] = useState({ os: 'Unknown OS', browser: 'Unknown Browser', icon: 'devices' });
 
   // Form states
   const [name, setName] = useState('');
@@ -35,6 +36,27 @@ export default function SettingsPage() {
   useEffect(() => {
     setIsMounted(true);
     
+    // Parse User Agent for Active Session section
+    const ua = window.navigator.userAgent;
+    let os = 'Unknown OS';
+    let icon = 'devices';
+    if (ua.indexOf('Win') !== -1) { os = 'Windows'; icon = 'laptop_windows'; }
+    else if (ua.indexOf('Mac') !== -1) { os = 'Mac OS'; icon = 'laptop_mac'; }
+    else if (ua.indexOf('Linux') !== -1) { os = 'Linux'; icon = 'laptop_chromebook'; }
+    else if (ua.indexOf('Android') !== -1) { os = 'Android'; icon = 'smartphone'; }
+    else if (ua.indexOf('like Mac') !== -1) { os = 'iOS'; icon = 'smartphone'; }
+
+    let browser = 'Unknown Browser';
+    if (ua.indexOf('Firefox') !== -1) browser = 'Firefox';
+    else if (ua.indexOf('SamsungBrowser') !== -1) browser = 'Samsung Browser';
+    else if (ua.indexOf('Opera') !== -1 || ua.indexOf('OPR') !== -1) browser = 'Opera';
+    else if (ua.indexOf('Trident') !== -1) browser = 'Internet Explorer';
+    else if (ua.indexOf('Edge') !== -1 || ua.indexOf('Edg') !== -1) browser = 'Edge';
+    else if (ua.indexOf('Chrome') !== -1) browser = 'Chrome';
+    else if (ua.indexOf('Safari') !== -1) browser = 'Safari';
+
+    setDeviceInfo({ os, browser, icon });
+
     // Load profile
     if (session?.user) {
       setEmail(session.user.email || '');
@@ -305,10 +327,10 @@ export default function SettingsPage() {
                   <div className="bg-surface-container-low border border-outline-variant rounded-lg p-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className="p-2 bg-surface-container rounded-lg">
-                        <span className="material-symbols-outlined text-primary">laptop_mac</span>
+                        <span className="material-symbols-outlined text-primary">{deviceInfo.icon}</span>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-on-surface">Mac OS • Chrome</p>
+                        <p className="text-sm font-medium text-on-surface">{deviceInfo.os} • {deviceInfo.browser}</p>
                         <p className="text-xs text-on-surface-variant">Mumbai, India • Current Session</p>
                       </div>
                     </div>
