@@ -117,6 +117,7 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
         session.user.type = token.type as string;
         session.user.isOnboarded = token.isOnboarded as boolean;
         session.accessToken = token.accessToken as string;
+        (session.user as any).accessToken = token.accessToken as string;
         if (token.name) {
           session.user.name = token.name;
         }

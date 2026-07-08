@@ -25,7 +25,7 @@ export default function UsersPage() {
       setData(res);
     } catch (err) {
       console.error(err);
-      setError('Failed to load users data. The backend endpoint might not be wired up yet.');
+      setError('Failed: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
       setLoading(false);
     }

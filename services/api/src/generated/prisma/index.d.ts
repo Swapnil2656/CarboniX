@@ -111,7 +111,12 @@ export namespace $Enums {
   export const CloudProvider: {
   AWS: 'AWS',
   GCP: 'GCP',
-  AZURE: 'AZURE'
+  AZURE: 'AZURE',
+  VERCEL: 'VERCEL',
+  NETLIFY: 'NETLIFY',
+  RAILWAY: 'RAILWAY',
+  RENDER: 'RENDER',
+  OTHER: 'OTHER'
 };
 
 export type CloudProvider = (typeof CloudProvider)[keyof typeof CloudProvider]
@@ -18393,6 +18398,9 @@ export namespace Prisma {
     id: string | null
     name: string | null
     region: string | null
+    sdkConnected: boolean | null
+    connectedAt: Date | null
+    lastPingAt: Date | null
     userId: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -18402,6 +18410,9 @@ export namespace Prisma {
     id: string | null
     name: string | null
     region: string | null
+    sdkConnected: boolean | null
+    connectedAt: Date | null
+    lastPingAt: Date | null
     userId: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -18411,6 +18422,9 @@ export namespace Prisma {
     id: number
     name: number
     region: number
+    sdkConnected: number
+    connectedAt: number
+    lastPingAt: number
     userId: number
     createdAt: number
     updatedAt: number
@@ -18422,6 +18436,9 @@ export namespace Prisma {
     id?: true
     name?: true
     region?: true
+    sdkConnected?: true
+    connectedAt?: true
+    lastPingAt?: true
     userId?: true
     createdAt?: true
     updatedAt?: true
@@ -18431,6 +18448,9 @@ export namespace Prisma {
     id?: true
     name?: true
     region?: true
+    sdkConnected?: true
+    connectedAt?: true
+    lastPingAt?: true
     userId?: true
     createdAt?: true
     updatedAt?: true
@@ -18440,6 +18460,9 @@ export namespace Prisma {
     id?: true
     name?: true
     region?: true
+    sdkConnected?: true
+    connectedAt?: true
+    lastPingAt?: true
     userId?: true
     createdAt?: true
     updatedAt?: true
@@ -18521,7 +18544,10 @@ export namespace Prisma {
   export type ProjectGroupByOutputType = {
     id: string
     name: string
-    region: string
+    region: string | null
+    sdkConnected: boolean
+    connectedAt: Date | null
+    lastPingAt: Date | null
     userId: string
     createdAt: Date
     updatedAt: Date
@@ -18548,6 +18574,9 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     region?: boolean
+    sdkConnected?: boolean
+    connectedAt?: boolean
+    lastPingAt?: boolean
     userId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -18558,6 +18587,9 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     region?: boolean
+    sdkConnected?: boolean
+    connectedAt?: boolean
+    lastPingAt?: boolean
     userId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -18568,6 +18600,9 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     region?: boolean
+    sdkConnected?: boolean
+    connectedAt?: boolean
+    lastPingAt?: boolean
     userId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -18588,7 +18623,10 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       name: string
-      region: string
+      region: string | null
+      sdkConnected: boolean
+      connectedAt: Date | null
+      lastPingAt: Date | null
       userId: string
       createdAt: Date
       updatedAt: Date
@@ -18989,6 +19027,9 @@ export namespace Prisma {
     readonly id: FieldRef<"Project", 'String'>
     readonly name: FieldRef<"Project", 'String'>
     readonly region: FieldRef<"Project", 'String'>
+    readonly sdkConnected: FieldRef<"Project", 'Boolean'>
+    readonly connectedAt: FieldRef<"Project", 'DateTime'>
+    readonly lastPingAt: FieldRef<"Project", 'DateTime'>
     readonly userId: FieldRef<"Project", 'String'>
     readonly createdAt: FieldRef<"Project", 'DateTime'>
     readonly updatedAt: FieldRef<"Project", 'DateTime'>
@@ -21533,6 +21574,9 @@ export namespace Prisma {
     id: 'id',
     name: 'name',
     region: 'region',
+    sdkConnected: 'sdkConnected',
+    connectedAt: 'connectedAt',
+    lastPingAt: 'lastPingAt',
     userId: 'userId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -23499,7 +23543,10 @@ export namespace Prisma {
     NOT?: ProjectWhereInput | ProjectWhereInput[]
     id?: StringFilter<"Project"> | string
     name?: StringFilter<"Project"> | string
-    region?: StringFilter<"Project"> | string
+    region?: StringNullableFilter<"Project"> | string | null
+    sdkConnected?: BoolFilter<"Project"> | boolean
+    connectedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    lastPingAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     userId?: StringFilter<"Project"> | string
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
@@ -23509,7 +23556,10 @@ export namespace Prisma {
   export type ProjectOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
-    region?: SortOrder
+    region?: SortOrderInput | SortOrder
+    sdkConnected?: SortOrder
+    connectedAt?: SortOrderInput | SortOrder
+    lastPingAt?: SortOrderInput | SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -23522,7 +23572,10 @@ export namespace Prisma {
     OR?: ProjectWhereInput[]
     NOT?: ProjectWhereInput | ProjectWhereInput[]
     name?: StringFilter<"Project"> | string
-    region?: StringFilter<"Project"> | string
+    region?: StringNullableFilter<"Project"> | string | null
+    sdkConnected?: BoolFilter<"Project"> | boolean
+    connectedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    lastPingAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     userId?: StringFilter<"Project"> | string
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
@@ -23532,7 +23585,10 @@ export namespace Prisma {
   export type ProjectOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
-    region?: SortOrder
+    region?: SortOrderInput | SortOrder
+    sdkConnected?: SortOrder
+    connectedAt?: SortOrderInput | SortOrder
+    lastPingAt?: SortOrderInput | SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -23547,7 +23603,10 @@ export namespace Prisma {
     NOT?: ProjectScalarWhereWithAggregatesInput | ProjectScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Project"> | string
     name?: StringWithAggregatesFilter<"Project"> | string
-    region?: StringWithAggregatesFilter<"Project"> | string
+    region?: StringNullableWithAggregatesFilter<"Project"> | string | null
+    sdkConnected?: BoolWithAggregatesFilter<"Project"> | boolean
+    connectedAt?: DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
+    lastPingAt?: DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
     userId?: StringWithAggregatesFilter<"Project"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
@@ -25565,7 +25624,10 @@ export namespace Prisma {
   export type ProjectCreateInput = {
     id?: string
     name: string
-    region: string
+    region?: string | null
+    sdkConnected?: boolean
+    connectedAt?: Date | string | null
+    lastPingAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProjectsInput
@@ -25574,7 +25636,10 @@ export namespace Prisma {
   export type ProjectUncheckedCreateInput = {
     id?: string
     name: string
-    region: string
+    region?: string | null
+    sdkConnected?: boolean
+    connectedAt?: Date | string | null
+    lastPingAt?: Date | string | null
     userId: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -25583,7 +25648,10 @@ export namespace Prisma {
   export type ProjectUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    region?: StringFieldUpdateOperationsInput | string
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProjectsNestedInput
@@ -25592,7 +25660,10 @@ export namespace Prisma {
   export type ProjectUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    region?: StringFieldUpdateOperationsInput | string
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     userId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25601,7 +25672,10 @@ export namespace Prisma {
   export type ProjectCreateManyInput = {
     id?: string
     name: string
-    region: string
+    region?: string | null
+    sdkConnected?: boolean
+    connectedAt?: Date | string | null
+    lastPingAt?: Date | string | null
     userId: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -25610,7 +25684,10 @@ export namespace Prisma {
   export type ProjectUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    region?: StringFieldUpdateOperationsInput | string
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -25618,7 +25695,10 @@ export namespace Prisma {
   export type ProjectUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    region?: StringFieldUpdateOperationsInput | string
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     userId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -27410,6 +27490,9 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     region?: SortOrder
+    sdkConnected?: SortOrder
+    connectedAt?: SortOrder
+    lastPingAt?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -27419,6 +27502,9 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     region?: SortOrder
+    sdkConnected?: SortOrder
+    connectedAt?: SortOrder
+    lastPingAt?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -27428,6 +27514,9 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     region?: SortOrder
+    sdkConnected?: SortOrder
+    connectedAt?: SortOrder
+    lastPingAt?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -28948,7 +29037,10 @@ export namespace Prisma {
   export type ProjectCreateWithoutUserInput = {
     id?: string
     name: string
-    region: string
+    region?: string | null
+    sdkConnected?: boolean
+    connectedAt?: Date | string | null
+    lastPingAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -28956,7 +29048,10 @@ export namespace Prisma {
   export type ProjectUncheckedCreateWithoutUserInput = {
     id?: string
     name: string
-    region: string
+    region?: string | null
+    sdkConnected?: boolean
+    connectedAt?: Date | string | null
+    lastPingAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -29044,7 +29139,10 @@ export namespace Prisma {
     NOT?: ProjectScalarWhereInput | ProjectScalarWhereInput[]
     id?: StringFilter<"Project"> | string
     name?: StringFilter<"Project"> | string
-    region?: StringFilter<"Project"> | string
+    region?: StringNullableFilter<"Project"> | string | null
+    sdkConnected?: BoolFilter<"Project"> | boolean
+    connectedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    lastPingAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     userId?: StringFilter<"Project"> | string
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
@@ -29495,7 +29593,10 @@ export namespace Prisma {
   export type ProjectCreateManyUserInput = {
     id?: string
     name: string
-    region: string
+    region?: string | null
+    sdkConnected?: boolean
+    connectedAt?: Date | string | null
+    lastPingAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -29509,7 +29610,10 @@ export namespace Prisma {
   export type ProjectUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    region?: StringFieldUpdateOperationsInput | string
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29517,7 +29621,10 @@ export namespace Prisma {
   export type ProjectUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    region?: StringFieldUpdateOperationsInput | string
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29525,7 +29632,10 @@ export namespace Prisma {
   export type ProjectUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    region?: StringFieldUpdateOperationsInput | string
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

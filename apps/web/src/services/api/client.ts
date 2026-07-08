@@ -15,8 +15,9 @@ export async function fetchClient(endpoint: string, options: RequestInit = {}) {
 
   // Attach a JWT token for the backend from NextAuth session
   const session = await getSession();
-  if ((session as any)?.accessToken) {
-    defaultHeaders['Authorization'] = `Bearer ${(session as any).accessToken}`;
+  const token = (session as any)?.accessToken || (session as any)?.user?.accessToken;
+  if (token) {
+    defaultHeaders['Authorization'] = `Bearer ${token}`;
   }
 
   const config: RequestInit = {
@@ -31,10 +32,12 @@ export async function fetchClient(endpoint: string, options: RequestInit = {}) {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `API Error: ${response.status}`);
+    throw new Error(errorData.error || errorData.message || `API Error: ${response.status}`);
   }
 
   // Some endpoints might return empty responses
   const text = await response.text();
   return text ? JSON.parse(text) : {};
 }
+
+console.log('fetchClient loaded');
