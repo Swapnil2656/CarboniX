@@ -205,13 +205,24 @@ export default function SettingsPage() {
                       ref={fileInputRef}
                       onChange={handleAvatarUpload}
                     />
-                    <button 
-                      type="button" 
-                      onClick={() => fileInputRef.current?.click()}
-                      className="bg-surface-container hover:bg-surface-container-high text-on-surface px-4 py-2 rounded-lg text-sm transition-colors border border-outline-variant"
-                    >
-                      Upload Avatar
-                    </button>
+                    <div className="flex gap-3">
+                      <button 
+                        type="button" 
+                        onClick={() => fileInputRef.current?.click()}
+                        className="bg-surface-container hover:bg-surface-container-high text-on-surface px-4 py-2 rounded-lg text-sm transition-colors border border-outline-variant"
+                      >
+                        Upload Avatar
+                      </button>
+                      {avatarUrl && (
+                        <button 
+                          type="button" 
+                          onClick={() => setAvatarUrl('')}
+                          className="bg-red-500/10 hover:bg-red-500/20 text-red-400 px-4 py-2 rounded-lg text-sm transition-colors border border-red-500/20"
+                        >
+                          Remove Photo
+                        </button>
+                      )}
+                    </div>
                     <p className="text-xs text-on-surface-variant mt-2">JPG, GIF or PNG. Max size of 10MB</p>
                   </div>
                 </div>
