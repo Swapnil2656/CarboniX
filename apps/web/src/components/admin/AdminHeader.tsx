@@ -30,11 +30,13 @@ export const AdminHeader = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState('');
   
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const notificationsRef = useRef<HTMLDivElement>(null);
+  const historyRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   // Mock Notifications
@@ -49,6 +51,15 @@ export const AdminHeader = () => {
   ]);
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  // Mock History (Audit Logs)
+  const [historyLogs] = useState([
+    { id: 1, action: 'Updated profile avatar', time: 'Just now', icon: 'image' },
+    { id: 2, action: 'Changed notification settings', time: '2 hours ago', icon: 'tune' },
+    { id: 3, action: 'Logged in from Mac OS • Chrome', time: '5 hours ago', icon: 'login' },
+    { id: 4, action: 'Created new API key "Prod"', time: '1 day ago', icon: 'key' },
+    { id: 5, action: 'Exported emissions report', time: '3 days ago', icon: 'download' },
+  ]);
 
   const userName = session?.user?.name || session?.user?.email?.split('@')[0] || 'User';
   const userInitial = userName.charAt(0).toUpperCase();
@@ -76,6 +87,9 @@ export const AdminHeader = () => {
       }
       if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
         setIsNotificationsOpen(false);
+      }
+      if (historyRef.current && !historyRef.current.contains(event.target as Node)) {
+        setIsHistoryOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -220,9 +234,57 @@ export const AdminHeader = () => {
           )}
         </div>
 
-        <button className="w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">
-          <span className="material-symbols-outlined text-[20px]">history</span>
-        </button>
+        <div className="relative" ref={historyRef}>
+          <button 
+            onClick={() => setIsHistoryOpen(!isHistoryOpen)}
+            className="w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
+          >
+            <span className="material-symbols-outlined text-[20px]">history</span>
+          </button>
+
+          {isHistoryOpen && (
+            <div className="absolute right-0 mt-2 w-80 rounded-lg bg-surface border border-outline-variant shadow-lg py-1 z-50 overflow-hidden flex flex-col max-h-[400px]">
+              <div className="px-4 py-3 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+                <h3 className="font-semibold text-on-surface text-sm">Recent Activity</h3>
+              </div>
+              <div className="overflow-y-auto flex-1 custom-scrollbar" data-lenis-prevent="true" style={{ overscrollBehavior: 'contain' }}>
+                {historyLogs.length > 0 ? (
+                  <ul className="divide-y divide-outline-variant/50">
+                    {historyLogs.map((log) => (
+                      <li key={log.id} className="p-4 hover:bg-surface-container transition-colors cursor-pointer">
+                        <div className="flex gap-3 items-center">
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-surface-container-high text-on-surface-variant">
+                            <span className="material-symbols-outlined text-[16px]">{log.icon}</span>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-on-surface">{log.action}</p>
+                            <p className="text-[10px] font-medium text-outline mt-0.5">{log.time}</p>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="p-8 text-center flex flex-col items-center justify-center">
+                    <span className="material-symbols-outlined text-outline text-[40px] mb-2 opacity-50">history</span>
+                    <p className="text-sm text-on-surface-variant">No recent activity</p>
+                  </div>
+                )}
+              </div>
+              <div className="p-2 border-t border-outline-variant bg-surface-container-lowest">
+                <button 
+                  onClick={() => {
+                    setIsHistoryOpen(false);
+                    alert("Full Audit Log page is coming soon!");
+                  }}
+                  className="w-full py-1.5 text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors text-center"
+                >
+                  View full audit log
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
         
         <div className="h-6 w-px bg-outline-variant mx-2"></div>
 
