@@ -17,7 +17,6 @@ export const AdminSidebar = () => {
   ];
 
   const bottomItems = [
-    { label: 'Upgrade Plan', path: '/upgrade', icon: 'bolt' },
     { label: 'Support', path: '/support', icon: 'help' },
     { label: 'Documentation', path: '/docs', icon: 'description' },
   ];

@@ -12,7 +12,6 @@ const searchTargets = [
   { label: 'API Keys', keywords: ['api', 'key', 'keys', 'tokens', 'integration', 'webhooks'], path: '/admin/api-keys' },
   { label: 'Feature Flags', keywords: ['feature', 'flag', 'flags', 'toggles', 'experiments', 'beta'], path: '/admin/feature-flags' },
   { label: 'Settings', keywords: ['settings', 'config', 'preferences'], path: '/admin/settings' },
-  { label: 'Upgrade Plan', keywords: ['upgrade', 'plan', 'billing', 'subscription'], path: '/upgrade' },
   { label: 'Support', keywords: ['support', 'help', 'contact', 'ticket', 'issue'], path: '/support' },
   { label: 'Documentation', keywords: ['docs', 'documentation', 'guide', 'tutorial', 'reference', 'sdk'], path: '/docs' },
 
@@ -20,7 +19,6 @@ const searchTargets = [
   { label: 'Developer Options', keywords: ['developer', 'options', 'dev', 'api', 'webhooks', 'integration', 'sdk'], path: '/admin/settings#developer' },
   { label: 'Account Security (2FA)', keywords: ['security', 'password', '2fa', 'authentication', 'mfa', 'login'], path: '/admin/settings#security' },
   { label: 'Notification Preferences', keywords: ['notifications', 'alerts', 'emails', 'push'], path: '/admin/settings#notifications' },
-  { label: 'Billing & Invoices', keywords: ['payment', 'card', 'credit', 'invoice', 'billing', 'receipts'], path: '/upgrade#billing' },
   { label: 'Carbon Alert Thresholds', keywords: ['alerts', 'thresholds', 'limits', 'warning', 'cap'], path: '/admin/emissions#alerts' },
   { label: 'CI/CD Integrations', keywords: ['ci', 'cd', 'github actions', 'pipeline', 'deployment', 'automation'], path: '/docs/ci-cd' },
 ];
