@@ -42,6 +42,10 @@ export const AdminHeader = () => {
     { id: 1, title: 'Carbon threshold warning', description: 'Server group US-East has exceeded the 500kg CO2 limit.', time: '10 min ago', isRead: false, type: 'warning', icon: 'warning' },
     { id: 2, title: 'Weekly report ready', description: 'Your emissions summary for last week is ready to view.', time: '2 hours ago', isRead: false, type: 'info', icon: 'bar_chart' },
     { id: 3, title: 'New team member', description: 'Jane Doe joined your workspace.', time: '1 day ago', isRead: true, type: 'success', icon: 'person_add' },
+    { id: 4, title: 'API Key Expiring', description: 'Your production API key will expire in 3 days.', time: '1 day ago', isRead: true, type: 'warning', icon: 'key' },
+    { id: 5, title: 'Optimization successful', description: 'Server sleep schedules applied, saving 45kg CO2.', time: '2 days ago', isRead: true, type: 'success', icon: 'eco' },
+    { id: 6, title: 'System Maintenance', description: 'Scheduled maintenance for region EU-West starts at 02:00 UTC.', time: '2 days ago', isRead: true, type: 'info', icon: 'build' },
+    { id: 7, title: 'Billing updated', description: 'Your subscription invoice is available.', time: '3 days ago', isRead: true, type: 'info', icon: 'receipt' },
   ]);
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
@@ -170,7 +174,7 @@ export const AdminHeader = () => {
                   </button>
                 )}
               </div>
-              <div className="overflow-y-auto flex-1">
+              <div className="overflow-y-auto flex-1 custom-scrollbar" data-lenis-prevent="true" style={{ overscrollBehavior: 'contain' }}>
                 {notifications.length > 0 ? (
                   <ul className="divide-y divide-outline-variant/50">
                     {notifications.map((notification) => (
@@ -202,7 +206,13 @@ export const AdminHeader = () => {
                 )}
               </div>
               <div className="p-2 border-t border-outline-variant bg-surface-container-lowest">
-                <button className="w-full py-1.5 text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors text-center">
+                <button 
+                  onClick={() => {
+                    setIsNotificationsOpen(false);
+                    alert("Notifications page is coming soon!");
+                  }}
+                  className="w-full py-1.5 text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors text-center"
+                >
                   View all notifications
                 </button>
               </div>
