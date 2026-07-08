@@ -60,8 +60,7 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
           email: user.email, 
           name: user.profile?.fullName || user.userName, 
           type: user.type, 
-          isOnboarded: user.isOnboarded,
-          avatarUrl: user.profile?.avatarUrl || undefined
+          isOnboarded: user.isOnboarded
         };
       },
     }),
@@ -76,7 +75,6 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
         token.id = user.id as string;
         token.type = user.type;
         token.isOnboarded = user.isOnboarded;
-        if (user.avatarUrl) token.avatarUrl = user.avatarUrl;
         
         // Generate a standard JWT compatible with the Express API middleware
         token.accessToken = jwt.sign(
@@ -105,9 +103,6 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
         if (session.name !== undefined) {
           token.name = session.name;
         }
-        if (session.avatarUrl !== undefined) {
-          token.avatarUrl = session.avatarUrl;
-        }
       }
       return token;
     },
@@ -120,9 +115,6 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
         (session.user as any).accessToken = token.accessToken as string;
         if (token.name) {
           session.user.name = token.name;
-        }
-        if (token.avatarUrl) {
-          session.user.avatarUrl = token.avatarUrl;
         }
       }
       return session;

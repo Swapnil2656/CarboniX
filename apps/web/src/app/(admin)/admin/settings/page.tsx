@@ -73,8 +73,8 @@ export default function SettingsPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     
-    if (file.size > 800 * 1024) {
-      setSaveMessage({ type: 'error', text: 'Image must be under 800KB' });
+    if (file.size > 10 * 1024 * 1024) {
+      setSaveMessage({ type: 'error', text: 'Image must be under 10MB' });
       return;
     }
 
@@ -95,8 +95,8 @@ export default function SettingsPage() {
       const res = await updateProfile({ name, avatarUrl });
       if (res.success) {
         setSaveMessage({ type: 'success', text: 'Profile saved successfully!' });
-        // Attempt to update session to reflect new name and avatar
-        await updateSession({ name, avatarUrl });
+        // Attempt to update session to reflect new name only (avatar is fetched dynamically now)
+        await updateSession({ name });
       } else {
         setSaveMessage({ type: 'error', text: res.error || 'Failed to save' });
       }
@@ -185,7 +185,7 @@ export default function SettingsPage() {
                     >
                       Upload Avatar
                     </button>
-                    <p className="text-xs text-on-surface-variant mt-2">JPG, GIF or PNG. Max size of 800K</p>
+                    <p className="text-xs text-on-surface-variant mt-2">JPG, GIF or PNG. Max size of 10MB</p>
                   </div>
                 </div>
 

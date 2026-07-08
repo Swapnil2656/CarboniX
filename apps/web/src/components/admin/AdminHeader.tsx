@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { getProfile } from '@/app/actions/settings-actions';
 
 const searchTargets = [
   // Primary Navigation
@@ -28,6 +29,8 @@ export const AdminHeader = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState('');
+  
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -36,6 +39,16 @@ export const AdminHeader = () => {
   const userInitial = userName.charAt(0).toUpperCase();
   const userEmail = session?.user?.email || '';
   const isAdmin = session?.user?.type === 'SUPER_ADMIN' || session?.user?.type === 'ADMIN';
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      getProfile().then(res => {
+        if (res.success && res.profile?.avatarUrl) {
+          setAvatarUrl(res.profile.avatarUrl);
+        }
+      });
+    }
+  }, [session?.user?.id]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -135,8 +148,8 @@ export const AdminHeader = () => {
             className="flex items-center gap-3 hover:bg-surface-container rounded-full py-1 pl-1 pr-3 transition-colors"
           >
             <div className="w-8 h-8 rounded-full bg-[rgba(245,197,24,0.15)] flex items-center justify-center text-primary border border-[rgba(245,197,24,0.3)] font-semibold text-sm overflow-hidden relative">
-              {session?.user?.avatarUrl ? (
-                <img src={session.user.avatarUrl} alt={userName} className="w-full h-full object-cover" />
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
               ) : (
                 userInitial
               )}
