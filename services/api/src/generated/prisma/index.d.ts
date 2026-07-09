@@ -103,6 +103,11 @@ export type Profile = $Result.DefaultSelection<Prisma.$ProfilePayload>
  * 
  */
 export type VerificationToken = $Result.DefaultSelection<Prisma.$VerificationTokenPayload>
+/**
+ * Model TeamMember
+ * 
+ */
+export type TeamMember = $Result.DefaultSelection<Prisma.$TeamMemberPayload>
 
 /**
  * Enums
@@ -649,6 +654,16 @@ export class PrismaClient<
     * ```
     */
   get verificationToken(): Prisma.VerificationTokenDelegate<ExtArgs>;
+
+  /**
+   * `prisma.teamMember`: Exposes CRUD operations for the **TeamMember** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TeamMembers
+    * const teamMembers = await prisma.teamMember.findMany()
+    * ```
+    */
+  get teamMember(): Prisma.TeamMemberDelegate<ExtArgs>;
 }
 
 export namespace Prisma {
@@ -1107,7 +1122,8 @@ export namespace Prisma {
     User: 'User',
     Project: 'Project',
     Profile: 'Profile',
-    VerificationToken: 'VerificationToken'
+    VerificationToken: 'VerificationToken',
+    TeamMember: 'TeamMember'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1123,7 +1139,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "mobileUser" | "calculation" | "session" | "apiKey" | "featureFlag" | "remoteConfig" | "auditLog" | "notification" | "pushToken" | "region" | "instanceType" | "provider" | "agentRun" | "emissionRecord" | "user" | "project" | "profile" | "verificationToken"
+      modelProps: "mobileUser" | "calculation" | "session" | "apiKey" | "featureFlag" | "remoteConfig" | "auditLog" | "notification" | "pushToken" | "region" | "instanceType" | "provider" | "agentRun" | "emissionRecord" | "user" | "project" | "profile" | "verificationToken" | "teamMember"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2384,6 +2400,76 @@ export namespace Prisma {
           count: {
             args: Prisma.VerificationTokenCountArgs<ExtArgs>
             result: $Utils.Optional<VerificationTokenCountAggregateOutputType> | number
+          }
+        }
+      }
+      TeamMember: {
+        payload: Prisma.$TeamMemberPayload<ExtArgs>
+        fields: Prisma.TeamMemberFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TeamMemberFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamMemberPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TeamMemberFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamMemberPayload>
+          }
+          findFirst: {
+            args: Prisma.TeamMemberFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamMemberPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TeamMemberFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamMemberPayload>
+          }
+          findMany: {
+            args: Prisma.TeamMemberFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamMemberPayload>[]
+          }
+          create: {
+            args: Prisma.TeamMemberCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamMemberPayload>
+          }
+          createMany: {
+            args: Prisma.TeamMemberCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TeamMemberCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamMemberPayload>[]
+          }
+          delete: {
+            args: Prisma.TeamMemberDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamMemberPayload>
+          }
+          update: {
+            args: Prisma.TeamMemberUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamMemberPayload>
+          }
+          deleteMany: {
+            args: Prisma.TeamMemberDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TeamMemberUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.TeamMemberUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamMemberPayload>
+          }
+          aggregate: {
+            args: Prisma.TeamMemberAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTeamMember>
+          }
+          groupBy: {
+            args: Prisma.TeamMemberGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TeamMemberGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TeamMemberCountArgs<ExtArgs>
+            result: $Utils.Optional<TeamMemberCountAggregateOutputType> | number
           }
         }
       }
@@ -19381,6 +19467,9 @@ export namespace Prisma {
     fullName: string | null
     avatarUrl: string | null
     phoneNumber: string | null
+    emailAlerts: boolean | null
+    pushAlerts: boolean | null
+    thresholdAlerts: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -19391,6 +19480,9 @@ export namespace Prisma {
     fullName: string | null
     avatarUrl: string | null
     phoneNumber: string | null
+    emailAlerts: boolean | null
+    pushAlerts: boolean | null
+    thresholdAlerts: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -19401,6 +19493,9 @@ export namespace Prisma {
     fullName: number
     avatarUrl: number
     phoneNumber: number
+    emailAlerts: number
+    pushAlerts: number
+    thresholdAlerts: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -19413,6 +19508,9 @@ export namespace Prisma {
     fullName?: true
     avatarUrl?: true
     phoneNumber?: true
+    emailAlerts?: true
+    pushAlerts?: true
+    thresholdAlerts?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -19423,6 +19521,9 @@ export namespace Prisma {
     fullName?: true
     avatarUrl?: true
     phoneNumber?: true
+    emailAlerts?: true
+    pushAlerts?: true
+    thresholdAlerts?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -19433,6 +19534,9 @@ export namespace Prisma {
     fullName?: true
     avatarUrl?: true
     phoneNumber?: true
+    emailAlerts?: true
+    pushAlerts?: true
+    thresholdAlerts?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -19516,6 +19620,9 @@ export namespace Prisma {
     fullName: string | null
     avatarUrl: string | null
     phoneNumber: string | null
+    emailAlerts: boolean
+    pushAlerts: boolean
+    thresholdAlerts: boolean
     createdAt: Date
     updatedAt: Date
     _count: ProfileCountAggregateOutputType | null
@@ -19543,6 +19650,9 @@ export namespace Prisma {
     fullName?: boolean
     avatarUrl?: boolean
     phoneNumber?: boolean
+    emailAlerts?: boolean
+    pushAlerts?: boolean
+    thresholdAlerts?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -19554,6 +19664,9 @@ export namespace Prisma {
     fullName?: boolean
     avatarUrl?: boolean
     phoneNumber?: boolean
+    emailAlerts?: boolean
+    pushAlerts?: boolean
+    thresholdAlerts?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -19565,6 +19678,9 @@ export namespace Prisma {
     fullName?: boolean
     avatarUrl?: boolean
     phoneNumber?: boolean
+    emailAlerts?: boolean
+    pushAlerts?: boolean
+    thresholdAlerts?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
@@ -19587,6 +19703,9 @@ export namespace Prisma {
       fullName: string | null
       avatarUrl: string | null
       phoneNumber: string | null
+      emailAlerts: boolean
+      pushAlerts: boolean
+      thresholdAlerts: boolean
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["profile"]>
@@ -19988,6 +20107,9 @@ export namespace Prisma {
     readonly fullName: FieldRef<"Profile", 'String'>
     readonly avatarUrl: FieldRef<"Profile", 'String'>
     readonly phoneNumber: FieldRef<"Profile", 'String'>
+    readonly emailAlerts: FieldRef<"Profile", 'Boolean'>
+    readonly pushAlerts: FieldRef<"Profile", 'Boolean'>
+    readonly thresholdAlerts: FieldRef<"Profile", 'Boolean'>
     readonly createdAt: FieldRef<"Profile", 'DateTime'>
     readonly updatedAt: FieldRef<"Profile", 'DateTime'>
   }
@@ -21244,6 +21366,1002 @@ export namespace Prisma {
 
 
   /**
+   * Model TeamMember
+   */
+
+  export type AggregateTeamMember = {
+    _count: TeamMemberCountAggregateOutputType | null
+    _avg: TeamMemberAvgAggregateOutputType | null
+    _sum: TeamMemberSumAggregateOutputType | null
+    _min: TeamMemberMinAggregateOutputType | null
+    _max: TeamMemberMaxAggregateOutputType | null
+  }
+
+  export type TeamMemberAvgAggregateOutputType = {
+    co2Emissions: number | null
+  }
+
+  export type TeamMemberSumAggregateOutputType = {
+    co2Emissions: number | null
+  }
+
+  export type TeamMemberMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    email: string | null
+    role: string | null
+    projectId: string | null
+    projectName: string | null
+    co2Emissions: number | null
+    location: string | null
+    status: string | null
+    aiSuggestion: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type TeamMemberMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    email: string | null
+    role: string | null
+    projectId: string | null
+    projectName: string | null
+    co2Emissions: number | null
+    location: string | null
+    status: string | null
+    aiSuggestion: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type TeamMemberCountAggregateOutputType = {
+    id: number
+    name: number
+    email: number
+    role: number
+    projectId: number
+    projectName: number
+    co2Emissions: number
+    location: number
+    status: number
+    aiSuggestion: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type TeamMemberAvgAggregateInputType = {
+    co2Emissions?: true
+  }
+
+  export type TeamMemberSumAggregateInputType = {
+    co2Emissions?: true
+  }
+
+  export type TeamMemberMinAggregateInputType = {
+    id?: true
+    name?: true
+    email?: true
+    role?: true
+    projectId?: true
+    projectName?: true
+    co2Emissions?: true
+    location?: true
+    status?: true
+    aiSuggestion?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type TeamMemberMaxAggregateInputType = {
+    id?: true
+    name?: true
+    email?: true
+    role?: true
+    projectId?: true
+    projectName?: true
+    co2Emissions?: true
+    location?: true
+    status?: true
+    aiSuggestion?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type TeamMemberCountAggregateInputType = {
+    id?: true
+    name?: true
+    email?: true
+    role?: true
+    projectId?: true
+    projectName?: true
+    co2Emissions?: true
+    location?: true
+    status?: true
+    aiSuggestion?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type TeamMemberAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TeamMember to aggregate.
+     */
+    where?: TeamMemberWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TeamMembers to fetch.
+     */
+    orderBy?: TeamMemberOrderByWithRelationInput | TeamMemberOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TeamMemberWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TeamMembers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TeamMembers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TeamMembers
+    **/
+    _count?: true | TeamMemberCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: TeamMemberAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: TeamMemberSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TeamMemberMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TeamMemberMaxAggregateInputType
+  }
+
+  export type GetTeamMemberAggregateType<T extends TeamMemberAggregateArgs> = {
+        [P in keyof T & keyof AggregateTeamMember]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTeamMember[P]>
+      : GetScalarType<T[P], AggregateTeamMember[P]>
+  }
+
+
+
+
+  export type TeamMemberGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TeamMemberWhereInput
+    orderBy?: TeamMemberOrderByWithAggregationInput | TeamMemberOrderByWithAggregationInput[]
+    by: TeamMemberScalarFieldEnum[] | TeamMemberScalarFieldEnum
+    having?: TeamMemberScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TeamMemberCountAggregateInputType | true
+    _avg?: TeamMemberAvgAggregateInputType
+    _sum?: TeamMemberSumAggregateInputType
+    _min?: TeamMemberMinAggregateInputType
+    _max?: TeamMemberMaxAggregateInputType
+  }
+
+  export type TeamMemberGroupByOutputType = {
+    id: string
+    name: string
+    email: string
+    role: string
+    projectId: string
+    projectName: string
+    co2Emissions: number
+    location: string
+    status: string
+    aiSuggestion: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: TeamMemberCountAggregateOutputType | null
+    _avg: TeamMemberAvgAggregateOutputType | null
+    _sum: TeamMemberSumAggregateOutputType | null
+    _min: TeamMemberMinAggregateOutputType | null
+    _max: TeamMemberMaxAggregateOutputType | null
+  }
+
+  type GetTeamMemberGroupByPayload<T extends TeamMemberGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TeamMemberGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TeamMemberGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TeamMemberGroupByOutputType[P]>
+            : GetScalarType<T[P], TeamMemberGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TeamMemberSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    email?: boolean
+    role?: boolean
+    projectId?: boolean
+    projectName?: boolean
+    co2Emissions?: boolean
+    location?: boolean
+    status?: boolean
+    aiSuggestion?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["teamMember"]>
+
+  export type TeamMemberSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    email?: boolean
+    role?: boolean
+    projectId?: boolean
+    projectName?: boolean
+    co2Emissions?: boolean
+    location?: boolean
+    status?: boolean
+    aiSuggestion?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["teamMember"]>
+
+  export type TeamMemberSelectScalar = {
+    id?: boolean
+    name?: boolean
+    email?: boolean
+    role?: boolean
+    projectId?: boolean
+    projectName?: boolean
+    co2Emissions?: boolean
+    location?: boolean
+    status?: boolean
+    aiSuggestion?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+
+  export type $TeamMemberPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TeamMember"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+      email: string
+      role: string
+      projectId: string
+      projectName: string
+      co2Emissions: number
+      location: string
+      status: string
+      aiSuggestion: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["teamMember"]>
+    composites: {}
+  }
+
+  type TeamMemberGetPayload<S extends boolean | null | undefined | TeamMemberDefaultArgs> = $Result.GetResult<Prisma.$TeamMemberPayload, S>
+
+  type TeamMemberCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<TeamMemberFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: TeamMemberCountAggregateInputType | true
+    }
+
+  export interface TeamMemberDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TeamMember'], meta: { name: 'TeamMember' } }
+    /**
+     * Find zero or one TeamMember that matches the filter.
+     * @param {TeamMemberFindUniqueArgs} args - Arguments to find a TeamMember
+     * @example
+     * // Get one TeamMember
+     * const teamMember = await prisma.teamMember.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TeamMemberFindUniqueArgs>(args: SelectSubset<T, TeamMemberFindUniqueArgs<ExtArgs>>): Prisma__TeamMemberClient<$Result.GetResult<Prisma.$TeamMemberPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one TeamMember that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {TeamMemberFindUniqueOrThrowArgs} args - Arguments to find a TeamMember
+     * @example
+     * // Get one TeamMember
+     * const teamMember = await prisma.teamMember.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TeamMemberFindUniqueOrThrowArgs>(args: SelectSubset<T, TeamMemberFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TeamMemberClient<$Result.GetResult<Prisma.$TeamMemberPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first TeamMember that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamMemberFindFirstArgs} args - Arguments to find a TeamMember
+     * @example
+     * // Get one TeamMember
+     * const teamMember = await prisma.teamMember.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TeamMemberFindFirstArgs>(args?: SelectSubset<T, TeamMemberFindFirstArgs<ExtArgs>>): Prisma__TeamMemberClient<$Result.GetResult<Prisma.$TeamMemberPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first TeamMember that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamMemberFindFirstOrThrowArgs} args - Arguments to find a TeamMember
+     * @example
+     * // Get one TeamMember
+     * const teamMember = await prisma.teamMember.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TeamMemberFindFirstOrThrowArgs>(args?: SelectSubset<T, TeamMemberFindFirstOrThrowArgs<ExtArgs>>): Prisma__TeamMemberClient<$Result.GetResult<Prisma.$TeamMemberPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more TeamMembers that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamMemberFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TeamMembers
+     * const teamMembers = await prisma.teamMember.findMany()
+     * 
+     * // Get first 10 TeamMembers
+     * const teamMembers = await prisma.teamMember.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const teamMemberWithIdOnly = await prisma.teamMember.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends TeamMemberFindManyArgs>(args?: SelectSubset<T, TeamMemberFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TeamMemberPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a TeamMember.
+     * @param {TeamMemberCreateArgs} args - Arguments to create a TeamMember.
+     * @example
+     * // Create one TeamMember
+     * const TeamMember = await prisma.teamMember.create({
+     *   data: {
+     *     // ... data to create a TeamMember
+     *   }
+     * })
+     * 
+     */
+    create<T extends TeamMemberCreateArgs>(args: SelectSubset<T, TeamMemberCreateArgs<ExtArgs>>): Prisma__TeamMemberClient<$Result.GetResult<Prisma.$TeamMemberPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many TeamMembers.
+     * @param {TeamMemberCreateManyArgs} args - Arguments to create many TeamMembers.
+     * @example
+     * // Create many TeamMembers
+     * const teamMember = await prisma.teamMember.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TeamMemberCreateManyArgs>(args?: SelectSubset<T, TeamMemberCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TeamMembers and returns the data saved in the database.
+     * @param {TeamMemberCreateManyAndReturnArgs} args - Arguments to create many TeamMembers.
+     * @example
+     * // Create many TeamMembers
+     * const teamMember = await prisma.teamMember.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many TeamMembers and only return the `id`
+     * const teamMemberWithIdOnly = await prisma.teamMember.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TeamMemberCreateManyAndReturnArgs>(args?: SelectSubset<T, TeamMemberCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TeamMemberPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a TeamMember.
+     * @param {TeamMemberDeleteArgs} args - Arguments to delete one TeamMember.
+     * @example
+     * // Delete one TeamMember
+     * const TeamMember = await prisma.teamMember.delete({
+     *   where: {
+     *     // ... filter to delete one TeamMember
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TeamMemberDeleteArgs>(args: SelectSubset<T, TeamMemberDeleteArgs<ExtArgs>>): Prisma__TeamMemberClient<$Result.GetResult<Prisma.$TeamMemberPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one TeamMember.
+     * @param {TeamMemberUpdateArgs} args - Arguments to update one TeamMember.
+     * @example
+     * // Update one TeamMember
+     * const teamMember = await prisma.teamMember.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TeamMemberUpdateArgs>(args: SelectSubset<T, TeamMemberUpdateArgs<ExtArgs>>): Prisma__TeamMemberClient<$Result.GetResult<Prisma.$TeamMemberPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more TeamMembers.
+     * @param {TeamMemberDeleteManyArgs} args - Arguments to filter TeamMembers to delete.
+     * @example
+     * // Delete a few TeamMembers
+     * const { count } = await prisma.teamMember.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TeamMemberDeleteManyArgs>(args?: SelectSubset<T, TeamMemberDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TeamMembers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamMemberUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TeamMembers
+     * const teamMember = await prisma.teamMember.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TeamMemberUpdateManyArgs>(args: SelectSubset<T, TeamMemberUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one TeamMember.
+     * @param {TeamMemberUpsertArgs} args - Arguments to update or create a TeamMember.
+     * @example
+     * // Update or create a TeamMember
+     * const teamMember = await prisma.teamMember.upsert({
+     *   create: {
+     *     // ... data to create a TeamMember
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TeamMember we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TeamMemberUpsertArgs>(args: SelectSubset<T, TeamMemberUpsertArgs<ExtArgs>>): Prisma__TeamMemberClient<$Result.GetResult<Prisma.$TeamMemberPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of TeamMembers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamMemberCountArgs} args - Arguments to filter TeamMembers to count.
+     * @example
+     * // Count the number of TeamMembers
+     * const count = await prisma.teamMember.count({
+     *   where: {
+     *     // ... the filter for the TeamMembers we want to count
+     *   }
+     * })
+    **/
+    count<T extends TeamMemberCountArgs>(
+      args?: Subset<T, TeamMemberCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TeamMemberCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TeamMember.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamMemberAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TeamMemberAggregateArgs>(args: Subset<T, TeamMemberAggregateArgs>): Prisma.PrismaPromise<GetTeamMemberAggregateType<T>>
+
+    /**
+     * Group by TeamMember.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamMemberGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TeamMemberGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TeamMemberGroupByArgs['orderBy'] }
+        : { orderBy?: TeamMemberGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TeamMemberGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTeamMemberGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TeamMember model
+   */
+  readonly fields: TeamMemberFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TeamMember.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TeamMemberClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TeamMember model
+   */ 
+  interface TeamMemberFieldRefs {
+    readonly id: FieldRef<"TeamMember", 'String'>
+    readonly name: FieldRef<"TeamMember", 'String'>
+    readonly email: FieldRef<"TeamMember", 'String'>
+    readonly role: FieldRef<"TeamMember", 'String'>
+    readonly projectId: FieldRef<"TeamMember", 'String'>
+    readonly projectName: FieldRef<"TeamMember", 'String'>
+    readonly co2Emissions: FieldRef<"TeamMember", 'Float'>
+    readonly location: FieldRef<"TeamMember", 'String'>
+    readonly status: FieldRef<"TeamMember", 'String'>
+    readonly aiSuggestion: FieldRef<"TeamMember", 'String'>
+    readonly createdAt: FieldRef<"TeamMember", 'DateTime'>
+    readonly updatedAt: FieldRef<"TeamMember", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TeamMember findUnique
+   */
+  export type TeamMemberFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamMember
+     */
+    select?: TeamMemberSelect<ExtArgs> | null
+    /**
+     * Filter, which TeamMember to fetch.
+     */
+    where: TeamMemberWhereUniqueInput
+  }
+
+  /**
+   * TeamMember findUniqueOrThrow
+   */
+  export type TeamMemberFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamMember
+     */
+    select?: TeamMemberSelect<ExtArgs> | null
+    /**
+     * Filter, which TeamMember to fetch.
+     */
+    where: TeamMemberWhereUniqueInput
+  }
+
+  /**
+   * TeamMember findFirst
+   */
+  export type TeamMemberFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamMember
+     */
+    select?: TeamMemberSelect<ExtArgs> | null
+    /**
+     * Filter, which TeamMember to fetch.
+     */
+    where?: TeamMemberWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TeamMembers to fetch.
+     */
+    orderBy?: TeamMemberOrderByWithRelationInput | TeamMemberOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TeamMembers.
+     */
+    cursor?: TeamMemberWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TeamMembers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TeamMembers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TeamMembers.
+     */
+    distinct?: TeamMemberScalarFieldEnum | TeamMemberScalarFieldEnum[]
+  }
+
+  /**
+   * TeamMember findFirstOrThrow
+   */
+  export type TeamMemberFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamMember
+     */
+    select?: TeamMemberSelect<ExtArgs> | null
+    /**
+     * Filter, which TeamMember to fetch.
+     */
+    where?: TeamMemberWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TeamMembers to fetch.
+     */
+    orderBy?: TeamMemberOrderByWithRelationInput | TeamMemberOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TeamMembers.
+     */
+    cursor?: TeamMemberWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TeamMembers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TeamMembers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TeamMembers.
+     */
+    distinct?: TeamMemberScalarFieldEnum | TeamMemberScalarFieldEnum[]
+  }
+
+  /**
+   * TeamMember findMany
+   */
+  export type TeamMemberFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamMember
+     */
+    select?: TeamMemberSelect<ExtArgs> | null
+    /**
+     * Filter, which TeamMembers to fetch.
+     */
+    where?: TeamMemberWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TeamMembers to fetch.
+     */
+    orderBy?: TeamMemberOrderByWithRelationInput | TeamMemberOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TeamMembers.
+     */
+    cursor?: TeamMemberWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TeamMembers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TeamMembers.
+     */
+    skip?: number
+    distinct?: TeamMemberScalarFieldEnum | TeamMemberScalarFieldEnum[]
+  }
+
+  /**
+   * TeamMember create
+   */
+  export type TeamMemberCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamMember
+     */
+    select?: TeamMemberSelect<ExtArgs> | null
+    /**
+     * The data needed to create a TeamMember.
+     */
+    data: XOR<TeamMemberCreateInput, TeamMemberUncheckedCreateInput>
+  }
+
+  /**
+   * TeamMember createMany
+   */
+  export type TeamMemberCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TeamMembers.
+     */
+    data: TeamMemberCreateManyInput | TeamMemberCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TeamMember createManyAndReturn
+   */
+  export type TeamMemberCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamMember
+     */
+    select?: TeamMemberSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many TeamMembers.
+     */
+    data: TeamMemberCreateManyInput | TeamMemberCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TeamMember update
+   */
+  export type TeamMemberUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamMember
+     */
+    select?: TeamMemberSelect<ExtArgs> | null
+    /**
+     * The data needed to update a TeamMember.
+     */
+    data: XOR<TeamMemberUpdateInput, TeamMemberUncheckedUpdateInput>
+    /**
+     * Choose, which TeamMember to update.
+     */
+    where: TeamMemberWhereUniqueInput
+  }
+
+  /**
+   * TeamMember updateMany
+   */
+  export type TeamMemberUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TeamMembers.
+     */
+    data: XOR<TeamMemberUpdateManyMutationInput, TeamMemberUncheckedUpdateManyInput>
+    /**
+     * Filter which TeamMembers to update
+     */
+    where?: TeamMemberWhereInput
+  }
+
+  /**
+   * TeamMember upsert
+   */
+  export type TeamMemberUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamMember
+     */
+    select?: TeamMemberSelect<ExtArgs> | null
+    /**
+     * The filter to search for the TeamMember to update in case it exists.
+     */
+    where: TeamMemberWhereUniqueInput
+    /**
+     * In case the TeamMember found by the `where` argument doesn't exist, create a new TeamMember with this data.
+     */
+    create: XOR<TeamMemberCreateInput, TeamMemberUncheckedCreateInput>
+    /**
+     * In case the TeamMember was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TeamMemberUpdateInput, TeamMemberUncheckedUpdateInput>
+  }
+
+  /**
+   * TeamMember delete
+   */
+  export type TeamMemberDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamMember
+     */
+    select?: TeamMemberSelect<ExtArgs> | null
+    /**
+     * Filter which TeamMember to delete.
+     */
+    where: TeamMemberWhereUniqueInput
+  }
+
+  /**
+   * TeamMember deleteMany
+   */
+  export type TeamMemberDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TeamMembers to delete
+     */
+    where?: TeamMemberWhereInput
+  }
+
+  /**
+   * TeamMember without action
+   */
+  export type TeamMemberDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamMember
+     */
+    select?: TeamMemberSelect<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -21591,6 +22709,9 @@ export namespace Prisma {
     fullName: 'fullName',
     avatarUrl: 'avatarUrl',
     phoneNumber: 'phoneNumber',
+    emailAlerts: 'emailAlerts',
+    pushAlerts: 'pushAlerts',
+    thresholdAlerts: 'thresholdAlerts',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -21606,6 +22727,24 @@ export namespace Prisma {
   };
 
   export type VerificationTokenScalarFieldEnum = (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum]
+
+
+  export const TeamMemberScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    email: 'email',
+    role: 'role',
+    projectId: 'projectId',
+    projectName: 'projectName',
+    co2Emissions: 'co2Emissions',
+    location: 'location',
+    status: 'status',
+    aiSuggestion: 'aiSuggestion',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type TeamMemberScalarFieldEnum = (typeof TeamMemberScalarFieldEnum)[keyof typeof TeamMemberScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -23621,6 +24760,9 @@ export namespace Prisma {
     fullName?: StringNullableFilter<"Profile"> | string | null
     avatarUrl?: StringNullableFilter<"Profile"> | string | null
     phoneNumber?: StringNullableFilter<"Profile"> | string | null
+    emailAlerts?: BoolFilter<"Profile"> | boolean
+    pushAlerts?: BoolFilter<"Profile"> | boolean
+    thresholdAlerts?: BoolFilter<"Profile"> | boolean
     createdAt?: DateTimeFilter<"Profile"> | Date | string
     updatedAt?: DateTimeFilter<"Profile"> | Date | string
     user?: XOR<UserRelationFilter, UserWhereInput>
@@ -23632,6 +24774,9 @@ export namespace Prisma {
     fullName?: SortOrderInput | SortOrder
     avatarUrl?: SortOrderInput | SortOrder
     phoneNumber?: SortOrderInput | SortOrder
+    emailAlerts?: SortOrder
+    pushAlerts?: SortOrder
+    thresholdAlerts?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -23646,6 +24791,9 @@ export namespace Prisma {
     fullName?: StringNullableFilter<"Profile"> | string | null
     avatarUrl?: StringNullableFilter<"Profile"> | string | null
     phoneNumber?: StringNullableFilter<"Profile"> | string | null
+    emailAlerts?: BoolFilter<"Profile"> | boolean
+    pushAlerts?: BoolFilter<"Profile"> | boolean
+    thresholdAlerts?: BoolFilter<"Profile"> | boolean
     createdAt?: DateTimeFilter<"Profile"> | Date | string
     updatedAt?: DateTimeFilter<"Profile"> | Date | string
     user?: XOR<UserRelationFilter, UserWhereInput>
@@ -23657,6 +24805,9 @@ export namespace Prisma {
     fullName?: SortOrderInput | SortOrder
     avatarUrl?: SortOrderInput | SortOrder
     phoneNumber?: SortOrderInput | SortOrder
+    emailAlerts?: SortOrder
+    pushAlerts?: SortOrder
+    thresholdAlerts?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ProfileCountOrderByAggregateInput
@@ -23673,6 +24824,9 @@ export namespace Prisma {
     fullName?: StringNullableWithAggregatesFilter<"Profile"> | string | null
     avatarUrl?: StringNullableWithAggregatesFilter<"Profile"> | string | null
     phoneNumber?: StringNullableWithAggregatesFilter<"Profile"> | string | null
+    emailAlerts?: BoolWithAggregatesFilter<"Profile"> | boolean
+    pushAlerts?: BoolWithAggregatesFilter<"Profile"> | boolean
+    thresholdAlerts?: BoolWithAggregatesFilter<"Profile"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Profile"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Profile"> | Date | string
   }
@@ -23725,6 +24879,95 @@ export namespace Prisma {
     token?: StringWithAggregatesFilter<"VerificationToken"> | string
     expires?: DateTimeWithAggregatesFilter<"VerificationToken"> | Date | string
     userId?: StringWithAggregatesFilter<"VerificationToken"> | string
+  }
+
+  export type TeamMemberWhereInput = {
+    AND?: TeamMemberWhereInput | TeamMemberWhereInput[]
+    OR?: TeamMemberWhereInput[]
+    NOT?: TeamMemberWhereInput | TeamMemberWhereInput[]
+    id?: StringFilter<"TeamMember"> | string
+    name?: StringFilter<"TeamMember"> | string
+    email?: StringFilter<"TeamMember"> | string
+    role?: StringFilter<"TeamMember"> | string
+    projectId?: StringFilter<"TeamMember"> | string
+    projectName?: StringFilter<"TeamMember"> | string
+    co2Emissions?: FloatFilter<"TeamMember"> | number
+    location?: StringFilter<"TeamMember"> | string
+    status?: StringFilter<"TeamMember"> | string
+    aiSuggestion?: StringNullableFilter<"TeamMember"> | string | null
+    createdAt?: DateTimeFilter<"TeamMember"> | Date | string
+    updatedAt?: DateTimeFilter<"TeamMember"> | Date | string
+  }
+
+  export type TeamMemberOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    role?: SortOrder
+    projectId?: SortOrder
+    projectName?: SortOrder
+    co2Emissions?: SortOrder
+    location?: SortOrder
+    status?: SortOrder
+    aiSuggestion?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TeamMemberWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    email?: string
+    AND?: TeamMemberWhereInput | TeamMemberWhereInput[]
+    OR?: TeamMemberWhereInput[]
+    NOT?: TeamMemberWhereInput | TeamMemberWhereInput[]
+    name?: StringFilter<"TeamMember"> | string
+    role?: StringFilter<"TeamMember"> | string
+    projectId?: StringFilter<"TeamMember"> | string
+    projectName?: StringFilter<"TeamMember"> | string
+    co2Emissions?: FloatFilter<"TeamMember"> | number
+    location?: StringFilter<"TeamMember"> | string
+    status?: StringFilter<"TeamMember"> | string
+    aiSuggestion?: StringNullableFilter<"TeamMember"> | string | null
+    createdAt?: DateTimeFilter<"TeamMember"> | Date | string
+    updatedAt?: DateTimeFilter<"TeamMember"> | Date | string
+  }, "id" | "email">
+
+  export type TeamMemberOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    role?: SortOrder
+    projectId?: SortOrder
+    projectName?: SortOrder
+    co2Emissions?: SortOrder
+    location?: SortOrder
+    status?: SortOrder
+    aiSuggestion?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: TeamMemberCountOrderByAggregateInput
+    _avg?: TeamMemberAvgOrderByAggregateInput
+    _max?: TeamMemberMaxOrderByAggregateInput
+    _min?: TeamMemberMinOrderByAggregateInput
+    _sum?: TeamMemberSumOrderByAggregateInput
+  }
+
+  export type TeamMemberScalarWhereWithAggregatesInput = {
+    AND?: TeamMemberScalarWhereWithAggregatesInput | TeamMemberScalarWhereWithAggregatesInput[]
+    OR?: TeamMemberScalarWhereWithAggregatesInput[]
+    NOT?: TeamMemberScalarWhereWithAggregatesInput | TeamMemberScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"TeamMember"> | string
+    name?: StringWithAggregatesFilter<"TeamMember"> | string
+    email?: StringWithAggregatesFilter<"TeamMember"> | string
+    role?: StringWithAggregatesFilter<"TeamMember"> | string
+    projectId?: StringWithAggregatesFilter<"TeamMember"> | string
+    projectName?: StringWithAggregatesFilter<"TeamMember"> | string
+    co2Emissions?: FloatWithAggregatesFilter<"TeamMember"> | number
+    location?: StringWithAggregatesFilter<"TeamMember"> | string
+    status?: StringWithAggregatesFilter<"TeamMember"> | string
+    aiSuggestion?: StringNullableWithAggregatesFilter<"TeamMember"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"TeamMember"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"TeamMember"> | Date | string
   }
 
   export type MobileUserCreateInput = {
@@ -25709,6 +26952,9 @@ export namespace Prisma {
     fullName?: string | null
     avatarUrl?: string | null
     phoneNumber?: string | null
+    emailAlerts?: boolean
+    pushAlerts?: boolean
+    thresholdAlerts?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProfileInput
@@ -25720,6 +26966,9 @@ export namespace Prisma {
     fullName?: string | null
     avatarUrl?: string | null
     phoneNumber?: string | null
+    emailAlerts?: boolean
+    pushAlerts?: boolean
+    thresholdAlerts?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -25729,6 +26978,9 @@ export namespace Prisma {
     fullName?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAlerts?: BoolFieldUpdateOperationsInput | boolean
+    pushAlerts?: BoolFieldUpdateOperationsInput | boolean
+    thresholdAlerts?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProfileNestedInput
@@ -25740,6 +26992,9 @@ export namespace Prisma {
     fullName?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAlerts?: BoolFieldUpdateOperationsInput | boolean
+    pushAlerts?: BoolFieldUpdateOperationsInput | boolean
+    thresholdAlerts?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -25750,6 +27005,9 @@ export namespace Prisma {
     fullName?: string | null
     avatarUrl?: string | null
     phoneNumber?: string | null
+    emailAlerts?: boolean
+    pushAlerts?: boolean
+    thresholdAlerts?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -25759,6 +27017,9 @@ export namespace Prisma {
     fullName?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAlerts?: BoolFieldUpdateOperationsInput | boolean
+    pushAlerts?: BoolFieldUpdateOperationsInput | boolean
+    thresholdAlerts?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -25769,6 +27030,9 @@ export namespace Prisma {
     fullName?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAlerts?: BoolFieldUpdateOperationsInput | boolean
+    pushAlerts?: BoolFieldUpdateOperationsInput | boolean
+    thresholdAlerts?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -25819,6 +27083,111 @@ export namespace Prisma {
     token?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TeamMemberCreateInput = {
+    id?: string
+    name: string
+    email: string
+    role: string
+    projectId: string
+    projectName: string
+    co2Emissions: number
+    location: string
+    status?: string
+    aiSuggestion?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TeamMemberUncheckedCreateInput = {
+    id?: string
+    name: string
+    email: string
+    role: string
+    projectId: string
+    projectName: string
+    co2Emissions: number
+    location: string
+    status?: string
+    aiSuggestion?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TeamMemberUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    projectName?: StringFieldUpdateOperationsInput | string
+    co2Emissions?: FloatFieldUpdateOperationsInput | number
+    location?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    aiSuggestion?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TeamMemberUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    projectName?: StringFieldUpdateOperationsInput | string
+    co2Emissions?: FloatFieldUpdateOperationsInput | number
+    location?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    aiSuggestion?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TeamMemberCreateManyInput = {
+    id?: string
+    name: string
+    email: string
+    role: string
+    projectId: string
+    projectName: string
+    co2Emissions: number
+    location: string
+    status?: string
+    aiSuggestion?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TeamMemberUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    projectName?: StringFieldUpdateOperationsInput | string
+    co2Emissions?: FloatFieldUpdateOperationsInput | number
+    location?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    aiSuggestion?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TeamMemberUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    projectName?: StringFieldUpdateOperationsInput | string
+    co2Emissions?: FloatFieldUpdateOperationsInput | number
+    location?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    aiSuggestion?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -27528,6 +28897,9 @@ export namespace Prisma {
     fullName?: SortOrder
     avatarUrl?: SortOrder
     phoneNumber?: SortOrder
+    emailAlerts?: SortOrder
+    pushAlerts?: SortOrder
+    thresholdAlerts?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -27538,6 +28910,9 @@ export namespace Prisma {
     fullName?: SortOrder
     avatarUrl?: SortOrder
     phoneNumber?: SortOrder
+    emailAlerts?: SortOrder
+    pushAlerts?: SortOrder
+    thresholdAlerts?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -27548,6 +28923,9 @@ export namespace Prisma {
     fullName?: SortOrder
     avatarUrl?: SortOrder
     phoneNumber?: SortOrder
+    emailAlerts?: SortOrder
+    pushAlerts?: SortOrder
+    thresholdAlerts?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -27571,6 +28949,59 @@ export namespace Prisma {
     token?: SortOrder
     expires?: SortOrder
     userId?: SortOrder
+  }
+
+  export type TeamMemberCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    role?: SortOrder
+    projectId?: SortOrder
+    projectName?: SortOrder
+    co2Emissions?: SortOrder
+    location?: SortOrder
+    status?: SortOrder
+    aiSuggestion?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TeamMemberAvgOrderByAggregateInput = {
+    co2Emissions?: SortOrder
+  }
+
+  export type TeamMemberMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    role?: SortOrder
+    projectId?: SortOrder
+    projectName?: SortOrder
+    co2Emissions?: SortOrder
+    location?: SortOrder
+    status?: SortOrder
+    aiSuggestion?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TeamMemberMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    role?: SortOrder
+    projectId?: SortOrder
+    projectName?: SortOrder
+    co2Emissions?: SortOrder
+    location?: SortOrder
+    status?: SortOrder
+    aiSuggestion?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TeamMemberSumOrderByAggregateInput = {
+    co2Emissions?: SortOrder
   }
 
   export type CalculationCreateNestedManyWithoutUserInput = {
@@ -29016,6 +30447,9 @@ export namespace Prisma {
     fullName?: string | null
     avatarUrl?: string | null
     phoneNumber?: string | null
+    emailAlerts?: boolean
+    pushAlerts?: boolean
+    thresholdAlerts?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -29025,6 +30459,9 @@ export namespace Prisma {
     fullName?: string | null
     avatarUrl?: string | null
     phoneNumber?: string | null
+    emailAlerts?: boolean
+    pushAlerts?: boolean
+    thresholdAlerts?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -29104,6 +30541,9 @@ export namespace Prisma {
     fullName?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAlerts?: BoolFieldUpdateOperationsInput | boolean
+    pushAlerts?: BoolFieldUpdateOperationsInput | boolean
+    thresholdAlerts?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29113,6 +30553,9 @@ export namespace Prisma {
     fullName?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAlerts?: BoolFieldUpdateOperationsInput | boolean
+    pushAlerts?: BoolFieldUpdateOperationsInput | boolean
+    thresholdAlerts?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29743,6 +31186,10 @@ export namespace Prisma {
      * @deprecated Use VerificationTokenDefaultArgs instead
      */
     export type VerificationTokenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = VerificationTokenDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use TeamMemberDefaultArgs instead
+     */
+    export type TeamMemberArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = TeamMemberDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany

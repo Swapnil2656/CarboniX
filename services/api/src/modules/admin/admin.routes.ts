@@ -8,7 +8,14 @@ import {
   getApiKeys,
   createApiKey,
   revokeApiKey,
-  getTeamMembers
+  getTeamMembers,
+  syncTeamMembers,
+  inviteUser,
+  removeTeamMember,
+  getEmissions,
+  migrateEmission,
+  getNotifications,
+  getAuditLogs
 } from './admin.controller';
 
 const router = Router();
@@ -16,7 +23,14 @@ const router = Router();
 router.use(authenticate);
 
 router.get('/dashboard', getDashboard);
+router.get('/emissions', getEmissions);
+router.post('/emissions/:id/migrate', migrateEmission);
+router.get('/notifications', getNotifications);
+router.get('/audit-logs', getAuditLogs);
 router.get('/users', getUsers);
+router.delete('/users/:id', removeTeamMember);
+router.post('/users/sync', syncTeamMembers);
+router.post('/users/invite', inviteUser);
 router.get('/team', getTeamMembers);
 router.get('/feature-flags', getFeatureFlags);
 router.patch('/feature-flags/:id', toggleFeatureFlag);

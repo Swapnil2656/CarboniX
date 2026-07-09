@@ -263,6 +263,79 @@ appCmd
     }
   });
 
+// team command
+const teamCmd = program.command('team').description('Team management commands');
+
+teamCmd
+  .command('sync')
+  .description('Automatically discover and sync codebase contributors to CarboniX')
+  .action(async () => {
+    try {
+      let config: any = {};
+      try {
+        const configData = await fs.readFile(CONFIG_PATH, 'utf-8');
+        config = JSON.parse(configData);
+      } catch (e) {
+        console.error(pc.red('Error: Project not initialized. Run `carbonix init --key <your-api-key>` first.'));
+        process.exit(1);
+      }
+
+      if (!config.apiKey) {
+        console.error(pc.red('Error: API Key not found in .carbonixrc.'));
+        process.exit(1);
+      }
+      
+      let projectName = 'unknown-project';
+      try {
+        const pkgData = await fs.readFile(path.join(process.cwd(), 'package.json'), 'utf-8');
+        projectName = JSON.parse(pkgData).name;
+      } catch (e) {}
+
+      console.log(pc.cyan(`\n🔍 Analyzing local git history for contributors...`));
+      
+      const { execSync } = require('child_process');
+      let gitOutput = '';
+      try {
+        gitOutput = execSync('git log --format="%an|%ae" | sort -u', { encoding: 'utf-8' });
+      } catch (e) {
+        console.log(pc.yellow(`Warning: Not a git repository or git not installed. Could not extract authors.`));
+        process.exit(0);
+      }
+
+      const rawAuthors = gitOutput.split('\n').filter((l: string) => l.trim() !== '');
+      const members = rawAuthors.map((line: string) => {
+        const [name, email] = line.split('|');
+        return { name, email };
+      }).filter((m: any) => {
+        const email = m.email?.toLowerCase() || '';
+        return m.name && email && !email.includes('dependabot') && !email.includes('bot@');
+      });
+
+      if (members.length === 0) {
+        console.log(pc.yellow(`No human contributors found.`));
+        return;
+      }
+
+      console.log(pc.cyan(`Found ${members.length} contributors. Syncing to CarboniX...`));
+
+      const res = await axios.post(`${API_URL}/admin/users/sync`, { members, projectName }, {
+        headers: {
+          'Authorization': `Bearer ${config.apiKey}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (res.data.success) {
+        console.log(pc.green(`✅ Successfully synced ${res.data.count} team members!`));
+        console.log(pc.gray(`Visit your CarboniX dashboard to view their emission ratings.`));
+      } else {
+        console.error(pc.red('Error: Sync failed.'));
+      }
+    } catch (err: any) {
+      console.error(pc.red(`Error connecting to CarboniX: ${err.response?.data?.error || err.message}`));
+    }
+  });
+
 program.parse(process.argv);
 
 if (!process.argv.slice(2).length) {

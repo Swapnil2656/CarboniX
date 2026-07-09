@@ -408,6 +408,9 @@ exports.Prisma.ProfileScalarFieldEnum = {
   fullName: 'fullName',
   avatarUrl: 'avatarUrl',
   phoneNumber: 'phoneNumber',
+  emailAlerts: 'emailAlerts',
+  pushAlerts: 'pushAlerts',
+  thresholdAlerts: 'thresholdAlerts',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -417,6 +420,21 @@ exports.Prisma.VerificationTokenScalarFieldEnum = {
   token: 'token',
   expires: 'expires',
   userId: 'userId'
+};
+
+exports.Prisma.TeamMemberScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  role: 'role',
+  projectId: 'projectId',
+  projectName: 'projectName',
+  co2Emissions: 'co2Emissions',
+  location: 'location',
+  status: 'status',
+  aiSuggestion: 'aiSuggestion',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -585,7 +603,8 @@ exports.Prisma.ModelName = {
   User: 'User',
   Project: 'Project',
   Profile: 'Profile',
-  VerificationToken: 'VerificationToken'
+  VerificationToken: 'VerificationToken',
+  TeamMember: 'TeamMember'
 };
 
 /**

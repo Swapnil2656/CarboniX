@@ -29,7 +29,7 @@ export default function SettingsPage() {
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Mocked settings
+  // Real settings from DB
   const [emailAlerts, setEmailAlerts] = useState(true);
   const [pushAlerts, setPushAlerts] = useState(false);
   const [thresholdAlerts, setThresholdAlerts] = useState(true);
@@ -79,6 +79,9 @@ export default function SettingsPage() {
         if (res.success && res.profile) {
           setName(res.profile.fullName || session.user.name || '');
           setAvatarUrl(res.profile.avatarUrl || '');
+          if (res.profile.emailAlerts !== undefined) setEmailAlerts(res.profile.emailAlerts);
+          if (res.profile.pushAlerts !== undefined) setPushAlerts(res.profile.pushAlerts);
+          if (res.profile.thresholdAlerts !== undefined) setThresholdAlerts(res.profile.thresholdAlerts);
         } else {
           setName(session.user.name || '');
         }
@@ -149,6 +152,7 @@ export default function SettingsPage() {
         setSaveMessage({ type: 'success', text: 'Profile saved successfully!' });
         // Attempt to update session to reflect new name only (avatar is fetched dynamically now)
         await updateSession({ name });
+        window.dispatchEvent(new Event('profileUpdated'));
       } else {
         setSaveMessage({ type: 'error', text: res.error || 'Failed to save' });
       }
@@ -157,6 +161,30 @@ export default function SettingsPage() {
     } finally {
       setIsSaving(false);
       setTimeout(() => setSaveMessage({ type: '', text: '' }), 3000);
+    }
+  };
+
+  const handleSaveSettings = async () => {
+    setIsSaving(true);
+    setSaveMessage({ type: '', text: '' });
+    
+    try {
+      const res = await updateProfile({
+        emailAlerts,
+        pushAlerts,
+        thresholdAlerts
+      });
+      
+      if (res.success) {
+        setSaveMessage({ type: 'success', text: 'Notification preferences saved.' });
+        setTimeout(() => setSaveMessage({ type: '', text: '' }), 3000);
+      } else {
+        setSaveMessage({ type: 'error', text: res.error || 'Failed to save settings' });
+      }
+    } catch (err: any) {
+      setSaveMessage({ type: 'error', text: err.message || 'An error occurred' });
+    } finally {
+      setIsSaving(false);
     }
   };
 

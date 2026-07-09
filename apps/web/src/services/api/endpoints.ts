@@ -50,6 +50,31 @@ export const referenceApi = {
 
 // ─── Admin Endpoints ─────────────────────────────────────────────────────────
 export const adminApi = {
+  getEmissions: async (provider = 'All', region = 'All'): Promise<import('@/types/admin').EmissionsResponse> => {
+    return fetchClient(`/admin/emissions?provider=${provider}&region=${region}`, {
+      method: 'GET',
+    });
+  },
+
+  migrateEmission: async (id: string, targetRegion: string): Promise<any> => {
+    return fetchClient(`/admin/emissions/${id}/migrate`, {
+      method: 'POST',
+      body: JSON.stringify({ targetRegion }),
+    });
+  },
+
+  getNotifications: async (): Promise<any> => {
+    return fetchClient('/admin/notifications', {
+      method: 'GET',
+    });
+  },
+
+  getAuditLogs: async (): Promise<any> => {
+    return fetchClient('/admin/audit-logs', {
+      method: 'GET',
+    });
+  },
+
   // TODO: implement GET /api/v1/admin/dashboard on the backend
   getDashboard: async (): Promise<DashboardData> => {
     return fetchClient('/admin/dashboard', {
@@ -98,6 +123,19 @@ export const adminApi = {
   // TODO: implement DELETE /api/v1/admin/api-keys/:id on the backend
   revokeApiKey: async (id: string): Promise<void> => {
     return fetchClient(`/admin/api-keys/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  inviteUser: async (payload: { name: string; email: string; role?: string; projectName?: string }): Promise<{ success: boolean; message: string }> => {
+    return fetchClient('/admin/users/invite', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  removeUser: async (id: string): Promise<{ success: boolean; message: string }> => {
+    return fetchClient(`/admin/users/${id}`, {
       method: 'DELETE',
     });
   },

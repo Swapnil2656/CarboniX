@@ -4,14 +4,15 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { getProfile } from '@/app/actions/settings-actions';
+import { adminApi } from '@/services/api/endpoints';
 
 const searchTargets = [
   // Primary Navigation
   { label: 'Dashboard', keywords: ['dashboard', 'home', 'main', 'overview', 'compute', 'resources', 'infrastructure', 'servers', 'nodes', 'deployments'], path: '/admin/dashboard' },
   { label: 'Emissions', keywords: ['emissions', 'carbon', 'co2', 'footprint', 'energy', 'sustainability', 'intensity'], path: '/admin/emissions' },
-  { label: 'Users & Assets', keywords: ['users', 'assets', 'people', 'customers', 'clients', 'accounts', 'mobile'], path: '/admin/users', requireAdmin: true },
+  { label: 'Team Emissions', keywords: ['users', 'assets', 'team', 'people', 'customers', 'clients', 'accounts', 'mobile'], path: '/admin/users', requireAdmin: true },
   { label: 'API Keys', keywords: ['api', 'key', 'keys', 'tokens', 'integration', 'webhooks'], path: '/admin/api-keys' },
-  { label: 'Feature Flags', keywords: ['feature', 'flag', 'flags', 'toggles', 'experiments', 'beta'], path: '/admin/feature-flags' },
+
   { label: 'Settings', keywords: ['settings', 'config', 'preferences'], path: '/admin/settings' },
   { label: 'Support', keywords: ['support', 'help', 'contact', 'ticket', 'issue'], path: '/support' },
   { label: 'Documentation', keywords: ['docs', 'documentation', 'guide', 'tutorial', 'reference', 'sdk'], path: '/docs' },
@@ -39,27 +40,47 @@ export const AdminHeader = () => {
   const historyRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  // Mock Notifications
-  const [notifications, setNotifications] = useState([
-    { id: 1, title: 'Carbon threshold warning', description: 'Server group US-East has exceeded the 500kg CO2 limit.', time: '10 min ago', isRead: false, type: 'warning', icon: 'warning' },
-    { id: 2, title: 'Weekly report ready', description: 'Your emissions summary for last week is ready to view.', time: '2 hours ago', isRead: false, type: 'info', icon: 'bar_chart' },
-    { id: 3, title: 'New team member', description: 'Jane Doe joined your workspace.', time: '1 day ago', isRead: true, type: 'success', icon: 'person_add' },
-    { id: 4, title: 'API Key Expiring', description: 'Your production API key will expire in 3 days.', time: '1 day ago', isRead: true, type: 'warning', icon: 'key' },
-    { id: 5, title: 'Optimization successful', description: 'Server sleep schedules applied, saving 45kg CO2.', time: '2 days ago', isRead: true, type: 'success', icon: 'eco' },
-    { id: 6, title: 'System Maintenance', description: 'Scheduled maintenance for region EU-West starts at 02:00 UTC.', time: '2 days ago', isRead: true, type: 'info', icon: 'build' },
-    { id: 7, title: 'Billing updated', description: 'Your subscription invoice is available.', time: '3 days ago', isRead: true, type: 'info', icon: 'receipt' },
-  ]);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [historyLogs, setHistoryLogs] = useState<any[]>([]);
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  useEffect(() => {
+    const fetchHeaderData = async () => {
+      try {
+        const [notifRes, logsRes] = await Promise.all([
+          adminApi.getNotifications().catch(() => null),
+          adminApi.getAuditLogs().catch(() => null)
+        ]);
+        
+        if (notifRes?.success) {
+          const mappedNotifs = notifRes.notifications.map((n: any) => ({
+            id: n.id,
+            title: n.title,
+            description: n.body,
+            time: new Date(n.createdAt).toLocaleString(),
+            isRead: true, // We don't track admin read status yet
+            type: n.type === 'THRESHOLD_ALERT' ? 'warning' : 'info',
+            icon: n.type === 'THRESHOLD_ALERT' ? 'warning' : 'notifications'
+          }));
+          setNotifications(mappedNotifs);
+        }
+        
+        if (logsRes?.success) {
+          const mappedLogs = logsRes.logs.map((l: any) => ({
+            id: l.id,
+            action: `${l.action} ${l.entityType ? `on ${l.entityType}` : ''}`,
+            time: new Date(l.createdAt).toLocaleString(),
+            icon: 'history'
+          }));
+          setHistoryLogs(mappedLogs);
+        }
+      } catch (err) {
+        console.error('Failed to fetch header data', err);
+      }
+    };
+    fetchHeaderData();
+  }, []);
 
-  // Mock History (Audit Logs)
-  const [historyLogs] = useState([
-    { id: 1, action: 'Updated profile avatar', time: 'Just now', icon: 'image' },
-    { id: 2, action: 'Changed notification settings', time: '2 hours ago', icon: 'tune' },
-    { id: 3, action: 'Logged in from Mac OS • Chrome', time: '5 hours ago', icon: 'login' },
-    { id: 4, action: 'Created new API key "Prod"', time: '1 day ago', icon: 'key' },
-    { id: 5, action: 'Exported emissions report', time: '3 days ago', icon: 'download' },
-  ]);
+  const unreadCount = 0;
 
   const userName = session?.user?.name || session?.user?.email?.split('@')[0] || 'User';
   const userInitial = userName.charAt(0).toUpperCase();
@@ -67,13 +88,22 @@ export const AdminHeader = () => {
   const isAdmin = session?.user?.type === 'SUPER_ADMIN' || session?.user?.type === 'ADMIN';
 
   useEffect(() => {
-    if (session?.user?.id) {
-      getProfile().then(res => {
-        if (res.success && res.profile?.avatarUrl) {
-          setAvatarUrl(res.profile.avatarUrl);
-        }
-      });
-    }
+    const fetchProfile = () => {
+      if (session?.user?.id) {
+        getProfile().then(res => {
+          if (res.success && res.profile?.avatarUrl) {
+            setAvatarUrl(res.profile.avatarUrl);
+          } else {
+            setAvatarUrl('');
+          }
+        });
+      }
+    };
+
+    fetchProfile();
+
+    window.addEventListener('profileUpdated', fetchProfile);
+    return () => window.removeEventListener('profileUpdated', fetchProfile);
   }, [session?.user?.id]);
 
   // Close dropdowns when clicking outside

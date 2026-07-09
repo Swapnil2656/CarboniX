@@ -36,24 +36,25 @@ export interface DashboardData {
 }
 
 // ─── Users / Device Assets ──────────────────────────────────────────────────
-export type DeviceStatus = 'ACTIVE' | 'BANNED';
+export type TeamMemberStatus = 'ACTIVE' | 'BANNED';
 
-export interface DeviceAsset {
+export interface TeamMember {
   id: string;
-  deviceId: string;
+  name: string;
   email: string;
-  country: string;
-  countryCode: string;
-  cloud: 'AWS' | 'GCP' | 'Azure';
-  region: string;
-  avgCo2KgPerHour: number;
-  calculationsOps: string;
-  lastActive: string;
-  status: DeviceStatus;
+  role: string;
+  projectId: string;
+  projectName: string;
+  co2Emissions: number;
+  location: string;
+  status: TeamMemberStatus;
+  aiSuggestion: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface UsersResponse {
-  users: DeviceAsset[];
+  users: TeamMember[];
   total: number;
   page: number;
   pageSize: number;
@@ -94,4 +95,38 @@ export interface CreateApiKeyPayload {
   name: string;
   permissions: string[];
   expiration: string;
+}
+
+// ─── Emissions ──────────────────────────────────────────────────────────────
+export interface EmissionRecord {
+  id: string;
+  instanceId: string;
+  instanceType: string;
+  provider: string;
+  region: string;
+  instanceName: string | null;
+  cpuUtilization: number;
+  memoryUtilization: number | null;
+  networkInGb: number | null;
+  networkOutGb: number | null;
+  energyKwh: number;
+  gridIntensity: number;
+  carbonKg: number;
+  isIdle: boolean;
+  isOversized: boolean;
+  recommendation: string | null;
+  timestamp: string;
+}
+
+export interface EmissionsMetrics {
+  totalInstances: number;
+  idleInstances: number;
+  oversizedInstances: number;
+  wastedCarbonKg: number;
+}
+
+export interface EmissionsResponse {
+  records: EmissionRecord[];
+  metrics: EmissionsMetrics;
+  isSdkConnected?: boolean;
 }
