@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity, Image } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { colors } from '../../src/theme/colors';
 
 export default function SettingsScreen() {
+  const insets = useSafeAreaInsets();
   const [alertsEnabled, setAlertsEnabled] = useState(true);
   const [autoReport, setAutoReport] = useState(false);
   const [defaultRegion, setDefaultRegion] = useState('us-east-1');
@@ -13,7 +15,7 @@ export default function SettingsScreen() {
   return (
     <View style={styles.container}>
       {/* TopAppBar */}
-      <View style={styles.topBar}>
+      <View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top }]}>
         <View style={styles.topBarLeft}>
           <Image source={require('../../assets/carbonix-logo.png')} style={styles.logoImage} />
           <Text style={styles.logo}>CarboniX</Text>
@@ -158,11 +160,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    height: 56,
     backgroundColor: colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: colors.outlineVariant,
-    paddingTop: 8, 
   },
   topBarLeft: {
     flexDirection: 'row',

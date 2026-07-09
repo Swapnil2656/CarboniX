@@ -32,12 +32,20 @@ export const useAuthStore = create<AuthState>((set) => ({
   isLoading: true,
 
   setAuth: async (user, token) => {
-    await SecureStore.setItemAsync('auth_token', token);
+    try {
+      await SecureStore.setItemAsync('auth_token', token);
+    } catch (e) {
+      console.warn('SecureStore failed to save token:', e);
+    }
     set({ user, token, isAuthenticated: true, isLoading: false });
   },
 
   clearAuth: async () => {
-    await SecureStore.deleteItemAsync('auth_token');
+    try {
+      await SecureStore.deleteItemAsync('auth_token');
+    } catch (e) {
+      console.warn('SecureStore failed to delete token:', e);
+    }
     set({ user: null, token: null, isAuthenticated: false, isLoading: false });
   },
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors } from '../../src/theme/colors';
 import { carbonApi } from '../../src/services/api/endpoints';
@@ -14,6 +15,8 @@ const INITIAL_PAYLOAD = {
 };
 
 export default function ConsoleScreen() {
+  const insets = useSafeAreaInsets();
+  const { height: windowHeight } = useWindowDimensions();
   const [response, setResponse] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [timeMs, setTimeMs] = useState(0);
@@ -36,7 +39,7 @@ export default function ConsoleScreen() {
   return (
     <View style={styles.container}>
       {/* TopAppBar */}
-      <View style={styles.topBar}>
+      <View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top }]}>
         <View style={styles.topBarLeft}>
           <Image source={require('../../assets/carbonix-logo.png')} style={styles.logoImage} />
           <Text style={styles.logo}>CarboniX</Text>
@@ -80,7 +83,7 @@ export default function ConsoleScreen() {
             <Text style={styles.editorTitle}>REQUEST BODY</Text>
             <Text style={styles.editorMeta}>JSON</Text>
           </View>
-          <View style={styles.codeBlock}>
+          <View style={[styles.codeBlock, { height: Math.min(300, windowHeight * 0.3) }]}>
             <ScrollView horizontal>
               <Text style={styles.codeText}>
                 {JSON.stringify(INITIAL_PAYLOAD, null, 2)}
@@ -116,7 +119,7 @@ export default function ConsoleScreen() {
               </View>
             )}
           </View>
-          <View style={styles.codeBlock}>
+          <View style={[styles.codeBlock, { height: Math.min(300, windowHeight * 0.3) }]}>
             <ScrollView horizontal>
               <Text style={styles.codeText}>
                 {response ? JSON.stringify(response, null, 2) : '// Click Fire Request to see response...'}
@@ -143,11 +146,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    height: 56,
     backgroundColor: colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: colors.outlineVariant,
-    paddingTop: 8,
   },
   topBarLeft: {
     flexDirection: 'row',
@@ -294,13 +295,13 @@ const styles = StyleSheet.create({
     borderColor: '#2A2A2A',
     borderRadius: 12,
     padding: 16,
-    height: 300,
     position: 'relative',
   },
   codeText: {
     fontFamily: 'JetBrains Mono',
     fontSize: 12,
     lineHeight: 24,
+    color: '#e5e2e1',
   },
   copyBtn: {
     position: 'absolute',

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { colors } from '../../src/theme/colors';
 import { FormInput } from '../../src/components/FormInput';
@@ -10,6 +11,8 @@ import { LOGO_SIZE, LOGO_GAP } from '../../src/constants/layout';
 import { useAuthStore } from '../../src/stores/auth.store';
 
 export default function SignupScreen() {
+  const insets = useSafeAreaInsets();
+  const { width: windowWidth } = useWindowDimensions();
   const router = useRouter();
   const setAuth = useAuthStore(state => state.setAuth);
   const [name, setName] = useState('');
@@ -55,17 +58,17 @@ export default function SignupScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <View style={styles.abstractGlow} />
+      <View style={[styles.abstractGlow, { width: windowWidth * 1.5, height: windowWidth * 1.5, borderRadius: windowWidth * 0.75, top: -(windowWidth * 0.5) }]} />
 
-      <View style={styles.scrollContent}>
+      <View style={[styles.scrollContent, { paddingTop: Math.max(insets.top, 16), paddingBottom: Math.max(insets.bottom, 16) }]}>
         <View style={styles.innerContainer}>
           <View style={styles.brandingSection}>
             <Image
-              source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAaePQOZta2HolrIdrsKoXDYVbDJHIIAXBJ-GQGjpbLgMH5kncWg57srUT-_LZNy4hl6E6jJ2tPOf7hw8Ls8P1YmmwyHUebY39KLS_2dQsL6XHxqvsIxJ5pWkS19j4Q223WC4SN3lDBm3bCdjD0gUPU564liFQr61Fy_eZR6mGCVAoh241x2TIyKbMS7WrqV9yo0UMbbN0qnSwBL4_2DCsWlaGVgdzHvW4fU2KEd26-bqlWw23k_NCrpL9bBCFA_PFhuqPhY7iu-ZAQGgs' }}
+              source={require('../../assets/carbonix-logo.png')}
               style={styles.logo}
               resizeMode="contain"
             />
-            <Text style={styles.title}>Join CarboniX</Text>
+            <Text style={styles.title}>Create Account</Text>
             <Text style={styles.subtitle}>Start monitoring your carbon footprint with developer-first tools.</Text>
           </View>
 
@@ -173,17 +176,12 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 16,
-    paddingVertical: 16,
+    paddingHorizontal: 16,
   },
   abstractGlow: {
     position: 'absolute',
-    top: 0,
-    width: '150%',
-    height: 400,
     backgroundColor: 'rgba(255, 229, 160, 0.05)',
-    borderRadius: 200,
-    transform: [{ translateY: -150 }],
+    left: '-25%',
   },
   innerContainer: {
     width: '100%',

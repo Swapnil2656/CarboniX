@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors } from '../../src/theme/colors';
 import { carbonApi } from '../../src/services/api/endpoints';
@@ -7,6 +8,8 @@ import { carbonApi } from '../../src/services/api/endpoints';
 const TREND_DATA = [30, 25, 40, 45, 60, 50, 70, 65, 80, 75, 90, 85, 100, 95];
 
 export default function HistoryScreen() {
+  const insets = useSafeAreaInsets();
+  const { height: windowHeight } = useWindowDimensions();
   const [searchQuery, setSearchQuery] = useState('');
   const [historyData, setHistoryData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,7 +44,7 @@ export default function HistoryScreen() {
   return (
     <View style={styles.container}>
       {/* TopAppBar */}
-      <View style={styles.topBar}>
+      <View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top }]}>
         <View style={styles.topBarLeft}>
           <Image source={require('../../assets/carbonix-logo.png')} style={styles.logoImage} />
           <Text style={styles.logo}>CarboniX</Text>
@@ -62,7 +65,7 @@ export default function HistoryScreen() {
         {/* Emissions Trend (30d) */}
         <View style={styles.trendPanel}>
           <Text style={styles.trendTitle}>EMISSIONS TREND (30D)</Text>
-          <View style={styles.chartContainer}>
+          <View style={[styles.chartContainer, { height: Math.min(128, windowHeight * 0.2) }]}>
             <View style={styles.yAxis}>
               <Text style={styles.axisLabel}>30kg</Text>
               <Text style={styles.axisLabel}>15kg</Text>
@@ -151,11 +154,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    height: 56,
     backgroundColor: colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: colors.outlineVariant,
-    paddingTop: 8, 
   },
   topBarLeft: {
     flexDirection: 'row',
@@ -217,7 +218,6 @@ const styles = StyleSheet.create({
   },
   chartContainer: {
     flexDirection: 'row',
-    height: 128,
     alignItems: 'flex-end',
   },
   yAxis: {

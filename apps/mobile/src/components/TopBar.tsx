@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 
 export const TopBar = () => {
+  const insets = useSafeAreaInsets();
   return (
-    <View style={styles.header}>
+    <View style={[styles.header, { paddingTop: insets.top, height: 56 + insets.top }]}>
       <View style={styles.leftContent}>
         <MaterialIcons name="terminal" size={20} color={colors.primary} />
         <Text style={styles.title}>CarbonSDK v1.2.4</Text>
@@ -22,7 +24,6 @@ export const TopBar = () => {
 
 const styles = StyleSheet.create({
   header: {
-    height: 56,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

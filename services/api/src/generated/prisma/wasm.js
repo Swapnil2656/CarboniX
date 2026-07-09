@@ -566,7 +566,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/swapnilsen/CarboniX/services/api/src/generated/prisma",
+      "value": "C:\\Users\\shubh\\CarboniX\\CarboniX\\services\\api\\src\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -575,7 +575,7 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "darwin-arm64",
+        "value": "windows",
         "native": true
       },
       {
@@ -594,12 +594,11 @@ const config = {
     "previewFeatures": [
       "driverAdapters"
     ],
-    "sourceFilePath": "/Users/swapnilsen/CarboniX/services/api/prisma/schema.prisma",
+    "sourceFilePath": "C:\\Users\\shubh\\CarboniX\\CarboniX\\services\\api\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../../../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "../../../prisma",
   "clientVersion": "5.22.0",
@@ -608,7 +607,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
+  "postinstall": true,
   "inlineDatasources": {
     "db": {
       "url": {

@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Picker } from '@react-native-picker/picker';
 import Slider from '@react-native-community/slider';
@@ -9,6 +10,7 @@ import { colors } from '../../src/theme/colors';
 import { carbonApi } from '../../src/services/api/endpoints';
 
 export default function ConfigScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const [provider, setProvider] = useState('aws');
   const [region, setRegion] = useState('ap-south-1');
@@ -110,7 +112,7 @@ export default function ConfigScreen() {
     return (
       <View style={styles.container}>
         {/* TopAppBar — same as config */}
-        <View style={styles.topBar}>
+        <View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top }]}>
           <View style={styles.topBarLeft}>
             <Image source={require('../../assets/carbonix-logo.png')} style={styles.logoImage} />
             <Text style={styles.logo}>CarboniX</Text>
@@ -242,7 +244,7 @@ export default function ConfigScreen() {
   return (
     <View style={styles.container}>
       {/* TopAppBar */}
-      <View style={styles.topBar}>
+      <View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top }]}>
         <View style={styles.topBarLeft}>
           <Image source={require('../../assets/carbonix-logo.png')} style={styles.logoImage} />
           <Text style={styles.logo}>CarboniX</Text>
@@ -406,11 +408,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    height: 56,
     backgroundColor: colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: colors.outlineVariant,
-    paddingTop: 8, // Safety for status bar
   },
   topBarLeft: {
     flexDirection: 'row',

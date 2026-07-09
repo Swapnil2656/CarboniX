@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { colors } from '../../src/theme/colors';
 import { FormInput } from '../../src/components/FormInput';
@@ -10,6 +11,8 @@ import { LOGO_SIZE, LOGO_GAP } from '../../src/constants/layout';
 import { useAuthStore } from '../../src/stores/auth.store';
 
 export default function LoginScreen() {
+  const insets = useSafeAreaInsets();
+  const { width: windowWidth } = useWindowDimensions();
   const router = useRouter();
   const setAuth = useAuthStore(state => state.setAuth);
   const [email, setEmail] = useState('');
@@ -42,13 +45,13 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       {/* Background Decor */}
-      <View style={styles.bgGlow1} />
-      <View style={styles.bgGlow2} />
+      <View style={[styles.bgGlow1, { width: windowWidth * 0.8, height: windowWidth * 0.8, borderRadius: windowWidth * 0.4, top: -(windowWidth * 0.25), left: -(windowWidth * 0.15) }]} />
+      <View style={[styles.bgGlow2, { width: windowWidth * 0.7, height: windowWidth * 0.7, borderRadius: windowWidth * 0.35, bottom: -(windowWidth * 0.25), right: -(windowWidth * 0.15) }]} />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingTop: Math.max(insets.top, 24), paddingBottom: Math.max(insets.bottom, 24) }]} keyboardShouldPersistTaps="handled">
         <View style={styles.innerContainer}>
           <Image
-            source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBitSBnKxkLqhvcE5MZUUE4HctuFSrGWVdMI_HTSm3Rn7VJU9do9nWxcTA9TXUS4R5zTt4dsiMh2fCk9WIiBUhu5PX70pEvrjGYFzwjI78EJMOxn9Q5bqctnb06G69jDLzIc3SY_c9UqBKgoZagFH7HNkkh-s9t53cLGuaQmYEgu8jd-cL0NeijO7v-wL4Ja77sK7a1bt3cLI8yTwoAl97n-94S5Jm25mykUcDhsRd0SrT3NnkhL_Qq_qBjI1soOImQ0vFHei1VG3PIXtM' }}
+            source={require('../../assets/carbonix-logo.png')}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -133,22 +136,12 @@ const styles = StyleSheet.create({
   },
   bgGlow1: {
     position: 'absolute',
-    top: -100,
-    left: -50,
-    width: 300,
-    height: 300,
-    borderRadius: 150,
     backgroundColor: colors.primaryContainer,
     opacity: 0.05,
     transform: [{ scale: 1.5 }],
   },
   bgGlow2: {
     position: 'absolute',
-    bottom: -100,
-    right: -50,
-    width: 250,
-    height: 250,
-    borderRadius: 125,
     backgroundColor: colors.info,
     opacity: 0.03,
     transform: [{ scale: 1.5 }],
@@ -157,8 +150,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
-    paddingVertical: 24,
+    paddingHorizontal: 20,
   },
   innerContainer: {
     width: '100%',

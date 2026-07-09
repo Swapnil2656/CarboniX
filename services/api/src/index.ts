@@ -170,7 +170,7 @@ cron.schedule('0 0 1 * *', async () => {
   }
 });
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`Server is running on port ${port}`);
   console.log(`Agent mock mode: ${USE_MOCK ? 'ON (static data)' : 'OFF (live CloudWatch)'}`);
   console.log(`Cron: Collector+Analyst every hour, Reporter on 1st of month`);
