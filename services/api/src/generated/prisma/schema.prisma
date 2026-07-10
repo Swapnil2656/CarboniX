@@ -566,6 +566,7 @@ model User {
   verificationTokens VerificationToken[]
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
+  ChatHistory        ChatHistory?
 }
 
 model Project {
@@ -624,4 +625,15 @@ model TeamMember {
   aiSuggestion String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+// ─── AI Chat History ──────────────────────────────────────────
+
+model ChatHistory {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Json     @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -419,6 +419,14 @@ exports.Prisma.VerificationTokenScalarFieldEnum = {
   userId: 'userId'
 };
 
+exports.Prisma.ChatHistoryScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  messages: 'messages',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -585,7 +593,8 @@ exports.Prisma.ModelName = {
   User: 'User',
   Project: 'Project',
   Profile: 'Profile',
-  VerificationToken: 'VerificationToken'
+  VerificationToken: 'VerificationToken',
+  ChatHistory: 'ChatHistory'
 };
 
 /**

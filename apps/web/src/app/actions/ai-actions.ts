@@ -228,6 +228,47 @@ async function executeTool(name: string, args: any, adminUserId: string) {
   }
 }
 
+export async function getChatHistory(adminUserId: string) {
+  try {
+    const history = await prisma.chatHistory.findUnique({
+      where: { userId: adminUserId },
+    });
+
+    if (history) {
+      // Check if history is older than 30 days
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      if (history.updatedAt < thirtyDaysAgo) {
+        // Clear history if older than 30 days
+        await prisma.chatHistory.delete({ where: { userId: adminUserId } });
+        return { success: true, messages: [] };
+      }
+
+      return { success: true, messages: history.messages as any as ChatMessage[] };
+    }
+
+    return { success: true, messages: [] };
+  } catch (error: any) {
+    console.error('Failed to get chat history:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function clearChatHistory(adminUserId: string) {
+  try {
+    await prisma.chatHistory.delete({ where: { userId: adminUserId } });
+    return { success: true };
+  } catch (error: any) {
+    if (error.code === 'P2025') {
+      // Record to delete does not exist, which is fine
+      return { success: true };
+    }
+    console.error('Failed to clear chat history:', error);
+    return { success: false, error: error.message };
+  }
+}
+
 export async function chatWithAgent(message: string, history: ChatMessage[], adminUserId: string) {
   try {
     const updatedHistory: ChatMessage[] = [...history, { role: 'user', content: message }];
@@ -289,6 +330,17 @@ export async function chatWithAgent(message: string, history: ChatMessage[], adm
     if (candidate?.content?.parts?.[0]?.text) {
       const text = candidate.content.parts[0].text;
       updatedHistory.push({ role: 'model', content: text });
+      
+      // Save history to database
+      await prisma.chatHistory.upsert({
+        where: { userId: adminUserId },
+        update: { messages: updatedHistory as any },
+        create: {
+          userId: adminUserId,
+          messages: updatedHistory as any,
+        },
+      });
+
       return { success: true, text, updatedHistory };
     }
 

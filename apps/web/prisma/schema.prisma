@@ -540,19 +540,20 @@ model User {
   verificationTokens VerificationToken[]
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
+  ChatHistory        ChatHistory?
 }
 
 model Project {
-  id            String    @id @default(cuid())
-  name          String
-  region        String?
-  sdkConnected  Boolean   @default(false)
-  connectedAt   DateTime?
-  lastPingAt    DateTime?
-  userId        String
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id           String    @id @default(cuid())
+  name         String
+  region       String?
+  sdkConnected Boolean   @default(false)
+  connectedAt  DateTime?
+  lastPingAt   DateTime?
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@index([userId])
 }
@@ -575,4 +576,15 @@ model VerificationToken {
   expires DateTime
   userId  String
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── AI Chat History ──────────────────────────────────────────
+
+model ChatHistory {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Json     @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -113,6 +113,11 @@ export type VerificationToken = $Result.DefaultSelection<Prisma.$VerificationTok
  * 
  */
 export type TeamMember = $Result.DefaultSelection<Prisma.$TeamMemberPayload>
+/**
+ * Model ChatHistory
+ * 
+ */
+export type ChatHistory = $Result.DefaultSelection<Prisma.$ChatHistoryPayload>
 
 /**
  * Enums
@@ -680,6 +685,16 @@ export class PrismaClient<
     * ```
     */
   get teamMember(): Prisma.TeamMemberDelegate<ExtArgs>;
+
+  /**
+   * `prisma.chatHistory`: Exposes CRUD operations for the **ChatHistory** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ChatHistories
+    * const chatHistories = await prisma.chatHistory.findMany()
+    * ```
+    */
+  get chatHistory(): Prisma.ChatHistoryDelegate<ExtArgs>;
 }
 
 export namespace Prisma {
@@ -1140,7 +1155,8 @@ export namespace Prisma {
     Project: 'Project',
     Profile: 'Profile',
     VerificationToken: 'VerificationToken',
-    TeamMember: 'TeamMember'
+    TeamMember: 'TeamMember',
+    ChatHistory: 'ChatHistory'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1156,7 +1172,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "mobileUser" | "calculation" | "session" | "apiKey" | "featureFlag" | "remoteConfig" | "auditLog" | "notification" | "userNotification" | "pushToken" | "region" | "instanceType" | "provider" | "agentRun" | "emissionRecord" | "user" | "project" | "profile" | "verificationToken" | "teamMember"
+      modelProps: "mobileUser" | "calculation" | "session" | "apiKey" | "featureFlag" | "remoteConfig" | "auditLog" | "notification" | "userNotification" | "pushToken" | "region" | "instanceType" | "provider" | "agentRun" | "emissionRecord" | "user" | "project" | "profile" | "verificationToken" | "teamMember" | "chatHistory"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2557,6 +2573,76 @@ export namespace Prisma {
           count: {
             args: Prisma.TeamMemberCountArgs<ExtArgs>
             result: $Utils.Optional<TeamMemberCountAggregateOutputType> | number
+          }
+        }
+      }
+      ChatHistory: {
+        payload: Prisma.$ChatHistoryPayload<ExtArgs>
+        fields: Prisma.ChatHistoryFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ChatHistoryFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatHistoryPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ChatHistoryFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatHistoryPayload>
+          }
+          findFirst: {
+            args: Prisma.ChatHistoryFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatHistoryPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ChatHistoryFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatHistoryPayload>
+          }
+          findMany: {
+            args: Prisma.ChatHistoryFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatHistoryPayload>[]
+          }
+          create: {
+            args: Prisma.ChatHistoryCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatHistoryPayload>
+          }
+          createMany: {
+            args: Prisma.ChatHistoryCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ChatHistoryCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatHistoryPayload>[]
+          }
+          delete: {
+            args: Prisma.ChatHistoryDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatHistoryPayload>
+          }
+          update: {
+            args: Prisma.ChatHistoryUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatHistoryPayload>
+          }
+          deleteMany: {
+            args: Prisma.ChatHistoryDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ChatHistoryUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ChatHistoryUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatHistoryPayload>
+          }
+          aggregate: {
+            args: Prisma.ChatHistoryAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateChatHistory>
+          }
+          groupBy: {
+            args: Prisma.ChatHistoryGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ChatHistoryGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ChatHistoryCountArgs<ExtArgs>
+            result: $Utils.Optional<ChatHistoryCountAggregateOutputType> | number
           }
         }
       }
@@ -18727,6 +18813,7 @@ export namespace Prisma {
     profile?: boolean | User$profileArgs<ExtArgs>
     projects?: boolean | User$projectsArgs<ExtArgs>
     verificationTokens?: boolean | User$verificationTokensArgs<ExtArgs>
+    ChatHistory?: boolean | User$ChatHistoryArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -18758,6 +18845,7 @@ export namespace Prisma {
     profile?: boolean | User$profileArgs<ExtArgs>
     projects?: boolean | User$projectsArgs<ExtArgs>
     verificationTokens?: boolean | User$verificationTokensArgs<ExtArgs>
+    ChatHistory?: boolean | User$ChatHistoryArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -18768,6 +18856,7 @@ export namespace Prisma {
       profile: Prisma.$ProfilePayload<ExtArgs> | null
       projects: Prisma.$ProjectPayload<ExtArgs>[]
       verificationTokens: Prisma.$VerificationTokenPayload<ExtArgs>[]
+      ChatHistory: Prisma.$ChatHistoryPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -19146,6 +19235,7 @@ export namespace Prisma {
     profile<T extends User$profileArgs<ExtArgs> = {}>(args?: Subset<T, User$profileArgs<ExtArgs>>): Prisma__ProfileClient<$Result.GetResult<Prisma.$ProfilePayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     projects<T extends User$projectsArgs<ExtArgs> = {}>(args?: Subset<T, User$projectsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany"> | Null>
     verificationTokens<T extends User$verificationTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$verificationTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VerificationTokenPayload<ExtArgs>, T, "findMany"> | Null>
+    ChatHistory<T extends User$ChatHistoryArgs<ExtArgs> = {}>(args?: Subset<T, User$ChatHistoryArgs<ExtArgs>>): Prisma__ChatHistoryClient<$Result.GetResult<Prisma.$ChatHistoryPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -19550,6 +19640,21 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: VerificationTokenScalarFieldEnum | VerificationTokenScalarFieldEnum[]
+  }
+
+  /**
+   * User.ChatHistory
+   */
+  export type User$ChatHistoryArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatHistory
+     */
+    select?: ChatHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatHistoryInclude<ExtArgs> | null
+    where?: ChatHistoryWhereInput
   }
 
   /**
@@ -23459,6 +23564,935 @@ export namespace Prisma {
 
 
   /**
+   * Model ChatHistory
+   */
+
+  export type AggregateChatHistory = {
+    _count: ChatHistoryCountAggregateOutputType | null
+    _min: ChatHistoryMinAggregateOutputType | null
+    _max: ChatHistoryMaxAggregateOutputType | null
+  }
+
+  export type ChatHistoryMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ChatHistoryMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ChatHistoryCountAggregateOutputType = {
+    id: number
+    userId: number
+    messages: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ChatHistoryMinAggregateInputType = {
+    id?: true
+    userId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ChatHistoryMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ChatHistoryCountAggregateInputType = {
+    id?: true
+    userId?: true
+    messages?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ChatHistoryAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ChatHistory to aggregate.
+     */
+    where?: ChatHistoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ChatHistories to fetch.
+     */
+    orderBy?: ChatHistoryOrderByWithRelationInput | ChatHistoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ChatHistoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ChatHistories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ChatHistories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ChatHistories
+    **/
+    _count?: true | ChatHistoryCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ChatHistoryMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ChatHistoryMaxAggregateInputType
+  }
+
+  export type GetChatHistoryAggregateType<T extends ChatHistoryAggregateArgs> = {
+        [P in keyof T & keyof AggregateChatHistory]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateChatHistory[P]>
+      : GetScalarType<T[P], AggregateChatHistory[P]>
+  }
+
+
+
+
+  export type ChatHistoryGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ChatHistoryWhereInput
+    orderBy?: ChatHistoryOrderByWithAggregationInput | ChatHistoryOrderByWithAggregationInput[]
+    by: ChatHistoryScalarFieldEnum[] | ChatHistoryScalarFieldEnum
+    having?: ChatHistoryScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ChatHistoryCountAggregateInputType | true
+    _min?: ChatHistoryMinAggregateInputType
+    _max?: ChatHistoryMaxAggregateInputType
+  }
+
+  export type ChatHistoryGroupByOutputType = {
+    id: string
+    userId: string
+    messages: JsonValue
+    createdAt: Date
+    updatedAt: Date
+    _count: ChatHistoryCountAggregateOutputType | null
+    _min: ChatHistoryMinAggregateOutputType | null
+    _max: ChatHistoryMaxAggregateOutputType | null
+  }
+
+  type GetChatHistoryGroupByPayload<T extends ChatHistoryGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ChatHistoryGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ChatHistoryGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ChatHistoryGroupByOutputType[P]>
+            : GetScalarType<T[P], ChatHistoryGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ChatHistorySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    messages?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["chatHistory"]>
+
+  export type ChatHistorySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    messages?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["chatHistory"]>
+
+  export type ChatHistorySelectScalar = {
+    id?: boolean
+    userId?: boolean
+    messages?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ChatHistoryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ChatHistoryIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $ChatHistoryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ChatHistory"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      messages: Prisma.JsonValue
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["chatHistory"]>
+    composites: {}
+  }
+
+  type ChatHistoryGetPayload<S extends boolean | null | undefined | ChatHistoryDefaultArgs> = $Result.GetResult<Prisma.$ChatHistoryPayload, S>
+
+  type ChatHistoryCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<ChatHistoryFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: ChatHistoryCountAggregateInputType | true
+    }
+
+  export interface ChatHistoryDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ChatHistory'], meta: { name: 'ChatHistory' } }
+    /**
+     * Find zero or one ChatHistory that matches the filter.
+     * @param {ChatHistoryFindUniqueArgs} args - Arguments to find a ChatHistory
+     * @example
+     * // Get one ChatHistory
+     * const chatHistory = await prisma.chatHistory.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ChatHistoryFindUniqueArgs>(args: SelectSubset<T, ChatHistoryFindUniqueArgs<ExtArgs>>): Prisma__ChatHistoryClient<$Result.GetResult<Prisma.$ChatHistoryPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one ChatHistory that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {ChatHistoryFindUniqueOrThrowArgs} args - Arguments to find a ChatHistory
+     * @example
+     * // Get one ChatHistory
+     * const chatHistory = await prisma.chatHistory.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ChatHistoryFindUniqueOrThrowArgs>(args: SelectSubset<T, ChatHistoryFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ChatHistoryClient<$Result.GetResult<Prisma.$ChatHistoryPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first ChatHistory that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatHistoryFindFirstArgs} args - Arguments to find a ChatHistory
+     * @example
+     * // Get one ChatHistory
+     * const chatHistory = await prisma.chatHistory.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ChatHistoryFindFirstArgs>(args?: SelectSubset<T, ChatHistoryFindFirstArgs<ExtArgs>>): Prisma__ChatHistoryClient<$Result.GetResult<Prisma.$ChatHistoryPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first ChatHistory that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatHistoryFindFirstOrThrowArgs} args - Arguments to find a ChatHistory
+     * @example
+     * // Get one ChatHistory
+     * const chatHistory = await prisma.chatHistory.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ChatHistoryFindFirstOrThrowArgs>(args?: SelectSubset<T, ChatHistoryFindFirstOrThrowArgs<ExtArgs>>): Prisma__ChatHistoryClient<$Result.GetResult<Prisma.$ChatHistoryPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more ChatHistories that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatHistoryFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ChatHistories
+     * const chatHistories = await prisma.chatHistory.findMany()
+     * 
+     * // Get first 10 ChatHistories
+     * const chatHistories = await prisma.chatHistory.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const chatHistoryWithIdOnly = await prisma.chatHistory.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ChatHistoryFindManyArgs>(args?: SelectSubset<T, ChatHistoryFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChatHistoryPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a ChatHistory.
+     * @param {ChatHistoryCreateArgs} args - Arguments to create a ChatHistory.
+     * @example
+     * // Create one ChatHistory
+     * const ChatHistory = await prisma.chatHistory.create({
+     *   data: {
+     *     // ... data to create a ChatHistory
+     *   }
+     * })
+     * 
+     */
+    create<T extends ChatHistoryCreateArgs>(args: SelectSubset<T, ChatHistoryCreateArgs<ExtArgs>>): Prisma__ChatHistoryClient<$Result.GetResult<Prisma.$ChatHistoryPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many ChatHistories.
+     * @param {ChatHistoryCreateManyArgs} args - Arguments to create many ChatHistories.
+     * @example
+     * // Create many ChatHistories
+     * const chatHistory = await prisma.chatHistory.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ChatHistoryCreateManyArgs>(args?: SelectSubset<T, ChatHistoryCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ChatHistories and returns the data saved in the database.
+     * @param {ChatHistoryCreateManyAndReturnArgs} args - Arguments to create many ChatHistories.
+     * @example
+     * // Create many ChatHistories
+     * const chatHistory = await prisma.chatHistory.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ChatHistories and only return the `id`
+     * const chatHistoryWithIdOnly = await prisma.chatHistory.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ChatHistoryCreateManyAndReturnArgs>(args?: SelectSubset<T, ChatHistoryCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChatHistoryPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a ChatHistory.
+     * @param {ChatHistoryDeleteArgs} args - Arguments to delete one ChatHistory.
+     * @example
+     * // Delete one ChatHistory
+     * const ChatHistory = await prisma.chatHistory.delete({
+     *   where: {
+     *     // ... filter to delete one ChatHistory
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ChatHistoryDeleteArgs>(args: SelectSubset<T, ChatHistoryDeleteArgs<ExtArgs>>): Prisma__ChatHistoryClient<$Result.GetResult<Prisma.$ChatHistoryPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one ChatHistory.
+     * @param {ChatHistoryUpdateArgs} args - Arguments to update one ChatHistory.
+     * @example
+     * // Update one ChatHistory
+     * const chatHistory = await prisma.chatHistory.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ChatHistoryUpdateArgs>(args: SelectSubset<T, ChatHistoryUpdateArgs<ExtArgs>>): Prisma__ChatHistoryClient<$Result.GetResult<Prisma.$ChatHistoryPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more ChatHistories.
+     * @param {ChatHistoryDeleteManyArgs} args - Arguments to filter ChatHistories to delete.
+     * @example
+     * // Delete a few ChatHistories
+     * const { count } = await prisma.chatHistory.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ChatHistoryDeleteManyArgs>(args?: SelectSubset<T, ChatHistoryDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ChatHistories.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatHistoryUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ChatHistories
+     * const chatHistory = await prisma.chatHistory.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ChatHistoryUpdateManyArgs>(args: SelectSubset<T, ChatHistoryUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ChatHistory.
+     * @param {ChatHistoryUpsertArgs} args - Arguments to update or create a ChatHistory.
+     * @example
+     * // Update or create a ChatHistory
+     * const chatHistory = await prisma.chatHistory.upsert({
+     *   create: {
+     *     // ... data to create a ChatHistory
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ChatHistory we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ChatHistoryUpsertArgs>(args: SelectSubset<T, ChatHistoryUpsertArgs<ExtArgs>>): Prisma__ChatHistoryClient<$Result.GetResult<Prisma.$ChatHistoryPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of ChatHistories.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatHistoryCountArgs} args - Arguments to filter ChatHistories to count.
+     * @example
+     * // Count the number of ChatHistories
+     * const count = await prisma.chatHistory.count({
+     *   where: {
+     *     // ... the filter for the ChatHistories we want to count
+     *   }
+     * })
+    **/
+    count<T extends ChatHistoryCountArgs>(
+      args?: Subset<T, ChatHistoryCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ChatHistoryCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ChatHistory.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatHistoryAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ChatHistoryAggregateArgs>(args: Subset<T, ChatHistoryAggregateArgs>): Prisma.PrismaPromise<GetChatHistoryAggregateType<T>>
+
+    /**
+     * Group by ChatHistory.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatHistoryGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ChatHistoryGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ChatHistoryGroupByArgs['orderBy'] }
+        : { orderBy?: ChatHistoryGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ChatHistoryGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetChatHistoryGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ChatHistory model
+   */
+  readonly fields: ChatHistoryFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ChatHistory.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ChatHistoryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ChatHistory model
+   */ 
+  interface ChatHistoryFieldRefs {
+    readonly id: FieldRef<"ChatHistory", 'String'>
+    readonly userId: FieldRef<"ChatHistory", 'String'>
+    readonly messages: FieldRef<"ChatHistory", 'Json'>
+    readonly createdAt: FieldRef<"ChatHistory", 'DateTime'>
+    readonly updatedAt: FieldRef<"ChatHistory", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ChatHistory findUnique
+   */
+  export type ChatHistoryFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatHistory
+     */
+    select?: ChatHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatHistoryInclude<ExtArgs> | null
+    /**
+     * Filter, which ChatHistory to fetch.
+     */
+    where: ChatHistoryWhereUniqueInput
+  }
+
+  /**
+   * ChatHistory findUniqueOrThrow
+   */
+  export type ChatHistoryFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatHistory
+     */
+    select?: ChatHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatHistoryInclude<ExtArgs> | null
+    /**
+     * Filter, which ChatHistory to fetch.
+     */
+    where: ChatHistoryWhereUniqueInput
+  }
+
+  /**
+   * ChatHistory findFirst
+   */
+  export type ChatHistoryFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatHistory
+     */
+    select?: ChatHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatHistoryInclude<ExtArgs> | null
+    /**
+     * Filter, which ChatHistory to fetch.
+     */
+    where?: ChatHistoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ChatHistories to fetch.
+     */
+    orderBy?: ChatHistoryOrderByWithRelationInput | ChatHistoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ChatHistories.
+     */
+    cursor?: ChatHistoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ChatHistories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ChatHistories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ChatHistories.
+     */
+    distinct?: ChatHistoryScalarFieldEnum | ChatHistoryScalarFieldEnum[]
+  }
+
+  /**
+   * ChatHistory findFirstOrThrow
+   */
+  export type ChatHistoryFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatHistory
+     */
+    select?: ChatHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatHistoryInclude<ExtArgs> | null
+    /**
+     * Filter, which ChatHistory to fetch.
+     */
+    where?: ChatHistoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ChatHistories to fetch.
+     */
+    orderBy?: ChatHistoryOrderByWithRelationInput | ChatHistoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ChatHistories.
+     */
+    cursor?: ChatHistoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ChatHistories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ChatHistories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ChatHistories.
+     */
+    distinct?: ChatHistoryScalarFieldEnum | ChatHistoryScalarFieldEnum[]
+  }
+
+  /**
+   * ChatHistory findMany
+   */
+  export type ChatHistoryFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatHistory
+     */
+    select?: ChatHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatHistoryInclude<ExtArgs> | null
+    /**
+     * Filter, which ChatHistories to fetch.
+     */
+    where?: ChatHistoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ChatHistories to fetch.
+     */
+    orderBy?: ChatHistoryOrderByWithRelationInput | ChatHistoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ChatHistories.
+     */
+    cursor?: ChatHistoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ChatHistories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ChatHistories.
+     */
+    skip?: number
+    distinct?: ChatHistoryScalarFieldEnum | ChatHistoryScalarFieldEnum[]
+  }
+
+  /**
+   * ChatHistory create
+   */
+  export type ChatHistoryCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatHistory
+     */
+    select?: ChatHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatHistoryInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ChatHistory.
+     */
+    data: XOR<ChatHistoryCreateInput, ChatHistoryUncheckedCreateInput>
+  }
+
+  /**
+   * ChatHistory createMany
+   */
+  export type ChatHistoryCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ChatHistories.
+     */
+    data: ChatHistoryCreateManyInput | ChatHistoryCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ChatHistory createManyAndReturn
+   */
+  export type ChatHistoryCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatHistory
+     */
+    select?: ChatHistorySelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many ChatHistories.
+     */
+    data: ChatHistoryCreateManyInput | ChatHistoryCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatHistoryIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ChatHistory update
+   */
+  export type ChatHistoryUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatHistory
+     */
+    select?: ChatHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatHistoryInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ChatHistory.
+     */
+    data: XOR<ChatHistoryUpdateInput, ChatHistoryUncheckedUpdateInput>
+    /**
+     * Choose, which ChatHistory to update.
+     */
+    where: ChatHistoryWhereUniqueInput
+  }
+
+  /**
+   * ChatHistory updateMany
+   */
+  export type ChatHistoryUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ChatHistories.
+     */
+    data: XOR<ChatHistoryUpdateManyMutationInput, ChatHistoryUncheckedUpdateManyInput>
+    /**
+     * Filter which ChatHistories to update
+     */
+    where?: ChatHistoryWhereInput
+  }
+
+  /**
+   * ChatHistory upsert
+   */
+  export type ChatHistoryUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatHistory
+     */
+    select?: ChatHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatHistoryInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ChatHistory to update in case it exists.
+     */
+    where: ChatHistoryWhereUniqueInput
+    /**
+     * In case the ChatHistory found by the `where` argument doesn't exist, create a new ChatHistory with this data.
+     */
+    create: XOR<ChatHistoryCreateInput, ChatHistoryUncheckedCreateInput>
+    /**
+     * In case the ChatHistory was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ChatHistoryUpdateInput, ChatHistoryUncheckedUpdateInput>
+  }
+
+  /**
+   * ChatHistory delete
+   */
+  export type ChatHistoryDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatHistory
+     */
+    select?: ChatHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatHistoryInclude<ExtArgs> | null
+    /**
+     * Filter which ChatHistory to delete.
+     */
+    where: ChatHistoryWhereUniqueInput
+  }
+
+  /**
+   * ChatHistory deleteMany
+   */
+  export type ChatHistoryDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ChatHistories to delete
+     */
+    where?: ChatHistoryWhereInput
+  }
+
+  /**
+   * ChatHistory without action
+   */
+  export type ChatHistoryDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatHistory
+     */
+    select?: ChatHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatHistoryInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -23864,6 +24898,17 @@ export namespace Prisma {
   };
 
   export type TeamMemberScalarFieldEnum = (typeof TeamMemberScalarFieldEnum)[keyof typeof TeamMemberScalarFieldEnum]
+
+
+  export const ChatHistoryScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    messages: 'messages',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ChatHistoryScalarFieldEnum = (typeof ChatHistoryScalarFieldEnum)[keyof typeof ChatHistoryScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -25837,6 +26882,7 @@ export namespace Prisma {
     profile?: XOR<ProfileNullableRelationFilter, ProfileWhereInput> | null
     projects?: ProjectListRelationFilter
     verificationTokens?: VerificationTokenListRelationFilter
+    ChatHistory?: XOR<ChatHistoryNullableRelationFilter, ChatHistoryWhereInput> | null
   }
 
   export type UserOrderByWithRelationInput = {
@@ -25852,6 +26898,7 @@ export namespace Prisma {
     profile?: ProfileOrderByWithRelationInput
     projects?: ProjectOrderByRelationAggregateInput
     verificationTokens?: VerificationTokenOrderByRelationAggregateInput
+    ChatHistory?: ChatHistoryOrderByWithRelationInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -25870,6 +26917,7 @@ export namespace Prisma {
     profile?: XOR<ProfileNullableRelationFilter, ProfileWhereInput> | null
     projects?: ProjectListRelationFilter
     verificationTokens?: VerificationTokenListRelationFilter
+    ChatHistory?: XOR<ChatHistoryNullableRelationFilter, ChatHistoryWhereInput> | null
   }, "id" | "userName" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -26194,6 +27242,61 @@ export namespace Prisma {
     aiSuggestion?: StringNullableWithAggregatesFilter<"TeamMember"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"TeamMember"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"TeamMember"> | Date | string
+  }
+
+  export type ChatHistoryWhereInput = {
+    AND?: ChatHistoryWhereInput | ChatHistoryWhereInput[]
+    OR?: ChatHistoryWhereInput[]
+    NOT?: ChatHistoryWhereInput | ChatHistoryWhereInput[]
+    id?: StringFilter<"ChatHistory"> | string
+    userId?: StringFilter<"ChatHistory"> | string
+    messages?: JsonFilter<"ChatHistory">
+    createdAt?: DateTimeFilter<"ChatHistory"> | Date | string
+    updatedAt?: DateTimeFilter<"ChatHistory"> | Date | string
+    user?: XOR<UserRelationFilter, UserWhereInput>
+  }
+
+  export type ChatHistoryOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    messages?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type ChatHistoryWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId?: string
+    AND?: ChatHistoryWhereInput | ChatHistoryWhereInput[]
+    OR?: ChatHistoryWhereInput[]
+    NOT?: ChatHistoryWhereInput | ChatHistoryWhereInput[]
+    messages?: JsonFilter<"ChatHistory">
+    createdAt?: DateTimeFilter<"ChatHistory"> | Date | string
+    updatedAt?: DateTimeFilter<"ChatHistory"> | Date | string
+    user?: XOR<UserRelationFilter, UserWhereInput>
+  }, "id" | "userId">
+
+  export type ChatHistoryOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    messages?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ChatHistoryCountOrderByAggregateInput
+    _max?: ChatHistoryMaxOrderByAggregateInput
+    _min?: ChatHistoryMinOrderByAggregateInput
+  }
+
+  export type ChatHistoryScalarWhereWithAggregatesInput = {
+    AND?: ChatHistoryScalarWhereWithAggregatesInput | ChatHistoryScalarWhereWithAggregatesInput[]
+    OR?: ChatHistoryScalarWhereWithAggregatesInput[]
+    NOT?: ChatHistoryScalarWhereWithAggregatesInput | ChatHistoryScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ChatHistory"> | string
+    userId?: StringWithAggregatesFilter<"ChatHistory"> | string
+    messages?: JsonWithAggregatesFilter<"ChatHistory">
+    createdAt?: DateTimeWithAggregatesFilter<"ChatHistory"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ChatHistory"> | Date | string
   }
 
   export type MobileUserCreateInput = {
@@ -28140,6 +29243,7 @@ export namespace Prisma {
     profile?: ProfileCreateNestedOneWithoutUserInput
     projects?: ProjectCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
+    ChatHistory?: ChatHistoryCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -28155,6 +29259,7 @@ export namespace Prisma {
     profile?: ProfileUncheckedCreateNestedOneWithoutUserInput
     projects?: ProjectUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    ChatHistory?: ChatHistoryUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -28170,6 +29275,7 @@ export namespace Prisma {
     profile?: ProfileUpdateOneWithoutUserNestedInput
     projects?: ProjectUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
+    ChatHistory?: ChatHistoryUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -28185,6 +29291,7 @@ export namespace Prisma {
     profile?: ProfileUncheckedUpdateOneWithoutUserNestedInput
     projects?: ProjectUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    ChatHistory?: ChatHistoryUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -28545,6 +29652,61 @@ export namespace Prisma {
     location?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     aiSuggestion?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ChatHistoryCreateInput = {
+    id?: string
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutChatHistoryInput
+  }
+
+  export type ChatHistoryUncheckedCreateInput = {
+    id?: string
+    userId: string
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ChatHistoryUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutChatHistoryNestedInput
+  }
+
+  export type ChatHistoryUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ChatHistoryCreateManyInput = {
+    id?: string
+    userId: string
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ChatHistoryUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ChatHistoryUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    messages?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30212,6 +31374,11 @@ export namespace Prisma {
     none?: VerificationTokenWhereInput
   }
 
+  export type ChatHistoryNullableRelationFilter = {
+    is?: ChatHistoryWhereInput | null
+    isNot?: ChatHistoryWhereInput | null
+  }
+
   export type ProjectOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -30418,6 +31585,28 @@ export namespace Prisma {
 
   export type TeamMemberSumOrderByAggregateInput = {
     co2Emissions?: SortOrder
+  }
+
+  export type ChatHistoryCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    messages?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ChatHistoryMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ChatHistoryMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type CalculationCreateNestedManyWithoutUserInput = {
@@ -30699,6 +31888,12 @@ export namespace Prisma {
     connect?: VerificationTokenWhereUniqueInput | VerificationTokenWhereUniqueInput[]
   }
 
+  export type ChatHistoryCreateNestedOneWithoutUserInput = {
+    create?: XOR<ChatHistoryCreateWithoutUserInput, ChatHistoryUncheckedCreateWithoutUserInput>
+    connectOrCreate?: ChatHistoryCreateOrConnectWithoutUserInput
+    connect?: ChatHistoryWhereUniqueInput
+  }
+
   export type ProfileUncheckedCreateNestedOneWithoutUserInput = {
     create?: XOR<ProfileCreateWithoutUserInput, ProfileUncheckedCreateWithoutUserInput>
     connectOrCreate?: ProfileCreateOrConnectWithoutUserInput
@@ -30717,6 +31912,12 @@ export namespace Prisma {
     connectOrCreate?: VerificationTokenCreateOrConnectWithoutUserInput | VerificationTokenCreateOrConnectWithoutUserInput[]
     createMany?: VerificationTokenCreateManyUserInputEnvelope
     connect?: VerificationTokenWhereUniqueInput | VerificationTokenWhereUniqueInput[]
+  }
+
+  export type ChatHistoryUncheckedCreateNestedOneWithoutUserInput = {
+    create?: XOR<ChatHistoryCreateWithoutUserInput, ChatHistoryUncheckedCreateWithoutUserInput>
+    connectOrCreate?: ChatHistoryCreateOrConnectWithoutUserInput
+    connect?: ChatHistoryWhereUniqueInput
   }
 
   export type EnumuserTypeFieldUpdateOperationsInput = {
@@ -30761,6 +31962,16 @@ export namespace Prisma {
     deleteMany?: VerificationTokenScalarWhereInput | VerificationTokenScalarWhereInput[]
   }
 
+  export type ChatHistoryUpdateOneWithoutUserNestedInput = {
+    create?: XOR<ChatHistoryCreateWithoutUserInput, ChatHistoryUncheckedCreateWithoutUserInput>
+    connectOrCreate?: ChatHistoryCreateOrConnectWithoutUserInput
+    upsert?: ChatHistoryUpsertWithoutUserInput
+    disconnect?: ChatHistoryWhereInput | boolean
+    delete?: ChatHistoryWhereInput | boolean
+    connect?: ChatHistoryWhereUniqueInput
+    update?: XOR<XOR<ChatHistoryUpdateToOneWithWhereWithoutUserInput, ChatHistoryUpdateWithoutUserInput>, ChatHistoryUncheckedUpdateWithoutUserInput>
+  }
+
   export type ProfileUncheckedUpdateOneWithoutUserNestedInput = {
     create?: XOR<ProfileCreateWithoutUserInput, ProfileUncheckedCreateWithoutUserInput>
     connectOrCreate?: ProfileCreateOrConnectWithoutUserInput
@@ -30797,6 +32008,16 @@ export namespace Prisma {
     update?: VerificationTokenUpdateWithWhereUniqueWithoutUserInput | VerificationTokenUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: VerificationTokenUpdateManyWithWhereWithoutUserInput | VerificationTokenUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: VerificationTokenScalarWhereInput | VerificationTokenScalarWhereInput[]
+  }
+
+  export type ChatHistoryUncheckedUpdateOneWithoutUserNestedInput = {
+    create?: XOR<ChatHistoryCreateWithoutUserInput, ChatHistoryUncheckedCreateWithoutUserInput>
+    connectOrCreate?: ChatHistoryCreateOrConnectWithoutUserInput
+    upsert?: ChatHistoryUpsertWithoutUserInput
+    disconnect?: ChatHistoryWhereInput | boolean
+    delete?: ChatHistoryWhereInput | boolean
+    connect?: ChatHistoryWhereUniqueInput
+    update?: XOR<XOR<ChatHistoryUpdateToOneWithWhereWithoutUserInput, ChatHistoryUpdateWithoutUserInput>, ChatHistoryUncheckedUpdateWithoutUserInput>
   }
 
   export type UserCreateNestedOneWithoutProjectsInput = {
@@ -30839,6 +32060,20 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutVerificationTokensInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutVerificationTokensInput, UserUpdateWithoutVerificationTokensInput>, UserUncheckedUpdateWithoutVerificationTokensInput>
+  }
+
+  export type UserCreateNestedOneWithoutChatHistoryInput = {
+    create?: XOR<UserCreateWithoutChatHistoryInput, UserUncheckedCreateWithoutChatHistoryInput>
+    connectOrCreate?: UserCreateOrConnectWithoutChatHistoryInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutChatHistoryNestedInput = {
+    create?: XOR<UserCreateWithoutChatHistoryInput, UserUncheckedCreateWithoutChatHistoryInput>
+    connectOrCreate?: UserCreateOrConnectWithoutChatHistoryInput
+    upsert?: UserUpsertWithoutChatHistoryInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutChatHistoryInput, UserUpdateWithoutChatHistoryInput>, UserUncheckedUpdateWithoutChatHistoryInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -32005,6 +33240,25 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ChatHistoryCreateWithoutUserInput = {
+    id?: string
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ChatHistoryUncheckedCreateWithoutUserInput = {
+    id?: string
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ChatHistoryCreateOrConnectWithoutUserInput = {
+    where: ChatHistoryWhereUniqueInput
+    create: XOR<ChatHistoryCreateWithoutUserInput, ChatHistoryUncheckedCreateWithoutUserInput>
+  }
+
   export type ProfileUpsertWithoutUserInput = {
     update: XOR<ProfileUpdateWithoutUserInput, ProfileUncheckedUpdateWithoutUserInput>
     create: XOR<ProfileCreateWithoutUserInput, ProfileUncheckedCreateWithoutUserInput>
@@ -32097,6 +33351,31 @@ export namespace Prisma {
     userId?: StringFilter<"VerificationToken"> | string
   }
 
+  export type ChatHistoryUpsertWithoutUserInput = {
+    update: XOR<ChatHistoryUpdateWithoutUserInput, ChatHistoryUncheckedUpdateWithoutUserInput>
+    create: XOR<ChatHistoryCreateWithoutUserInput, ChatHistoryUncheckedCreateWithoutUserInput>
+    where?: ChatHistoryWhereInput
+  }
+
+  export type ChatHistoryUpdateToOneWithWhereWithoutUserInput = {
+    where?: ChatHistoryWhereInput
+    data: XOR<ChatHistoryUpdateWithoutUserInput, ChatHistoryUncheckedUpdateWithoutUserInput>
+  }
+
+  export type ChatHistoryUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ChatHistoryUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type UserCreateWithoutProjectsInput = {
     id?: string
     userName: string
@@ -32109,6 +33388,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     profile?: ProfileCreateNestedOneWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
+    ChatHistory?: ChatHistoryCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutProjectsInput = {
@@ -32123,6 +33403,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     profile?: ProfileUncheckedCreateNestedOneWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    ChatHistory?: ChatHistoryUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutProjectsInput = {
@@ -32153,6 +33434,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     profile?: ProfileUpdateOneWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
+    ChatHistory?: ChatHistoryUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProjectsInput = {
@@ -32167,6 +33449,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     profile?: ProfileUncheckedUpdateOneWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    ChatHistory?: ChatHistoryUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateWithoutProfileInput = {
@@ -32181,6 +33464,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     projects?: ProjectCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
+    ChatHistory?: ChatHistoryCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutProfileInput = {
@@ -32195,6 +33479,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     projects?: ProjectUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    ChatHistory?: ChatHistoryUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutProfileInput = {
@@ -32225,6 +33510,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     projects?: ProjectUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
+    ChatHistory?: ChatHistoryUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProfileInput = {
@@ -32239,6 +33525,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     projects?: ProjectUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    ChatHistory?: ChatHistoryUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateWithoutVerificationTokensInput = {
@@ -32253,6 +33540,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     profile?: ProfileCreateNestedOneWithoutUserInput
     projects?: ProjectCreateNestedManyWithoutUserInput
+    ChatHistory?: ChatHistoryCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutVerificationTokensInput = {
@@ -32267,6 +33555,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     profile?: ProfileUncheckedCreateNestedOneWithoutUserInput
     projects?: ProjectUncheckedCreateNestedManyWithoutUserInput
+    ChatHistory?: ChatHistoryUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutVerificationTokensInput = {
@@ -32297,6 +33586,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     profile?: ProfileUpdateOneWithoutUserNestedInput
     projects?: ProjectUpdateManyWithoutUserNestedInput
+    ChatHistory?: ChatHistoryUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutVerificationTokensInput = {
@@ -32311,6 +33601,83 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     profile?: ProfileUncheckedUpdateOneWithoutUserNestedInput
     projects?: ProjectUncheckedUpdateManyWithoutUserNestedInput
+    ChatHistory?: ChatHistoryUncheckedUpdateOneWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutChatHistoryInput = {
+    id?: string
+    userName: string
+    email: string
+    password: string
+    isVerified?: boolean
+    isOnboarded?: boolean
+    type?: $Enums.userType
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    profile?: ProfileCreateNestedOneWithoutUserInput
+    projects?: ProjectCreateNestedManyWithoutUserInput
+    verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutChatHistoryInput = {
+    id?: string
+    userName: string
+    email: string
+    password: string
+    isVerified?: boolean
+    isOnboarded?: boolean
+    type?: $Enums.userType
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    profile?: ProfileUncheckedCreateNestedOneWithoutUserInput
+    projects?: ProjectUncheckedCreateNestedManyWithoutUserInput
+    verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutChatHistoryInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutChatHistoryInput, UserUncheckedCreateWithoutChatHistoryInput>
+  }
+
+  export type UserUpsertWithoutChatHistoryInput = {
+    update: XOR<UserUpdateWithoutChatHistoryInput, UserUncheckedUpdateWithoutChatHistoryInput>
+    create: XOR<UserCreateWithoutChatHistoryInput, UserUncheckedCreateWithoutChatHistoryInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutChatHistoryInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutChatHistoryInput, UserUncheckedUpdateWithoutChatHistoryInput>
+  }
+
+  export type UserUpdateWithoutChatHistoryInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    isOnboarded?: BoolFieldUpdateOperationsInput | boolean
+    type?: EnumuserTypeFieldUpdateOperationsInput | $Enums.userType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: ProfileUpdateOneWithoutUserNestedInput
+    projects?: ProjectUpdateManyWithoutUserNestedInput
+    verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutChatHistoryInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    isOnboarded?: BoolFieldUpdateOperationsInput | boolean
+    type?: EnumuserTypeFieldUpdateOperationsInput | $Enums.userType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: ProfileUncheckedUpdateOneWithoutUserNestedInput
+    projects?: ProjectUncheckedUpdateManyWithoutUserNestedInput
+    verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type CalculationCreateManyUserInput = {
@@ -32674,6 +34041,10 @@ export namespace Prisma {
      * @deprecated Use TeamMemberDefaultArgs instead
      */
     export type TeamMemberArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = TeamMemberDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use ChatHistoryDefaultArgs instead
+     */
+    export type ChatHistoryArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ChatHistoryDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany

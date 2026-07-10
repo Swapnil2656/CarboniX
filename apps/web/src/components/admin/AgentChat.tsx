@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { chatWithAgent, ChatMessage } from '@/app/actions/ai-actions';
-import { Send, Bot, X, Loader2, Maximize2, Minimize2 } from 'lucide-react';
+import { chatWithAgent, getChatHistory, clearChatHistory, ChatMessage } from '@/app/actions/ai-actions';
+import { Send, Bot, X, Loader2, Maximize2, Minimize2, Trash2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
 export default function AgentChat() {
@@ -18,6 +18,35 @@ export default function AgentChat() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Load chat history
+  useEffect(() => {
+    const loadHistory = async () => {
+      const adminUserId = session?.user?.id;
+      if (adminUserId && isOpen && messages.length === 0) {
+        setIsLoading(true);
+        try {
+          const res = await getChatHistory(adminUserId);
+          if (res.success && res.messages) {
+            setMessages(res.messages);
+          }
+        } catch (e) {
+          console.error("Failed to load history", e);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+    loadHistory();
+  }, [session?.user?.id, isOpen]);
+
+  const handleClearHistory = async () => {
+    const adminUserId = session?.user?.id;
+    if (!adminUserId) return;
+    
+    setMessages([]);
+    await clearChatHistory(adminUserId);
+  };
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -86,6 +115,13 @@ export default function AgentChat() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <button 
+            onClick={handleClearHistory}
+            className="text-gray-400 hover:text-red-400 transition-colors p-1"
+            title="Clear Chat History"
+          >
+            <Trash2 size={16} />
+          </button>
           <button 
             onClick={() => setIsExpanded(!isExpanded)}
             className="text-gray-400 hover:text-white transition-colors p-1"
