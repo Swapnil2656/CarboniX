@@ -77,20 +77,17 @@ export const AdminSidebar = ({ isCollapsed, onToggle }: AdminSidebarProps) => {
             {!isCollapsed && <span className="whitespace-nowrap overflow-hidden">{item.label}</span>}
           </Link>
         ))}
-        
-        <button
-          onClick={onToggle}
-          title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-          className={`mt-2 flex items-center gap-3 py-2.5 rounded-lg transition-colors text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-medium text-sm ${
-            isCollapsed ? 'justify-center px-0' : 'px-3'
-          }`}
-        >
-          <span className="material-symbols-outlined text-[20px] shrink-0">
-            {isCollapsed ? 'chevron_right' : 'chevron_left'}
-          </span>
-          {!isCollapsed && <span className="whitespace-nowrap overflow-hidden">Collapse</span>}
-        </button>
       </div>
+
+      <button
+        onClick={onToggle}
+        title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+        className="absolute -right-3.5 top-9 w-7 h-7 bg-surface border border-outline-variant rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary transition-colors shadow-sm z-10"
+      >
+        <span className="material-symbols-outlined text-[18px]">
+          {isCollapsed ? 'chevron_right' : 'chevron_left'}
+        </span>
+      </button>
     </aside>
   );
 };
