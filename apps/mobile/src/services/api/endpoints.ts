@@ -20,6 +20,38 @@ export const carbonApi = {
   }
 };
 
+// Agents API Endpoints
+export const agentsApi = {
+  getAgentRuns: async (params?: { limit?: number; offset?: number; type?: string }) => {
+    const response = await apiClient.get('/agents/runs', { params });
+    return response.data;
+  },
+  getLatestBRSR: async () => {
+    const response = await apiClient.get('/agents/report/brsr');
+    return response.data;
+  }
+};
+
+// Admin API Endpoints
+export const adminApi = {
+  getDashboardStats: async () => {
+    const response = await apiClient.get('/admin/dashboard');
+    return response.data;
+  },
+  getUsers: async (params?: { page?: number; limit?: number }) => {
+    const response = await apiClient.get('/admin/users', { params });
+    return response.data;
+  },
+  getApiKeys: async () => {
+    const response = await apiClient.get('/admin/api-keys');
+    return response.data;
+  },
+  getFeatureFlags: async () => {
+    const response = await apiClient.get('/admin/feature-flags');
+    return response.data;
+  }
+};
+
 // Auth Endpoints (if you are using the separate express backend for mobile auth)
 export const authApi = {
   login: async (credentials: Record<string, unknown>) => {

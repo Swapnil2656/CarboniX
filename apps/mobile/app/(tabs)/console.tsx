@@ -1,40 +1,49 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image, ActivityIndicator, useWindowDimensions } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useQuery } from '@tanstack/react-query';
 import { colors } from '../../src/theme/colors';
-import { carbonApi } from '../../src/services/api/endpoints';
+import { agentsApi } from '../../src/services/api/endpoints';
 
-const INITIAL_PAYLOAD = {
-  provider: "aws",
-  region: "us-east-1",
-  cpuCores: 8,
-  memoryGb: 32,
-  storageGb: 500,
-  durationHours: 730
+// Helper to format time ago
+function timeAgo(dateString: string) {
+  const diff = Date.now() - new Date(dateString).getTime();
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hr ago`;
+  return `${Math.floor(hours / 24)} days ago`;
+}
+
+// Map agent types to icons and colors
+const getAgentMeta = (type: string, status: string) => {
+  if (status !== 'SUCCESS') return { icon: 'sync', color: colors.textMuted, label: 'Running...' };
+  switch (type) {
+    case 'COLLECTOR':
+      return { icon: 'data-usage', color: colors.primary, label: 'Collector Agent' };
+    case 'ANALYST':
+      return { icon: 'auto-awesome', color: '#f5c518', label: 'Analyst Agent' }; // Yellow
+    case 'CICD_GATE':
+      return { icon: 'security', color: '#ff5555', label: 'Gate Agent' };
+    case 'REPORTER':
+      return { icon: 'article', color: '#50FA7B', label: 'Reporter Agent' };
+    default:
+      return { icon: 'smart-toy', color: colors.textMuted, label: 'Unknown Agent' };
+  }
 };
 
-export default function ConsoleScreen() {
+export default function AgentFeedScreen() {
   const insets = useSafeAreaInsets();
   const { height: windowHeight } = useWindowDimensions();
-  const [response, setResponse] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [timeMs, setTimeMs] = useState(0);
+  const [expandedId, setExpandedId] = React.useState<string | null>(null);
 
-  const handleFire = async () => {
-    setLoading(true);
-    setResponse(null);
-    const start = Date.now();
-    try {
-      const res = await carbonApi.calculate(INITIAL_PAYLOAD);
-      setResponse(res);
-    } catch (err: any) {
-      setResponse({ error: err.message || 'Failed' });
-    } finally {
-      setTimeMs(Date.now() - start);
-      setLoading(false);
-    }
-  };
+  const { data, isLoading, isError, error, refetch, isRefetching } = useQuery({
+    queryKey: ['agentRuns'],
+    queryFn: () => agentsApi.getAgentRuns({ limit: 20 }),
+  });
+
+  const runs = data?.data || [];
 
   return (
     <View style={styles.container}>
@@ -44,91 +53,94 @@ export default function ConsoleScreen() {
           <Image source={require('../../assets/carbonix-logo.png')} style={styles.logoImage} />
           <Text style={styles.logo}>CarboniX</Text>
         </View>
-        <TouchableOpacity style={styles.iconBtn}>
-          <MaterialIcons name="notifications" size={24} color={colors.textMuted} />
+        <TouchableOpacity style={styles.iconBtn} onPress={() => refetch()}>
+          <MaterialIcons name="refresh" size={24} color={isRefetching ? colors.primary : colors.textMuted} />
         </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={styles.main} showsVerticalScrollIndicator={false}>
-        
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>API Console</Text>
-          <Text style={styles.subtitle}>Live environment for testing calculation endpoints.</Text>
+          <Text style={styles.title}>Agent Feed</Text>
+          <Text style={styles.subtitle}>Real-time automated orchestration logs</Text>
         </View>
 
-        {/* Endpoint Selector */}
-        <View style={styles.endpointSelector}>
-          <View style={styles.methodBadge}>
-            <Text style={styles.methodText}>POST</Text>
-          </View>
-          <Text style={styles.endpointUrl} numberOfLines={1}>
-            /api/v1/carbon/calculate
-          </Text>
-          <TouchableOpacity style={styles.fireBtn} onPress={handleFire} disabled={loading}>
-            {loading ? (
-              <ActivityIndicator size="small" color="#695200" />
-            ) : (
-              <>
-                <MaterialIcons name="play-arrow" size={20} color={colors.onPrimaryContainer} />
-                <Text style={styles.fireBtnText}>Fire Request</Text>
-              </>
-            )}
-          </TouchableOpacity>
-        </View>
+        {/* Feed List */}
+        <View style={styles.feedContainer}>
+          {isLoading ? (
+            <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 40 }} />
+          ) : isError ? (
+            <View style={styles.errorBox}>
+              <MaterialIcons name="error-outline" size={24} color={colors.error} />
+              <Text style={styles.errorText}>Failed to load feed: {(error as any)?.message}</Text>
+              <TouchableOpacity onPress={() => refetch()} style={styles.retryBtn}>
+                <Text style={styles.retryText}>Retry</Text>
+              </TouchableOpacity>
+            </View>
+          ) : runs.length === 0 ? (
+            <Text style={styles.emptyText}>No agent activity found.</Text>
+          ) : (
+            runs.map((run: any) => {
+              const meta = getAgentMeta(run.agentType, run.status);
+              const isExpanded = expandedId === run.id;
+              
+              return (
+                <TouchableOpacity 
+                  key={run.id} 
+                  style={[styles.feedCard, isExpanded && styles.feedCardExpanded]}
+                  activeOpacity={0.8}
+                  onPress={() => setExpandedId(isExpanded ? null : run.id)}
+                >
+                  <View style={styles.cardHeader}>
+                    <View style={styles.agentInfo}>
+                      <MaterialIcons name={meta.icon as any} size={18} color={meta.color} />
+                      <Text style={[styles.agentName, { color: meta.color }]}>{meta.label}</Text>
+                    </View>
+                    <Text style={styles.timeText}>{timeAgo(run.createdAt)}</Text>
+                  </View>
+                  
+                  <Text style={styles.summaryText}>{run.summary || 'Executing tasks...'}</Text>
+                  
+                  {isExpanded && run.details && (
+                    <View style={styles.expandedDetails}>
+                      <View style={styles.divider} />
+                      
+                      {run.agentType === 'ANALYST' && run.details.recommendations?.map((rec: any, idx: number) => (
+                        <View key={idx} style={styles.detailBlock}>
+                          <Text style={styles.detailTitle}>🎯 Recommendation for {rec.instanceName || rec.instanceId}</Text>
+                          <Text style={styles.detailText}>{rec.reasoning}</Text>
+                          <TouchableOpacity style={styles.actionBtn}>
+                            <Text style={styles.actionBtnText}>Apply Fix</Text>
+                          </TouchableOpacity>
+                        </View>
+                      ))}
 
-        {/* Editor Grid: Request Body */}
-        <View style={styles.editorSection}>
-          <View style={styles.editorHeader}>
-            <Text style={styles.editorTitle}>REQUEST BODY</Text>
-            <Text style={styles.editorMeta}>JSON</Text>
-          </View>
-          <View style={[styles.codeBlock, { height: Math.min(300, windowHeight * 0.3) }]}>
-            <ScrollView horizontal>
-              <Text style={styles.codeText}>
-                {JSON.stringify(INITIAL_PAYLOAD, null, 2)}
-              </Text>
-            </ScrollView>
-            <TouchableOpacity style={styles.copyBtn}>
-              <MaterialIcons name="content-copy" size={16} color={colors.textMuted} />
-            </TouchableOpacity>
-          </View>
-        </View>
+                      {run.agentType === 'CICD_GATE' && (
+                        <View style={styles.detailBlock}>
+                          <Text style={styles.detailTitle}>Gate Status: {run.details.passed ? 'PASSED ✅' : 'FAILED ❌'}</Text>
+                          <Text style={styles.detailText}>Delta: {run.details.deltaKgPerDay} kg CO₂/day (Budget: {run.details.budgetKgPerDay} kg)</Text>
+                        </View>
+                      )}
 
-        {/* Editor Grid: Response Block */}
-        <View style={styles.editorSection}>
-          <View style={styles.editorHeader}>
-            <Text style={styles.editorTitle}>RESPONSE</Text>
-            {response && !response.error && (
-              <View style={styles.responseTags}>
-                <View style={styles.tagSuccess}>
-                  <MaterialIcons name="check" size={12} color="#002108" />
-                  <Text style={styles.tagSuccessText}>200 OK</Text>
-                </View>
-                <View style={styles.tagTime}>
-                  <Text style={styles.tagTimeText}>{timeMs}ms</Text>
-                </View>
-              </View>
-            )}
-            {response && response.error && (
-              <View style={styles.responseTags}>
-                <View style={[styles.tagSuccess, { backgroundColor: colors.errorContainer }]}>
-                  <MaterialIcons name="error" size={12} color={colors.onErrorContainer} />
-                  <Text style={[styles.tagSuccessText, { color: colors.onErrorContainer }]}>ERROR</Text>
-                </View>
-              </View>
-            )}
-          </View>
-          <View style={[styles.codeBlock, { height: Math.min(300, windowHeight * 0.3) }]}>
-            <ScrollView horizontal>
-              <Text style={styles.codeText}>
-                {response ? JSON.stringify(response, null, 2) : '// Click Fire Request to see response...'}
-              </Text>
-            </ScrollView>
-            <TouchableOpacity style={styles.copyBtn}>
-              <MaterialIcons name="content-copy" size={16} color={colors.textMuted} />
-            </TouchableOpacity>
-          </View>
+                      {run.agentType === 'COLLECTOR' && (
+                        <View style={styles.detailBlock}>
+                          <Text style={styles.detailTitle}>Collection Results</Text>
+                          <Text style={styles.detailText}>Processed {run.details.instanceCount} instances.</Text>
+                          <Text style={styles.detailText}>Total footprint: {run.details.totalCarbonKg?.toFixed(2)} kg CO₂</Text>
+                        </View>
+                      )}
+                    </View>
+                  )}
+                  
+                  {!isExpanded && run.details?.recommendations?.length > 0 && (
+                    <View style={styles.tapToReview}>
+                      <Text style={styles.tapToReviewText}>Tap to review {run.details.recommendations.length} recommendation(s) →</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              );
+            })
+          )}
         </View>
 
       </ScrollView>
@@ -164,7 +176,6 @@ const styles = StyleSheet.create({
   logo: {
     fontFamily: 'Inter-Bold',
     fontSize: 20,
-    fontWeight: '900',
     color: colors.primary,
     letterSpacing: -0.5,
     marginLeft: -6,
@@ -185,7 +196,6 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: 'Inter-Bold',
     fontSize: 36,
-    fontWeight: '900',
     color: colors.textHeader,
     letterSpacing: -1,
   },
@@ -194,128 +204,124 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.textMuted,
   },
-  endpointSelector: {
-    backgroundColor: '#2A2A2A', // surface-container-high
+  feedContainer: {
+    gap: 16,
+  },
+  feedCard: {
+    backgroundColor: '#1E1E1E',
     borderWidth: 1,
     borderColor: '#2A2A2A',
     borderRadius: 12,
     padding: 16,
-    flexDirection: 'column',
-    gap: 16,
-  },
-  methodBadge: {
-    backgroundColor: '#90ff9e', // tertiary
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-  },
-  methodText: {
-    fontFamily: 'JetBrainsMono-Bold',
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#003912',
-    textTransform: 'uppercase',
-  },
-  endpointUrl: {
-    fontFamily: 'JetBrains Mono',
-    fontSize: 14,
-    color: '#e5e2e1',
-  },
-  fireBtn: {
-    backgroundColor: '#f5c518', // primary-container
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 12,
     gap: 8,
   },
-  fireBtnText: {
-    fontFamily: 'Inter-Bold',
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#695200', // on-primary-container
+  feedCardExpanded: {
+    borderColor: colors.outlineVariant,
   },
-  editorSection: {
-    gap: 8,
-  },
-  editorHeader: {
+  cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 8,
   },
-  editorTitle: {
+  agentInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  agentName: {
+    fontFamily: 'JetBrainsMono-Bold',
+    fontSize: 12,
+    textTransform: 'uppercase',
+  },
+  timeText: {
     fontFamily: 'JetBrains Mono',
+    fontSize: 12,
+    color: colors.textMuted,
+  },
+  summaryText: {
+    fontFamily: 'Inter',
+    fontSize: 15,
+    color: colors.textHeader,
+    lineHeight: 22,
+    marginTop: 4,
+  },
+  tapToReview: {
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#2A2A2A',
+  },
+  tapToReviewText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 13,
+    color: colors.primary,
+  },
+  expandedDetails: {
+    marginTop: 8,
+    gap: 12,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#2A2A2A',
+    marginVertical: 4,
+  },
+  detailBlock: {
+    backgroundColor: '#2A2A2A',
+    padding: 12,
+    borderRadius: 8,
+    gap: 6,
+  },
+  detailTitle: {
+    fontFamily: 'Inter-Bold',
     fontSize: 14,
+    color: colors.textHeader,
+  },
+  detailText: {
+    fontFamily: 'JetBrains Mono',
+    fontSize: 13,
     color: colors.textMuted,
-    letterSpacing: 1.1,
+    lineHeight: 20,
   },
-  editorMeta: {
-    fontFamily: 'JetBrains Mono',
-    fontSize: 12,
+  actionBtn: {
+    backgroundColor: colors.primaryContainer,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+    marginTop: 8,
+  },
+  actionBtnText: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 14,
+    color: colors.onPrimaryContainer,
+  },
+  emptyText: {
+    fontFamily: 'Inter',
     color: colors.textMuted,
-    opacity: 0.5,
+    textAlign: 'center',
+    marginTop: 40,
   },
-  responseTags: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  tagSuccess: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#31e368', // tertiary-fixed-dim
-    paddingHorizontal: 4,
-    paddingVertical: 2,
-    borderRadius: 12,
-    gap: 2,
-  },
-  tagSuccessText: {
-    fontFamily: 'JetBrains Mono',
-    fontSize: 12,
-    color: '#002108',
-  },
-  tagTime: {
-    backgroundColor: '#2A2A2A',
-    paddingHorizontal: 4,
-    paddingVertical: 2,
-    borderRadius: 12,
-  },
-  tagTimeText: {
-    fontFamily: 'JetBrains Mono',
-    fontSize: 12,
-    color: '#e5e2e1',
-  },
-  codeBlock: {
-    backgroundColor: '#141414',
-    borderWidth: 1,
-    borderColor: '#2A2A2A',
-    borderRadius: 12,
+  errorBox: {
+    backgroundColor: colors.errorContainer,
     padding: 16,
-    position: 'relative',
-  },
-  codeText: {
-    fontFamily: 'JetBrains Mono',
-    fontSize: 12,
-    lineHeight: 24,
-    color: '#e5e2e1',
-  },
-  copyBtn: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: '#2A2A2A',
-    padding: 8,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#2A2A2A',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 20,
   },
-  // Syntax highlighting colors
-  key: { color: '#b48ead' }, // Purple
-  string: { color: '#a3be8c' }, // Green/Yellow
-  number: { color: '#d08770' }, // Orange
-  punct: { color: '#8fbcbb' }, // Cyan
+  errorText: {
+    color: colors.onErrorContainer,
+    fontFamily: 'Inter',
+    textAlign: 'center',
+  },
+  retryBtn: {
+    backgroundColor: colors.error,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  retryText: {
+    color: '#fff',
+    fontFamily: 'Inter-Bold',
+  }
 });

@@ -1,16 +1,25 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
+import { useQuery } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
 import { colors } from '../../src/theme/colors';
+import { adminApi } from '../../src/services/api/endpoints';
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [alertsEnabled, setAlertsEnabled] = useState(true);
   const [autoReport, setAutoReport] = useState(false);
   const [defaultRegion, setDefaultRegion] = useState('us-east-1');
   const [defaultProvider, setDefaultProvider] = useState('aws');
+
+  const { data: dashboard, isLoading: dashboardLoading } = useQuery({
+    queryKey: ['adminDashboard'],
+    queryFn: adminApi.getDashboardStats,
+  });
 
   return (
     <View style={styles.container}>
@@ -25,12 +34,64 @@ export default function SettingsScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         
         {/* Header Section */}
         <View style={styles.header}>
           <Text style={styles.title}>SETTINGS</Text>
           <Text style={styles.subtitle}>MANAGE CARBONIX PREFERENCES</Text>
+        </View>
+
+        {/* Admin Dashboard */}
+        <View style={styles.panel}>
+          <View style={styles.panelHeaderRow}>
+            <MaterialIcons name="dashboard" size={20} color={colors.primary} />
+            <Text style={styles.panelTitle}>ADMIN DASHBOARD</Text>
+          </View>
+          
+          {dashboardLoading ? (
+            <ActivityIndicator size="small" color={colors.primary} />
+          ) : (
+            <View style={styles.statsGrid}>
+              <View style={styles.statBox}>
+                <Text style={styles.statLabel}>API CALLS</Text>
+                <Text style={styles.statValue}>{dashboard?.totalApiCalls?.toLocaleString() || 0}</Text>
+              </View>
+              <View style={styles.statBox}>
+                <Text style={styles.statLabel}>SESSIONS</Text>
+                <Text style={styles.statValue}>{dashboard?.activeSessions?.toLocaleString() || 0}</Text>
+              </View>
+              <View style={styles.statBox}>
+                <Text style={styles.statLabel}>AVG CO₂ (kg)</Text>
+                <Text style={styles.statValue}>{dashboard?.avgCo2Kg || 0}</Text>
+              </View>
+              <View style={styles.statBox}>
+                <Text style={styles.statLabel}>INSTALLS</Text>
+                <Text style={styles.statValue}>{dashboard?.sdkInstalls?.toLocaleString() || 0}</Text>
+              </View>
+            </View>
+          )}
+
+          {/* Quick links to Management screens */}
+          <View style={styles.divider} />
+          <View style={styles.adminLinks}>
+            <TouchableOpacity style={styles.adminLinkBtn} onPress={() => router.push('/settings/users')}>
+              <MaterialIcons name="people" size={18} color={colors.textHeader} />
+              <Text style={styles.adminLinkText}>Manage Users</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.adminLinkBtn} onPress={() => router.push('/settings/keys')}>
+              <MaterialIcons name="vpn-key" size={18} color={colors.textHeader} />
+              <Text style={styles.adminLinkText}>API Keys</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.adminLinkBtn} onPress={() => router.push('/settings/flags')}>
+              <MaterialIcons name="flag" size={18} color={colors.textHeader} />
+              <Text style={styles.adminLinkText}>Feature Flags</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.adminLinkBtn} onPress={() => router.push('/settings/brsr')}>
+              <MaterialIcons name="assessment" size={18} color={colors.textHeader} />
+              <Text style={styles.adminLinkText}>BRSR Reports</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Global Defaults */}
@@ -117,28 +178,6 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        {/* Account Management */}
-        <View style={styles.panel}>
-          <View style={styles.panelHeaderRow}>
-            <MaterialIcons name="admin-panel-settings" size={20} color={colors.primary} />
-            <Text style={styles.panelTitle}>API KEYS & ACCESS</Text>
-          </View>
-          
-          <View style={styles.apiKeyBox}>
-            <Text style={styles.apiKeyLabel}>ACTIVE SECRET KEY</Text>
-            <View style={styles.apiKeyValueRow}>
-              <Text style={styles.apiKeyValue}>cx_live_*******************</Text>
-              <TouchableOpacity>
-                <MaterialIcons name="visibility" size={18} color={colors.textMuted} />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <TouchableOpacity style={styles.btnOutline}>
-            <Text style={styles.btnOutlineText}>ROTATE API KEY</Text>
-          </TouchableOpacity>
-        </View>
-
         {/* Footer info */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>CarbonSDK Version 1.2.4</Text>
@@ -178,7 +217,6 @@ const styles = StyleSheet.create({
   logo: {
     fontFamily: 'Inter-Bold',
     fontSize: 20,
-    fontWeight: '900',
     color: colors.primary,
     letterSpacing: -0.5,
     marginLeft: -6,
@@ -227,6 +265,48 @@ const styles = StyleSheet.create({
     color: colors.textHeader,
     letterSpacing: 1.1,
   },
+  statsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  statBox: {
+    width: '48%',
+    backgroundColor: '#2A2A2A',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'flex-start',
+  },
+  statLabel: {
+    fontFamily: 'JetBrainsMono-Bold',
+    fontSize: 10,
+    color: colors.textMuted,
+    marginBottom: 4,
+  },
+  statValue: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 20,
+    color: colors.textHeader,
+  },
+  adminLinks: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  adminLinkBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#2A2A2A',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    gap: 6,
+  },
+  adminLinkText: {
+    fontFamily: 'Inter-SemiBold',
+    fontSize: 12,
+    color: colors.textHeader,
+  },
   settingRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -246,7 +326,7 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: '#2A2A2A',
-      borderRadius: 12,
+    borderRadius: 12,
   },
   settingRowCol: {
     flexDirection: 'column',
@@ -266,43 +346,6 @@ const styles = StyleSheet.create({
     fontFamily: 'JetBrains Mono',
     height: 52,
     width: '100%',
-  },
-  apiKeyBox: {
-    backgroundColor: '#0A0A0A',
-    borderWidth: 1,
-    borderColor: '#2A2A2A',
-    borderRadius: 12,
-    padding: 12,
-  },
-  apiKeyLabel: {
-    fontFamily: 'JetBrainsMono-Bold',
-    fontSize: 10,
-    color: colors.textMuted,
-    letterSpacing: 1.1,
-    marginBottom: 8,
-  },
-  apiKeyValueRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  apiKeyValue: {
-    fontFamily: 'JetBrains Mono',
-    fontSize: 14,
-    color: '#90ff9e',
-  },
-  btnOutline: {
-    borderWidth: 1,
-    borderColor: colors.primary,
-    paddingVertical: 12,
-    alignItems: 'center',
-    borderRadius: 12,
-  },
-  btnOutlineText: {
-    fontFamily: 'JetBrainsMono-Bold',
-    fontSize: 12,
-    color: colors.primary,
-    letterSpacing: 1.1,
   },
   footer: {
     alignItems: 'center',

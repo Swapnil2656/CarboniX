@@ -5668,3 +5668,40 @@
 {"_e":"metro:client_log","_t":1783590813424,"level":"error","data":["[Error: Uncaught (in promise, id: 12) Error: Call to function 'ExpoAsset.downloadAsync' has been rejected.\n→ Caused by: Unable to download asset from url: http://wkojpbk-anonymous-8081.exp.direct/assets/?unstable_path=.%2F..%2F..%2Fnode_modules%2F%40expo%2Fvector-icons%2Fbuild%2Fvendor%2Freact-native-vector-icons%2FFonts%2FMaterialIcons.ttf&platform=android&hash=4e85bc9ebe07e0340c9c4fc2f6c38908]"]}
 {"_e":"metro:client_log","_t":1783590813424,"level":"error","data":["[Error: Uncaught (in promise, id: 13) Error: Call to function 'ExpoAsset.downloadAsync' has been rejected.\n→ Caused by: Unable to download asset from url: http://wkojpbk-anonymous-8081.exp.direct/assets/?unstable_path=.%2F..%2F..%2Fnode_modules%2F%40expo%2Fvector-icons%2Fbuild%2Fvendor%2Freact-native-vector-icons%2FFonts%2FMaterialIcons.ttf&platform=android&hash=4e85bc9ebe07e0340c9c4fc2f6c38908]"]}
 {"_e":"metro:client_log","_t":1783590815465,"level":"error","data":["Failed to compare:","[AxiosError: Network Error]"]}
+{"_e":"root:init","_t":1783622915536,"format":"v0-jsonl","version":"56.1.19"}
+{"_e":"env:mode","_t":1783622915537,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783622915542,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783622916424,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../..\\..\\app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783622918059,"serverRoot":"../..\\..\\..\\..","projectRoot":"../..\\..","exporting":false,"flags":{"autolinkingModuleResolution":true,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783622934825,"atlas":false,"workers":8,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783623031326,"id":"7","platform":"android","environment":null,"entry":"node_modules\\expo-router\\entry.js"}
+{"_e":"metro:bundling:progress","_t":1783623031326,"id":"7","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1783623031329,"id":"7","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1783623031429,"id":"7","progress":0.026688559945103423,"total":202,"current":33}
+{"_e":"metro:bundling:progress","_t":1783623031529,"id":"7","progress":0.13294137095788802,"total":373,"current":136}
+{"_e":"metro:bundling:progress","_t":1783623031629,"id":"7","progress":0.28783498260410867,"total":589,"current":316}
+{"_e":"metro:bundling:progress","_t":1783623031730,"id":"7","progress":0.3783092512666541,"total":730,"current":449}
+{"_e":"metro:bundling:progress","_t":1783623031830,"id":"7","progress":0.4414465140816492,"total":888,"current":590}
+{"_e":"metro:bundling:progress","_t":1783623031931,"id":"7","progress":0.6419099715820387,"total":1006,"current":806}
+{"_e":"metro:bundling:progress","_t":1783623032034,"id":"7","progress":0.6431722380158809,"total":1111,"current":891}
+{"_e":"metro:bundling:progress","_t":1783623032133,"id":"7","progress":0.7177675153678389,"total":1309,"current":1109}
+{"_e":"metro:bundling:progress","_t":1783623032233,"id":"7","progress":0.8435005159806105,"total":1471,"current":1351}
+{"_e":"metro:bundling:progress","_t":1783623032333,"id":"7","progress":0.9083737235177564,"total":1620,"current":1544}
+{"_e":"metro:bundling:progress","_t":1783623032433,"id":"7","progress":0.932259970121954,"total":1828,"current":1765}
+{"_e":"metro:bundling:done","_t":1783623032568,"id":"7","total":1828,"ms":1242.6675}
+{"_e":"metro:client_log","_t":1783623083303,"level":"error","data":["Failed to compare:","[AxiosError: Network Error]"]}
+{"_e":"metro:client_log","_t":1783623105947,"level":"error","data":["Failed to fetch history:","[AxiosError: Network Error]"]}
+{"_e":"metro:client_log","_t":1783623925306,"level":"error","data":["Failed to fetch history:","[AxiosError: Network Error]"]}
+{"_e":"metro:client_log","_t":1783623925401,"level":"error","data":["Failed to compare:","[AxiosError: Network Error]"]}
+{"_e":"metro:bundling:started","_t":1783623986369,"id":"o","platform":"android","environment":null,"entry":"node_modules\\expo-router\\entry.js"}
+{"_e":"metro:bundling:progress","_t":1783623986369,"id":"o","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1783623986450,"id":"o","total":1,"ms":81.3721}
+{"_e":"metro:client_log","_t":1783624102284,"level":"error","data":["Failed to compare:","[AxiosError: Network Error]"]}
+{"_e":"metro:client_log","_t":1783624136740,"level":"error","data":["Failed to compare:","[AxiosError: Network Error]"]}
+{"_e":"metro:client_log","_t":1783624142876,"level":"error","data":["Failed to fetch history:","[AxiosError: Network Error]"]}
+{"_e":"metro:client_log","_t":1783624179366,"level":"error","data":["Failed to compare:","[AxiosError: Network Error]"]}
+{"_e":"metro:client_log","_t":1783624185151,"level":"error","data":["Failed to fetch history:","[AxiosError: Network Error]"]}
+{"_e":"metro:client_log","_t":1783624190120,"level":"error","data":["Failed to compare:","[AxiosError: Network Error]"]}
+{"_e":"metro:client_log","_t":1783624190180,"level":"error","data":["Failed to fetch history:","[AxiosError: Network Error]"]}
+{"_e":"metro:client_log","_t":1783624324443,"level":"error","data":["Failed to fetch history:","[AxiosError: Network Error]"]}
+{"_e":"metro:client_log","_t":1783624354683,"level":"error","data":["Failed to compare:","[AxiosError: Network Error]"]}

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../src/theme/colors';
 import { useAuthStore } from '../src/stores/auth.store';
 import { NeonButton } from '../src/components/NeonButton';
@@ -16,7 +17,7 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Top Bar */}
       <View style={styles.topBar}>
         <TouchableOpacity style={styles.iconBtn} onPress={() => router.back()}>
@@ -68,7 +69,7 @@ export default function ProfileScreen() {
               <MaterialIcons name="badge" size={20} color={colors.textMuted} />
               <Text style={styles.listText}>Account ID</Text>
             </View>
-            <Text style={styles.listValue}>{user?.id || '---'}</Text>
+            <Text style={styles.listValue} numberOfLines={1}>{user?.id || '---'}</Text>
           </View>
 
           <View style={styles.listItem}>
@@ -76,7 +77,7 @@ export default function ProfileScreen() {
               <MaterialIcons name="security" size={20} color={colors.textMuted} />
               <Text style={styles.listText}>Security Protocol</Text>
             </View>
-            <Text style={styles.listValue}>Strict</Text>
+            <Text style={styles.listValue} numberOfLines={1}>Strict</Text>
           </View>
 
           <View style={[styles.listItem, { borderBottomWidth: 0 }]}>
@@ -84,7 +85,7 @@ export default function ProfileScreen() {
               <MaterialIcons name="data-usage" size={20} color={colors.textMuted} />
               <Text style={styles.listText}>Data Region</Text>
             </View>
-            <Text style={styles.listValue}>us-east-1</Text>
+            <Text style={styles.listValue} numberOfLines={1}>us-east-1</Text>
           </View>
         </View>
 
@@ -103,7 +104,7 @@ export default function ProfileScreen() {
           <View style={styles.traceLine} />
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -117,11 +118,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    height: 56,
+    minHeight: 56,
     backgroundColor: colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: colors.outlineVariant,
-    paddingTop: 8,
+    paddingVertical: 8,
   },
   iconBtn: {
     padding: 8,
@@ -132,6 +133,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: colors.textHeader,
+    flex: 1,
+    textAlign: 'center',
   },
   content: {
     padding: 20,
@@ -145,6 +148,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 24,
     alignItems: 'center',
+    width: '100%',
   },
   avatarLarge: {
     width: 80,
@@ -163,15 +167,19 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: colors.textHeader,
     marginBottom: 4,
+    textAlign: 'center',
   },
   userEmail: {
     fontFamily: 'JetBrains Mono',
     fontSize: 14,
     color: colors.textMuted,
     marginBottom: 16,
+    textAlign: 'center',
   },
   badgesContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
     gap: 8,
   },
   badge: {
@@ -190,10 +198,12 @@ const styles = StyleSheet.create({
   },
   statsGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 16,
   },
   statBox: {
     flex: 1,
+    minWidth: 140,
     backgroundColor: colors.surfaceContainer,
     borderWidth: 1,
     borderColor: colors.borderSubtle,
@@ -213,6 +223,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: colors.textMuted,
     letterSpacing: 0.5,
+    textAlign: 'center',
   },
   listContainer: {
     backgroundColor: colors.surfaceContainerLow,
@@ -235,21 +246,26 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: colors.borderSubtle,
+    gap: 16,
   },
   listItemLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+    flex: 1,
   },
   listText: {
     fontFamily: 'Inter',
     fontSize: 14,
     color: colors.textHeader,
+    flexShrink: 1,
   },
   listValue: {
     fontFamily: 'JetBrains Mono',
     fontSize: 14,
     color: colors.textMuted,
+    flexShrink: 1,
+    textAlign: 'right',
   },
   logoutButton: {
     backgroundColor: 'transparent',
