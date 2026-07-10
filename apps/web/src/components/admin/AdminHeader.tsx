@@ -198,10 +198,6 @@ export const AdminHeader = () => {
             onKeyDown={handleSearch}
             onFocus={() => setIsSearchFocused(true)}
           />
-          <div className="absolute right-3 flex items-center gap-1 text-[10px] font-label-caps text-outline font-medium pointer-events-none">
-            <span className="px-1.5 py-0.5 rounded bg-surface border border-outline-variant">⌘</span>
-            <span className="px-1.5 py-0.5 rounded bg-surface border border-outline-variant">K</span>
-          </div>
           
           {isSearchFocused && searchQuery.trim() && (
             <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-outline-variant rounded-lg shadow-lg overflow-hidden z-50">
