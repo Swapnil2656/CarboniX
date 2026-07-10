@@ -4,7 +4,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { StatCard } from '@/components/ui/StatCard';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { Skeleton } from '@/components/ui/Skeleton';
-import AgentChat from '@/components/admin/AgentChat';
 import { SdkConnectionBanner } from '@/components/admin/SdkConnectionBanner';
 import { getProjects } from '@/app/actions/dashboard-actions';
 import { adminApi, carbonApi } from '@/services/api/endpoints';
@@ -341,9 +340,6 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
-
-      {/* Floating Agent Chat */}
-      <AgentChat />
 
       {/* Analysis Modal */}
       {analysisResult && (

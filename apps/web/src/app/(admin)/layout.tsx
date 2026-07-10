@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { AdminHeader } from '@/components/admin/AdminHeader';
+import AgentChat from '@/components/admin/AgentChat';
 
 export default function AdminLayout({
   children,
@@ -26,6 +27,7 @@ export default function AdminLayout({
           </div>
         </main>
       </div>
+      <AgentChat />
     </div>
   );
 }
