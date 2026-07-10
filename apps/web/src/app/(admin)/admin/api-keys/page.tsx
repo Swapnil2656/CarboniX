@@ -62,6 +62,7 @@ export default function ApiKeysPage() {
         });
       }
       await adminApi.revokeApiKey(targetKey.id);
+      window.dispatchEvent(new Event('dataUpdated'));
     } catch (err) {
       console.error(err);
       // Let it fail silently on UI for now or show toast
@@ -81,6 +82,7 @@ export default function ApiKeysPage() {
       }
       // Use hard delete endpoint
       await adminApi.deleteApiKey(id); 
+      window.dispatchEvent(new Event('dataUpdated'));
     } catch (err) {
       console.error(err);
     }
@@ -107,6 +109,7 @@ export default function ApiKeysPage() {
       
       setNewlyCreatedKey({ name: newKeyName, key: res.key });
       setCreateModalOpen(false);
+      window.dispatchEvent(new Event('dataUpdated'));
       
       // Refresh list to show new key (masked)
       fetchData();

@@ -22,6 +22,7 @@ export default function SupportPage() {
       if (result.success) {
         setSubmitStatus('success');
         form.reset();
+        window.dispatchEvent(new Event('dataUpdated'));
         setTimeout(() => setSubmitStatus('idle'), 3000);
       } else {
         setSubmitStatus('error');

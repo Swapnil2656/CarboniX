@@ -97,6 +97,7 @@ export default function EmissionsPage() {
     try {
       const res = await adminApi.migrateEmission(recordId, targetRegion);
       if (res.success) {
+        window.dispatchEvent(new Event('dataUpdated'));
         // Update local state to reflect new region and lowered carbon
         setLocalRecords((prev) =>
           prev.map((r) => (r.id === recordId ? res.record : r))

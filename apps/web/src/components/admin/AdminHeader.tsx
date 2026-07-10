@@ -78,6 +78,8 @@ export const AdminHeader = () => {
       }
     };
     fetchHeaderData();
+    window.addEventListener('dataUpdated', fetchHeaderData);
+    return () => window.removeEventListener('dataUpdated', fetchHeaderData);
   }, []);
 
   const unreadCount = 0;

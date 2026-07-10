@@ -94,11 +94,13 @@ export default function UsersPage() {
     try {
       setInviteLoading(true);
       const res = await adminApi.inviteUser({ name: inviteName, email: inviteEmail, role: inviteRole, projectName: inviteProject });
-      alert(res.message);
-      setInviteModalOpen(false);
-      setInviteName('');
-      setInviteEmail('');
-      fetchData();
+      if (res.success) {
+        setInviteModalOpen(false);
+        setInviteName('');
+        setInviteEmail('');
+        window.dispatchEvent(new Event('dataUpdated'));
+        fetchData();
+      }
     } catch (err: any) {
       alert('Failed to invite user: ' + err.message);
     } finally {
@@ -110,8 +112,10 @@ export default function UsersPage() {
     if (confirm(`Are you sure you want to remove ${name}?`)) {
       try {
         const res = await adminApi.removeUser(id);
-        alert(res.message);
-        fetchData();
+        if (res.success) {
+          window.dispatchEvent(new Event('dataUpdated'));
+          fetchData();
+        }
       } catch (err: any) {
         alert('Failed to remove user: ' + err.message);
       }

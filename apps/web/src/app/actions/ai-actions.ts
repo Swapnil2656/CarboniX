@@ -125,9 +125,10 @@ async function callGeminiApi(history: ChatMessage[]) {
   );
 
   if (!response.ok) {
-    const err = await response.text();
-    console.error('Gemini API Error:', err);
-    throw new Error('Failed to generate response from Gemini.');
+    const errText = await response.text();
+    console.error('Gemini API Error details:', errText);
+    console.error('Sent body:', JSON.stringify(body, null, 2));
+    throw new Error('Failed to generate response from Gemini. See console.');
   }
 
   const data = await response.json();
@@ -259,10 +260,19 @@ export async function chatWithAgent(message: string, history: ChatMessage[], adm
       });
 
       // Call Gemini again with the tool result
-      aiData = await callGeminiApi(updatedHistory);
-      candidate = aiData?.candidates?.[0];
-      
-      if (!candidate) break;
+      try {
+        aiData = await callGeminiApi(updatedHistory);
+        candidate = aiData?.candidates?.[0];
+        
+        if (!candidate) break;
+      } catch (geminiError: any) {
+        console.error('Gemini API Error after tool execution:', geminiError);
+        updatedHistory.push({
+          role: 'model',
+          content: `I executed the action successfully, but encountered an API error generating my response: ${geminiError.message}`
+        });
+        return { success: true, updatedHistory };
+      }
     }
 
     // Final text response

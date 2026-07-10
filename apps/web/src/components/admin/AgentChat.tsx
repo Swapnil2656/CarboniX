@@ -38,6 +38,7 @@ export default function AgentChat() {
 
       if (result.success && result.updatedHistory) {
         setMessages(result.updatedHistory);
+        window.dispatchEvent(new Event('dataUpdated'));
       } else {
         setMessages([
           ...newHistory, 

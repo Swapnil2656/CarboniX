@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
+import AgentChat from "@/components/admin/AgentChat";
 
 export const metadata: Metadata = {
   title: "CarboniX | The Carbon Cost of Your Cloud",
@@ -16,7 +17,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased">
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <AgentChat />
+        </Providers>
       </body>
     </html>
   );

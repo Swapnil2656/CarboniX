@@ -153,6 +153,7 @@ export default function SettingsPage() {
         // Attempt to update session to reflect new name only (avatar is fetched dynamically now)
         await updateSession({ name });
         window.dispatchEvent(new Event('profileUpdated'));
+        window.dispatchEvent(new Event('dataUpdated'));
       } else {
         setSaveMessage({ type: 'error', text: res.error || 'Failed to save' });
       }
@@ -177,6 +178,7 @@ export default function SettingsPage() {
       
       if (res.success) {
         setSaveMessage({ type: 'success', text: 'Notification preferences saved.' });
+        window.dispatchEvent(new Event('dataUpdated'));
         setTimeout(() => setSaveMessage({ type: '', text: '' }), 3000);
       } else {
         setSaveMessage({ type: 'error', text: res.error || 'Failed to save settings' });
@@ -197,6 +199,7 @@ export default function SettingsPage() {
       const res = await updatePassword('new-password-mock'); // Using mock password value from UI
       if (res.success) {
         setSaveMessage({ type: 'success', text: 'Password updated successfully!' });
+        window.dispatchEvent(new Event('dataUpdated'));
       } else {
         setSaveMessage({ type: 'error', text: res.error || 'Failed to update password' });
       }
