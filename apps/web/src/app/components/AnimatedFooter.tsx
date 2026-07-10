@@ -9,20 +9,25 @@ export function AnimatedFooter() {
     <>
       <footer
         ref={footerRef}
-        className="relative z-0 bg-surface-container-lowest/50 dark:bg-black/20 backdrop-blur-lg text-on-surface py-3xl overflow-hidden group"
+        className="relative z-0 bg-transparent dark:bg-transparent backdrop-blur-xl border-t border-white/5 text-on-surface py-3xl overflow-hidden group"
       >
 
 
 
-        <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-gutter px-margin max-w-[1440px] mx-auto">
+        <div className="relative z-10 flex flex-col items-center text-center gap-lg px-margin max-w-[800px] mx-auto">
           {/* Brand */}
-          <div className="space-y-lg">
-            <span className="text-section-header font-display font-black text-amber-500 dark:text-primary">CarboniX</span>
-            <p className="text-on-surface-variant font-body-md pr-lg">
+          <div className="flex flex-col items-center space-y-md">
+            <div className="flex items-center gap-sm">
+              <img src="/carbonix-logo.png" alt="CarboniX Logo" className="w-10 h-10 object-contain" />
+              <span className="text-section-header font-display font-black text-amber-500 dark:text-primary">CarboniX</span>
+            </div>
+            
+            <p className="text-on-surface-variant font-body-md max-w-md">
               Standardizing the environmental impact of software engineering. High-performance
               intelligence for a sustainable cloud.
             </p>
-            <div className="flex gap-md">
+            
+            <div className="flex gap-md justify-center">
               <a
                 href="mailto:swapnilsen2656@gmail.com"
                 aria-label="Email"
@@ -52,30 +57,12 @@ export function AnimatedFooter() {
             </div>
           </div>
 
-          {/* Product links */}
-          <div>
-            <h4 className="font-label-caps text-label-caps text-on-surface mb-xl">PRODUCT</h4>
-            <ul className="space-y-md">
-              {['Core SDK', 'CI/CD Gating', 'Regional Explorer', 'Compliance Engine'].map((l) => (
-                <li key={l}>
-                  <a href="#" className="text-on-surface-variant hover:text-amber-600 dark:hover:text-primary transition-colors font-body-md">{l}</a>
-                </li>
-              ))}
-            </ul>
+          {/* Credits */}
+          <div className="mt-xl pt-xl border-t border-outline-variant w-full">
+            <p className="text-on-surface-variant font-body-sm">
+              Engineered with precision by <span className="text-primary font-semibold">Team MetaNova</span>
+            </p>
           </div>
-
-          {/* Resources links */}
-          <div>
-            <h4 className="font-label-caps text-label-caps text-on-surface mb-xl">RESOURCES</h4>
-            <ul className="space-y-md">
-              {['Documentation', 'API Reference', 'Case Studies', 'Carbon Blog'].map((l) => (
-                <li key={l}>
-                  <a href="#" className="text-on-surface-variant hover:text-amber-600 dark:hover:text-primary transition-colors font-body-md">{l}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
         </div>
 
 

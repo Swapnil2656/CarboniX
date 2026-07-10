@@ -82,18 +82,6 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
           process.env.JWT_SECRET || 'super-secret-key-for-dev',
           { expiresIn: '1d' }
         );
-      } else if (token?.id) {
-        // Verify the user still exists in the database
-        try {
-          const existingUser = await db.user.findUnique({ id: token.id as string });
-          if (!existingUser) {
-            // If the user was definitively deleted, destroy the session
-            return null as any;
-          }
-        } catch (error) {
-          // If the database is unreachable (e.g. serverless sleep), do not log out the user!
-          console.error("Database error during session validation:", error);
-        }
       }
 
       if (trigger === "update" && session) {
