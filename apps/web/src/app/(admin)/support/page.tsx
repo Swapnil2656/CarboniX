@@ -11,15 +11,17 @@ export default function SupportPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const form = e.currentTarget;
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(form);
 
     try {
       const result = await submitSupportTicket(formData);
       if (result.success) {
         setSubmitStatus('success');
+        form.reset();
         setTimeout(() => setSubmitStatus('idle'), 3000);
       } else {
         setSubmitStatus('error');

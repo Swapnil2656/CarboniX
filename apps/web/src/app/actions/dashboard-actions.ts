@@ -4,7 +4,7 @@ import { prisma } from '@/lib/carbonix-auth/prisma';
 import { redis } from '@/lib/redis';
 import { auth } from '@/auth';
 
-export async function getProjects() {
+export async function getProjects(page = 1, pageSize = 5) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -13,22 +13,28 @@ export async function getProjects() {
 
     const userId = session.user.id;
     // Cache is scoped per-user so users never see each other's projects
-    const CACHE_KEY = `dashboard:projects_list:${userId}`;
+    const CACHE_KEY = `dashboard:projects_list:${userId}:${page}:${pageSize}`;
 
     // Try to get from cache, but don't fail if Redis is down
     try {
       const cached = await redis.get(CACHE_KEY);
       if (cached) {
-        return { success: true, projects: JSON.parse(cached) };
+        return JSON.parse(cached);
       }
     } catch (cacheErr) {
       console.warn('Redis cache get failed, falling back to DB:', cacheErr);
     }
 
-    // Only fetch projects belonging to the currently logged-in user
+    // Get total count for pagination
+    const total = await prisma.project.count({ where: { userId } });
+    const totalPages = Math.ceil(total / pageSize);
+
+    // Only fetch projects belonging to the currently logged-in user for the specific page
     const projects = await prisma.project.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
     });
 
     // Convert all Date fields to ISO strings so it's safe for Client Components
@@ -40,22 +46,27 @@ export async function getProjects() {
       lastPingAt: p.lastPingAt?.toISOString() ?? null,
     }));
 
+    const resultPayload = {
+      success: true,
+      projects: serializedProjects,
+      total,
+      totalPages,
+      currentPage: page,
+    };
+
     // Cache the result per user, but don't fail if Redis is down
     try {
-      await redis.setex(CACHE_KEY, 5, JSON.stringify(serializedProjects));
+      await redis.setex(CACHE_KEY, 5, JSON.stringify(resultPayload));
     } catch (cacheErr) {
       console.warn('Redis cache set failed:', cacheErr);
     }
 
-    return {
-      success: true,
-      projects: serializedProjects,
-    };
+    return resultPayload;
   } catch (error: any) {
     console.error('Error fetching projects:', error);
     // Graceful fallback for Prisma Accelerate / Database connection issues
     if (error.message?.includes("Can't reach database server") || error.message?.includes("PrismaClientInitializationError")) {
-      return { success: true, projects: [] };
+      return { success: true, projects: [], total: 0, totalPages: 0, currentPage: 1 };
     }
     return { success: false, error: error.message };
   }

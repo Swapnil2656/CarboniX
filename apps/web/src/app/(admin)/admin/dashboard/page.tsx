@@ -51,6 +51,8 @@ export default function DashboardPage() {
   const [dismissedBanner, setDismissedBanner] = useState(false);
   const [analyzingProjectId, setAnalyzingProjectId] = useState<string | null>(null);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const router = useRouter();
 
   const handleAnalyze = async (project: Project) => {
@@ -77,7 +79,7 @@ export default function DashboardPage() {
     }
   };
 
-  const fetchProjectsData = useCallback(async (isInitial = false) => {
+  const fetchProjectsData = useCallback(async (pageToFetch = currentPage, isInitial = false) => {
     try {
       if (isInitial) {
         setLoading(true);
@@ -85,12 +87,13 @@ export default function DashboardPage() {
       }
 
       const [res, statsRes] = await Promise.all([
-        getProjects(),
+        getProjects(pageToFetch, 5),
         adminApi.getDashboard().catch(() => null)
       ]);
 
       if (res.success) {
         setProjects(res.projects || []);
+        if (res.totalPages) setTotalPages(res.totalPages);
         setError(null);
       } else {
         setError(res.error || 'Failed to fetch projects.');
@@ -108,12 +111,14 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    fetchProjectsData(true);
+    fetchProjectsData(1, true);
+  }, []); // Initial load
 
-    // Auto refresh every 5 seconds to catch SDK connection pings
-    const interval = setInterval(() => fetchProjectsData(false), 5000);
+  useEffect(() => {
+    // Auto refresh every 5 seconds to catch SDK connection pings on the current page
+    const interval = setInterval(() => fetchProjectsData(currentPage, false), 5000);
     return () => clearInterval(interval);
-  }, [fetchProjectsData]);
+  }, [fetchProjectsData, currentPage]);
 
   // ── Derived state ────────────────────────────────────────────────────────
   const activeDeployments = projects.length;
@@ -134,7 +139,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {error && <ErrorBanner message={error} onRetry={fetchProjectsData} />}
+      {error && <ErrorBanner message={error} onRetry={() => fetchProjectsData(currentPage, true)} />}
 
       {/* ── SDK Connection Banner ──────────────────────────────────────── */}
       {showBanner && (
@@ -283,6 +288,39 @@ export default function DashboardPage() {
                 ))}
               </tbody>
             </table>
+            
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between px-4 py-3 border-t border-outline-variant/30">
+                <div className="text-sm text-on-surface-variant">
+                  Page <span className="font-medium text-on-surface">{currentPage}</span> of <span className="font-medium text-on-surface">{totalPages}</span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      const newPage = Math.max(1, currentPage - 1);
+                      setCurrentPage(newPage);
+                      fetchProjectsData(newPage, true);
+                    }}
+                    disabled={currentPage === 1 || loading}
+                    className="flex items-center justify-center w-8 h-8 rounded-lg border border-outline-variant bg-surface-container hover:bg-surface-container-high disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-on-surface"
+                  >
+                    <span className="material-symbols-outlined text-sm">chevron_left</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      const newPage = Math.min(totalPages, currentPage + 1);
+                      setCurrentPage(newPage);
+                      fetchProjectsData(newPage, true);
+                    }}
+                    disabled={currentPage === totalPages || loading}
+                    className="flex items-center justify-center w-8 h-8 rounded-lg border border-outline-variant bg-surface-container hover:bg-surface-container-high disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-on-surface"
+                  >
+                    <span className="material-symbols-outlined text-sm">chevron_right</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           /* Empty state — no projects at all */
