@@ -1,4 +1,17 @@
+/// <reference types="@react-three/fiber" />
 "use client";
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      points: any;
+      bufferGeometry: any;
+      bufferAttribute: any;
+      shaderMaterial: any;
+    }
+  }
+}
+
 
 import { useTheme } from "next-themes";
 import React, { useRef, useState, useEffect } from "react";

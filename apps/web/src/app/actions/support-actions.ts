@@ -2,6 +2,7 @@
 
 import { sendEmail } from '@/lib/carbonix-auth/email';
 import { auth } from '@/auth';
+import { prisma } from '@/lib/carbonix-auth/prisma';
 
 export async function submitSupportTicket(formData: FormData) {
   try {
@@ -14,7 +15,7 @@ export async function submitSupportTicket(formData: FormData) {
     const subject = formData.get('subject') as string || 'No Subject';
     const message = formData.get('message') as string || '';
 
-    const userEmail = session.user.email;
+    const userEmail = session.user.email || 'unknown@example.com';
     const userName = session.user.name || 'User';
 
     const htmlContent = `
@@ -34,6 +35,21 @@ export async function submitSupportTicket(formData: FormData) {
       htmlContent,
       userEmail // Set reply-to as the user's email
     );
+
+    await prisma.auditLog.create({
+      data: {
+        actorId: session.user.id,
+        actorEmail: userEmail,
+        actorRole: (session.user as any).type || 'USER',
+        action: 'SUPPORT_TICKET_CREATED',
+        resource: 'support',
+        resourceId: `ticket_${Date.now()}`,
+        before: {},
+        after: { subject, category },
+        ip: 'Web Client',
+        userAgent: 'Browser',
+      }
+    });
 
     return { success: true };
   } catch (error) {

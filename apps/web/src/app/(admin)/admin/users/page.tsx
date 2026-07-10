@@ -94,11 +94,13 @@ export default function UsersPage() {
     try {
       setInviteLoading(true);
       const res = await adminApi.inviteUser({ name: inviteName, email: inviteEmail, role: inviteRole, projectName: inviteProject });
-      alert(res.message);
-      setInviteModalOpen(false);
-      setInviteName('');
-      setInviteEmail('');
-      fetchData();
+      if (res.success) {
+        setInviteModalOpen(false);
+        setInviteName('');
+        setInviteEmail('');
+        window.dispatchEvent(new Event('dataUpdated'));
+        fetchData();
+      }
     } catch (err: any) {
       alert('Failed to invite user: ' + err.message);
     } finally {
@@ -110,8 +112,10 @@ export default function UsersPage() {
     if (confirm(`Are you sure you want to remove ${name}?`)) {
       try {
         const res = await adminApi.removeUser(id);
-        alert(res.message);
-        fetchData();
+        if (res.success) {
+          window.dispatchEvent(new Event('dataUpdated'));
+          fetchData();
+        }
       } catch (err: any) {
         alert('Failed to remove user: ' + err.message);
       }
@@ -152,12 +156,13 @@ export default function UsersPage() {
     }));
 
     // High Emitter Detected
-    if (data.users.length > 0 && data.fleetAvg > 0) {
+    const dataAny = data as any;
+    if (data.users.length > 0 && dataAny.fleetAvg > 0) {
       const topEmitter = [...data.users].sort((a, b) => b.co2Emissions - a.co2Emissions)[0];
-      if (topEmitter.co2Emissions > data.fleetAvg * 1.1) {
+      if (topEmitter.co2Emissions > dataAny.fleetAvg * 1.1) {
         highEmitter = {
           name: topEmitter.name,
-          percentAbove: Math.round(((topEmitter.co2Emissions - data.fleetAvg) / data.fleetAvg) * 100)
+          percentAbove: Math.round(((topEmitter.co2Emissions - dataAny.fleetAvg) / dataAny.fleetAvg) * 100)
         };
       }
     }
@@ -232,7 +237,7 @@ export default function UsersPage() {
         
         <div className="flex items-center gap-4 bg-surface-container px-4 py-2 rounded-lg border border-outline-variant">
           <div className="text-sm text-on-surface-variant">Fleet Avg:</div>
-          <div className="text-lg font-semibold text-primary">{data?.fleetAvg || 0} kg/h</div>
+          <div className="text-lg font-semibold text-primary">{(data as any)?.fleetAvg || 0} kg/h</div>
           <div className="flex items-center text-xs font-medium text-[#50FA7B]">
             <span className="material-symbols-outlined text-[14px]">trending_down</span>
             2.4%
@@ -290,7 +295,7 @@ export default function UsersPage() {
                       </Badge>
                     </td>
                     <td className="px-6 py-4">
-                      <Badge variant={user.status === 'ACTIVE' ? 'success' : user.status === 'PENDING' ? 'info' : 'error'}>
+                      <Badge variant={user.status === 'ACTIVE' ? 'success' : (user.status as any) === 'PENDING' ? 'info' : 'error'}>
                         {user.status}
                       </Badge>
                     </td>

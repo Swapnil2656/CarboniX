@@ -116,7 +116,7 @@ async function callGeminiApi(history: ChatMessage[]) {
   };
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -125,9 +125,20 @@ async function callGeminiApi(history: ChatMessage[]) {
   );
 
   if (!response.ok) {
-    const err = await response.text();
-    console.error('Gemini API Error:', err);
-    throw new Error('Failed to generate response from Gemini.');
+    const errText = await response.text();
+    console.error('Gemini API Error details:', errText);
+    
+    let detailedMsg = 'Failed to generate response from Gemini. See console.';
+    try {
+      const errJson = JSON.parse(errText);
+      if (errJson.error && errJson.error.message) {
+        detailedMsg = errJson.error.message;
+      }
+    } catch(e) {
+      // Ignore JSON parse errors
+    }
+    
+    throw new Error(`Gemini API Error: ${detailedMsg}`);
   }
 
   const data = await response.json();
@@ -141,10 +152,43 @@ async function executeTool(name: string, args: any, adminUserId: string) {
   switch (name) {
     case 'switchProjectRegion': {
       const { projectId, region } = args;
+      
+      const oldProject = await prisma.project.findUnique({ where: { id: projectId } });
+      if (!oldProject) throw new Error('Project not found');
+
       const project = await prisma.project.update({
         where: { id: projectId },
         data: { region },
       });
+
+      // Audit Log
+      await prisma.auditLog.create({
+        data: {
+          actorId: adminUserId,
+          actorEmail: 'system@carbonix.ai',
+          actorRole: 'SYSTEM',
+          action: 'PROJECT_REGION_SWITCH',
+          resource: 'project',
+          resourceId: projectId,
+          before: { region: oldProject.region },
+          after: { region },
+          ip: 'AI Agent',
+          userAgent: 'CarboniX Copilot',
+        }
+      });
+
+      // Notification
+      await prisma.notification.create({
+        data: {
+          title: 'Project Region Changed',
+          body: `Project '${project.name}' was switched from ${oldProject.region || 'unknown'} to ${region} to optimize carbon emissions.`,
+          type: 'BROADCAST',
+          status: 'SENT',
+          targetAudience: 'ALL',
+          createdBy: adminUserId,
+        }
+      });
+
       // Invalidate the cache to immediately show the new region
       try {
         await redis.del('dashboard:projects_list');
@@ -226,10 +270,19 @@ export async function chatWithAgent(message: string, history: ChatMessage[], adm
       });
 
       // Call Gemini again with the tool result
-      aiData = await callGeminiApi(updatedHistory);
-      candidate = aiData?.candidates?.[0];
-      
-      if (!candidate) break;
+      try {
+        aiData = await callGeminiApi(updatedHistory);
+        candidate = aiData?.candidates?.[0];
+        
+        if (!candidate) break;
+      } catch (geminiError: any) {
+        console.error('Gemini API Error after tool execution:', geminiError);
+        updatedHistory.push({
+          role: 'model',
+          content: `I executed the action successfully, but encountered an API error generating my response: ${geminiError.message}`
+        });
+        return { success: true, updatedHistory };
+      }
     }
 
     // Final text response
