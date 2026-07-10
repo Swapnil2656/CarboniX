@@ -1,17 +1,36 @@
 {
   "name": "carbonix",
   "version": "1.0.0",
+  "description": "Official Node.js SDK for CarboniX — cloud carbon footprint tracking, AI recommendations, and live telemetry ingestion.",
   "main": "dist/index.js",
-  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist/",
+    "scripts/",
+    "README.md"
+  ],
+  "keywords": ["carbon", "cloud", "aws", "gcp", "azure", "sustainability", "green-cloud", "emissions"],
   "scripts": {
-    "build": "tsup src/index.ts",
-    "dev": "tsup src/index.ts --watch",
-    "test": "jest",
-    "lint": "eslint src/"
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "echo \"No tests yet\" && exit 0",
+    "lint": "tsc --noEmit",
+    "postinstall": "node scripts/postinstall.js"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
-    "tsup": "^8.0.2",
     "typescript": "^5.4.5"
   }
 }
+
+

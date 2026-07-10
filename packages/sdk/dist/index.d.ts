@@ -1,4 +1,3 @@
-"use strict";
 /**
  * CarboniX SDK — Main Entry Point
  *
@@ -46,20 +45,11 @@
  *
  * ─────────────────────────────────────────────────────────────────
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Carbonix = exports.CarbonixTimeoutError = exports.CarbonixNetworkError = exports.CarbonixApiError = void 0;
-const client_js_1 = require("./http/client.js");
-const calculate_js_1 = require("./methods/calculate.js");
-const ingest_js_1 = require("./methods/ingest.js");
-const compare_js_1 = require("./methods/compare.js");
-const recommend_js_1 = require("./methods/recommend.js");
-var index_js_1 = require("./errors/index.js");
-Object.defineProperty(exports, "CarbonixApiError", { enumerable: true, get: function () { return index_js_1.CarbonixApiError; } });
-Object.defineProperty(exports, "CarbonixNetworkError", { enumerable: true, get: function () { return index_js_1.CarbonixNetworkError; } });
-Object.defineProperty(exports, "CarbonixTimeoutError", { enumerable: true, get: function () { return index_js_1.CarbonixTimeoutError; } });
-// ─── Main SDK Class ───────────────────────────────────────────────────────────
-class Carbonix {
-    client;
+export type { CarbonixConfig, CloudProvider, CarbonRating, CalculateInput, CalculateResult, TelemetryInput, TelemetryResult, CompareResult, RecommendResult, } from './types/index.js';
+export { CarbonixApiError, CarbonixNetworkError, CarbonixTimeoutError, } from './errors/index.js';
+import type { CarbonixConfig, CalculateInput, CalculateResult, TelemetryInput, TelemetryResult, CompareResult, RecommendResult } from './types/index.js';
+export declare class Carbonix {
+    private readonly client;
     /**
      * Create a new CarboniX SDK instance.
      *
@@ -67,13 +57,7 @@ class Carbonix {
      * @param config.baseUrl  - Override the API URL (default: http://localhost:4000)
      * @param config.timeoutMs - Request timeout in ms (default: 10_000)
      */
-    constructor(config) {
-        if (!config.apiKey) {
-            throw new Error('[CarboniX SDK] apiKey is required. Get yours at app.carbonix.dev');
-        }
-        this.client = new client_js_1.HttpClient(config);
-    }
-    // ─── Carbon Calculation ───────────────────────────────────────────────────
+    constructor(config: CarbonixConfig);
     /**
      * Calculate the monthly carbon footprint of a cloud workload.
      *
@@ -82,10 +66,7 @@ class Carbonix {
      * a real-world equivalent (e.g. "equivalent to 12 car trips"),
      * and a greener-region recommendation if one exists.
      */
-    calculate(input) {
-        return (0, calculate_js_1.calculate)(this.client, input);
-    }
-    // ─── Region Comparison ────────────────────────────────────────────────────
+    calculate(input: CalculateInput): Promise<CalculateResult>;
     /**
      * Compare the carbon footprint of your workload across multiple
      * cloud providers and regions simultaneously.
@@ -93,20 +74,14 @@ class Carbonix {
      * Returns your current setup as `base` and a ranked list of
      * greener `options` across AWS eu-west-1, GCP eu-north-1, and Azure northeurope.
      */
-    compare(input) {
-        return (0, compare_js_1.compare)(this.client, input);
-    }
-    // ─── Green Region Recommendation ─────────────────────────────────────────
+    compare(input: CalculateInput): Promise<CompareResult>;
     /**
      * Get the single best alternative region for your workload.
      *
      * Only returns a recommendation if switching would save >10% of emissions —
      * otherwise returns a message confirming you are already optimally placed.
      */
-    recommend(input) {
-        return (0, recommend_js_1.recommend)(this.client, input);
-    }
-    // ─── Live Telemetry Ingestion ─────────────────────────────────────────────
+    recommend(input: CalculateInput): Promise<RecommendResult>;
     /**
      * Push live server telemetry into CarboniX for AI analysis.
      *
@@ -115,11 +90,7 @@ class Carbonix {
      * instances (CPU < 5%) and oversized instances (CPU < 20%) and
      * surface actionable recommendations on your Dashboard.
      */
-    ingest(input) {
-        return (0, ingest_js_1.ingest)(this.client, input);
-    }
+    ingest(input: TelemetryInput): Promise<TelemetryResult>;
 }
-exports.Carbonix = Carbonix;
-// Default export for ergonomic `import Carbonix from 'carbonix'` usage
-exports.default = Carbonix;
-//# sourceMappingURL=index.js.map
+export default Carbonix;
+//# sourceMappingURL=index.d.ts.map
