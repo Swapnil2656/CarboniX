@@ -33,7 +33,7 @@ function InviteContent() {
       if (res.ok) {
         setSuccess(true);
         setTimeout(() => {
-          router.push('/admin/dashboard');
+          router.push('/login');
         }, 2000);
       } else {
         setError(data.error || 'Failed to accept invitation.');

@@ -105,11 +105,41 @@ export const getUsers = async (req: Request, res: Response) => {
     const page = parseInt(req.query.page as string) || 1;
     const pageSize = parseInt(req.query.pageSize as string) || 20;
 
-    const users = await prisma.teamMember.findMany({
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-      orderBy: { createdAt: 'desc' },
+    const rawTeamMembers = await prisma.teamMember.findMany();
+    const rawUsers = await prisma.user.findMany({ include: { profile: true } });
+
+    const mergedMap = new Map();
+    rawTeamMembers.forEach(tm => mergedMap.set(tm.email, tm));
+    
+    rawUsers.forEach(u => {
+      if (!mergedMap.has(u.email)) {
+        mergedMap.set(u.email, {
+          id: u.id,
+          name: u.profile?.fullName || u.userName || u.email.split('@')[0],
+          email: u.email,
+          role: u.type,
+          projectName: 'CarboniX Core',
+          projectId: 'core',
+          location: 'Global',
+          co2Emissions: 0,
+          status: 'ACTIVE',
+          aiSuggestion: null,
+          createdAt: u.createdAt,
+          updatedAt: u.updatedAt
+        });
+      } else {
+        const existing = mergedMap.get(u.email);
+        if (existing.status === 'PENDING') {
+          existing.status = 'ACTIVE';
+        }
+      }
     });
+
+    let allUsers = Array.from(mergedMap.values());
+    allUsers.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    
+    const users = allUsers.slice((page - 1) * pageSize, page * pageSize);
+    const total = allUsers.length;
     
     const projects = await prisma.project.findMany({ select: { name: true, sdkConnected: true } });
     const connectedProjectNames = new Set(projects.filter(p => p.sdkConnected).map(p => p.name));
@@ -133,9 +163,6 @@ export const getUsers = async (req: Request, res: Response) => {
     });
 
     const fleetAvg = connectedCount > 0 ? Math.round(totalEmissions / connectedCount) : 0;
-    
-    const total = await prisma.teamMember.count();
-
     res.json({
       users: enrichedUsers,
       total,
@@ -426,6 +453,11 @@ export const inviteUser = async (req: Request, res: Response) => {
   try {
     const { name, email, role, projectName } = req.body;
     
+    const existingMember = await prisma.teamMember.findUnique({ where: { email } });
+    if (existingMember) {
+      return res.status(400).json({ error: "A team member with this email already exists." });
+    }
+
     const inviteLink = `http://localhost:3000/invite?email=${encodeURIComponent(email)}`;
     
     await sendEmail(

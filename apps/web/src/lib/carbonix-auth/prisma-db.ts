@@ -13,6 +13,7 @@ export const db = {
             email: string;
             password: string;
             type?: userType;
+            isOnboarded?: boolean;
         }) => prisma.user.create({ data }),
 
         findUnique: async (where: { id?: string; email?: string; userName?: string }) => {

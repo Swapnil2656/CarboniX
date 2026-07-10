@@ -3,6 +3,7 @@ import { signIn } from "@/auth";
 import bcrypt from "bcryptjs";
 import { AuthError } from "next-auth";
 import { db } from "./prisma-db";
+import { prisma } from "./prisma";
 import { createUserSchema, signInSchema } from "./zod";
 import crypto from "crypto";
 import { sendEmail } from "./email";
@@ -53,9 +54,18 @@ export async function signUp(data: {
   const existingUser = await db.user.findUnique({ email });
   if (existingUser) throw new Error("An account with that email already exists");
 
+  const existingTeamMembers = await prisma.$queryRaw<any[]>`SELECT id FROM "TeamMember" WHERE email = ${email} LIMIT 1`;
+  const isInvited = existingTeamMembers && existingTeamMembers.length > 0;
+
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const user = await db.user.create({ userName, email, password: hashedPassword, type: accountType });
+  const user = await db.user.create({ 
+    userName, 
+    email, 
+    password: hashedPassword, 
+    type: accountType,
+    isOnboarded: isInvited
+  });
   await db.profile.create({ userId: user.id, fullName: userName });
 
   const token = crypto.randomBytes(32).toString("hex");
