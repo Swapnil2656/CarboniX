@@ -42,6 +42,8 @@ export const AdminHeader = () => {
 
   const [notifications, setNotifications] = useState<any[]>([]);
   const [historyLogs, setHistoryLogs] = useState<any[]>([]);
+  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
+  const [hasUnreadHistory, setHasUnreadHistory] = useState(false);
 
   useEffect(() => {
     const fetchHeaderData = async () => {
@@ -52,6 +54,13 @@ export const AdminHeader = () => {
         ]);
         
         if (notifRes?.success) {
+          if (notifRes.notifications.length > 0) {
+            const latestId = notifRes.notifications[0].id;
+            const storedId = localStorage.getItem('lastSeenNotificationId');
+            if (latestId !== storedId) {
+              setHasUnreadNotifications(true);
+            }
+          }
           const mappedNotifs = notifRes.notifications.map((n: any) => ({
             id: n.id,
             title: n.title,
@@ -65,6 +74,13 @@ export const AdminHeader = () => {
         }
         
         if (logsRes?.success) {
+          if (logsRes.logs.length > 0) {
+            const latestId = logsRes.logs[0].id;
+            const storedId = localStorage.getItem('lastSeenHistoryId');
+            if (latestId !== storedId) {
+              setHasUnreadHistory(true);
+            }
+          }
           const mappedLogs = logsRes.logs.map((l: any) => ({
             id: l.id,
             action: `${l.action} ${l.entityType ? `on ${l.entityType}` : ''}`,
@@ -82,7 +98,25 @@ export const AdminHeader = () => {
     return () => window.removeEventListener('dataUpdated', fetchHeaderData);
   }, []);
 
-  const unreadCount = 0;
+  const toggleNotifications = () => {
+    const newState = !isNotificationsOpen;
+    setIsNotificationsOpen(newState);
+    setIsHistoryOpen(false); // close other dropdown
+    if (newState && notifications.length > 0) {
+      setHasUnreadNotifications(false);
+      localStorage.setItem('lastSeenNotificationId', notifications[0].id);
+    }
+  };
+
+  const toggleHistory = () => {
+    const newState = !isHistoryOpen;
+    setIsHistoryOpen(newState);
+    setIsNotificationsOpen(false); // close other dropdown
+    if (newState && historyLogs.length > 0) {
+      setHasUnreadHistory(false);
+      localStorage.setItem('lastSeenHistoryId', historyLogs[0].id);
+    }
+  };
 
   const userName = session?.user?.name || session?.user?.email?.split('@')[0] || 'User';
   const userInitial = userName.charAt(0).toUpperCase();
@@ -198,12 +232,12 @@ export const AdminHeader = () => {
       <div className="flex items-center gap-4">
         <div className="relative" ref={notificationsRef}>
           <button 
-            onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+            onClick={toggleNotifications}
             className="w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors relative"
           >
             <span className="material-symbols-outlined text-[20px]">notifications</span>
-            {unreadCount > 0 && (
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary ring-2 ring-surface"></span>
+            {hasUnreadNotifications && (
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#50FA7B] ring-2 ring-surface"></span>
             )}
           </button>
 
@@ -211,9 +245,12 @@ export const AdminHeader = () => {
             <div className="absolute right-0 mt-2 w-80 rounded-lg bg-surface border border-outline-variant shadow-lg py-1 z-50 overflow-hidden flex flex-col max-h-[400px]">
               <div className="px-4 py-3 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
                 <h3 className="font-semibold text-on-surface text-sm">Notifications</h3>
-                {unreadCount > 0 && (
+                {hasUnreadNotifications && (
                   <button 
-                    onClick={() => setNotifications(notifications.map(n => ({ ...n, isRead: true })))}
+                    onClick={() => {
+                      setHasUnreadNotifications(false);
+                      if (notifications.length > 0) localStorage.setItem('lastSeenNotificationId', notifications[0].id);
+                    }}
                     className="text-xs text-primary hover:text-primary-hover font-medium transition-colors"
                   >
                     Mark all as read
@@ -268,10 +305,13 @@ export const AdminHeader = () => {
 
         <div className="relative" ref={historyRef}>
           <button 
-            onClick={() => setIsHistoryOpen(!isHistoryOpen)}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
+            onClick={toggleHistory}
+            className="w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors relative"
           >
             <span className="material-symbols-outlined text-[20px]">history</span>
+            {hasUnreadHistory && (
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#50FA7B] ring-2 ring-surface"></span>
+            )}
           </button>
 
           {isHistoryOpen && (

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { AuthRequest } from '../../middleware/auth.middleware';
 import { prisma } from '../../lib/prisma';
 import crypto from 'crypto';
 import { redis } from '../../lib/redis';
@@ -632,9 +633,10 @@ export const migrateEmission = async (req: Request, res: Response) => {
   }
 };
 
-export const getNotifications = async (req: Request, res: Response) => {
+export const getNotifications = async (req: AuthRequest, res: Response) => {
   try {
     const notifications = await prisma.notification.findMany({
+      where: { createdBy: req.user?.id },
       orderBy: { createdAt: 'desc' },
       take: 10
     });
@@ -644,9 +646,10 @@ export const getNotifications = async (req: Request, res: Response) => {
   }
 };
 
-export const getAuditLogs = async (req: Request, res: Response) => {
+export const getAuditLogs = async (req: AuthRequest, res: Response) => {
   try {
     const logs = await prisma.auditLog.findMany({
+      where: { actorId: req.user?.id },
       orderBy: { createdAt: 'desc' },
       take: 10
     });
