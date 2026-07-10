@@ -53,7 +53,8 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
         const isValid = await bcrypt.compare(password, user.password);
         if (!isValid) throw new Error("Invalid password");
 
-        if (!user.isVerified) throw new Error("Please verify your email before logging in");
+        // Temporarily bypassed for development
+        // if (!user.isVerified) throw new Error("Please verify your email before logging in");
 
         return { 
           id: user.id, 
