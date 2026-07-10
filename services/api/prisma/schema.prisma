@@ -449,6 +449,7 @@ enum AgentType {
   ANALYST
   CICD_GATE
   REPORTER
+  ORCHESTRATOR
 }
 
 enum AgentRunStatus {
