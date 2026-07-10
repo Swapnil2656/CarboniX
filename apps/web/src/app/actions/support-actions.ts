@@ -15,7 +15,7 @@ export async function submitSupportTicket(formData: FormData) {
     const subject = formData.get('subject') as string || 'No Subject';
     const message = formData.get('message') as string || '';
 
-    const userEmail = session.user.email;
+    const userEmail = session.user.email || 'unknown@example.com';
     const userName = session.user.name || 'User';
 
     const htmlContent = `

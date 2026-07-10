@@ -27,7 +27,7 @@ export async function getProfile() {
   }
 }
 
-export async function updateProfile(data: { name?: string; avatarUrl?: string }) {
+export async function updateProfile(data: { name?: string; avatarUrl?: string; emailAlerts?: boolean; pushAlerts?: boolean; thresholdAlerts?: boolean; }) {
   const session = await auth();
   if (!session?.user?.id) {
     return { success: false, error: "Unauthorized" };

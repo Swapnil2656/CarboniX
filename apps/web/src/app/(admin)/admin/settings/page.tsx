@@ -79,9 +79,10 @@ export default function SettingsPage() {
         if (res.success && res.profile) {
           setName(res.profile.fullName || session.user.name || '');
           setAvatarUrl(res.profile.avatarUrl || '');
-          if (res.profile.emailAlerts !== undefined) setEmailAlerts(res.profile.emailAlerts);
-          if (res.profile.pushAlerts !== undefined) setPushAlerts(res.profile.pushAlerts);
-          if (res.profile.thresholdAlerts !== undefined) setThresholdAlerts(res.profile.thresholdAlerts);
+          const p = res.profile as any;
+          if (p.emailAlerts !== undefined) setEmailAlerts(p.emailAlerts);
+          if (p.pushAlerts !== undefined) setPushAlerts(p.pushAlerts);
+          if (p.thresholdAlerts !== undefined) setThresholdAlerts(p.thresholdAlerts);
         } else {
           setName(session.user.name || '');
         }

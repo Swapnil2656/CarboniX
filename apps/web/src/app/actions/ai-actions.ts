@@ -116,7 +116,7 @@ async function callGeminiApi(history: ChatMessage[]) {
   };
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -127,8 +127,18 @@ async function callGeminiApi(history: ChatMessage[]) {
   if (!response.ok) {
     const errText = await response.text();
     console.error('Gemini API Error details:', errText);
-    console.error('Sent body:', JSON.stringify(body, null, 2));
-    throw new Error('Failed to generate response from Gemini. See console.');
+    
+    let detailedMsg = 'Failed to generate response from Gemini. See console.';
+    try {
+      const errJson = JSON.parse(errText);
+      if (errJson.error && errJson.error.message) {
+        detailedMsg = errJson.error.message;
+      }
+    } catch(e) {
+      // Ignore JSON parse errors
+    }
+    
+    throw new Error(`Gemini API Error: ${detailedMsg}`);
   }
 
   const data = await response.json();
