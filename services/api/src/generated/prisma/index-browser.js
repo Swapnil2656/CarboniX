@@ -137,6 +137,14 @@ exports.Prisma.MobileUserScalarFieldEnum = {
   theme: 'theme',
   notificationsEnabled: 'notificationsEnabled',
   defaultProvider: 'defaultProvider',
+  weeklyDigestEnabled: 'weeklyDigestEnabled',
+  budgetAlertEnabled: 'budgetAlertEnabled',
+  greenTipsEnabled: 'greenTipsEnabled',
+  carbonBudgetKg: 'carbonBudgetKg',
+  preferredUnit: 'preferredUnit',
+  defaultRegion: 'defaultRegion',
+  avatarUrl: 'avatarUrl',
+  bio: 'bio',
   status: 'status',
   banReason: 'banReason',
   bannedAt: 'bannedAt',
@@ -284,6 +292,17 @@ exports.Prisma.NotificationScalarFieldEnum = {
   createdBy: 'createdBy',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.UserNotificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  title: 'title',
+  body: 'body',
+  type: 'type',
+  data: 'data',
+  isRead: 'isRead',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.PushTokenScalarFieldEnum = {
@@ -595,6 +614,7 @@ exports.Prisma.ModelName = {
   RemoteConfig: 'RemoteConfig',
   AuditLog: 'AuditLog',
   Notification: 'Notification',
+  UserNotification: 'UserNotification',
   PushToken: 'PushToken',
   Region: 'Region',
   InstanceType: 'InstanceType',

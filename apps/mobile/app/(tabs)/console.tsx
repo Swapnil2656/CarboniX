@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
 import { colors } from '../../src/theme/colors';
-import { adminApi, agentsApi } from '../../src/services/api/endpoints';
+import { carbonApi } from '../../src/services/api/endpoints';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CHART_WIDTH = SCREEN_WIDTH - 72; // padding + panel padding
@@ -20,41 +21,45 @@ function timeAgo(dateString: string) {
   return `${Math.floor(hours / 24)}d ago`;
 }
 
-const getAgentMeta = (type: string, status: string) => {
-  if (status !== 'SUCCESS') return { icon: 'sync', color: colors.textMuted, label: 'Running...' };
-  switch (type) {
-    case 'COLLECTOR': return { icon: 'data-usage', color: colors.primary, label: 'Collector' };
-    case 'ANALYST': return { icon: 'auto-awesome', color: '#f5c518', label: 'Analyst' };
-    case 'CICD_GATE': return { icon: 'security', color: '#ff5555', label: 'Gate' };
-    case 'REPORTER': return { icon: 'article', color: '#50FA7B', label: 'Reporter' };
-    default: return { icon: 'smart-toy', color: colors.textMuted, label: 'Agent' };
+const getRatingColor = (rating: string) => {
+  switch (rating) {
+    case 'LOW': return '#50FA7B';
+    case 'MEDIUM': return '#f5c518';
+    case 'HIGH': return '#ff5555';
+    default: return colors.textMuted;
   }
 };
 
-// Mini bar chart component for hourly API calls
-function ActivityChart({ data }: { data: { hour: string; calls: number }[] }) {
+const getProviderIcon = (provider: string) => {
+  switch (provider?.toLowerCase()) {
+    case 'aws': return 'aws';
+    case 'gcp': return 'google';
+    case 'azure': return 'microsoft';
+    default: return 'cloud';
+  }
+};
+
+function WeeklySparkline({ data }: { data: { date: string; co2Kg: number }[] }) {
   if (!data || data.length === 0) return null;
-  const maxCalls = Math.max(...data.map(d => d.calls), 1);
-  // Show last 12 hours for compact view
-  const chartData = data.slice(-12);
-  const barWidth = (CHART_WIDTH - (chartData.length - 1) * 3) / chartData.length;
+  const maxCo2 = Math.max(...data.map(d => d.co2Kg), 1);
+  const barWidth = (CHART_WIDTH - (data.length - 1) * 4) / data.length;
 
   return (
-    <View style={chartStyles.container}>
-      <View style={chartStyles.barsRow}>
-        {chartData.map((d, i) => {
-          const height = Math.max((d.calls / maxCalls) * 60, 3);
-          const isActive = d.calls > 0;
+    <View style={sparklineStyles.container}>
+      <View style={sparklineStyles.barsRow}>
+        {data.map((d, i) => {
+          const height = Math.max((d.co2Kg / maxCo2) * 60, 3);
+          const isActive = d.co2Kg > 0;
           return (
-            <View key={i} style={chartStyles.barWrapper}>
+            <View key={i} style={sparklineStyles.barWrapper}>
               <View
                 style={[
-                  chartStyles.bar,
+                  sparklineStyles.bar,
                   {
                     height,
                     width: barWidth,
                     backgroundColor: isActive ? colors.primary : '#2A2A2A',
-                    opacity: isActive ? 0.4 + (d.calls / maxCalls) * 0.6 : 0.3,
+                    opacity: isActive ? 0.6 + (d.co2Kg / maxCo2) * 0.4 : 0.3,
                   },
                 ]}
               />
@@ -62,52 +67,11 @@ function ActivityChart({ data }: { data: { hour: string; calls: number }[] }) {
           );
         })}
       </View>
-      <View style={chartStyles.labelsRow}>
-        {chartData.map((d, i) => (
-          i % 3 === 0 ? (
-            <Text key={i} style={[chartStyles.label, { width: barWidth * 3 + 6 }]}>{d.hour}</Text>
-          ) : null
-        ))}
-      </View>
-    </View>
-  );
-}
-
-// Provider distribution bar
-function ProviderBar({ data }: { data: { provider: string; percent: number }[] }) {
-  if (!data || data.length === 0) return null;
-  const providerColors: Record<string, string> = {
-    AWS: '#FF9900',
-    GCP: '#4285F4',
-    Azure: '#00BCF2',
-  };
-
-  return (
-    <View>
-      <View style={provBarStyles.barContainer}>
+      <View style={sparklineStyles.labelsRow}>
         {data.map((d, i) => (
-          <View
-            key={i}
-            style={[
-              provBarStyles.segment,
-              {
-                flex: d.percent,
-                backgroundColor: providerColors[d.provider] || colors.textMuted,
-                borderTopLeftRadius: i === 0 ? 6 : 0,
-                borderBottomLeftRadius: i === 0 ? 6 : 0,
-                borderTopRightRadius: i === data.length - 1 ? 6 : 0,
-                borderBottomRightRadius: i === data.length - 1 ? 6 : 0,
-              },
-            ]}
-          />
-        ))}
-      </View>
-      <View style={provBarStyles.legendRow}>
-        {data.map((d, i) => (
-          <View key={i} style={provBarStyles.legendItem}>
-            <View style={[provBarStyles.legendDot, { backgroundColor: providerColors[d.provider] || colors.textMuted }]} />
-            <Text style={provBarStyles.legendText}>{d.provider} {d.percent}%</Text>
-          </View>
+          <Text key={i} style={[sparklineStyles.label, { width: barWidth, textAlign: 'center' }]}>
+            {new Date(d.date).toLocaleDateString('en-US', { weekday: 'short' })}
+          </Text>
         ))}
       </View>
     </View>
@@ -117,18 +81,30 @@ function ProviderBar({ data }: { data: { provider: string; percent: number }[] }
 export default function DashboardScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  
+  const [useLbs, setUseLbs] = useState(false);
 
-  const { data: dashboard, isLoading: dashboardLoading, refetch, isRefetching } = useQuery({
-    queryKey: ['adminDashboard'],
-    queryFn: adminApi.getDashboardStats,
+  useFocusEffect(
+    React.useCallback(() => {
+      SecureStore.getItemAsync('useLbs').then((val) => {
+        setUseLbs(val === 'true');
+      });
+    }, [])
+  );
+
+  const { data: response, isLoading, refetch, isRefetching } = useQuery({
+    queryKey: ['carbonDashboard'],
+    queryFn: carbonApi.getDashboard,
   });
 
-  const { data: agentData, isLoading: agentsLoading } = useQuery({
-    queryKey: ['agentRuns'],
-    queryFn: () => agentsApi.getAgentRuns({ limit: 5 }),
-  });
-
-  const runs = agentData?.data || [];
+  const dashboard = response?.data;
+  
+  const formatCo2 = (kg: number) => {
+    if (!kg) return '0.0';
+    if (useLbs) return (kg * 2.20462).toFixed(1);
+    return kg.toFixed(1);
+  };
+  const unit = useLbs ? 'lbs CO₂' : 'kg CO₂';
 
   return (
     <View style={styles.container}>
@@ -148,159 +124,181 @@ export default function DashboardScreen() {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Dashboard</Text>
-          <Text style={styles.subtitle}>Platform analytics & management</Text>
+          <Text style={styles.subtitle}>Personal carbon footprint overview</Text>
         </View>
 
-        {dashboardLoading ? (
+        {isLoading ? (
           <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 40 }} />
         ) : (
           <>
-            {/* KPI Cards Row */}
-            <View style={styles.kpiRow}>
-              <View style={[styles.kpiCard, { borderLeftColor: colors.primary }]}>
-                <MaterialIcons name="api" size={18} color={colors.primary} />
-                <Text style={styles.kpiValue}>{dashboard?.totalApiCalls?.toLocaleString() || '0'}</Text>
-                <Text style={styles.kpiLabel}>API Calls</Text>
+            {/* Personal Carbon Summary Card */}
+            <View style={styles.heroCard}>
+              <View style={styles.heroHeader}>
+                <Text style={styles.heroTitle}>Your Total Carbon Footprint</Text>
+                <View style={styles.ratingBadge}>
+                  <Text style={styles.ratingText}>{dashboard?.carbonRating?.label || 'A'}</Text>
+                </View>
               </View>
-              <View style={[styles.kpiCard, { borderLeftColor: '#50FA7B' }]}>
-                <MaterialIcons name="people" size={18} color="#50FA7B" />
-                <Text style={styles.kpiValue}>{dashboard?.activeSessions?.toLocaleString() || '0'}</Text>
-                <Text style={styles.kpiLabel}>Sessions</Text>
+              <Text style={styles.heroValue}>{formatCo2(dashboard?.totalCo2ThisMonth)} <Text style={styles.heroUnit}>{unit}</Text></Text>
+              
+              <View style={styles.heroFooter}>
+                <Text style={styles.heroDate}>This Month</Text>
+                <View style={styles.trendBadge}>
+                  <MaterialIcons 
+                    name={dashboard?.changeDirection === 'up' ? 'arrow-upward' : dashboard?.changeDirection === 'down' ? 'arrow-downward' : 'remove'} 
+                    size={14} 
+                    color={dashboard?.changeDirection === 'up' ? '#ff5555' : dashboard?.changeDirection === 'down' ? '#50FA7B' : colors.textMuted} 
+                  />
+                  <Text style={[styles.trendText, { color: dashboard?.changeDirection === 'up' ? '#ff5555' : dashboard?.changeDirection === 'down' ? '#50FA7B' : colors.textMuted }]}>
+                    {dashboard?.changePercent}% vs last month
+                  </Text>
+                </View>
               </View>
-            </View>
-            <View style={styles.kpiRow}>
-              <View style={[styles.kpiCard, { borderLeftColor: '#ff5555' }]}>
-                <MaterialIcons name="co2" size={18} color="#ff5555" />
-                <Text style={styles.kpiValue}>{dashboard?.avgCo2Kg || '0'}</Text>
-                <Text style={styles.kpiLabel}>Avg CO₂ (kg)</Text>
-              </View>
-              <View style={[styles.kpiCard, { borderLeftColor: '#f5c518' }]}>
-                <MaterialIcons name="install-mobile" size={18} color="#f5c518" />
-                <Text style={styles.kpiValue}>{dashboard?.sdkInstalls?.toLocaleString() || '0'}</Text>
-                <Text style={styles.kpiLabel}>SDK Installs</Text>
-              </View>
-            </View>
-
-            {/* Activity Chart */}
-            <View style={styles.panel}>
-              <View style={styles.panelHeaderRow}>
-                <MaterialIcons name="show-chart" size={20} color={colors.primary} />
-                <Text style={styles.panelTitle}>API ACTIVITY (24H)</Text>
-              </View>
-              <ActivityChart data={dashboard?.apiCallsOverTime || []} />
             </View>
 
-            {/* Provider Distribution */}
+            {/* Quick Actions */}
+            <View style={styles.quickActionsRow}>
+              <TouchableOpacity style={styles.quickActionBtn} onPress={() => router.push('/config')}>
+                <View style={[styles.quickActionIcon, { backgroundColor: 'rgba(255, 229, 160, 0.1)' }]}>
+                  <MaterialIcons name="calculate" size={24} color={colors.primary} />
+                </View>
+                <Text style={styles.quickActionText}>Calculate</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.quickActionBtn} onPress={() => router.push('/compare')}>
+                <View style={[styles.quickActionIcon, { backgroundColor: 'rgba(66, 133, 244, 0.1)' }]}>
+                  <MaterialIcons name="compare-arrows" size={24} color="#4285F4" />
+                </View>
+                <Text style={styles.quickActionText}>Compare</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.quickActionBtn} onPress={() => router.push('/history')}>
+                <View style={[styles.quickActionIcon, { backgroundColor: 'rgba(80, 250, 123, 0.1)' }]}>
+                  <MaterialIcons name="history" size={24} color="#50FA7B" />
+                </View>
+                <Text style={styles.quickActionText}>History</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Carbon Budget Tracker */}
             <View style={styles.panel}>
               <View style={styles.panelHeaderRow}>
-                <MaterialIcons name="cloud" size={20} color={colors.primary} />
-                <Text style={styles.panelTitle}>PROVIDER DISTRIBUTION</Text>
+                <MaterialIcons name="account-balance-wallet" size={20} color={colors.primary} />
+                <Text style={styles.panelTitle}>MONTHLY BUDGET</Text>
               </View>
-              <ProviderBar data={dashboard?.providerDistribution || []} />
+              <View style={styles.budgetHeader}>
+                <Text style={styles.budgetText}>{formatCo2(dashboard?.budget?.usedKg)} / {formatCo2(dashboard?.budget?.limitKg)} {unit}</Text>
+                <Text style={styles.budgetPercent}>{dashboard?.budget?.percentUsed}%</Text>
+              </View>
+              <View style={styles.budgetBarContainer}>
+                <View 
+                  style={[
+                    styles.budgetBarFill, 
+                    { 
+                      width: `${Math.min(dashboard?.budget?.percentUsed || 0, 100)}%`,
+                      backgroundColor: dashboard?.budget?.isOverBudget ? '#ff5555' : (dashboard?.budget?.percentUsed > 80 ? '#f5c518' : '#50FA7B')
+                    }
+                  ]} 
+                />
+              </View>
+              {dashboard?.budget?.isOverBudget ? (
+                <Text style={[styles.budgetStatus, { color: '#ff5555' }]}>Over budget by {formatCo2((dashboard?.budget?.usedKg || 0) - (dashboard?.budget?.limitKg || 0))} {unit}</Text>
+              ) : (
+                <Text style={styles.budgetStatus}>{formatCo2((dashboard?.budget?.limitKg || 0) - (dashboard?.budget?.usedKg || 0))} {unit} remaining</Text>
+              )}
             </View>
+
+            {/* Active Configurations */}
+            <View style={styles.panel}>
+              <View style={styles.panelHeaderRow}>
+                <MaterialIcons name="dns" size={20} color={colors.primary} />
+                <Text style={styles.panelTitle}>YOUR MONITORED INFRASTRUCTURE</Text>
+              </View>
+              
+              {!dashboard?.activeConfigurations || dashboard.activeConfigurations.length === 0 ? (
+                <Text style={styles.emptyText}>No active configurations.</Text>
+              ) : (
+                dashboard.activeConfigurations.map((config: any, index: number) => (
+                  <TouchableOpacity key={index} style={styles.configCard} onPress={() => router.push('/history')}>
+                    <View style={styles.configHeader}>
+                      <FontAwesome5 name={getProviderIcon(config.provider)} size={18} color={colors.textHeader} />
+                      <Text style={styles.configProvider}>{config.provider.toUpperCase()}</Text>
+                      <View style={[styles.configBadge, { backgroundColor: getRatingColor(config.rating) + '20' }]}>
+                        <Text style={[styles.configBadgeText, { color: getRatingColor(config.rating) }]}>{config.rating}</Text>
+                      </View>
+                    </View>
+                    <View style={styles.configBody}>
+                      <View>
+                        <Text style={styles.configLabel}>Region</Text>
+                        <Text style={styles.configValue}>{config.region}</Text>
+                      </View>
+                      <View>
+                        <Text style={styles.configLabel}>Instance</Text>
+                        <Text style={styles.configValue}>{config.instanceType}</Text>
+                      </View>
+                      <View style={{ alignItems: 'flex-end' }}>
+                        <Text style={styles.configLabel}>Emissions</Text>
+                        <Text style={[styles.configValue, { color: colors.primary }]}>{formatCo2(config.lastCo2Kg)}</Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                ))
+              )}
+            </View>
+
+            {/* Weekly Sparkline */}
+            <View style={styles.panel}>
+              <View style={styles.panelHeaderRow}>
+                <MaterialIcons name="insights" size={20} color={colors.primary} />
+                <Text style={styles.panelTitle}>WEEKLY TREND</Text>
+              </View>
+              <WeeklySparkline data={dashboard?.weeklySparkline || []} />
+            </View>
+
+            {/* Real-Time Alerts */}
+            <View style={styles.panel}>
+              <View style={styles.panelHeaderRow}>
+                <MaterialIcons name="notifications-active" size={20} color={colors.primary} />
+                <Text style={styles.panelTitle}>RECENT ALERTS</Text>
+              </View>
+              
+              {!dashboard?.recentAlerts || dashboard.recentAlerts.length === 0 ? (
+                <Text style={styles.emptyText}>No recent alerts.</Text>
+              ) : (
+                dashboard.recentAlerts.map((alert: any) => (
+                  <View key={alert.id} style={styles.alertCard}>
+                    <View style={styles.alertIcon}>
+                      <MaterialIcons 
+                        name={alert.type === 'HIGH_EMISSION' ? 'warning' : alert.type === 'BUDGET_ALERT' ? 'account-balance-wallet' : 'lightbulb'} 
+                        size={20} 
+                        color={alert.type === 'HIGH_EMISSION' ? '#ff5555' : alert.type === 'BUDGET_ALERT' ? '#f5c518' : '#50FA7B'} 
+                      />
+                    </View>
+                    <View style={styles.alertContent}>
+                      <View style={styles.alertHeader}>
+                        <Text style={styles.alertTitle}>{alert.title}</Text>
+                        <Text style={styles.alertTime}>{timeAgo(alert.createdAt)}</Text>
+                      </View>
+                      <Text style={styles.alertBody}>{alert.body}</Text>
+                    </View>
+                  </View>
+                ))
+              )}
+            </View>
+
           </>
         )}
-
-        {/* Quick Management Links */}
-        <View style={styles.panel}>
-          <View style={styles.panelHeaderRow}>
-            <MaterialIcons name="admin-panel-settings" size={20} color={colors.primary} />
-            <Text style={styles.panelTitle}>MANAGEMENT</Text>
-          </View>
-          <TouchableOpacity style={styles.mgmtLink} onPress={() => router.push('/settings/users')}>
-            <View style={[styles.mgmtIconWrap, { backgroundColor: 'rgba(255, 229, 160, 0.1)' }]}>
-              <MaterialIcons name="people" size={20} color={colors.primary} />
-            </View>
-            <View style={styles.mgmtTextWrap}>
-              <Text style={styles.mgmtLinkTitle}>Manage Users</Text>
-              <Text style={styles.mgmtLinkDesc}>View and remove mobile users</Text>
-            </View>
-            <MaterialIcons name="chevron-right" size={20} color={colors.textMuted} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.mgmtLink} onPress={() => router.push('/settings/keys')}>
-            <View style={[styles.mgmtIconWrap, { backgroundColor: 'rgba(80, 250, 123, 0.1)' }]}>
-              <MaterialIcons name="vpn-key" size={20} color="#50FA7B" />
-            </View>
-            <View style={styles.mgmtTextWrap}>
-              <Text style={styles.mgmtLinkTitle}>API Keys</Text>
-              <Text style={styles.mgmtLinkDesc}>Create and revoke SDK keys</Text>
-            </View>
-            <MaterialIcons name="chevron-right" size={20} color={colors.textMuted} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.mgmtLink} onPress={() => router.push('/settings/flags')}>
-            <View style={[styles.mgmtIconWrap, { backgroundColor: 'rgba(66, 133, 244, 0.1)' }]}>
-              <MaterialIcons name="flag" size={20} color="#4285F4" />
-            </View>
-            <View style={styles.mgmtTextWrap}>
-              <Text style={styles.mgmtLinkTitle}>Feature Flags</Text>
-              <Text style={styles.mgmtLinkDesc}>Toggle remote config</Text>
-            </View>
-            <MaterialIcons name="chevron-right" size={20} color={colors.textMuted} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.mgmtLink} onPress={() => router.push('/settings/brsr')}>
-            <View style={[styles.mgmtIconWrap, { backgroundColor: 'rgba(245, 197, 24, 0.1)' }]}>
-              <MaterialIcons name="assessment" size={20} color="#f5c518" />
-            </View>
-            <View style={styles.mgmtTextWrap}>
-              <Text style={styles.mgmtLinkTitle}>BRSR Reports</Text>
-              <Text style={styles.mgmtLinkDesc}>Monthly compliance reports</Text>
-            </View>
-            <MaterialIcons name="chevron-right" size={20} color={colors.textMuted} />
-          </TouchableOpacity>
-        </View>
-
-        {/* Agent Activity Feed */}
-        <View style={styles.panel}>
-          <View style={styles.panelHeaderRow}>
-            <MaterialIcons name="smart-toy" size={20} color={colors.primary} />
-            <Text style={styles.panelTitle}>RECENT AGENT ACTIVITY</Text>
-          </View>
-          {agentsLoading ? (
-            <ActivityIndicator size="small" color={colors.primary} />
-          ) : runs.length === 0 ? (
-            <Text style={styles.emptyText}>No agent activity found.</Text>
-          ) : (
-            runs.map((run: any) => {
-              const meta = getAgentMeta(run.agentType, run.status);
-              return (
-                <View key={run.id} style={styles.feedCard}>
-                  <View style={styles.cardHeader}>
-                    <View style={styles.agentInfo}>
-                      <View style={[styles.agentDot, { backgroundColor: meta.color }]} />
-                      <Text style={[styles.agentName, { color: meta.color }]}>{meta.label}</Text>
-                    </View>
-                    <Text style={styles.timeText}>{timeAgo(run.createdAt)}</Text>
-                  </View>
-                  <Text style={styles.summaryText} numberOfLines={2}>{run.summary || 'Executing tasks...'}</Text>
-                </View>
-              );
-            })
-          )}
-        </View>
-
       </ScrollView>
     </View>
   );
 }
 
-// ─── Activity Chart Styles ───
-const chartStyles = StyleSheet.create({
+// ─── Sparkline Styles ───
+const sparklineStyles = StyleSheet.create({
   container: { marginTop: 4 },
-  barsRow: { flexDirection: 'row', alignItems: 'flex-end', height: 64, gap: 3 },
+  barsRow: { flexDirection: 'row', alignItems: 'flex-end', height: 64, gap: 4, justifyContent: 'space-between' },
   barWrapper: { justifyContent: 'flex-end' },
-  bar: { borderRadius: 3 },
-  labelsRow: { flexDirection: 'row', marginTop: 6 },
-  label: { fontFamily: 'JetBrains Mono', fontSize: 9, color: colors.textMuted },
-});
-
-// ─── Provider Bar Styles ───
-const provBarStyles = StyleSheet.create({
-  barContainer: { flexDirection: 'row', height: 14, borderRadius: 6, overflow: 'hidden', gap: 2 },
-  segment: { minWidth: 8 },
-  legendRow: { flexDirection: 'row', gap: 16, marginTop: 12, flexWrap: 'wrap' },
-  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  legendDot: { width: 8, height: 8, borderRadius: 4 },
-  legendText: { fontFamily: 'JetBrains Mono', fontSize: 12, color: colors.textMuted },
+  bar: { borderRadius: 4 },
+  labelsRow: { flexDirection: 'row', marginTop: 8, justifyContent: 'space-between' },
+  label: { fontFamily: 'JetBrains Mono', fontSize: 10, color: colors.textMuted },
 });
 
 // ─── Main Styles ───
@@ -320,43 +318,59 @@ const styles = StyleSheet.create({
   title: { fontFamily: 'Inter-Bold', fontSize: 36, color: colors.textHeader, letterSpacing: -1 },
   subtitle: { fontFamily: 'Inter', fontSize: 16, color: colors.textMuted },
 
-  // KPI Cards
-  kpiRow: { flexDirection: 'row', gap: 12 },
-  kpiCard: {
-    flex: 1, backgroundColor: '#1E1E1E', borderWidth: 1, borderColor: '#2A2A2A',
-    borderRadius: 12, padding: 16, gap: 6,
-    borderLeftWidth: 4,
+  // Hero Card
+  heroCard: {
+    backgroundColor: '#1E1E1E', borderWidth: 1, borderColor: '#2A2A2A',
+    borderRadius: 16, padding: 20, gap: 12,
   },
-  kpiValue: { fontFamily: 'Inter-Bold', fontSize: 26, color: colors.textHeader },
-  kpiLabel: { fontFamily: 'JetBrains Mono', fontSize: 11, color: colors.textMuted, textTransform: 'uppercase' },
+  heroHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  heroTitle: { fontFamily: 'JetBrainsMono-Bold', fontSize: 12, color: colors.textMuted, textTransform: 'uppercase' },
+  ratingBadge: { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(255, 229, 160, 0.1)', justifyContent: 'center', alignItems: 'center' },
+  ratingText: { fontFamily: 'Inter-Bold', fontSize: 16, color: colors.primary },
+  heroValue: { fontFamily: 'Inter-Bold', fontSize: 42, color: colors.textHeader, letterSpacing: -1 },
+  heroUnit: { fontFamily: 'Inter-SemiBold', fontSize: 16, color: colors.textMuted },
+  heroFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 },
+  heroDate: { fontFamily: 'Inter', fontSize: 14, color: colors.textMuted },
+  trendBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#252525', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, gap: 4 },
+  trendText: { fontFamily: 'Inter-SemiBold', fontSize: 12 },
+
+  // Quick Actions
+  quickActionsRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
+  quickActionBtn: { flex: 1, backgroundColor: '#1E1E1E', borderWidth: 1, borderColor: '#2A2A2A', borderRadius: 12, paddingVertical: 16, alignItems: 'center', gap: 8 },
+  quickActionIcon: { width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center' },
+  quickActionText: { fontFamily: 'Inter-SemiBold', fontSize: 13, color: colors.textHeader },
 
   // Panels
-  panel: {
-    backgroundColor: '#1E1E1E', borderWidth: 1, borderColor: '#2A2A2A',
-    padding: 16, gap: 12, borderRadius: 12,
-  },
+  panel: { backgroundColor: '#1E1E1E', borderWidth: 1, borderColor: '#2A2A2A', padding: 16, gap: 16, borderRadius: 12 },
   panelHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   panelTitle: { fontFamily: 'JetBrainsMono-Bold', fontSize: 13, color: colors.textHeader, letterSpacing: 1 },
 
-  // Management Links
-  mgmtLink: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    backgroundColor: '#252525', borderRadius: 10, padding: 14,
-  },
-  mgmtIconWrap: {
-    width: 40, height: 40, borderRadius: 10, alignItems: 'center', justifyContent: 'center',
-  },
-  mgmtTextWrap: { flex: 1 },
-  mgmtLinkTitle: { fontFamily: 'Inter-SemiBold', fontSize: 15, color: colors.textHeader },
-  mgmtLinkDesc: { fontFamily: 'JetBrains Mono', fontSize: 11, color: colors.textMuted, marginTop: 2 },
+  // Budget
+  budgetHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  budgetText: { fontFamily: 'Inter-SemiBold', fontSize: 16, color: colors.textHeader },
+  budgetPercent: { fontFamily: 'JetBrains Mono', fontSize: 14, color: colors.textMuted },
+  budgetBarContainer: { height: 8, backgroundColor: '#2A2A2A', borderRadius: 4, overflow: 'hidden' },
+  budgetBarFill: { height: '100%', borderRadius: 4 },
+  budgetStatus: { fontFamily: 'Inter', fontSize: 13, color: colors.textMuted },
 
-  // Agent Feed
-  feedCard: { backgroundColor: '#252525', borderRadius: 10, padding: 14, gap: 6 },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  agentInfo: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  agentDot: { width: 8, height: 8, borderRadius: 4 },
-  agentName: { fontFamily: 'JetBrainsMono-Bold', fontSize: 11, textTransform: 'uppercase' },
-  timeText: { fontFamily: 'JetBrains Mono', fontSize: 11, color: colors.textMuted },
-  summaryText: { fontFamily: 'Inter', fontSize: 14, color: colors.textHeader, lineHeight: 20 },
+  // Active Configs
+  configCard: { backgroundColor: '#252525', borderRadius: 10, padding: 16, gap: 12 },
+  configHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  configProvider: { fontFamily: 'Inter-Bold', fontSize: 15, color: colors.textHeader, flex: 1 },
+  configBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4 },
+  configBadgeText: { fontFamily: 'JetBrainsMono-Bold', fontSize: 10 },
+  configBody: { flexDirection: 'row', justifyContent: 'space-between' },
+  configLabel: { fontFamily: 'JetBrains Mono', fontSize: 11, color: colors.textMuted, marginBottom: 4 },
+  configValue: { fontFamily: 'Inter-SemiBold', fontSize: 14, color: colors.textHeader },
+
+  // Alerts
+  alertCard: { flexDirection: 'row', gap: 12, backgroundColor: '#252525', borderRadius: 10, padding: 12 },
+  alertIcon: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#1E1E1E', justifyContent: 'center', alignItems: 'center' },
+  alertContent: { flex: 1, gap: 4 },
+  alertHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  alertTitle: { fontFamily: 'Inter-SemiBold', fontSize: 14, color: colors.textHeader },
+  alertTime: { fontFamily: 'JetBrains Mono', fontSize: 10, color: colors.textMuted },
+  alertBody: { fontFamily: 'Inter', fontSize: 13, color: colors.textMuted, lineHeight: 18 },
+
   emptyText: { fontFamily: 'Inter', color: colors.textMuted, textAlign: 'center', paddingVertical: 20 },
 });

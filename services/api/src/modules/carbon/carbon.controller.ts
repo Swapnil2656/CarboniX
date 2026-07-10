@@ -73,6 +73,63 @@ export const calculate = async (req: AuthRequest, res: Response) => {
       redis.del(`history:${userId}`).catch(console.error);
     });
 
+    // --- AUTO NOTIFICATIONS ---
+    const user = await prisma.mobileUser.findUnique({ where: { id: userId } });
+
+    // 1. High emission alert
+    if (user?.notificationsEnabled && result.co2KgMonth > (user.carbonAlertThreshold || 50)) {
+      await prisma.userNotification.create({
+        data: {
+          userId,
+          title: 'High Emission Detected',
+          body: `Your ${input.provider.toUpperCase()} ${input.region} calculation produced ${result.co2KgMonth.toFixed(1)} kg CO₂ — exceeds your ${user.carbonAlertThreshold}kg threshold.`,
+          type: 'HIGH_EMISSION',
+          data: { calculationId: calculation.id, co2Kg: result.co2KgMonth, region: input.region }
+        }
+      });
+    }
+
+    // 2. Budget alert
+    if (user?.budgetAlertEnabled) {
+      const monthStart = new Date();
+      monthStart.setDate(1);
+      monthStart.setHours(0, 0, 0, 0);
+      
+      const monthlyTotal = await prisma.calculation.aggregate({
+        where: { userId, createdAt: { gte: monthStart } },
+        _sum: { co2KgMonth: true }
+      });
+      
+      const totalKg = monthlyTotal._sum.co2KgMonth || 0;
+      const budget = user.carbonBudgetKg || 100;
+      
+      if (totalKg >= budget * 0.8) {
+        await prisma.userNotification.create({
+          data: {
+            userId,
+            title: totalKg >= budget ? 'Carbon Budget Exceeded' : 'Carbon Budget Warning',
+            body: `Monthly usage: ${totalKg.toFixed(1)} / ${budget} kg CO₂ (${Math.round((totalKg / budget) * 100)}%)`,
+            type: 'BUDGET_ALERT',
+            data: { usedKg: totalKg, budgetKg: budget }
+          }
+        });
+      }
+    }
+
+    // 3. Green tip
+    if (user?.greenTipsEnabled && recommendation.reductionPercent && recommendation.reductionPercent > 50) {
+      await prisma.userNotification.create({
+        data: {
+          userId,
+          title: 'Greener Region Available',
+          body: `Switching to ${recommendation.recommendedRegion} could reduce carbon by ${recommendation.reductionPercent}%`,
+          type: 'GREEN_TIP',
+          data: { currentRegion: input.region, recommendedRegion: recommendation.recommendedRegion }
+        }
+      });
+    }
+    // --- END AUTO NOTIFICATIONS ---
+
     res.json({ 
 
       success: true, 

@@ -14,8 +14,24 @@ export const carbonApi = {
     const response = await apiClient.post('/carbon/recommend', payload);
     return response.data;
   },
-  getHistory: async () => {
-    const response = await apiClient.get('/carbon/history');
+  getHistory: async (params?: { from?: string; to?: string; provider?: string }) => {
+    const response = await apiClient.get('/carbon/history', { params });
+    return response.data;
+  },
+  deleteHistory: async (id: string) => {
+    const response = await apiClient.delete(`/carbon/history/${id}`);
+    return response.data;
+  },
+  getDashboard: async () => {
+    const response = await apiClient.get('/carbon/dashboard');
+    return response.data;
+  },
+  getNotifications: async () => {
+    const response = await apiClient.get('/carbon/notifications');
+    return response.data;
+  },
+  markNotificationRead: async (id: string) => {
+    const response = await apiClient.patch(`/carbon/notifications/${id}/read`);
     return response.data;
   }
 };
@@ -77,6 +93,22 @@ export const authApi = {
   signup: async (credentials: Record<string, unknown>) => {
     const response = await apiClient.post('/auth/signup', credentials);
     return response.data;
+  },
+  getProfile: async () => {
+    const response = await apiClient.get('/auth/me');
+    return response.data;
+  },
+  updateProfile: async (data: Record<string, unknown>) => {
+    const response = await apiClient.patch('/auth/me', data);
+    return response.data;
+  },
+  registerPushToken: async (token: string, platform: string) => {
+    const response = await apiClient.post('/auth/push-token', { token, platform });
+    return response.data;
+  },
+  logout: async () => {
+    const response = await apiClient.post('/auth/logout');
+    return response.data;
   }
 };
 
@@ -88,6 +120,10 @@ export const referenceApi = {
   },
   getInstances: async () => {
     const response = await apiClient.get('/reference/instances');
+    return response.data;
+  },
+  getRegionsRanked: async (provider: string) => {
+    const response = await apiClient.get('/reference/regions/ranked', { params: { provider } });
     return response.data;
   }
 };
