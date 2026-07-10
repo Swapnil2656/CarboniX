@@ -138,7 +138,11 @@ export default function AgentChat() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div 
+        className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar" 
+        data-lenis-prevent="true" 
+        style={{ overscrollBehavior: 'contain' }}
+      >
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center space-y-3 opacity-60">
             <Bot size={48} className="text-gray-500" />
