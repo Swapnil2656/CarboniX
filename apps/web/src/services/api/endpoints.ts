@@ -69,8 +69,8 @@ export const adminApi = {
     });
   },
 
-  getAuditLogs: async (): Promise<any> => {
-    return fetchClient('/admin/audit-logs', {
+  getAuditLogs: async (page = 1, pageSize = 20): Promise<any> => {
+    return fetchClient(`/admin/audit-logs?page=${page}&pageSize=${pageSize}`, {
       method: 'GET',
     });
   },
@@ -106,8 +106,8 @@ export const adminApi = {
   },
 
   // TODO: implement GET /api/v1/admin/api-keys on the backend
-  getApiKeys: async (): Promise<ApiKeysResponse> => {
-    return fetchClient('/admin/api-keys', {
+  getApiKeys: async (page = 1, pageSize = 20): Promise<ApiKeysResponse> => {
+    return fetchClient(`/admin/api-keys?page=${page}&pageSize=${pageSize}`, {
       method: 'GET',
     });
   },
