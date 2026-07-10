@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { colors } from '../../src/theme/colors';
 import { adminApi } from '../../src/services/api/endpoints';
 
@@ -11,12 +11,29 @@ export default function ApiKeysScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
+  const [newKeyName, setNewKeyName] = React.useState('');
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['adminApiKeys'],
     queryFn: () => adminApi.getApiKeys(),
   });
 
   const keys = data?.data || [];
+  const queryClient = useQueryClient();
+
+  const createMutation = useMutation({
+    mutationFn: (name: string) => adminApi.createApiKey(name),
+    onSuccess: () => {
+      setNewKeyName('');
+      queryClient.invalidateQueries({ queryKey: ['adminApiKeys'] });
+    },
+  });
+
+  const revokeMutation = useMutation({
+    mutationFn: (id: string) => adminApi.revokeApiKey(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminApiKeys'] });
+    },
+  });
 
   return (
     <View style={styles.container}>
@@ -37,10 +54,31 @@ export default function ApiKeysScreen() {
           </TouchableOpacity>
         </View>
       ) : (
-        <FlatList
-          data={keys}
-          keyExtractor={(item: any) => item.id}
-          contentContainerStyle={styles.listContent}
+        <View style={{ flex: 1 }}>
+          <View style={styles.createRow}>
+            <TextInput
+              style={styles.input}
+              placeholder="New API Key Name..."
+              placeholderTextColor={colors.textMuted}
+              value={newKeyName}
+              onChangeText={setNewKeyName}
+            />
+            <TouchableOpacity 
+              style={[styles.createBtn, !newKeyName && { opacity: 0.5 }]} 
+              disabled={!newKeyName || createMutation.isPending}
+              onPress={() => createMutation.mutate(newKeyName)}
+            >
+              {createMutation.isPending ? (
+                <ActivityIndicator size="small" color="#000" />
+              ) : (
+                <Text style={styles.createBtnText}>Create</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            data={keys}
+            keyExtractor={(item: any) => item.id}
+            contentContainerStyle={styles.listContent}
           renderItem={({ item }) => (
             <View style={styles.keyCard}>
               <View style={styles.keyHeader}>
@@ -56,15 +94,25 @@ export default function ApiKeysScreen() {
               
               <View style={styles.keyDetailRow}>
                 <Text style={styles.detailLabel}>Last Used:</Text>
-                <Text style={styles.detailValue}>{new Date(item.lastUsed).toLocaleDateString()}</Text>
+                <Text style={styles.detailValue}>{item.lastUsed ? new Date(item.lastUsed).toLocaleDateString() : 'Never'}</Text>
               </View>
               <View style={styles.keyDetailRow}>
                 <Text style={styles.detailLabel}>Created By:</Text>
                 <Text style={styles.detailValue}>{item.createdBy}</Text>
               </View>
+              {item.status === 'ACTIVE' && (
+                <TouchableOpacity 
+                  style={styles.revokeBtn}
+                  disabled={revokeMutation.isPending}
+                  onPress={() => revokeMutation.mutate(item.id)}
+                >
+                  <Text style={styles.revokeBtnText}>Revoke Key</Text>
+                </TouchableOpacity>
+              )}
             </View>
           )}
         />
+        </View>
       )}
     </View>
   );
@@ -105,4 +153,10 @@ const styles = StyleSheet.create({
   keyDetailRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 },
   detailLabel: { fontFamily: 'Inter', fontSize: 13, color: colors.textMuted },
   detailValue: { fontFamily: 'JetBrains Mono', fontSize: 13, color: '#e5e2e1' },
+  createRow: { flexDirection: 'row', padding: 20, paddingBottom: 0, gap: 12 },
+  input: { flex: 1, backgroundColor: '#1E1E1E', borderWidth: 1, borderColor: '#2A2A2A', borderRadius: 8, paddingHorizontal: 16, color: colors.textHeader, fontFamily: 'Inter' },
+  createBtn: { backgroundColor: colors.primary, paddingHorizontal: 16, justifyContent: 'center', alignItems: 'center', borderRadius: 8 },
+  createBtnText: { fontFamily: 'Inter-Bold', color: '#000' },
+  revokeBtn: { marginTop: 16, backgroundColor: 'rgba(255, 85, 85, 0.1)', borderWidth: 1, borderColor: 'rgba(255, 85, 85, 0.3)', padding: 12, borderRadius: 8, alignItems: 'center' },
+  revokeBtnText: { color: '#ff5555', fontFamily: 'Inter-Bold', fontSize: 13 },
 });

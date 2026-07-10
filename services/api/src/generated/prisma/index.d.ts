@@ -257,7 +257,8 @@ export const AgentType: {
   COLLECTOR: 'COLLECTOR',
   ANALYST: 'ANALYST',
   CICD_GATE: 'CICD_GATE',
-  REPORTER: 'REPORTER'
+  REPORTER: 'REPORTER',
+  ORCHESTRATOR: 'ORCHESTRATOR'
 };
 
 export type AgentType = (typeof AgentType)[keyof typeof AgentType]

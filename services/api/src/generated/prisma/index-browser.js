@@ -568,7 +568,8 @@ exports.AgentType = exports.$Enums.AgentType = {
   COLLECTOR: 'COLLECTOR',
   ANALYST: 'ANALYST',
   CICD_GATE: 'CICD_GATE',
-  REPORTER: 'REPORTER'
+  REPORTER: 'REPORTER',
+  ORCHESTRATOR: 'ORCHESTRATOR'
 };
 
 exports.AgentRunStatus = exports.$Enums.AgentRunStatus = {

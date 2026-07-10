@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { colors } from '../../src/theme/colors';
 import { adminApi } from '../../src/services/api/endpoints';
 
@@ -14,6 +14,15 @@ export default function FeatureFlagsScreen() {
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['adminFeatureFlags'],
     queryFn: () => adminApi.getFeatureFlags(),
+  });
+
+  const queryClient = useQueryClient();
+
+  const toggleMutation = useMutation({
+    mutationFn: ({ id, enabled }: { id: string; enabled: boolean }) => adminApi.toggleFeatureFlag(id, enabled),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminFeatureFlags'] });
+    },
   });
 
   const flags = data?.data || [];
@@ -49,7 +58,8 @@ export default function FeatureFlagsScreen() {
               </View>
               <Switch
                 value={item.enabled}
-                onValueChange={() => {}} // Read-only for now
+                onValueChange={(val) => toggleMutation.mutate({ id: item.id, enabled: val })}
+                disabled={toggleMutation.isPending}
                 trackColor={{ false: '#2A2A2A', true: 'rgba(255, 229, 160, 0.4)' }}
                 thumbColor={item.enabled ? colors.primary : colors.textMuted}
               />
