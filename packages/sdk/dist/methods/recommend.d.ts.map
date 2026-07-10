@@ -1,0 +1,1 @@
+{"version":3,"file":"recommend.d.ts","sourceRoot":"","sources":["../../src/methods/recommend.ts"],"names":[],"mappings":"AAAA;;;;;;;;;;;;;;;;;;;;;;;;GAwBG;AAEH,OAAO,EAAE,UAAU,EAAE,MAAM,mBAAmB,CAAC;AAC/C,OAAO,EAAE,cAAc,EAAE,eAAe,EAAE,MAAM,mBAAmB,CAAC;AAEpE,wBAAsB,SAAS,CAC7B,MAAM,EAAE,UAAU,EAClB,KAAK,EAAE,cAAc,GACpB,OAAO,CAAC,eAAe,CAAC,CAE1B"}
