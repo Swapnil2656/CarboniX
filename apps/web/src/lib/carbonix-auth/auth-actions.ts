@@ -65,7 +65,8 @@ export async function signUp(data: {
     userId: user.id,
   });
 
-  const verifyUrl = `${process.env.NEXTAUTH_URL}${authConfig.routes.verify}?token=${token}`;
+  const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+  const verifyUrl = `${baseUrl}${authConfig.routes.verify}?token=${token}`;
 
   try {
     await sendEmail(

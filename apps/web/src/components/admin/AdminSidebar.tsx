@@ -4,7 +4,12 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-export const AdminSidebar = () => {
+interface AdminSidebarProps {
+  isCollapsed: boolean;
+  onToggle: () => void;
+}
+
+export const AdminSidebar = ({ isCollapsed, onToggle }: AdminSidebarProps) => {
   const pathname = usePathname();
 
   const navItems = [
@@ -12,7 +17,7 @@ export const AdminSidebar = () => {
     { label: 'Emissions', path: '/admin/emissions', icon: 'co2' },
     { label: 'Team Emissions', path: '/admin/users', icon: 'group' },
     { label: 'API Keys', path: '/admin/api-keys', icon: 'key' },
-
+    { label: 'Audit Logs', path: '/admin/history', icon: 'history' },
     { label: 'Settings', path: '/admin/settings', icon: 'settings' },
   ];
 
@@ -22,10 +27,18 @@ export const AdminSidebar = () => {
   ];
 
   return (
-    <aside className="w-64 h-screen fixed left-0 top-0 bg-surface border-r border-outline-variant flex flex-col pt-6 pb-6">
-      <div className="px-6 mb-8 flex items-center gap-3">
-        <img src="/carbonix-logo.png" alt="CarboniX" className="w-8 h-8 object-contain" />
-        <span className="font-display font-semibold text-xl tracking-tight text-amber-500 dark:text-primary">CarboniX</span>
+    <aside 
+      className={`h-screen fixed z-50 left-0 top-0 bg-surface border-r border-outline-variant flex flex-col pt-6 pb-6 transition-all duration-300 ${
+        isCollapsed ? 'w-20' : 'w-64'
+      }`}
+    >
+      <div className={`px-6 mb-8 flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3'}`}>
+        <img src="/carbonix-logo.png" alt="CarboniX" className="w-8 h-8 object-contain shrink-0" />
+        {!isCollapsed && (
+          <span className="font-display font-semibold text-xl tracking-tight text-amber-500 dark:text-primary whitespace-nowrap overflow-hidden">
+            CarboniX
+          </span>
+        )}
       </div>
 
       <nav className="flex-1 px-4 flex flex-col gap-1">
@@ -35,14 +48,17 @@ export const AdminSidebar = () => {
             <Link 
               key={item.path} 
               href={item.path}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-medium text-sm ${
+              title={isCollapsed ? item.label : undefined}
+              className={`flex items-center gap-3 py-2.5 rounded-lg transition-colors font-medium text-sm ${
+                isCollapsed ? 'justify-center px-0' : 'px-3'
+              } ${
                 isActive 
                   ? 'bg-[rgba(245,197,24,0.1)] text-primary border-l-2 border-primary' 
                   : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
               }`}
             >
-              <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
-              {item.label}
+              <span className="material-symbols-outlined text-[20px] shrink-0">{item.icon}</span>
+              {!isCollapsed && <span className="whitespace-nowrap overflow-hidden">{item.label}</span>}
             </Link>
           );
         })}
@@ -53,13 +69,26 @@ export const AdminSidebar = () => {
           <Link 
             key={item.path} 
             href={item.path}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-medium text-sm"
+            title={isCollapsed ? item.label : undefined}
+            className={`flex items-center gap-3 py-2.5 rounded-lg transition-colors text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-medium text-sm ${
+              isCollapsed ? 'justify-center px-0' : 'px-3'
+            }`}
           >
-            <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
-            {item.label}
+            <span className="material-symbols-outlined text-[20px] shrink-0">{item.icon}</span>
+            {!isCollapsed && <span className="whitespace-nowrap overflow-hidden">{item.label}</span>}
           </Link>
         ))}
       </div>
+
+      <button
+        onClick={onToggle}
+        title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+        className="absolute -right-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-surface border border-outline rounded-full flex items-center justify-center text-on-surface hover:text-primary hover:border-primary transition-all shadow-md hover:shadow-lg z-10 group"
+      >
+        <span className="material-symbols-outlined text-[20px] transition-transform group-hover:scale-110">
+          {isCollapsed ? 'chevron_right' : 'chevron_left'}
+        </span>
+      </button>
     </aside>
   );
 };

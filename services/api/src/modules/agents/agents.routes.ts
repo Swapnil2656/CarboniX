@@ -13,6 +13,7 @@ import {
   triggerAnalyst,
   runGate,
   triggerReporter,
+  triggerOrchestrator,
   getEmissions,
   getLatestBRSR,
 } from './agents.controller';
@@ -27,6 +28,7 @@ router.get('/runs/:id', authenticate, getAgentRun);
 router.post('/trigger/collector', authenticate, triggerCollector);
 router.post('/trigger/analyst', authenticate, triggerAnalyst);
 router.post('/trigger/reporter', authenticate, triggerReporter);
+router.post('/trigger/orchestrator', authenticate, triggerOrchestrator);
 
 // CI/CD Gate (can be called without JWT — uses API key in production)
 router.post('/gate', runGate);

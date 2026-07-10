@@ -10,10 +10,9 @@ export async function submitSupportTicket(formData: FormData) {
       return { success: false, error: 'Unauthorized' };
     }
 
-    const category = formData.get('category') as string;
-    const priority = formData.get('priority') as string;
-    const subject = formData.get('subject') as string;
-    const message = formData.get('message') as string;
+    const category = formData.get('category') as string || 'General';
+    const subject = formData.get('subject') as string || 'No Subject';
+    const message = formData.get('message') as string || '';
 
     const userEmail = session.user.email;
     const userName = session.user.name || 'User';
@@ -22,7 +21,6 @@ export async function submitSupportTicket(formData: FormData) {
       <h2>New Support Ticket</h2>
       <p><strong>From:</strong> ${userName} (${userEmail})</p>
       <p><strong>Category:</strong> ${category}</p>
-      <p><strong>Priority:</strong> ${priority}</p>
       <hr />
       <h3>${subject}</h3>
       <p>${message.replace(/\n/g, '<br/>')}</p>
@@ -32,7 +30,7 @@ export async function submitSupportTicket(formData: FormData) {
     // Defaulting to the requested support email address
     await sendEmail(
       'kumarikhushi24168@gmail.com',
-      `[Support - ${priority.toUpperCase()}] ${subject}`,
+      `[Support] ${subject}`,
       htmlContent,
       userEmail // Set reply-to as the user's email
     );

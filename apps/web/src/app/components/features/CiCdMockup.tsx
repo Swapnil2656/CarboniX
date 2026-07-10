@@ -15,7 +15,7 @@ export function CiCdMockup() {
   }, []);
 
   return (
-    <div className="w-full max-w-[600px] bg-[#0d1117] rounded-xl border border-[#30363d] shadow-2xl overflow-hidden font-sans text-sm mx-auto">
+    <div className="w-full max-w-[600px] min-h-[540px] bg-[#0d1117] rounded-xl border border-[#30363d] shadow-2xl overflow-hidden font-sans text-sm mx-auto">
       {/* PR Header */}
       <div className="border-b border-[#30363d] p-4 flex gap-3 items-start bg-[#161b22]">
         <div className="mt-1">

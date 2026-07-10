@@ -11,6 +11,7 @@ import { runCollector } from '@carbonix/agents';
 import { runAnalyst } from '@carbonix/agents';
 import { runGateAgent } from '@carbonix/agents';
 import { runReporter } from '@carbonix/agents';
+import { runOrchestrator, Recommendation } from '@carbonix/agents';
 
 const USE_MOCK = process.env.USE_MOCK_AGENTS !== 'false';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
@@ -413,3 +414,93 @@ export const getLatestBRSR = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
+/**
+ * POST /api/v1/agents/trigger/orchestrator — Execute Blue/Green migrations
+ *
+ * Fetches the latest Analyst Agent recommendations from the DB and passes
+ * all MIGRATE_REGION candidates (or top HIGH-priority ones) to the
+ * Orchestrator Agent for zero-downtime Blue/Green migration execution.
+ */
+export const triggerOrchestrator = async (req: Request, res: Response) => {
+  const startTime = Date.now();
+
+  try {
+    // ── Step 1: Create an AgentRun record ────────────────────────────────
+    const agentRun = await prisma.agentRun.create({
+      data: {
+        agentType: 'ORCHESTRATOR',
+        status: 'RUNNING',
+        triggeredBy: (req as any).user?.id ? 'manual' : 'api',
+      },
+    });
+
+    // ── Step 2: Fetch latest Analyst recommendations from DB ─────────────
+    const latestAnalystRun = await prisma.agentRun.findFirst({
+      where: { agentType: 'ANALYST', status: 'SUCCESS' },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!latestAnalystRun || !latestAnalystRun.details) {
+      await prisma.agentRun.update({
+        where: { id: agentRun.id },
+        data: {
+          status: 'FAILED',
+          errorMessage: 'No successful Analyst run found. Run the Analyst Agent first.',
+          completedAt: new Date(),
+          durationMs: Date.now() - startTime,
+        },
+      });
+      return res.status(400).json({
+        success: false,
+        error: 'No Analyst recommendations available. Run /trigger/analyst first.',
+      });
+    }
+
+    const details = latestAnalystRun.details as any;
+    const recommendations: Recommendation[] = details.recommendations || [];
+
+    if (recommendations.length === 0) {
+      await prisma.agentRun.update({
+        where: { id: agentRun.id },
+        data: {
+          status: 'SUCCESS',
+          summary: 'No recommendations to migrate. All instances are within acceptable thresholds.',
+          recordsProcessed: 0,
+          completedAt: new Date(),
+          durationMs: Date.now() - startTime,
+        },
+      });
+      return res.json({ success: true, data: { message: 'Nothing to orchestrate.' } });
+    }
+
+    // ── Step 3: Run the Orchestrator (Blue/Green migrations) ─────────────
+    const maxConcurrent = parseInt(req.body?.maxConcurrent) || 3;
+    const result = await runOrchestrator(recommendations, maxConcurrent);
+
+    // ── Step 4: Persist the orchestration run ────────────────────────────
+    await prisma.agentRun.update({
+      where: { id: agentRun.id },
+      data: {
+        status: 'SUCCESS',
+        summary: result.summary,
+        details: result as any,
+        recordsProcessed: result.totalMigrations,
+        completedAt: new Date(),
+        durationMs: Date.now() - startTime,
+      },
+    });
+
+    res.json({
+      success: true,
+      data: {
+        runId: agentRun.id,
+        ...result,
+        durationMs: Date.now() - startTime,
+      },
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+

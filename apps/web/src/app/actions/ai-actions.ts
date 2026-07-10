@@ -80,7 +80,7 @@ async function callGeminiApi(history: ChatMessage[]) {
   const contents = history.map((msg) => {
     if (msg.role === 'function') {
       return {
-        role: 'user', // Gemini requires function responses to be from 'user' role but we use 'function' as a concept, wait. Gemini functionResponse actually has a specific format.
+        role: 'function',
         parts: [{
           functionResponse: {
             name: msg.name,
