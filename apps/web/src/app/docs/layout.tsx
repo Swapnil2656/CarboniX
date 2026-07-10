@@ -18,7 +18,7 @@ export default async function DocsLayout({ children }: { children: React.ReactNo
   return (
     <>
       <AtomCursor />
-      <div className="bg-black text-on-surface font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-fixed min-h-screen flex flex-col">
+      <div className="bg-black text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-fixed min-h-screen flex flex-col">
         <Navbar session={session} />
 
       <main className="flex-grow pt-[120px] pb-3xl relative z-10 max-w-[1440px] w-full mx-auto px-margin flex flex-col md:flex-row gap-xl">
