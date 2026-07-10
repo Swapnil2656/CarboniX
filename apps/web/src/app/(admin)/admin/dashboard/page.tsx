@@ -79,8 +79,10 @@ export default function DashboardPage() {
 
   const fetchProjectsData = useCallback(async (isInitial = false) => {
     try {
-      if (isInitial) setLoading(true);
-      setError(null);
+      if (isInitial) {
+        setLoading(true);
+        setError(null);
+      }
 
       const [res, statsRes] = await Promise.all([
         getProjects(),
@@ -89,6 +91,7 @@ export default function DashboardPage() {
 
       if (res.success) {
         setProjects(res.projects || []);
+        setError(null);
       } else {
         setError(res.error || 'Failed to fetch projects.');
       }

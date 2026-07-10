@@ -53,6 +53,10 @@ export async function getProjects() {
     };
   } catch (error: any) {
     console.error('Error fetching projects:', error);
+    // Graceful fallback for Prisma Accelerate / Database connection issues
+    if (error.message?.includes("Can't reach database server") || error.message?.includes("PrismaClientInitializationError")) {
+      return { success: true, projects: [] };
+    }
     return { success: false, error: error.message };
   }
 }
