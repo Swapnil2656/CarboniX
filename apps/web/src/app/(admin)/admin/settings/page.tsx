@@ -34,6 +34,11 @@ export default function SettingsPage() {
   const [pushAlerts, setPushAlerts] = useState(false);
   const [thresholdAlerts, setThresholdAlerts] = useState(true);
 
+  // Password Update State
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
   useEffect(() => {
     setIsMounted(true);
     
@@ -193,14 +198,30 @@ export default function SettingsPage() {
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setSaveMessage({ type: 'error', text: 'All password fields are required.' });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setSaveMessage({ type: 'error', text: 'New passwords do not match.' });
+      return;
+    }
+    if (newPassword.length < 8) {
+      setSaveMessage({ type: 'error', text: 'New password must be at least 8 characters.' });
+      return;
+    }
+
     setIsSaving(true);
     setSaveMessage({ type: '', text: '' });
     
     try {
-      const res = await updatePassword('new-password-mock'); // Using mock password value from UI
+      const res = await updatePassword(currentPassword, newPassword);
       if (res.success) {
         setSaveMessage({ type: 'success', text: 'Password updated successfully!' });
         window.dispatchEvent(new Event('dataUpdated'));
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
       } else {
         setSaveMessage({ type: 'error', text: res.error || 'Failed to update password' });
       }
@@ -360,11 +381,20 @@ export default function SettingsPage() {
                 {/* Password Section */}
                 <div>
                   <h3 className="text-base font-medium text-on-surface mb-4">Update Password</h3>
+                  
+                  {saveMessage.text && (
+                    <div className={`mb-6 p-3 rounded-lg text-sm border ${saveMessage.type === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
+                      {saveMessage.text}
+                    </div>
+                  )}
+
                   <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-md">
                     <div>
                       <label className="block text-sm font-medium text-on-surface-variant mb-1">Current Password</label>
                       <input 
                         type="password" 
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
                         className="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2 text-on-surface focus:outline-none focus:border-primary transition-all"
                       />
                     </div>
@@ -372,6 +402,17 @@ export default function SettingsPage() {
                       <label className="block text-sm font-medium text-on-surface-variant mb-1">New Password</label>
                       <input 
                         type="password" 
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2 text-on-surface focus:outline-none focus:border-primary transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-on-surface-variant mb-1">Confirm New Password</label>
+                      <input 
+                        type="password" 
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
                         className="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2 text-on-surface focus:outline-none focus:border-primary transition-all"
                       />
                     </div>
@@ -409,7 +450,13 @@ export default function SettingsPage() {
             <section className="animate-in fade-in slide-in-from-bottom-2 duration-300">
               <h2 className="text-xl font-semibold text-on-surface mb-6">Notification Preferences</h2>
               
-              <div className="space-y-6">
+              {saveMessage.text && (
+                <div className={`mb-6 p-3 rounded-lg text-sm border ${saveMessage.type === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
+                  {saveMessage.text}
+                </div>
+              )}
+
+              <form onSubmit={handleSaveSettings} className="space-y-6">
                 <div className="flex items-start justify-between pb-6 border-b border-outline-variant">
                   <div className="pr-8">
                     <h3 className="text-base font-medium text-on-surface mb-1">Email Alerts</h3>
@@ -439,7 +486,7 @@ export default function SettingsPage() {
                     <ToggleSwitch checked={thresholdAlerts} onChange={setThresholdAlerts} />
                   </div>
                 </div>
-              </div>
+              </form>
             </section>
           )}
 

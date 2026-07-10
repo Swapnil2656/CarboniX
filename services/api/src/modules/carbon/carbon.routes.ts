@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { calculate, compare, recommend, calculateEmissions, verifyKey, ingestTelemetry } from './carbon.controller';
-import { getHistory } from './history.controller';
+import { getHistory, deleteCalculation } from './history.controller';
+import { getDashboard } from './dashboard.controller';
+import { getNotifications, markNotificationRead } from './notifications.controller';
 import { authenticate } from '../../middleware/auth.middleware';
 import { authenticateApiKey } from '../../middleware/apiKey.middleware';
 
@@ -18,5 +20,9 @@ router.post('/verify-key', authenticateApiKey, verifyKey as any);
 router.post('/telemetry/ingest', authenticateApiKey, ingestTelemetry as any);
 
 router.get('/history', authenticate, getHistory);
+router.delete('/history/:id', authenticate, deleteCalculation);
+router.get('/dashboard', authenticate, getDashboard);
+router.get('/notifications', authenticate, getNotifications);
+router.patch('/notifications/:id/read', authenticate, markNotificationRead);
 
 export default router;
