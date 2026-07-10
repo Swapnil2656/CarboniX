@@ -141,10 +141,43 @@ async function executeTool(name: string, args: any, adminUserId: string) {
   switch (name) {
     case 'switchProjectRegion': {
       const { projectId, region } = args;
+      
+      const oldProject = await prisma.project.findUnique({ where: { id: projectId } });
+      if (!oldProject) throw new Error('Project not found');
+
       const project = await prisma.project.update({
         where: { id: projectId },
         data: { region },
       });
+
+      // Audit Log
+      await prisma.auditLog.create({
+        data: {
+          actorId: adminUserId,
+          actorEmail: 'system@carbonix.ai',
+          actorRole: 'SYSTEM',
+          action: 'PROJECT_REGION_SWITCH',
+          resource: 'project',
+          resourceId: projectId,
+          before: { region: oldProject.region },
+          after: { region },
+          ip: 'AI Agent',
+          userAgent: 'CarboniX Copilot',
+        }
+      });
+
+      // Notification
+      await prisma.notification.create({
+        data: {
+          title: 'Project Region Changed',
+          body: `Project '${project.name}' was switched from ${oldProject.region || 'unknown'} to ${region} to optimize carbon emissions.`,
+          type: 'BROADCAST',
+          status: 'SENT',
+          targetAudience: 'ALL',
+          createdBy: adminUserId,
+        }
+      });
+
       // Invalidate the cache to immediately show the new region
       try {
         await redis.del('dashboard:projects_list');

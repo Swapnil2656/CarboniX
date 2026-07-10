@@ -173,6 +173,8 @@ export const toggleFeatureFlag = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { enabled } = req.body;
 
+    const oldFlag = await prisma.featureFlag.findUnique({ where: { id } });
+
     const updated = await prisma.featureFlag.update({
       where: { id },
       data: { 
@@ -181,6 +183,23 @@ export const toggleFeatureFlag = async (req: Request, res: Response) => {
         toggleCount: { increment: 1 }
       }
     });
+
+    if (oldFlag) {
+      await prisma.auditLog.create({
+        data: {
+          actorId: 'admin_user',
+          actorEmail: 'admin@carbonix.ai',
+          actorRole: 'ADMIN',
+          action: 'FEATURE_FLAG_TOGGLE',
+          resource: 'feature_flag',
+          resourceId: id,
+          before: { enabled: oldFlag.enabled },
+          after: { enabled },
+          ip: req.ip || '127.0.0.1',
+          userAgent: req.headers['user-agent'] || 'Unknown',
+        }
+      });
+    }
 
     res.json({ success: true, flag: updated });
   } catch (error: any) {
@@ -237,6 +256,21 @@ export const createApiKey = async (req: Request, res: Response) => {
       }
     });
 
+    await prisma.auditLog.create({
+      data: {
+        actorId: 'admin_user',
+        actorEmail: 'admin@carbonix.ai',
+        actorRole: 'ADMIN',
+        action: 'API_KEY_CREATED',
+        resource: 'api_key',
+        resourceId: apiKey.id,
+        before: {},
+        after: { name, permissions, expiration },
+        ip: req.ip || '127.0.0.1',
+        userAgent: req.headers['user-agent'] || 'Unknown',
+      }
+    });
+
     // Return the raw key ONLY ONCE
     res.status(201).json({ key: rawKey, id: apiKey.id });
   } catch (error: any) {
@@ -255,6 +289,22 @@ export const revokeApiKey = async (req: Request, res: Response) => {
         revokedBy: 'admin_user'
       }
     });
+
+    await prisma.auditLog.create({
+      data: {
+        actorId: 'admin_user',
+        actorEmail: 'admin@carbonix.ai',
+        actorRole: 'ADMIN',
+        action: 'API_KEY_REVOKED',
+        resource: 'api_key',
+        resourceId: id,
+        before: { status: 'ACTIVE' },
+        after: { status: 'REVOKED' },
+        ip: req.ip || '127.0.0.1',
+        userAgent: req.headers['user-agent'] || 'Unknown',
+      }
+    });
+
     res.json({ success: true });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -266,6 +316,22 @@ export const deleteApiKey = async (req: Request, res: Response) => {
     await prisma.apiKey.delete({
       where: { id }
     });
+
+    await prisma.auditLog.create({
+      data: {
+        actorId: 'admin_user',
+        actorEmail: 'admin@carbonix.ai',
+        actorRole: 'ADMIN',
+        action: 'API_KEY_DELETED',
+        resource: 'api_key',
+        resourceId: id,
+        before: {},
+        after: {},
+        ip: req.ip || '127.0.0.1',
+        userAgent: req.headers['user-agent'] || 'Unknown',
+      }
+    });
+
     res.json({ success: true });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -334,6 +400,22 @@ export const syncTeamMembers = async (req: Request, res: Response) => {
     }
     
     res.json({ success: true, count: synced.length, synced });
+
+    await prisma.auditLog.create({
+      data: {
+        actorId: 'admin_user',
+        actorEmail: 'admin@carbonix.ai',
+        actorRole: 'ADMIN',
+        action: 'CODEBASE_SYNCED',
+        resource: 'project',
+        resourceId: projectName || 'Unknown',
+        before: {},
+        after: { syncedCount: synced.length },
+        ip: req.ip || '127.0.0.1',
+        userAgent: req.headers['user-agent'] || 'Unknown',
+      }
+    });
+
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -375,6 +457,22 @@ export const inviteUser = async (req: Request, res: Response) => {
     });
 
     res.json({ success: true, message: `Invite sent to ${email}`, member: newMember });
+
+    await prisma.auditLog.create({
+      data: {
+        actorId: 'admin_user',
+        actorEmail: 'admin@carbonix.ai',
+        actorRole: 'ADMIN',
+        action: 'TEAM_INVITE',
+        resource: 'team_member',
+        resourceId: newMember.id,
+        before: {},
+        after: { email, role, projectName },
+        ip: req.ip || '127.0.0.1',
+        userAgent: req.headers['user-agent'] || 'Unknown',
+      }
+    });
+
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -389,6 +487,22 @@ export const removeTeamMember = async (req: Request, res: Response) => {
     });
 
     res.json({ success: true, message: 'Teammate removed successfully' });
+
+    await prisma.auditLog.create({
+      data: {
+        actorId: 'admin_user',
+        actorEmail: 'admin@carbonix.ai',
+        actorRole: 'ADMIN',
+        action: 'TEAM_MEMBER_REMOVED',
+        resource: 'team_member',
+        resourceId: id,
+        before: {},
+        after: {},
+        ip: req.ip || '127.0.0.1',
+        userAgent: req.headers['user-agent'] || 'Unknown',
+      }
+    });
+
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -481,6 +595,34 @@ export const migrateEmission = async (req: Request, res: Response) => {
         isIdle: false,
         isOversized: false,
         recommendation: `Migrated to ${targetRegion}. Operations nominal.`
+      }
+    });
+
+    // Audit Log
+    await prisma.auditLog.create({
+      data: {
+        actorId: 'admin_user', // from mocked auth session in the Express backend
+        actorEmail: 'admin@carbonix.ai',
+        actorRole: 'ADMIN',
+        action: 'EMISSION_MIGRATE',
+        resource: 'emission_record',
+        resourceId: id,
+        before: { region: record.region, carbonKg: record.carbonKg },
+        after: { region: targetRegion, carbonKg: updatedRecord.carbonKg },
+        ip: req.ip || '127.0.0.1',
+        userAgent: req.headers['user-agent'] || 'Unknown',
+      }
+    });
+
+    // Notification
+    await prisma.notification.create({
+      data: {
+        title: 'Emission Instance Migrated',
+        body: `Instance was successfully migrated from ${record.region} to ${targetRegion}, saving an estimated ${(record.carbonKg - updatedRecord.carbonKg).toFixed(2)}kg CO2.`,
+        type: 'BROADCAST',
+        status: 'SENT',
+        targetAudience: 'ALL',
+        createdBy: 'admin_user',
       }
     });
 
