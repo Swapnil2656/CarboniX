@@ -7,22 +7,23 @@ import { getProfile } from '@/app/actions/settings-actions';
 import { adminApi } from '@/services/api/endpoints';
 
 const searchTargets = [
-  // Primary Navigation
+  // Existing Dashboard Features
   { label: 'Dashboard', keywords: ['dashboard', 'home', 'main', 'overview', 'compute', 'resources', 'infrastructure', 'servers', 'nodes', 'deployments'], path: '/admin/dashboard' },
   { label: 'Emissions', keywords: ['emissions', 'carbon', 'co2', 'footprint', 'energy', 'sustainability', 'intensity'], path: '/admin/emissions' },
   { label: 'Team Emissions', keywords: ['users', 'assets', 'team', 'people', 'customers', 'clients', 'accounts', 'mobile'], path: '/admin/users', requireAdmin: true },
   { label: 'API Keys', keywords: ['api', 'key', 'keys', 'tokens', 'integration', 'webhooks'], path: '/admin/api-keys' },
-
-  { label: 'Settings', keywords: ['settings', 'config', 'preferences'], path: '/admin/settings' },
-  { label: 'Support', keywords: ['support', 'help', 'contact', 'ticket', 'issue'], path: '/support' },
-  { label: 'Documentation', keywords: ['docs', 'documentation', 'guide', 'tutorial', 'reference', 'sdk'], path: '/docs' },
-
-  // Deep / Hidden Features (Mobile-Style Search)
-  { label: 'Developer Options', keywords: ['developer', 'options', 'dev', 'api', 'webhooks', 'integration', 'sdk'], path: '/admin/settings#developer' },
-  { label: 'Account Security (2FA)', keywords: ['security', 'password', '2fa', 'authentication', 'mfa', 'login'], path: '/admin/settings#security' },
-  { label: 'Notification Preferences', keywords: ['notifications', 'alerts', 'emails', 'push'], path: '/admin/settings#notifications' },
-  { label: 'Carbon Alert Thresholds', keywords: ['alerts', 'thresholds', 'limits', 'warning', 'cap'], path: '/admin/emissions#alerts' },
-  { label: 'CI/CD Integrations', keywords: ['ci', 'cd', 'github actions', 'pipeline', 'deployment', 'automation'], path: '/docs/ci-cd' },
+  { label: 'Settings', keywords: ['settings', 'config', 'preferences', 'profile', 'account'], path: '/admin/settings' },
+  { label: 'Audit History', keywords: ['history', 'audit', 'logs', 'activity', 'recent'], path: '/admin/history' },
+  
+  // Documentation Features
+  { label: 'Documentation Home', keywords: ['docs', 'documentation', 'guide', 'tutorial', 'reference'], path: '/docs' },
+  { label: 'CI/CD Integration', keywords: ['ci', 'cd', 'github actions', 'pipeline', 'deployment', 'automation', 'docs'], path: '/docs/ci-cd' },
+  { label: 'API Reference', keywords: ['api', 'reference', 'endpoints', 'docs'], path: '/docs/api-reference' },
+  { label: 'SDK Reference', keywords: ['sdk', 'reference', 'library', 'package', 'docs'], path: '/docs/sdk-reference' },
+  { label: 'Methodology', keywords: ['methodology', 'calculation', 'math', 'formula', 'docs'], path: '/docs/methodology' },
+  { label: 'Authentication Docs', keywords: ['auth', 'authentication', 'security', 'login', 'docs'], path: '/docs/authentication' },
+  { label: 'Supported Regions', keywords: ['regions', 'cloud', 'aws', 'gcp', 'azure', 'locations', 'docs'], path: '/docs/regions' },
+  { label: 'Quick Start', keywords: ['quick start', 'getting started', 'setup', 'install', 'docs'], path: '/docs/quick-start' },
 ];
 
 export const AdminHeader = () => {
