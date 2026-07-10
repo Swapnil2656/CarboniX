@@ -305,7 +305,7 @@ export const AdminHeader = () => {
                 <button 
                   onClick={() => {
                     setIsHistoryOpen(false);
-                    alert("Full Audit Log page is coming soon!");
+                    router.push('/admin/history');
                   }}
                   className="w-full py-1.5 text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors text-center"
                 >

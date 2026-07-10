@@ -17,6 +17,7 @@ export const AdminSidebar = ({ isCollapsed, onToggle }: AdminSidebarProps) => {
     { label: 'Emissions', path: '/admin/emissions', icon: 'co2' },
     { label: 'Team Emissions', path: '/admin/users', icon: 'group' },
     { label: 'API Keys', path: '/admin/api-keys', icon: 'key' },
+    { label: 'Audit Logs', path: '/admin/history', icon: 'history' },
     { label: 'Settings', path: '/admin/settings', icon: 'settings' },
   ];
 
