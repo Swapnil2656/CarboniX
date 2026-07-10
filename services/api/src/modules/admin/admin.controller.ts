@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { prisma } from '../../lib/prisma';
 import crypto from 'crypto';
 import { redis } from '../../lib/redis';
+import { sendEmail } from '../../utils/email';
 
 export const getDashboard = async (req: Request, res: Response) => {
   try {
@@ -40,19 +41,36 @@ export const getDashboard = async (req: Request, res: Response) => {
       percent: totalRecords > 0 ? Math.round((g._count / totalRecords) * 100) : 0
     }));
 
-    // Dummy data for over time and top endpoints
-    const apiCallsOverTime = Array.from({ length: 24 }).map((_, i) => ({
-      hour: `${i}:00`,
-      calls: Math.floor(Math.random() * 5000) + 1000
-    }));
+    // Real data for api calls over time using Calculations table
+    const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const calculations = await prisma.calculation.findMany({
+      where: { createdAt: { gte: last24Hours } },
+      select: { createdAt: true }
+    });
 
-    const topEndpoints = [
-      { path: '/v1/carbon/calculate', calls: 45210 },
-      { path: '/v1/agents/runs', calls: 12450 },
-      { path: '/v1/reference/regions', calls: 8900 },
-      { path: '/v1/users/profile', calls: 5200 },
-      { path: '/v1/auth/session', calls: 3100 },
-    ];
+    // Group by hour
+    const hourlyCounts = new Array(24).fill(0);
+    const currentHour = new Date().getHours();
+    
+    calculations.forEach(calc => {
+      const calcHour = calc.createdAt.getHours();
+      // Calculate how many hours ago this was (0-23)
+      let diff = currentHour - calcHour;
+      if (diff < 0) diff += 24;
+      if (diff < 24) hourlyCounts[23 - diff]++; // index 23 is current hour
+    });
+
+    const apiCallsOverTime = hourlyCounts.map((calls, i) => {
+      let h = currentHour - (23 - i);
+      if (h < 0) h += 24;
+      return {
+        hour: `${h}:00`,
+        calls: calls
+      };
+    });
+
+    // We do not currently track individual endpoint hits, so return empty array
+    const topEndpoints: any[] = [];
 
     const responseData = {
       totalApiCalls,
@@ -86,39 +104,43 @@ export const getUsers = async (req: Request, res: Response) => {
     const page = parseInt(req.query.page as string) || 1;
     const pageSize = parseInt(req.query.pageSize as string) || 20;
 
-    const users = await prisma.mobileUser.findMany({
+    const users = await prisma.teamMember.findMany({
       skip: (page - 1) * pageSize,
       take: pageSize,
-      orderBy: { lastActiveAt: 'desc' },
-      include: {
-        calculations: {
-          orderBy: { createdAt: 'desc' },
-          take: 1
-        }
-      }
+      orderBy: { createdAt: 'desc' },
     });
     
-    const total = await prisma.mobileUser.count();
+    const projects = await prisma.project.findMany({ select: { name: true, sdkConnected: true } });
+    const connectedProjectNames = new Set(projects.filter(p => p.sdkConnected).map(p => p.name));
+    
+    let totalEmissions = 0;
+    let connectedCount = 0;
 
-    const formattedUsers = users.map(u => ({
-      id: u.id,
-      deviceId: u.deviceId || 'Unknown Device',
-      email: u.email,
-      country: u.country || 'US',
-      countryCode: u.country || 'US',
-      cloud: u.defaultProvider === 'AZURE' ? 'Azure' : (u.defaultProvider || 'AWS'),
-      region: u.calculations[0]?.region || 'us-east-1',
-      avgCo2KgPerHour: u.calculations[0]?.co2GramsHour ? u.calculations[0].co2GramsHour / 1000 : 0,
-      calculationsOps: u.calculationCount.toString(),
-      lastActive: u.lastActiveAt.toISOString(),
-      status: u.status
-    }));
+    const enrichedUsers = users.map(user => {
+      const isConnected = connectedProjectNames.has(user.projectName);
+      const co2 = isConnected ? user.co2Emissions : 0;
+      
+      if (isConnected) {
+        totalEmissions += co2;
+        connectedCount++;
+      }
+      
+      return {
+        ...user,
+        co2Emissions: co2
+      };
+    });
+
+    const fleetAvg = connectedCount > 0 ? Math.round(totalEmissions / connectedCount) : 0;
+    
+    const total = await prisma.teamMember.count();
 
     res.json({
-      users: formattedUsers,
+      users: enrichedUsers,
       total,
       page,
-      pageSize
+      pageSize,
+      fleetAvg
     });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -238,7 +260,17 @@ export const revokeApiKey = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message });
   }
 };
-
+export const deleteApiKey = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    await prisma.apiKey.delete({
+      where: { id }
+    });
+    res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
 export const getTeamMembers = async (req: Request, res: Response) => {
   try {
     const team = await prisma.user.findMany({
@@ -260,6 +292,223 @@ export const getTeamMembers = async (req: Request, res: Response) => {
     });
 
     res.json({ team });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const syncTeamMembers = async (req: Request, res: Response) => {
+  try {
+    const { members, projectName } = req.body;
+    
+    const synced = [];
+    for (const m of members) {
+      if (!m.name || !m.email) continue;
+      
+      const existing = await prisma.teamMember.findFirst({
+        where: { name: m.name }
+      });
+      
+      if (!existing) {
+        const newMember = await prisma.teamMember.create({
+          data: {
+            name: m.name,
+            email: m.email,
+            role: 'Developer',
+            projectName: projectName || 'Unknown Project',
+            projectId: 'proj_' + Math.random().toString(36).substring(7),
+            location: 'Global',
+            co2Emissions: Math.floor(Math.random() * 200) + 50,
+            status: 'ACTIVE',
+            aiSuggestion: `AI Suggestion: Consider optimizing the database queries running in ${projectName || 'your project'} to reduce compute cycles by an estimated 15%.`
+          }
+        });
+        synced.push(newMember);
+      } else {
+        const updated = await prisma.teamMember.update({
+          where: { id: existing.id },
+          data: { projectName: projectName || existing.projectName }
+        });
+        synced.push(updated);
+      }
+    }
+    
+    res.json({ success: true, count: synced.length, synced });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const inviteUser = async (req: Request, res: Response) => {
+  try {
+    const { name, email, role, projectName } = req.body;
+    
+    const inviteLink = `http://localhost:3000/invite?email=${encodeURIComponent(email)}`;
+    
+    await sendEmail(
+      email,
+      "You've been invited to CarboniX!",
+      `<div style="font-family:sans-serif;max-width:480px;margin:auto">
+        <h2>Hi ${name || email.split('@')[0]},</h2>
+        <p>You have been invited to join the <strong>${projectName}</strong> project on CarboniX as a ${role || 'Developer'}.</p>
+        <p>Please click below to accept the invitation and connect your environment:</p>
+        <p>
+          <a href="${inviteLink}" style="display:inline-block;padding:12px 24px;background:#50FA7B;color:#1e1e2e;text-decoration:none;border-radius:8px;font-weight:600">
+            Accept Invitation
+          </a>
+        </p>
+      </div>`
+    );
+
+    const newMember = await prisma.teamMember.create({
+      data: {
+        name: name || email.split('@')[0],
+        email: email,
+        role: role || 'Developer',
+        projectName: projectName || 'Invited',
+        projectId: 'proj_invite',
+        location: 'Pending',
+        co2Emissions: 0,
+        status: 'PENDING',
+        aiSuggestion: 'User has just been invited. Waiting for them to accept and connect their environment.'
+      }
+    });
+
+    res.json({ success: true, message: `Invite sent to ${email}`, member: newMember });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const removeTeamMember = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    
+    await prisma.teamMember.delete({
+      where: { id }
+    });
+
+    res.json({ success: true, message: 'Teammate removed successfully' });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getEmissions = async (req: Request, res: Response) => {
+  try {
+    const provider = req.query.provider as string;
+    const region = req.query.region as string;
+
+    const projects = await prisma.project.findMany({ select: { sdkConnected: true } });
+    const isSdkConnected = projects.some(p => p.sdkConnected);
+
+    if (!isSdkConnected) {
+      return res.json({
+        records: [],
+        metrics: {
+          totalInstances: 0,
+          idleInstances: 0,
+          oversizedInstances: 0,
+          wastedCarbonKg: 0
+        },
+        isSdkConnected: false
+      });
+    }
+
+    const where: any = {};
+    if (provider && provider !== 'All') {
+      where.provider = provider.toUpperCase();
+    }
+    if (region && region !== 'All') {
+      where.region = region;
+    }
+
+    const records = await prisma.emissionRecord.findMany({
+      where,
+      orderBy: { timestamp: 'desc' },
+      take: 500
+    });
+
+    const totalInstances = records.length;
+    const idleInstances = records.filter(r => r.isIdle).length;
+    const oversizedInstances = records.filter(r => r.isOversized).length;
+    
+    const wastedCarbonKg = records.reduce((sum, r) => {
+      if (r.isIdle) return sum + r.carbonKg;
+      if (r.isOversized) return sum + (r.carbonKg * 0.5);
+      return sum;
+    }, 0);
+
+    res.json({
+      records,
+      metrics: {
+        totalInstances,
+        idleInstances,
+        oversizedInstances,
+        wastedCarbonKg
+      },
+      isSdkConnected: true
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const migrateEmission = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { targetRegion } = req.body;
+
+    if (!targetRegion) {
+      return res.status(400).json({ error: 'Target region is required' });
+    }
+
+    // Simulate provisioning delay (2 seconds)
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // Get the current record
+    const record = await prisma.emissionRecord.findUnique({ where: { id } });
+    if (!record) {
+      return res.status(404).json({ error: 'Record not found' });
+    }
+
+    // Update the record: new region, lower carbon footprint, and clear oversized/idle flags
+    const updatedRecord = await prisma.emissionRecord.update({
+      where: { id },
+      data: {
+        region: targetRegion,
+        carbonKg: record.carbonKg * 0.6, // Simulate 40% carbon savings
+        isIdle: false,
+        isOversized: false,
+        recommendation: `Migrated to ${targetRegion}. Operations nominal.`
+      }
+    });
+
+    res.json({ success: true, record: updatedRecord });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getNotifications = async (req: Request, res: Response) => {
+  try {
+    const notifications = await prisma.notification.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 10
+    });
+    res.json({ success: true, notifications });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getAuditLogs = async (req: Request, res: Response) => {
+  try {
+    const logs = await prisma.auditLog.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 10
+    });
+    res.json({ success: true, logs });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

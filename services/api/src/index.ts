@@ -39,6 +39,22 @@ app.use('/api/v1/agents', agentRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/connect', connectRoutes);
 
+app.post('/api/v1/public/accept-invite', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+    
+    await prisma.teamMember.updateMany({
+      where: { email, status: 'PENDING' },
+      data: { status: 'ACTIVE' }
+    });
+    
+    res.json({ success: true, message: 'Invitation accepted!' });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ─── Agent Cron Scheduling ───────────────────────────────────
 
 // Run Collector + Analyst every hour

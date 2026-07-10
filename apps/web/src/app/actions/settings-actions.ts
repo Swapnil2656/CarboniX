@@ -18,7 +18,10 @@ export async function getProfile() {
       success: true, 
       profile: {
         fullName: profile?.fullName || session.user.name || '',
-        avatarUrl: profile?.avatarUrl || ''
+        avatarUrl: profile?.avatarUrl || '',
+        emailAlerts: profile?.emailAlerts ?? true,
+        pushAlerts: profile?.pushAlerts ?? false,
+        thresholdAlerts: profile?.thresholdAlerts ?? true
       }
     };
   } catch (error) {
@@ -27,7 +30,7 @@ export async function getProfile() {
   }
 }
 
-export async function updateProfile(data: { name?: string; avatarUrl?: string }) {
+export async function updateProfile(data: { name?: string; avatarUrl?: string; emailAlerts?: boolean; pushAlerts?: boolean; thresholdAlerts?: boolean }) {
   const session = await auth();
   if (!session?.user?.id) {
     return { success: false, error: "Unauthorized" };
@@ -51,11 +54,17 @@ export async function updateProfile(data: { name?: string; avatarUrl?: string })
       update: {
         ...(data.name && { fullName: data.name }),
         ...(data.avatarUrl && { avatarUrl: data.avatarUrl }),
+        ...(data.emailAlerts !== undefined && { emailAlerts: data.emailAlerts }),
+        ...(data.pushAlerts !== undefined && { pushAlerts: data.pushAlerts }),
+        ...(data.thresholdAlerts !== undefined && { thresholdAlerts: data.thresholdAlerts }),
       },
       create: {
         userId,
         fullName: data.name || session.user.name || '',
         avatarUrl: data.avatarUrl || '',
+        emailAlerts: data.emailAlerts ?? true,
+        pushAlerts: data.pushAlerts ?? false,
+        thresholdAlerts: data.thresholdAlerts ?? true
       },
     });
 

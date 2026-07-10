@@ -34,16 +34,20 @@ export function IdeSnippet() {
         <Highlight theme={themes.vsDark} code={codeSnippet} language="javascript">
           {({ className, style, tokens, getLineProps, getTokenProps }) => (
             <pre className={className} style={{ ...style, backgroundColor: 'transparent' }}>
-              {tokens.map((line, i) => (
-                <div key={i} {...getLineProps({ line, key: i })} className="table-row">
-                  <span className="table-cell text-right pr-4 text-[#858585] select-none opacity-50">{i + 1}</span>
-                  <span className="table-cell">
-                    {line.map((token, key) => (
-                      <span key={key} {...getTokenProps({ token, key })} />
-                    ))}
-                  </span>
-                </div>
-              ))}
+              {tokens.map((line, i) => {
+                const { key: lineKey, ...lineProps } = getLineProps({ line, key: i });
+                return (
+                  <div key={i} {...lineProps} className="table-row">
+                    <span className="table-cell text-right pr-4 text-[#858585] select-none opacity-50">{i + 1}</span>
+                    <span className="table-cell">
+                      {line.map((token, key) => {
+                        const { key: tokenKey, ...tokenProps } = getTokenProps({ token, key });
+                        return <span key={key} {...tokenProps} />;
+                      })}
+                    </span>
+                  </div>
+                );
+              })}
             </pre>
           )}
         </Highlight>

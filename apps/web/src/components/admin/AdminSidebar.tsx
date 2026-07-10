@@ -10,9 +10,9 @@ export const AdminSidebar = () => {
   const navItems = [
     { label: 'Dashboard', path: '/admin/dashboard', icon: 'dashboard' },
     { label: 'Emissions', path: '/admin/emissions', icon: 'co2' },
-    { label: 'Users & Assets', path: '/admin/users', icon: 'group' },
+    { label: 'Team Emissions', path: '/admin/users', icon: 'group' },
     { label: 'API Keys', path: '/admin/api-keys', icon: 'key' },
-    { label: 'Feature Flags', path: '/admin/feature-flags', icon: 'toggle_on' },
+
     { label: 'Settings', path: '/admin/settings', icon: 'settings' },
   ];
 

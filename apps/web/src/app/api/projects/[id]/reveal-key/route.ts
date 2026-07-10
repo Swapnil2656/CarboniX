@@ -25,9 +25,13 @@ export async function POST(
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
 
-    // Revoke all existing ACTIVE keys for this user
+    // Revoke only existing ACTIVE keys for THIS specific project (matched by name)
     await prisma.apiKey.updateMany({
-      where: { createdBy: session.user.id, status: 'ACTIVE' },
+      where: { 
+        createdBy: session.user.id, 
+        name: `${project.name} Key`,
+        status: 'ACTIVE' 
+      },
       data: { status: 'REVOKED', revokedAt: new Date(), revokedBy: session.user.id },
     });
 

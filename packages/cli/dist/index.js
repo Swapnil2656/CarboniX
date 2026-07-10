@@ -33,7 +33,6 @@ var CONFIG_PATH = import_path.default.join(process.cwd(), ".carbonixrc");
 var API_URL = process.env.CARBONIX_API_URL || "http://localhost:4000/api/v1";
 program.name("carbonix").description("CarboniX Command Line Interface").version("0.1.0");
 program.command("init").description("Initialize a new CarboniX deployment from your project").option("-k, --key <key>", "Your project API key").action(async (options) => {
-  var _a, _b;
   if (!options.key) {
     console.error(import_picocolors.default.red("Error: --key is required to initialize a project."));
     process.exit(1);
@@ -68,7 +67,7 @@ Verifying API Key...`));
       console.error(import_picocolors.default.red("Error: API Key verification failed."));
     }
   } catch (err) {
-    console.error(import_picocolors.default.red(`Error connecting to CarboniX: ${((_b = (_a = err.response) == null ? void 0 : _a.data) == null ? void 0 : _b.error) || err.message}`));
+    console.error(import_picocolors.default.red(`Error connecting to CarboniX: ${err.response?.data?.error || err.message}`));
   }
 });
 var authCmd = program.command("auth").description("Authentication commands");
@@ -140,7 +139,6 @@ Run \`carbonix app deploy\` and the Agentic AI will automatically apply this opt
   }
 });
 appCmd.command("deploy").description("Deploy the current codebase and send telemetry to CarboniX").option("-p, --project <project>", "Target project name").action(async (options) => {
-  var _a, _b;
   try {
     let config = {};
     try {
@@ -231,7 +229,67 @@ appCmd.command("deploy").description("Deploy the current codebase and send telem
       console.error(import_picocolors.default.red("Error: Deployment failed."));
     }
   } catch (err) {
-    console.error(import_picocolors.default.red(`Error connecting to CarboniX: ${((_b = (_a = err.response) == null ? void 0 : _a.data) == null ? void 0 : _b.error) || err.message}`));
+    console.error(import_picocolors.default.red(`Error connecting to CarboniX: ${err.response?.data?.error || err.message}`));
+  }
+});
+var teamCmd = program.command("team").description("Team management commands");
+teamCmd.command("sync").description("Automatically discover and sync codebase contributors to CarboniX").action(async () => {
+  try {
+    let config = {};
+    try {
+      const configData = await import_promises.default.readFile(CONFIG_PATH, "utf-8");
+      config = JSON.parse(configData);
+    } catch (e) {
+      console.error(import_picocolors.default.red("Error: Project not initialized. Run `carbonix init --key <your-api-key>` first."));
+      process.exit(1);
+    }
+    if (!config.apiKey) {
+      console.error(import_picocolors.default.red("Error: API Key not found in .carbonixrc."));
+      process.exit(1);
+    }
+    let projectName = "unknown-project";
+    try {
+      const pkgData = await import_promises.default.readFile(import_path.default.join(process.cwd(), "package.json"), "utf-8");
+      projectName = JSON.parse(pkgData).name;
+    } catch (e) {
+    }
+    console.log(import_picocolors.default.cyan(`
+\u{1F50D} Analyzing local git history for contributors...`));
+    const { execSync } = require("child_process");
+    let gitOutput = "";
+    try {
+      gitOutput = execSync('git log --format="%an|%ae" | sort -u', { encoding: "utf-8" });
+    } catch (e) {
+      console.log(import_picocolors.default.yellow(`Warning: Not a git repository or git not installed. Could not extract authors.`));
+      process.exit(0);
+    }
+    const rawAuthors = gitOutput.split("\n").filter((l) => l.trim() !== "");
+    const members = rawAuthors.map((line) => {
+      const [name, email] = line.split("|");
+      return { name, email };
+    }).filter((m) => {
+      const email = m.email?.toLowerCase() || "";
+      return m.name && email && !email.includes("dependabot") && !email.includes("bot@");
+    });
+    if (members.length === 0) {
+      console.log(import_picocolors.default.yellow(`No human contributors found.`));
+      return;
+    }
+    console.log(import_picocolors.default.cyan(`Found ${members.length} contributors. Syncing to CarboniX...`));
+    const res = await import_axios.default.post(`${API_URL}/admin/users/sync`, { members, projectName }, {
+      headers: {
+        "Authorization": `Bearer ${config.apiKey}`,
+        "Content-Type": "application/json"
+      }
+    });
+    if (res.data.success) {
+      console.log(import_picocolors.default.green(`\u2705 Successfully synced ${res.data.count} team members!`));
+      console.log(import_picocolors.default.gray(`Visit your CarboniX dashboard to view their emission ratings.`));
+    } else {
+      console.error(import_picocolors.default.red("Error: Sync failed."));
+    }
+  } catch (err) {
+    console.error(import_picocolors.default.red(`Error connecting to CarboniX: ${err.response?.data?.error || err.message}`));
   }
 });
 program.parse(process.argv);

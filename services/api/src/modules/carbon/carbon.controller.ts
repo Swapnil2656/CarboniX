@@ -24,8 +24,17 @@ export const calculate = async (req: AuthRequest, res: Response) => {
     
     const userId = req.user!.id;
     
-    // Removed dummy user upsert
-
+    // Ensure user exists to satisfy foreign key constraints (useful for Postman testing)
+    await prisma.mobileUser.upsert({
+      where: { id: userId },
+      update: {},
+      create: {
+        id: userId,
+        email: req.user!.email || 'test@carbonix.dev',
+        name: `User ${userId}`,
+        passwordHash: 'hashed_mock_password'
+      }
+    });
     const calculation = await prisma.calculation.create({
       data: {
         userId: userId,

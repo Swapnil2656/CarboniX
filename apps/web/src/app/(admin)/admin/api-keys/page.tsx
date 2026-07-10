@@ -26,6 +26,7 @@ export default function ApiKeysPage() {
   
   // New Key Display State
   const [newlyCreatedKey, setNewlyCreatedKey] = useState<{ name: string, key: string } | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -67,6 +68,21 @@ export default function ApiKeysPage() {
     } finally {
       setRevokeModalOpen(false);
       setTargetKey(null);
+    }
+  };
+
+  const executeDelete = async (id: string) => {
+    try {
+      if (data) {
+        setData({
+          ...data,
+          keys: data.keys.filter(k => k.id !== id)
+        });
+      }
+      // Use hard delete endpoint
+      await adminApi.deleteApiKey(id); 
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -145,18 +161,24 @@ export default function ApiKeysPage() {
               {newlyCreatedKey.key}
             </code>
             <button 
-              onClick={() => navigator.clipboard.writeText(newlyCreatedKey.key)}
-              className="bg-surface-container hover:bg-surface-container-high border border-outline-variant px-4 py-3 rounded-lg text-on-surface transition-colors flex items-center gap-2"
+              onClick={() => {
+                navigator.clipboard.writeText(newlyCreatedKey.key);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+              className="bg-surface-container hover:bg-surface-container-high border border-outline-variant px-4 py-3 rounded-lg text-on-surface transition-colors flex items-center gap-2 min-w-[100px] justify-center"
             >
-              <span className="material-symbols-outlined text-[18px]">content_copy</span>
-              Copy
+              <span className="material-symbols-outlined text-[18px]">
+                {copied ? 'check' : 'content_copy'}
+              </span>
+              {copied ? 'Copied!' : 'Copy'}
             </button>
           </div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <div className="xl:col-span-2 flex flex-col gap-4">
+      <div className="max-w-4xl flex flex-col gap-4">
+        <div className="flex flex-col gap-4">
           {loading ? (
             Array(3).fill(0).map((_, i) => (
               <div key={i} className="glass-card rounded-xl border border-outline-variant p-6">
@@ -204,6 +226,18 @@ export default function ApiKeysPage() {
                     </button>
                   </div>
                 )}
+
+                {key.status === 'REVOKED' && (
+                  <div className="sm:pl-4 sm:border-l border-outline-variant flex justify-end">
+                    <button 
+                      onClick={() => executeDelete(key.id)}
+                      className="text-on-surface-variant hover:text-error p-2 rounded-full hover:bg-[rgba(248,113,113,0.1)] transition-colors"
+                      title="Delete Key Forever"
+                    >
+                      <span className="material-symbols-outlined">delete_forever</span>
+                    </button>
+                  </div>
+                )}
               </div>
             ))
           ) : (
@@ -213,54 +247,6 @@ export default function ApiKeysPage() {
               <p className="text-on-surface-variant text-sm max-w-md">Generate your first API key to start authenticating requests to the CarboniX API.</p>
             </div>
           )}
-        </div>
-
-        <div className="flex flex-col gap-6">
-          <div className="glass-card rounded-xl border border-outline-variant p-6">
-            <h3 className="text-sm font-label-caps text-on-surface-variant mb-6">Usage Quotas</h3>
-            <div className="flex flex-col gap-2 mb-6">
-              <div className="flex justify-between items-end">
-                <div className="flex flex-col">
-                  <span className="text-2xl font-semibold text-on-surface">1.2M</span>
-                  <span className="text-xs text-on-surface-variant">Calls this month</span>
-                </div>
-                <div className="text-sm font-medium text-primary">
-                  {data?.monthlyUsagePercent || 0}%
-                </div>
-              </div>
-              <div className="w-full h-2 bg-surface-container rounded-full overflow-hidden mt-1">
-                <div 
-                  className={`h-full rounded-full ${((data?.monthlyUsagePercent || 0) > 85) ? 'bg-error' : 'bg-primary'}`} 
-                  style={{ width: `${data?.monthlyUsagePercent || 0}%` }}
-                ></div>
-              </div>
-              <div className="flex justify-between text-xs text-outline mt-1">
-                <span>0</span>
-                <span>2M Limit</span>
-              </div>
-            </div>
-            <button className="w-full py-2 rounded-lg border border-outline-variant text-sm font-medium text-on-surface hover:bg-surface-container transition-colors">
-              Manage Quotas
-            </button>
-          </div>
-
-          <div className="glass-card rounded-xl border border-outline-variant p-6">
-            <h3 className="text-sm font-label-caps text-on-surface-variant mb-4">Quick Docs</h3>
-            <div className="flex flex-col gap-3">
-              <a href="#" className="flex items-center gap-3 text-sm text-on-surface hover:text-primary transition-colors p-2 -mx-2 rounded hover:bg-surface-container">
-                <span className="material-symbols-outlined text-[20px] text-primary">menu_book</span>
-                Authentication Guide
-              </a>
-              <a href="#" className="flex items-center gap-3 text-sm text-on-surface hover:text-primary transition-colors p-2 -mx-2 rounded hover:bg-surface-container">
-                <span className="material-symbols-outlined text-[20px] text-tertiary">api</span>
-                REST API Endpoints
-              </a>
-              <a href="#" className="flex items-center gap-3 text-sm text-on-surface hover:text-primary transition-colors p-2 -mx-2 rounded hover:bg-surface-container">
-                <span className="material-symbols-outlined text-[20px] text-secondary">code</span>
-                Node.js SDK
-              </a>
-            </div>
-          </div>
         </div>
       </div>
 
