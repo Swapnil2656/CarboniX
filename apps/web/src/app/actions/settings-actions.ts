@@ -85,16 +85,40 @@ export async function updateProfile(data: { name?: string; avatarUrl?: string; e
   }
 }
 
-export async function updatePassword(password: string) {
+import bcrypt from 'bcryptjs';
+
+export async function updatePassword(currentPassword: string, newPassword: string) {
   const session = await auth();
   if (!session?.user?.id) {
     return { success: false, error: "Unauthorized" };
   }
 
   try {
-    // Usually you would bcrypt the new password and update the user record here.
-    // For now we just log the audit event to satisfy the requirement.
     const userId = session.user.id;
+
+    // Fetch the user to get their current hashed password
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user || !user.password) {
+      return { success: false, error: "User not found" };
+    }
+
+    // Verify current password
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isPasswordValid) {
+      return { success: false, error: "Incorrect current password" };
+    }
+
+    // Hash the new password
+    const newHashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the password in the database
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: newHashedPassword },
+    });
 
     await prisma.auditLog.create({
       data: {
