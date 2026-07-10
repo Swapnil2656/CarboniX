@@ -2,7 +2,7 @@
 import { verifyEmail } from "@/lib/carbonix-auth/auth-actions";
 import { authConfig } from "@/carbonix-auth.config";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
@@ -13,12 +13,17 @@ function VerifyContent() {
   const [status, setStatus] = useState<"verifying" | "success" | "error">("verifying");
   const [error, setError] = useState<string | null>(null);
 
+  const hasVerified = useRef(false);
+
   useEffect(() => {
     if (!token) {
       setStatus("error");
       setError("No verification token found in the URL.");
       return;
     }
+
+    if (hasVerified.current) return;
+    hasVerified.current = true;
 
     const verify = async () => {
       try {
