@@ -33,7 +33,6 @@ var CONFIG_PATH = import_path.default.join(process.cwd(), ".carbonixrc");
 var API_URL = process.env.CARBONIX_API_URL || "http://localhost:4000/api/v1";
 program.name("carbonix").description("CarboniX Command Line Interface").version("0.1.0");
 program.command("init").description("Initialize a new CarboniX deployment from your project").option("-k, --key <key>", "Your project API key").action(async (options) => {
-  var _a, _b;
   if (!options.key) {
     console.error(import_picocolors.default.red("Error: --key is required to initialize a project."));
     process.exit(1);
@@ -68,7 +67,7 @@ Verifying API Key...`));
       console.error(import_picocolors.default.red("Error: API Key verification failed."));
     }
   } catch (err) {
-    console.error(import_picocolors.default.red(`Error connecting to CarboniX: ${((_b = (_a = err.response) == null ? void 0 : _a.data) == null ? void 0 : _b.error) || err.message}`));
+    console.error(import_picocolors.default.red(`Error connecting to CarboniX: ${err.response?.data?.error || err.message}`));
   }
 });
 var authCmd = program.command("auth").description("Authentication commands");
@@ -140,7 +139,6 @@ Run \`carbonix app deploy\` and the Agentic AI will automatically apply this opt
   }
 });
 appCmd.command("deploy").description("Deploy the current codebase and send telemetry to CarboniX").option("-p, --project <project>", "Target project name").action(async (options) => {
-  var _a, _b;
   try {
     let config = {};
     try {
@@ -231,12 +229,11 @@ appCmd.command("deploy").description("Deploy the current codebase and send telem
       console.error(import_picocolors.default.red("Error: Deployment failed."));
     }
   } catch (err) {
-    console.error(import_picocolors.default.red(`Error connecting to CarboniX: ${((_b = (_a = err.response) == null ? void 0 : _a.data) == null ? void 0 : _b.error) || err.message}`));
+    console.error(import_picocolors.default.red(`Error connecting to CarboniX: ${err.response?.data?.error || err.message}`));
   }
 });
 var teamCmd = program.command("team").description("Team management commands");
 teamCmd.command("sync").description("Automatically discover and sync codebase contributors to CarboniX").action(async () => {
-  var _a, _b;
   try {
     let config = {};
     try {
@@ -271,8 +268,7 @@ teamCmd.command("sync").description("Automatically discover and sync codebase co
       const [name, email] = line.split("|");
       return { name, email };
     }).filter((m) => {
-      var _a2;
-      const email = ((_a2 = m.email) == null ? void 0 : _a2.toLowerCase()) || "";
+      const email = m.email?.toLowerCase() || "";
       return m.name && email && !email.includes("dependabot") && !email.includes("bot@");
     });
     if (members.length === 0) {
@@ -293,7 +289,7 @@ teamCmd.command("sync").description("Automatically discover and sync codebase co
       console.error(import_picocolors.default.red("Error: Sync failed."));
     }
   } catch (err) {
-    console.error(import_picocolors.default.red(`Error connecting to CarboniX: ${((_b = (_a = err.response) == null ? void 0 : _a.data) == null ? void 0 : _b.error) || err.message}`));
+    console.error(import_picocolors.default.red(`Error connecting to CarboniX: ${err.response?.data?.error || err.message}`));
   }
 });
 program.parse(process.argv);

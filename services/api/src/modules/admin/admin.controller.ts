@@ -260,7 +260,17 @@ export const revokeApiKey = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message });
   }
 };
-
+export const deleteApiKey = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    await prisma.apiKey.delete({
+      where: { id }
+    });
+    res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
 export const getTeamMembers = async (req: Request, res: Response) => {
   try {
     const team = await prisma.user.findMany({

@@ -8,6 +8,7 @@ import {
   getApiKeys,
   createApiKey,
   revokeApiKey,
+  deleteApiKey,
   getTeamMembers,
   syncTeamMembers,
   inviteUser,
@@ -37,5 +38,6 @@ router.patch('/feature-flags/:id', toggleFeatureFlag);
 router.get('/api-keys', getApiKeys);
 router.post('/api-keys', createApiKey);
 router.delete('/api-keys/:id', revokeApiKey);
+router.delete('/api-keys/:id/hard', deleteApiKey);
 
 export default router;

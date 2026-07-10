@@ -26,6 +26,7 @@ export default function ApiKeysPage() {
   
   // New Key Display State
   const [newlyCreatedKey, setNewlyCreatedKey] = useState<{ name: string, key: string } | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -78,8 +79,8 @@ export default function ApiKeysPage() {
           keys: data.keys.filter(k => k.id !== id)
         });
       }
-      // Currently using revoke endpoint as placeholder for hard delete
-      await adminApi.revokeApiKey(id); 
+      // Use hard delete endpoint
+      await adminApi.deleteApiKey(id); 
     } catch (err) {
       console.error(err);
     }
@@ -160,11 +161,17 @@ export default function ApiKeysPage() {
               {newlyCreatedKey.key}
             </code>
             <button 
-              onClick={() => navigator.clipboard.writeText(newlyCreatedKey.key)}
-              className="bg-surface-container hover:bg-surface-container-high border border-outline-variant px-4 py-3 rounded-lg text-on-surface transition-colors flex items-center gap-2"
+              onClick={() => {
+                navigator.clipboard.writeText(newlyCreatedKey.key);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+              className="bg-surface-container hover:bg-surface-container-high border border-outline-variant px-4 py-3 rounded-lg text-on-surface transition-colors flex items-center gap-2 min-w-[100px] justify-center"
             >
-              <span className="material-symbols-outlined text-[18px]">content_copy</span>
-              Copy
+              <span className="material-symbols-outlined text-[18px]">
+                {copied ? 'check' : 'content_copy'}
+              </span>
+              {copied ? 'Copied!' : 'Copy'}
             </button>
           </div>
         </div>

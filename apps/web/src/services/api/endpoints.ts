@@ -127,6 +127,12 @@ export const adminApi = {
     });
   },
 
+  deleteApiKey: async (id: string): Promise<void> => {
+    return fetchClient(`/admin/api-keys/${id}/hard`, {
+      method: 'DELETE',
+    });
+  },
+
   inviteUser: async (payload: { name: string; email: string; role?: string; projectName?: string }): Promise<{ success: boolean; message: string }> => {
     return fetchClient('/admin/users/invite', {
       method: 'POST',
