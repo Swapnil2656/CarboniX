@@ -12,7 +12,9 @@ export async function getHistoryLogs(page = 1, pageSize = 15, search = '') {
 
 
 
-    const where = search
+    const isAdmin = session.user.type === 'SUPER_ADMIN' || session.user.type === 'ADMIN';
+
+    const where: any = search
       ? {
           OR: [
             { actorEmail: { contains: search, mode: 'insensitive' as const } },
@@ -21,6 +23,11 @@ export async function getHistoryLogs(page = 1, pageSize = 15, search = '') {
           ],
         }
       : {};
+
+    // Regular users should only see their own logs
+    if (!isAdmin) {
+      where.actorId = session.user.id;
+    }
 
     const [logs, total] = await Promise.all([
       prisma.auditLog.findMany({

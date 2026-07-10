@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
+import { useSession } from 'next-auth/react';
 import { getHistoryLogs } from '@/app/actions/history-actions';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -10,6 +11,9 @@ export default function HistoryPage() {
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.type === 'SUPER_ADMIN' || session?.user?.type === 'ADMIN';
   
   // Pagination & Search
   const [page, setPage] = useState(1);
@@ -56,7 +60,11 @@ export default function HistoryPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-section-header text-on-surface">Audit Logs</h1>
-          <p className="text-on-surface-variant mt-1">Platform-wide history of actions and configuration changes.</p>
+          <p className="text-on-surface-variant mt-1">
+            {isAdmin 
+              ? 'Platform-wide history of actions and configuration changes.' 
+              : 'History of your recent actions and configuration changes.'}
+          </p>
         </div>
         
         <div className="flex items-center gap-3 relative max-w-sm w-full">
