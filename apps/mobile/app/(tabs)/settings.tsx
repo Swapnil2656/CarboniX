@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
-import { useQuery } from '@tanstack/react-query';
+
 import { useRouter } from 'expo-router';
 import { colors } from '../../src/theme/colors';
-import { adminApi } from '../../src/services/api/endpoints';
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
@@ -15,11 +14,6 @@ export default function SettingsScreen() {
   const [autoReport, setAutoReport] = useState(false);
   const [defaultRegion, setDefaultRegion] = useState('us-east-1');
   const [defaultProvider, setDefaultProvider] = useState('aws');
-
-  const { data: dashboard, isLoading: dashboardLoading } = useQuery({
-    queryKey: ['adminDashboard'],
-    queryFn: adminApi.getDashboardStats,
-  });
 
   return (
     <View style={styles.container}>
@@ -40,58 +34,6 @@ export default function SettingsScreen() {
         <View style={styles.header}>
           <Text style={styles.title}>SETTINGS</Text>
           <Text style={styles.subtitle}>MANAGE CARBONIX PREFERENCES</Text>
-        </View>
-
-        {/* Admin Dashboard */}
-        <View style={styles.panel}>
-          <View style={styles.panelHeaderRow}>
-            <MaterialIcons name="dashboard" size={20} color={colors.primary} />
-            <Text style={styles.panelTitle}>ADMIN DASHBOARD</Text>
-          </View>
-          
-          {dashboardLoading ? (
-            <ActivityIndicator size="small" color={colors.primary} />
-          ) : (
-            <View style={styles.statsGrid}>
-              <View style={styles.statBox}>
-                <Text style={styles.statLabel}>API CALLS</Text>
-                <Text style={styles.statValue}>{dashboard?.totalApiCalls?.toLocaleString() || 0}</Text>
-              </View>
-              <View style={styles.statBox}>
-                <Text style={styles.statLabel}>SESSIONS</Text>
-                <Text style={styles.statValue}>{dashboard?.activeSessions?.toLocaleString() || 0}</Text>
-              </View>
-              <View style={styles.statBox}>
-                <Text style={styles.statLabel}>AVG CO₂ (kg)</Text>
-                <Text style={styles.statValue}>{dashboard?.avgCo2Kg || 0}</Text>
-              </View>
-              <View style={styles.statBox}>
-                <Text style={styles.statLabel}>INSTALLS</Text>
-                <Text style={styles.statValue}>{dashboard?.sdkInstalls?.toLocaleString() || 0}</Text>
-              </View>
-            </View>
-          )}
-
-          {/* Quick links to Management screens */}
-          <View style={styles.divider} />
-          <View style={styles.adminLinks}>
-            <TouchableOpacity style={styles.adminLinkBtn} onPress={() => router.push('/settings/users')}>
-              <MaterialIcons name="people" size={18} color={colors.textHeader} />
-              <Text style={styles.adminLinkText}>Manage Users</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.adminLinkBtn} onPress={() => router.push('/settings/keys')}>
-              <MaterialIcons name="vpn-key" size={18} color={colors.textHeader} />
-              <Text style={styles.adminLinkText}>API Keys</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.adminLinkBtn} onPress={() => router.push('/settings/flags')}>
-              <MaterialIcons name="flag" size={18} color={colors.textHeader} />
-              <Text style={styles.adminLinkText}>Feature Flags</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.adminLinkBtn} onPress={() => router.push('/settings/brsr')}>
-              <MaterialIcons name="assessment" size={18} color={colors.textHeader} />
-              <Text style={styles.adminLinkText}>BRSR Reports</Text>
-            </TouchableOpacity>
-          </View>
         </View>
 
         {/* Global Defaults */}
@@ -206,20 +148,19 @@ const styles = StyleSheet.create({
   topBarLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 0,
-    marginLeft: -15,
+    gap: 4,
   },
   logoImage: {
-    width: 50,
-    height: 60,
+    width: 40,
+    height: 40,
     resizeMode: 'contain',
   },
   logo: {
     fontFamily: 'Inter-Bold',
     fontSize: 20,
+    fontWeight: '900',
     color: colors.primary,
     letterSpacing: -0.5,
-    marginLeft: -6,
   },
   iconBtn: {
     padding: 8,

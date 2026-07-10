@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator }
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { colors } from '../../src/theme/colors';
 import { adminApi } from '../../src/services/api/endpoints';
 
@@ -17,6 +17,14 @@ export default function UsersScreen() {
   });
 
   const users = data?.data || [];
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => adminApi.removeUser(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminUsers'] });
+    },
+  });
 
   return (
     <View style={styles.container}>
@@ -63,6 +71,13 @@ export default function UsersScreen() {
                 <Text style={styles.detailLabel}>Calculations:</Text>
                 <Text style={styles.detailValue}>{item.calculationCount}</Text>
               </View>
+              <TouchableOpacity 
+                style={styles.deleteBtn}
+                disabled={deleteMutation.isPending}
+                onPress={() => deleteMutation.mutate(item.id)}
+              >
+                <Text style={styles.deleteBtnText}>Remove User</Text>
+              </TouchableOpacity>
             </View>
           )}
         />
@@ -102,4 +117,6 @@ const styles = StyleSheet.create({
   userDetailRow: { flexDirection: 'row', justifyContent: 'space-between' },
   detailLabel: { fontFamily: 'Inter', fontSize: 13, color: colors.textMuted },
   detailValue: { fontFamily: 'JetBrains Mono', fontSize: 13, color: '#e5e2e1' },
+  deleteBtn: { marginTop: 12, backgroundColor: 'rgba(255, 85, 85, 0.1)', borderWidth: 1, borderColor: 'rgba(255, 85, 85, 0.3)', padding: 12, borderRadius: 8, alignItems: 'center' },
+  deleteBtnText: { color: '#ff5555', fontFamily: 'Inter-Bold', fontSize: 13 },
 });

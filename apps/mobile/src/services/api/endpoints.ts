@@ -49,6 +49,22 @@ export const adminApi = {
   getFeatureFlags: async () => {
     const response = await apiClient.get('/admin/feature-flags');
     return response.data;
+  },
+  toggleFeatureFlag: async (id: string, enabled: boolean) => {
+    const response = await apiClient.patch(`/admin/feature-flags/${id}`, { enabled });
+    return response.data;
+  },
+  createApiKey: async (name: string) => {
+    const response = await apiClient.post('/admin/api-keys', { name });
+    return response.data;
+  },
+  revokeApiKey: async (id: string) => {
+    const response = await apiClient.delete(`/admin/api-keys/${id}`);
+    return response.data;
+  },
+  removeUser: async (id: string) => {
+    const response = await apiClient.delete(`/admin/users/${id}`);
+    return response.data;
   }
 };
 

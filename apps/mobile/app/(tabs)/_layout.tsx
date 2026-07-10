@@ -129,7 +129,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
         let iconName = 'home';
         if (route.name === 'config') iconName = 'home';
         if (route.name === 'compare') iconName = 'compare-arrows';
-        if (route.name === 'console') iconName = 'terminal';
+        if (route.name === 'console') iconName = 'dashboard';
         if (route.name === 'history') iconName = 'history';
         if (route.name === 'settings') iconName = 'settings';
 
@@ -170,7 +170,7 @@ export default function TabLayout() {
     >
       <Tabs.Screen name="config" options={{ title: 'Home' }} />
       <Tabs.Screen name="compare" options={{ title: 'Compare' }} />
-      <Tabs.Screen name="console" options={{ title: 'Console' }} />
+      <Tabs.Screen name="console" options={{ title: 'Dashboard' }} />
       <Tabs.Screen name="history" options={{ title: 'History' }} />
       <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
     </Tabs>

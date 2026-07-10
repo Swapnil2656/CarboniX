@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
@@ -9,8 +9,8 @@ export const TopBar = () => {
   return (
     <View style={[styles.header, { paddingTop: insets.top, height: 56 + insets.top }]}>
       <View style={styles.leftContent}>
-        <MaterialIcons name="terminal" size={20} color={colors.primary} />
-        <Text style={styles.title}>CarbonSDK v1.2.4</Text>
+        <Image source={require('../../assets/carbonix-logo.png')} style={styles.logoImage} />
+        <Text style={styles.logoText}>CarboniX</Text>
       </View>
       <View style={styles.rightContent}>
         <View style={styles.statusBadge}>
@@ -35,14 +35,21 @@ const styles = StyleSheet.create({
   leftContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 0,
+    marginLeft: -15,
   },
-  title: {
+  logoImage: {
+    width: 50,
+    height: 60,
+    resizeMode: 'contain',
+  },
+  logoText: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 20,
+    fontWeight: '900',
     color: colors.primary,
-    fontSize: 14,
-    fontWeight: 'bold',
     letterSpacing: -0.5,
-    fontFamily: 'JetBrains Mono',
+    marginLeft: -6,
   },
   rightContent: {
     flexDirection: 'row',

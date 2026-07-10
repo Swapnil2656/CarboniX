@@ -179,12 +179,11 @@ const styles = StyleSheet.create({
   topBarLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 0,
-    marginLeft: -15,
+    gap: 4,
   },
   logoImage: {
-    width: 50,
-    height: 60,
+    width: 40,
+    height: 40,
     resizeMode: 'contain',
   },
   logo: {
@@ -193,7 +192,6 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: colors.primary,
     letterSpacing: -0.5,
-    marginLeft: -6,
   },
   iconBtn: {
     padding: 8,
