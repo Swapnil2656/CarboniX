@@ -89,6 +89,9 @@ export interface ApiKey {
 export interface ApiKeysResponse {
   keys: ApiKey[];
   monthlyUsagePercent: number;
+  total?: number;
+  page?: number;
+  pageSize?: number;
 }
 
 export interface CreateApiKeyPayload {

@@ -4,10 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "dotenv -e ../../.env -- ts-node-dev --respawn --exit-child --transpile-only src/index.ts",
-    "build": "tsc && cp -r src/generated dist/generated",
+    "build": "rm -rf src/generated dist && npx prisma generate && npx tsc && cp -r src/generated dist/generated",
     "start": "node dist/index.js",
     "lint": "eslint src/**/*.ts",
     "test": "jest"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "@carbonix/agents": "*",

@@ -9,6 +9,7 @@ import { getProjects } from '@/app/actions/dashboard-actions';
 import { adminApi, carbonApi } from '@/services/api/endpoints';
 import type { DashboardData } from '@/types/admin';
 import { useRouter } from 'next/navigation';
+import { Pagination } from '@/components/ui/Pagination';
 
 interface Project {
   id: string;
@@ -52,6 +53,7 @@ export default function DashboardPage() {
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const router = useRouter();
 
   const handleAnalyze = async (project: Project) => {
@@ -93,6 +95,7 @@ export default function DashboardPage() {
       if (res.success) {
         setProjects(res.projects || []);
         if (res.totalPages) setTotalPages(res.totalPages);
+        if (res.total !== undefined) setTotalItems(res.total);
         setError(null);
       } else {
         setError(res.error || 'Failed to fetch projects.');
@@ -289,37 +292,15 @@ export default function DashboardPage() {
             </table>
             
             {/* Pagination Controls */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between px-4 py-3 border-t border-outline-variant/30">
-                <div className="text-sm text-on-surface-variant">
-                  Page <span className="font-medium text-on-surface">{currentPage}</span> of <span className="font-medium text-on-surface">{totalPages}</span>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      const newPage = Math.max(1, currentPage - 1);
-                      setCurrentPage(newPage);
-                      fetchProjectsData(newPage, true);
-                    }}
-                    disabled={currentPage === 1 || loading}
-                    className="flex items-center justify-center w-8 h-8 rounded-lg border border-outline-variant bg-surface-container hover:bg-surface-container-high disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-on-surface"
-                  >
-                    <span className="material-symbols-outlined text-sm">chevron_left</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      const newPage = Math.min(totalPages, currentPage + 1);
-                      setCurrentPage(newPage);
-                      fetchProjectsData(newPage, true);
-                    }}
-                    disabled={currentPage === totalPages || loading}
-                    className="flex items-center justify-center w-8 h-8 rounded-lg border border-outline-variant bg-surface-container hover:bg-surface-container-high disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-on-surface"
-                  >
-                    <span className="material-symbols-outlined text-sm">chevron_right</span>
-                  </button>
-                </div>
-              </div>
-            )}
+            <Pagination 
+              currentPage={currentPage}
+              pageSize={5}
+              totalItems={totalItems}
+              onPageChange={(page) => {
+                setCurrentPage(page);
+                fetchProjectsData(page, true);
+              }}
+            />
           </div>
         ) : (
           /* Empty state — no projects at all */

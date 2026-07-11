@@ -6,6 +6,7 @@ import { getHistoryLogs } from '@/app/actions/history-actions';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Badge } from '@/components/ui/Badge';
+import { Pagination } from '@/components/ui/Pagination';
 
 export default function HistoryPage() {
   const [logs, setLogs] = useState<any[]>([]);
@@ -17,7 +18,7 @@ export default function HistoryPage() {
   
   // Pagination & Search
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
@@ -39,7 +40,7 @@ export default function HistoryPage() {
       const res = await getHistoryLogs(page, pageSize, debouncedSearch);
       if (res.success) {
         setLogs(res.logs || []);
-        setTotalPages(res.totalPages || 1);
+        setTotalItems(res.total || 0);
       } else {
         setError(res.error || 'Failed to fetch audit logs');
       }
@@ -142,27 +143,12 @@ export default function HistoryPage() {
         
         {/* Pagination Controls */}
         {!loading && logs.length > 0 && (
-          <div className="border-t border-outline-variant p-4 flex items-center justify-between bg-surface-container-low">
-            <span className="text-sm text-on-surface-variant">
-              Page <span className="font-medium text-on-surface">{page}</span> of <span className="font-medium text-on-surface">{totalPages}</span>
-            </span>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="px-3 py-1.5 text-sm font-medium rounded bg-surface border border-outline-variant hover:bg-surface-container disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-on-surface"
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                className="px-3 py-1.5 text-sm font-medium rounded bg-surface border border-outline-variant hover:bg-surface-container disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-on-surface"
-              >
-                Next
-              </button>
-            </div>
-          </div>
+          <Pagination 
+            currentPage={page} 
+            pageSize={pageSize} 
+            totalItems={totalItems} 
+            onPageChange={setPage} 
+          />
         )}
       </div>
     </div>

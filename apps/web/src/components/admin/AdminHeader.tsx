@@ -12,18 +12,14 @@ const searchTargets = [
   { label: 'Emissions', keywords: ['emissions', 'carbon', 'co2', 'footprint', 'energy', 'sustainability', 'intensity'], path: '/admin/emissions' },
   { label: 'Team Emissions', keywords: ['users', 'assets', 'team', 'people', 'customers', 'clients', 'accounts', 'mobile'], path: '/admin/users', requireAdmin: true },
   { label: 'API Keys', keywords: ['api', 'key', 'keys', 'tokens', 'integration', 'webhooks'], path: '/admin/api-keys' },
-  { label: 'Settings', keywords: ['settings', 'config', 'preferences', 'profile', 'account'], path: '/admin/settings' },
+  { label: 'Settings', keywords: ['settings', 'config', 'preferences'], path: '/admin/settings' },
   { label: 'Audit History', keywords: ['history', 'audit', 'logs', 'activity', 'recent'], path: '/admin/history' },
-  
-  // Documentation Features
-  { label: 'Documentation Home', keywords: ['docs', 'documentation', 'guide', 'tutorial', 'reference'], path: '/docs' },
-  { label: 'CI/CD Integration', keywords: ['ci', 'cd', 'github actions', 'pipeline', 'deployment', 'automation', 'docs'], path: '/docs/ci-cd' },
-  { label: 'API Reference', keywords: ['api', 'reference', 'endpoints', 'docs'], path: '/docs/api-reference' },
-  { label: 'SDK Reference', keywords: ['sdk', 'reference', 'library', 'package', 'docs'], path: '/docs/sdk-reference' },
-  { label: 'Methodology', keywords: ['methodology', 'calculation', 'math', 'formula', 'docs'], path: '/docs/methodology' },
-  { label: 'Authentication Docs', keywords: ['auth', 'authentication', 'security', 'login', 'docs'], path: '/docs/authentication' },
-  { label: 'Supported Regions', keywords: ['regions', 'cloud', 'aws', 'gcp', 'azure', 'locations', 'docs'], path: '/docs/regions' },
-  { label: 'Quick Start', keywords: ['quick start', 'getting started', 'setup', 'install', 'docs'], path: '/docs/quick-start' },
+  { label: 'Documentation', keywords: ['docs', 'documentation', 'guide', 'tutorial', 'reference', 'sdk'], path: '/docs' },
+
+  // Deep / Hidden Features (Mobile-Style Search)
+  { label: 'Developer Options', keywords: ['developer', 'options', 'dev', 'api', 'webhooks', 'integration', 'sdk'], path: '/admin/settings#developer' },
+  { label: 'Account Security', keywords: ['security', 'password', 'authentication', 'login'], path: '/admin/settings#security' },
+  { label: 'Notification Preferences', keywords: ['notifications', 'alerts', 'emails', 'push'], path: '/admin/settings#notifications' },
 ];
 
 export const AdminHeader = () => {
@@ -41,8 +37,8 @@ export const AdminHeader = () => {
   const historyRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [historyLogs, setHistoryLogs] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<{ id: string; title: string; description: string; time: string; isRead: boolean; type: string; icon: string }[]>([]);
+  const [historyLogs, setHistoryLogs] = useState<{ id: string; action: string; time: string; icon: string }[]>([]);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const [hasUnreadHistory, setHasUnreadHistory] = useState(false);
 
@@ -62,7 +58,7 @@ export const AdminHeader = () => {
               setHasUnreadNotifications(true);
             }
           }
-          const mappedNotifs = notifRes.notifications.map((n: any) => ({
+          const mappedNotifs = notifRes.notifications.map((n: { id: string; title: string; body: string; createdAt: string; type: string }) => ({
             id: n.id,
             title: n.title,
             description: n.body,
@@ -82,7 +78,7 @@ export const AdminHeader = () => {
               setHasUnreadHistory(true);
             }
           }
-          const mappedLogs = logsRes.logs.map((l: any) => ({
+          const mappedLogs = logsRes.logs.map((l: { id: string; action: string; entityType: string; createdAt: string }) => ({
             id: l.id,
             action: `${l.action} ${l.entityType ? `on ${l.entityType}` : ''}`,
             time: new Date(l.createdAt).toLocaleString(),
@@ -218,7 +214,7 @@ export const AdminHeader = () => {
                 </ul>
               ) : (
                 <div className="px-4 py-3 text-sm text-on-surface-variant text-center">
-                  No results found for "{searchQuery}"
+                  No results found for &quot;{searchQuery}&quot;
                 </div>
               )}
             </div>

@@ -5,9 +5,32 @@ import crypto from 'crypto';
 import { redis } from '../../lib/redis';
 import { sendEmail } from '../../utils/email';
 
-export const getDashboard = async (req: Request, res: Response) => {
+// Helper to resolve the IDs of all users/projects in the current user's team/tenant
+async function resolveTenantContext(userId: string, userEmail: string) {
+  const ownedProjects = await prisma.project.findMany({ select: { id: true }, where: { userId } });
+  const memberRecords = await prisma.teamMember.findMany({ select: { projectId: true }, where: { email: userEmail } });
+  
+  const projectIds = Array.from(new Set([
+    ...ownedProjects.map(p => p.id),
+    ...memberRecords.map(m => m.projectId)
+  ]));
+
+  const teamMembers = await prisma.teamMember.findMany({ where: { projectId: { in: projectIds } } });
+  const teamEmails = teamMembers.map(tm => tm.email);
+  const teamUsers = await prisma.user.findMany({ select: { id: true }, where: { email: { in: teamEmails } } });
+  
+  const teamUserIds = Array.from(new Set([...teamUsers.map(u => u.id), userId]));
+  
+  return { projectIds, teamUserIds };
+}
+
+export const getDashboard = async (req: AuthRequest, res: Response) => {
   try {
-    const cacheKey = 'admin:dashboard_stats';
+    const userId = req.user?.id;
+    const userEmail = req.user?.email;
+    if (!userId || !userEmail) return res.status(401).json({ error: 'Unauthorized' });
+
+    const cacheKey = `admin:dashboard_stats:${userId}`;
     let cached = null;
     try {
       cached = await redis.get(cacheKey);
@@ -18,7 +41,11 @@ export const getDashboard = async (req: Request, res: Response) => {
       return res.json({ ...JSON.parse(cached), cached: true });
     }
 
-    const apiKeys = await prisma.apiKey.findMany();
+    const { teamUserIds } = await resolveTenantContext(userId, userEmail);
+
+    const apiKeys = await prisma.apiKey.findMany({
+      where: { createdBy: { in: teamUserIds } }
+    });
     const totalApiCalls = apiKeys.reduce((acc, key) => acc + key.totalRequests, 0);
 
     const activeSessions = await prisma.session.count({ where: { isActive: true } });
@@ -45,7 +72,10 @@ export const getDashboard = async (req: Request, res: Response) => {
     // Real data for api calls over time using Calculations table
     const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const calculations = await prisma.calculation.findMany({
-      where: { createdAt: { gte: last24Hours } },
+      where: { 
+        createdAt: { gte: last24Hours },
+        userId: { in: teamUserIds }
+      },
       select: { createdAt: true }
     });
 
@@ -100,13 +130,29 @@ export const getDashboard = async (req: Request, res: Response) => {
   }
 };
 
-export const getUsers = async (req: Request, res: Response) => {
+export const getUsers = async (req: AuthRequest, res: Response) => {
   try {
+    const userId = req.user?.id;
+    const userEmail = req.user?.email;
+    if (!userId || !userEmail) return res.status(401).json({ error: 'Unauthorized' });
+
     const page = parseInt(req.query.page as string) || 1;
     const pageSize = parseInt(req.query.pageSize as string) || 20;
 
-    const rawTeamMembers = await prisma.teamMember.findMany();
-    const rawUsers = await prisma.user.findMany({ include: { profile: true } });
+    const { projectIds } = await resolveTenantContext(userId, userEmail);
+
+    const rawTeamMembers = await prisma.teamMember.findMany({
+      where: { projectId: { in: projectIds } }
+    });
+    
+    // Also include the current user and users who are in the team members list
+    const memberEmails = rawTeamMembers.map(tm => tm.email);
+    const emailsToFetch = Array.from(new Set([...memberEmails, userEmail]));
+    
+    const rawUsers = await prisma.user.findMany({
+      where: { email: { in: emailsToFetch } },
+      include: { profile: true }
+    });
 
     const mergedMap = new Map();
     rawTeamMembers.forEach(tm => mergedMap.set(tm.email, tm));
@@ -119,7 +165,7 @@ export const getUsers = async (req: Request, res: Response) => {
           email: u.email,
           role: u.type,
           projectName: 'CarboniX Core',
-          projectId: 'core',
+          projectId: projectIds[0] || 'core', // Default to their first project
           location: 'Global',
           co2Emissions: 0,
           status: 'ACTIVE',
@@ -141,7 +187,11 @@ export const getUsers = async (req: Request, res: Response) => {
     const users = allUsers.slice((page - 1) * pageSize, page * pageSize);
     const total = allUsers.length;
     
-    const projects = await prisma.project.findMany({ select: { name: true, sdkConnected: true } });
+    // Only get projects for the current user
+    const projects = await prisma.project.findMany({ 
+      where: { id: { in: projectIds } },
+      select: { name: true, sdkConnected: true } 
+    });
     const connectedProjectNames = new Set(projects.filter(p => p.sdkConnected).map(p => p.name));
     
     let totalEmissions = 0;
@@ -235,10 +285,26 @@ export const toggleFeatureFlag = async (req: Request, res: Response) => {
   }
 };
 
-export const getApiKeys = async (req: Request, res: Response) => {
+export const getApiKeys = async (req: AuthRequest, res: Response) => {
   try {
+    const userId = req.user?.id;
+    const userEmail = req.user?.email;
+    if (!userId || !userEmail) return res.status(401).json({ error: 'Unauthorized' });
+
+    const page = parseInt(req.query.page as string) || 1;
+    const pageSize = parseInt(req.query.pageSize as string) || 20;
+
+    const { teamUserIds } = await resolveTenantContext(userId, userEmail);
+
     const keys = await prisma.apiKey.findMany({
+      where: { createdBy: { in: teamUserIds } },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
       orderBy: { createdAt: 'desc' }
+    });
+
+    const total = await prisma.apiKey.count({
+      where: { createdBy: { in: teamUserIds } }
     });
 
     const formattedKeys = keys.map(k => ({
@@ -252,6 +318,9 @@ export const getApiKeys = async (req: Request, res: Response) => {
 
     res.json({ 
       keys: formattedKeys,
+      total,
+      page,
+      pageSize,
       monthlyUsagePercent: 42 // placeholder or could compute from sum / limit
     });
   } catch (error: any) {
@@ -365,9 +434,16 @@ export const deleteApiKey = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message });
   }
 };
-export const getTeamMembers = async (req: Request, res: Response) => {
+export const getTeamMembers = async (req: AuthRequest, res: Response) => {
   try {
+    const userId = req.user?.id;
+    const userEmail = req.user?.email;
+    if (!userId || !userEmail) return res.status(401).json({ error: 'Unauthorized' });
+
+    const { teamUserIds } = await resolveTenantContext(userId, userEmail);
+
     const team = await prisma.user.findMany({
+      where: { id: { in: teamUserIds } },
       orderBy: { createdAt: 'desc' },
       select: {
         id: true,
@@ -391,16 +467,23 @@ export const getTeamMembers = async (req: Request, res: Response) => {
   }
 };
 
-export const syncTeamMembers = async (req: Request, res: Response) => {
+export const syncTeamMembers = async (req: AuthRequest, res: Response) => {
   try {
+    const userId = req.user?.id;
+    const userEmail = req.user?.email;
+    if (!userId || !userEmail) return res.status(401).json({ error: 'Unauthorized' });
+
     const { members, projectName } = req.body;
+    
+    const { projectIds } = await resolveTenantContext(userId, userEmail);
+    const targetProjectId = projectIds.length > 0 ? projectIds[0] : 'proj_invite';
     
     const synced = [];
     for (const m of members) {
       if (!m.name || !m.email) continue;
       
       const existing = await prisma.teamMember.findFirst({
-        where: { name: m.name }
+        where: { name: m.name, projectId: targetProjectId }
       });
       
       if (!existing) {
@@ -410,7 +493,7 @@ export const syncTeamMembers = async (req: Request, res: Response) => {
             email: m.email,
             role: 'Developer',
             projectName: projectName || 'Unknown Project',
-            projectId: 'proj_' + Math.random().toString(36).substring(7),
+            projectId: targetProjectId,
             location: 'Global',
             co2Emissions: Math.floor(Math.random() * 200) + 50,
             status: 'ACTIVE',
@@ -449,8 +532,12 @@ export const syncTeamMembers = async (req: Request, res: Response) => {
   }
 };
 
-export const inviteUser = async (req: Request, res: Response) => {
+export const inviteUser = async (req: AuthRequest, res: Response) => {
   try {
+    const userId = req.user?.id;
+    const userEmail = req.user?.email;
+    if (!userId || !userEmail) return res.status(401).json({ error: 'Unauthorized' });
+
     const { name, email, role, projectName } = req.body;
     
     const existingMember = await prisma.teamMember.findUnique({ where: { email } });
@@ -465,7 +552,7 @@ export const inviteUser = async (req: Request, res: Response) => {
       "You've been invited to CarboniX!",
       `<div style="font-family:sans-serif;max-width:480px;margin:auto">
         <h2>Hi ${name || email.split('@')[0]},</h2>
-        <p>You have been invited to join the <strong>${projectName}</strong> project on CarboniX as a ${role || 'Developer'}.</p>
+        <p>You have been invited to join the <strong>${projectName || 'project'}</strong> project on CarboniX as a ${role || 'Developer'}.</p>
         <p>Please click below to accept the invitation and connect your environment:</p>
         <p>
           <a href="${inviteLink}" style="display:inline-block;padding:12px 24px;background:#50FA7B;color:#1e1e2e;text-decoration:none;border-radius:8px;font-weight:600">
@@ -475,13 +562,16 @@ export const inviteUser = async (req: Request, res: Response) => {
       </div>`
     );
 
+    const { projectIds } = await resolveTenantContext(userId, userEmail);
+    const targetProjectId = projectIds.length > 0 ? projectIds[0] : 'proj_invite';
+
     const newMember = await prisma.teamMember.create({
       data: {
         name: name || email.split('@')[0],
         email: email,
         role: role || 'Developer',
         projectName: projectName || 'Invited',
-        projectId: 'proj_invite',
+        projectId: targetProjectId,
         location: 'Pending',
         co2Emissions: 0,
         status: 'PENDING',
@@ -680,12 +770,19 @@ export const getNotifications = async (req: AuthRequest, res: Response) => {
 
 export const getAuditLogs = async (req: AuthRequest, res: Response) => {
   try {
+    const page = parseInt(req.query.page as string) || 1;
+    const pageSize = parseInt(req.query.pageSize as string) || 20;
+
     const logs = await prisma.auditLog.findMany({
       where: { actorId: req.user?.id },
       orderBy: { createdAt: 'desc' },
-      take: 10
+      skip: (page - 1) * pageSize,
+      take: pageSize
     });
-    res.json({ success: true, logs });
+    
+    const total = await prisma.auditLog.count({ where: { actorId: req.user?.id } });
+    
+    res.json({ success: true, logs, total, page, pageSize });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

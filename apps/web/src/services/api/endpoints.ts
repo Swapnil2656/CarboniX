@@ -69,20 +69,18 @@ export const adminApi = {
     });
   },
 
-  getAuditLogs: async (): Promise<any> => {
-    return fetchClient('/admin/audit-logs', {
+  getAuditLogs: async (page = 1, pageSize = 20): Promise<any> => {
+    return fetchClient(`/admin/audit-logs?page=${page}&pageSize=${pageSize}`, {
       method: 'GET',
     });
   },
 
-  // TODO: implement GET /api/v1/admin/dashboard on the backend
   getDashboard: async (): Promise<DashboardData> => {
     return fetchClient('/admin/dashboard', {
       method: 'GET',
     });
   },
 
-  // TODO: implement GET /api/v1/admin/users on the backend
   getUsers: async (page = 1, pageSize = 20): Promise<UsersResponse> => {
     return fetchClient(`/admin/users?page=${page}&pageSize=${pageSize}`, {
       method: 'GET',
@@ -90,14 +88,12 @@ export const adminApi = {
   },
 
 
-  // TODO: implement GET /api/v1/admin/feature-flags on the backend
   getFeatureFlags: async (): Promise<FeatureFlagsResponse> => {
     return fetchClient('/admin/feature-flags', {
       method: 'GET',
     });
   },
 
-  // TODO: implement PATCH /api/v1/admin/feature-flags/:id on the backend
   toggleFeatureFlag: async (id: string, enabled: boolean): Promise<void> => {
     return fetchClient(`/admin/feature-flags/${id}`, {
       method: 'PATCH',
@@ -105,14 +101,12 @@ export const adminApi = {
     });
   },
 
-  // TODO: implement GET /api/v1/admin/api-keys on the backend
-  getApiKeys: async (): Promise<ApiKeysResponse> => {
-    return fetchClient('/admin/api-keys', {
+  getApiKeys: async (page = 1, pageSize = 20): Promise<ApiKeysResponse> => {
+    return fetchClient(`/admin/api-keys?page=${page}&pageSize=${pageSize}`, {
       method: 'GET',
     });
   },
 
-  // TODO: implement POST /api/v1/admin/api-keys on the backend
   createApiKey: async (payload: CreateApiKeyPayload): Promise<{ key: string; id: string }> => {
     return fetchClient('/admin/api-keys', {
       method: 'POST',
@@ -120,7 +114,6 @@ export const adminApi = {
     });
   },
 
-  // TODO: implement DELETE /api/v1/admin/api-keys/:id on the backend
   revokeApiKey: async (id: string): Promise<void> => {
     return fetchClient(`/admin/api-keys/${id}`, {
       method: 'DELETE',

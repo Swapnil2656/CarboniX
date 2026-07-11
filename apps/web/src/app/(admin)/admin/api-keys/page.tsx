@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/Badge';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { Pagination } from '@/components/ui/Pagination';
 import { adminApi } from '@/services/api/endpoints';
 import type { ApiKey, ApiKeysResponse, CreateApiKeyPayload } from '@/types/admin';
 
@@ -12,6 +13,8 @@ export default function ApiKeysPage() {
   const [data, setData] = useState<ApiKeysResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const pageSize = 20;
   
   // Revoke Modal State
   const [revokeModalOpen, setRevokeModalOpen] = useState(false);
@@ -32,7 +35,7 @@ export default function ApiKeysPage() {
     try {
       setLoading(true);
       setError(null);
-      const res = await adminApi.getApiKeys();
+      const res = await adminApi.getApiKeys(page, pageSize);
       setData(res);
     } catch (err) {
       console.error(err);
@@ -44,7 +47,7 @@ export default function ApiKeysPage() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [page]);
 
   const handleRevokeClick = (key: ApiKey) => {
     setTargetKey(key);
@@ -251,6 +254,17 @@ export default function ApiKeysPage() {
             </div>
           )}
         </div>
+        
+        {data && data.total !== undefined && (
+          <div className="glass-card rounded-xl border border-outline-variant overflow-hidden mt-4">
+            <Pagination 
+              currentPage={page} 
+              pageSize={pageSize} 
+              totalItems={data.total || 0} 
+              onPageChange={setPage} 
+            />
+          </div>
+        )}
       </div>
 
       {/* Revoke Modal */}

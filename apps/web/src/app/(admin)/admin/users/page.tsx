@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/Badge';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { Pagination } from '@/components/ui/Pagination';
 import { adminApi } from '@/services/api/endpoints';
 import type { UsersResponse } from '@/types/admin';
 
@@ -122,7 +123,7 @@ export default function UsersPage() {
     }
   };
 
-  const totalPages = data ? Math.ceil(data.total / data.pageSize) : 0;
+  
 
   const uniqueProjects = Array.from(new Set(data?.users?.map(u => u.projectName) || [])).filter(Boolean);
   if (uniqueProjects.length === 0) uniqueProjects.push('CarboniX Core');
@@ -349,45 +350,12 @@ export default function UsersPage() {
         </div>
         
         {/* Pagination */}
-        <div className="px-6 py-4 border-t border-outline-variant flex items-center justify-between bg-surface-container-lowest">
-          <span className="text-sm text-on-surface-variant">
-            Showing {filteredUsers.length} of {data?.total || 0} results
-          </span>
-          <div className="flex items-center gap-1">
-            <button 
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="p-1 rounded bg-surface border border-outline-variant text-on-surface-variant hover:text-on-surface disabled:opacity-50"
-            >
-              <span className="material-symbols-outlined text-[20px]">chevron_left</span>
-            </button>
-            
-            <button className="px-3 py-1 rounded bg-[rgba(245,197,24,0.1)] text-primary border border-primary font-medium text-sm">
-              {page}
-            </button>
-            
-            {page < totalPages && (
-              <button 
-                onClick={() => setPage(page + 1)}
-                className="px-3 py-1 rounded bg-surface border border-outline-variant text-on-surface hover:bg-surface-container font-medium text-sm"
-              >
-                {page + 1}
-              </button>
-            )}
-            
-            {page < totalPages - 1 && (
-              <span className="px-2 text-on-surface-variant">...</span>
-            )}
-            
-            <button 
-              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages || totalPages === 0}
-              className="p-1 rounded bg-surface border border-outline-variant text-on-surface-variant hover:text-on-surface disabled:opacity-50"
-            >
-              <span className="material-symbols-outlined text-[20px]">chevron_right</span>
-            </button>
-          </div>
-        </div>
+        <Pagination 
+          currentPage={page} 
+          pageSize={pageSize} 
+          totalItems={data?.total || 0} 
+          onPageChange={setPage} 
+        />
       </div>
 
       {/* Insights Section */}
