@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "dotenv -e ../../.env -- next dev",
+    "dev": "rm -rf .next && dotenv -e ../../.env -- next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -50,6 +50,7 @@
     "@types/pg": "^8.20.0",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "autoprefixer": "^10.5.2",
     "dotenv": "^16.6.1",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",

@@ -65,19 +65,58 @@ exports.REGION_PUE_OVERRIDES = {
 const cache = {};
 // 1 hour cache TTL
 const CACHE_TTL_MS = 60 * 60 * 1000;
+// Map cloud regions to ISO 3166-1 alpha-2 country codes for emissions.dev
+const getCountryFromRegion = (region) => {
+    if (region.startsWith('us-'))
+        return 'US';
+    if (region.startsWith('eu-west'))
+        return 'IE'; // Ireland for AWS eu-west-1
+    if (region.startsWith('eu-central'))
+        return 'DE'; // Frankfurt
+    if (region.startsWith('europe-west'))
+        return 'BE'; // GCP Belgium
+    if (region.startsWith('ap-south'))
+        return 'IN'; // Mumbai
+    if (region.startsWith('ap-northeast'))
+        return 'JP'; // Tokyo
+    if (region.startsWith('ap-southeast'))
+        return 'SG'; // Singapore
+    return 'US'; // default
+};
 async function getGridIntensity(region) {
     const now = Date.now();
     if (cache[region] && (now - cache[region].timestamp < CACHE_TTL_MS)) {
         return cache[region].intensity;
     }
-    // TODO: Add Electricity Maps API call here.
-    // For now, if no API key is set or the call fails, we rely on the robust static fallback.
-    const fallback = exports.DEFAULT_GRID_INTENSITIES[region] || 400; // global average fallback
+    let intensity = exports.DEFAULT_GRID_INTENSITIES[region] || 400; // global average fallback
+    const apiKey = process.env.EMISSIONS_DEV_API_KEY || 'em_live_BRnhlaMwNsojVQqErueNPGvS36XXrZ1VV6Eo7S';
+    if (apiKey) {
+        try {
+            const countryCode = getCountryFromRegion(region);
+            // Fetch emissions for 1000 kWh. The result in kg CO2e is mathematically equal to g CO2e / kWh
+            const res = await fetch(`https://api.emissions.dev/v1/electricity/emissions?kwh=1000&country=${countryCode}`, {
+                headers: { 'Authorization': `Bearer ${apiKey}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data && typeof data.co2e === 'number') {
+                    intensity = data.co2e; // 1000 kWh -> kg CO2e == g/kWh
+                }
+            }
+            else {
+                const errData = await res.json().catch(() => ({}));
+                console.warn(`[GridCache] emissions.dev API failed (Status ${res.status}):`, errData.error?.message || 'Unknown error');
+            }
+        }
+        catch (error) {
+            console.warn(`[GridCache] Failed to fetch live intensity for ${region}, using fallback: ${error.message}`);
+        }
+    }
     cache[region] = {
-        intensity: fallback,
+        intensity,
         timestamp: now
     };
-    return fallback;
+    return intensity;
 }
 function getProviderPue(provider, region) {
     if (exports.REGION_PUE_OVERRIDES[region]) {

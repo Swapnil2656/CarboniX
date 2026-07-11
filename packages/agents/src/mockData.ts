@@ -92,10 +92,10 @@ const MOCK_FLEET: Omit<MockInstance, 'cpuUtilization' | 'memoryUtilization' | 'n
   // GCP instance — EU region (clean energy)
   {
     instanceId: 'gce-carbonix-web-eu',
-    instanceType: 't3.medium',
+    instanceType: 'e2-medium',
     instanceName: 'web-frontend-eu',
-    provider: 'AWS',
-    region: 'eu-north-1',
+    provider: 'GCP',
+    region: 'europe-west1',
     storageGb: 20,
     hoursRunning: 720,
   },
