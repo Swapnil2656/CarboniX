@@ -32,7 +32,7 @@ export const AdminSidebar = ({ isCollapsed, onToggle }: AdminSidebarProps) => {
       }`}
     >
       <div className={`px-6 mb-8 flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3'}`}>
-        <img src="/carbonix-logo.png" alt="CarboniX" className="w-8 h-8 object-contain shrink-0" />
+        <img src="/carbonix-logo.png" alt="" className="w-8 h-8 object-contain shrink-0" />
         {!isCollapsed && (
           <span className="font-display font-semibold text-xl tracking-tight text-amber-500 dark:text-primary whitespace-nowrap overflow-hidden">
             CarboniX

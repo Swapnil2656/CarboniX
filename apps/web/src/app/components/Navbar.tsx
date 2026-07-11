@@ -39,7 +39,7 @@ export function Navbar({ session }: { session: any }) {
       <div className="flex justify-between items-center px-margin py-md max-w-[1440px] mx-auto">
         <div className="flex items-center gap-xl">
           <Link href="/" className="flex items-center gap-sm">
-            <img src="/carbonix-logo.png" alt="CarboniX" className="w-8 h-8 object-contain" />
+            <img src="/carbonix-logo.png" alt="" className="w-8 h-8 object-contain" />
             <span className="text-section-header font-display font-black text-amber-500 dark:text-primary">
               CarboniX
             </span>
