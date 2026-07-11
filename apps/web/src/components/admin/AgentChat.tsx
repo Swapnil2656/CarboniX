@@ -90,6 +90,7 @@ export default function AgentChat() {
     return (
       <button 
         onClick={toggleChat}
+        aria-label="Open AI Assistant"
         className="fixed bottom-6 right-6 bg-gradient-to-r from-green-500 to-emerald-600 text-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 z-50 flex items-center justify-center"
       >
         <Bot size={28} />
