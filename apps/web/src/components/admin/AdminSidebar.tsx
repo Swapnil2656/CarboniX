@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Image from "next/image";
 
 interface AdminSidebarProps {
   isCollapsed: boolean;
@@ -32,7 +33,7 @@ export const AdminSidebar = ({ isCollapsed, onToggle }: AdminSidebarProps) => {
       }`}
     >
       <div className={`px-6 mb-8 flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3'}`}>
-        <img src="/carbonix-logo.png" alt="" className="w-8 h-8 object-contain shrink-0" />
+        <Image src="/carbonix-logo.png" alt="" width={32} height={32} className="w-8 h-8 object-contain shrink-0" />
         {!isCollapsed && (
           <span className="font-display font-semibold text-xl tracking-tight text-amber-500 dark:text-primary whitespace-nowrap overflow-hidden">
             CarboniX

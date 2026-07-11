@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
-import AgentChat from "@/components/admin/AgentChat";
+import dynamic from 'next/dynamic';
+
+const AgentChat = dynamic(() => import('@/components/admin/AgentChat'), { ssr: false });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "CarboniX | The Carbon Cost of Your Cloud",
@@ -16,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className="antialiased">
+      <body className={`antialiased ${inter.className}`}>
         <Providers>
           {children}
           <AgentChat />

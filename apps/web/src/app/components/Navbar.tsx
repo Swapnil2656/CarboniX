@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { SignOutButton } from "./SignOutButton";
 
@@ -39,7 +40,7 @@ export function Navbar({ session }: { session: any }) {
       <div className="flex justify-between items-center px-margin py-md max-w-[1440px] mx-auto">
         <div className="flex items-center gap-xl">
           <Link href="/" className="flex items-center gap-sm">
-            <img src="/carbonix-logo.png" alt="" className="w-8 h-8 object-contain" />
+            <Image src="/carbonix-logo.png" alt="" width={32} height={32} className="w-8 h-8 object-contain" />
             <span className="text-section-header font-display font-black text-amber-500 dark:text-primary">
               CarboniX
             </span>
