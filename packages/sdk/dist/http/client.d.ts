@@ -15,7 +15,7 @@ export declare class HttpClient {
     private readonly sdkVersion;
     constructor(config: CarbonixConfig);
     request<T>(method: 'GET' | 'POST' | 'DELETE', path: string, body?: unknown): Promise<T>;
-    get<T>(path: string): Promise<T>;
-    post<T>(path: string, body: unknown): Promise<T>;
+    get<T>(path: string): Promise<T_1>;
+    post<T>(path: string, body: unknown): Promise<T_1>;
 }
 //# sourceMappingURL=client.d.ts.map
