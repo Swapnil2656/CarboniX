@@ -25,7 +25,7 @@ export function IdeSnippet() {
           <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
           <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
         </div>
-        <div className="text-[#858585] text-xs font-sans flex-1 text-center pr-12">
+        <div className="text-[#a3a3a3] text-xs font-sans flex-1 text-center pr-12">
           main.tf - carbonix-infrastructure
         </div>
       </div>
@@ -38,7 +38,7 @@ export function IdeSnippet() {
                 const { key: lineKey, ...lineProps } = getLineProps({ line, key: i });
                 return (
                   <div key={i} {...lineProps} className="table-row">
-                    <span className="table-cell text-right pr-4 text-[#858585] select-none opacity-50">{i + 1}</span>
+                    <span className="table-cell text-right pr-4 text-[#a3a3a3] select-none opacity-50">{i + 1}</span>
                     <span className="table-cell">
                       {line.map((token, key) => {
                         const { key: tokenKey, ...tokenProps } = getTokenProps({ token, key });
@@ -64,10 +64,10 @@ export function IdeSnippet() {
               <span className="text-primary text-[10px] font-bold">CX</span>
             </div>
             <div>
-              <h4 className="text-on-surface font-sans text-xs font-bold mb-1 flex items-center gap-1">
+              <h3 className="text-on-surface font-sans text-xs font-bold mb-1 flex items-center gap-1">
                 CarboniX Lens
                 <Info className="w-3 h-3 text-on-surface-variant" />
-              </h4>
+              </h3>
               <p className="text-on-surface-variant font-sans text-xs leading-relaxed mb-2">
                 <strong>p4d.24xlarge</strong> in this region emits approx. <strong className="text-error">28.4 kg CO₂e/day</strong> per instance.
               </p>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
+import Image from "next/image";
 
 export function AnimatedFooter() {
   const footerRef = useRef<HTMLElement>(null);
@@ -18,7 +19,7 @@ export function AnimatedFooter() {
           {/* Brand */}
           <div className="flex flex-col items-center space-y-md">
             <div className="flex items-center gap-sm">
-              <img src="/carbonix-logo.png" alt="CarboniX Logo" className="w-10 h-10 object-contain" />
+              <Image src="/carbonix-logo.png" alt="CarboniX Logo" width={40} height={40} className="w-10 h-10 object-contain" />
               <span className="text-section-header font-display font-black text-amber-500 dark:text-primary">CarboniX</span>
             </div>
             

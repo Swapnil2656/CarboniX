@@ -1,0 +1,9 @@
+# CarboniX
+
+This site is optimized for AI consumption.
+
+## Links
+
+- [Documentation](/docs)
+- [Admin Dashboard](/admin)
+- [Features](/features)

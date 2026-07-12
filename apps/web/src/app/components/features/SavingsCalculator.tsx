@@ -32,10 +32,11 @@ export function SavingsCalculator() {
 
       <div className="mb-xl">
         <div className="flex justify-between items-end mb-4">
-          <label className="text-on-surface font-label-caps tracking-widest text-sm">Cloud Instances</label>
+          <label htmlFor="servers-range" className="text-on-surface font-label-caps tracking-widest text-sm">Cloud Instances</label>
           <span className="font-display text-primary text-2xl font-bold">{servers}</span>
         </div>
         <input
+          id="servers-range"
           type="range"
           min="10"
           max="5000"

@@ -11,7 +11,7 @@ const program = new Command();
 const CONFIG_PATH = path.join(process.cwd(), '.carbonixrc');
 
 // ─── Use CARBONIX_API_URL env var, then .carbonixrc baseUrl, then default ────
-const DEFAULT_API_BASE = process.env.CARBONIX_API_URL || 'http://localhost:4000';
+const DEFAULT_API_BASE = process.env.CARBONIX_API_URL || 'https://api-production-f6965.up.railway.app';
 
 // ─── Brand Banner ─────────────────────────────────────────────────────────────
 function printBanner() {
