@@ -3,18 +3,46 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.revokeApiKey = exports.createApiKey = exports.getApiKeys = exports.toggleFeatureFlag = exports.getFeatureFlags = exports.getUsers = exports.getDashboard = void 0;
+exports.getAuditLogs = exports.getNotifications = exports.migrateEmission = exports.getEmissions = exports.removeTeamMember = exports.inviteUser = exports.syncTeamMembers = exports.getTeamMembers = exports.deleteApiKey = exports.revokeApiKey = exports.createApiKey = exports.getApiKeys = exports.toggleFeatureFlag = exports.getFeatureFlags = exports.getUsers = exports.getDashboard = void 0;
 const prisma_1 = require("../../lib/prisma");
 const crypto_1 = __importDefault(require("crypto"));
 const redis_1 = require("../../lib/redis");
+const email_1 = require("../../utils/email");
+// Helper to resolve the IDs of all users/projects in the current user's team/tenant
+async function resolveTenantContext(userId, userEmail) {
+    const ownedProjects = await prisma_1.prisma.project.findMany({ select: { id: true }, where: { userId } });
+    const memberRecords = await prisma_1.prisma.teamMember.findMany({ select: { projectId: true }, where: { email: userEmail } });
+    const projectIds = Array.from(new Set([
+        ...ownedProjects.map(p => p.id),
+        ...memberRecords.map(m => m.projectId)
+    ]));
+    const teamMembers = await prisma_1.prisma.teamMember.findMany({ where: { projectId: { in: projectIds } } });
+    const teamEmails = teamMembers.map(tm => tm.email);
+    const teamUsers = await prisma_1.prisma.user.findMany({ select: { id: true }, where: { email: { in: teamEmails } } });
+    const teamUserIds = Array.from(new Set([...teamUsers.map(u => u.id), userId]));
+    return { projectIds, teamUserIds };
+}
 const getDashboard = async (req, res) => {
     try {
-        const cacheKey = 'admin:dashboard_stats';
-        const cached = await redis_1.redis.get(cacheKey);
+        const userId = req.user?.id;
+        const userEmail = req.user?.email;
+        if (!userId || !userEmail)
+            return res.status(401).json({ error: 'Unauthorized' });
+        const cacheKey = `admin:dashboard_stats:${userId}`;
+        let cached = null;
+        try {
+            cached = await redis_1.redis.get(cacheKey);
+        }
+        catch (e) {
+            console.warn('[REDIS] Cache read failed, falling back to DB');
+        }
         if (cached) {
             return res.json({ ...JSON.parse(cached), cached: true });
         }
-        const apiKeys = await prisma_1.prisma.apiKey.findMany();
+        const { teamUserIds } = await resolveTenantContext(userId, userEmail);
+        const apiKeys = await prisma_1.prisma.apiKey.findMany({
+            where: { createdBy: { in: teamUserIds } }
+        });
         const totalApiCalls = apiKeys.reduce((acc, key) => acc + key.totalRequests, 0);
         const activeSessions = await prisma_1.prisma.session.count({ where: { isActive: true } });
         // Average grid intensity across all emission records
@@ -33,18 +61,38 @@ const getDashboard = async (req, res) => {
             provider: g.provider === 'AZURE' ? 'Azure' : g.provider, // map to exact string UI wants
             percent: totalRecords > 0 ? Math.round((g._count / totalRecords) * 100) : 0
         }));
-        // Dummy data for over time and top endpoints
-        const apiCallsOverTime = Array.from({ length: 24 }).map((_, i) => ({
-            hour: `${i}:00`,
-            calls: Math.floor(Math.random() * 5000) + 1000
-        }));
-        const topEndpoints = [
-            { path: '/v1/carbon/calculate', calls: 45210 },
-            { path: '/v1/agents/runs', calls: 12450 },
-            { path: '/v1/reference/regions', calls: 8900 },
-            { path: '/v1/users/profile', calls: 5200 },
-            { path: '/v1/auth/session', calls: 3100 },
-        ];
+        // Real data for api calls over time using Calculations table
+        const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        const calculations = await prisma_1.prisma.calculation.findMany({
+            where: {
+                createdAt: { gte: last24Hours },
+                userId: { in: teamUserIds }
+            },
+            select: { createdAt: true }
+        });
+        // Group by hour
+        const hourlyCounts = new Array(24).fill(0);
+        const currentHour = new Date().getHours();
+        calculations.forEach(calc => {
+            const calcHour = calc.createdAt.getHours();
+            // Calculate how many hours ago this was (0-23)
+            let diff = currentHour - calcHour;
+            if (diff < 0)
+                diff += 24;
+            if (diff < 24)
+                hourlyCounts[23 - diff]++; // index 23 is current hour
+        });
+        const apiCallsOverTime = hourlyCounts.map((calls, i) => {
+            let h = currentHour - (23 - i);
+            if (h < 0)
+                h += 24;
+            return {
+                hour: `${h}:00`,
+                calls: calls
+            };
+        });
+        // We do not currently track individual endpoint hits, so return empty array
+        const topEndpoints = [];
         const responseData = {
             totalApiCalls,
             activeSessions: activeSessions || 125, // fallback if no sessions
@@ -59,7 +107,12 @@ const getDashboard = async (req, res) => {
             ],
             liveApiStream: []
         };
-        await redis_1.redis.setex(cacheKey, 30, JSON.stringify(responseData));
+        try {
+            await redis_1.redis.setex(cacheKey, 30, JSON.stringify(responseData));
+        }
+        catch (e) {
+            console.warn('[REDIS] Cache write failed');
+        }
         res.json(responseData);
     }
     catch (error) {
@@ -69,38 +122,80 @@ const getDashboard = async (req, res) => {
 exports.getDashboard = getDashboard;
 const getUsers = async (req, res) => {
     try {
+        const userId = req.user?.id;
+        const userEmail = req.user?.email;
+        if (!userId || !userEmail)
+            return res.status(401).json({ error: 'Unauthorized' });
         const page = parseInt(req.query.page) || 1;
         const pageSize = parseInt(req.query.pageSize) || 20;
-        const users = await prisma_1.prisma.mobileUser.findMany({
-            skip: (page - 1) * pageSize,
-            take: pageSize,
-            orderBy: { lastActiveAt: 'desc' },
-            include: {
-                calculations: {
-                    orderBy: { createdAt: 'desc' },
-                    take: 1
+        const { projectIds } = await resolveTenantContext(userId, userEmail);
+        const rawTeamMembers = await prisma_1.prisma.teamMember.findMany({
+            where: { projectId: { in: projectIds } }
+        });
+        // Also include the current user and users who are in the team members list
+        const memberEmails = rawTeamMembers.map(tm => tm.email);
+        const emailsToFetch = Array.from(new Set([...memberEmails, userEmail]));
+        const rawUsers = await prisma_1.prisma.user.findMany({
+            where: { email: { in: emailsToFetch } },
+            include: { profile: true }
+        });
+        const mergedMap = new Map();
+        rawTeamMembers.forEach(tm => mergedMap.set(tm.email, tm));
+        rawUsers.forEach(u => {
+            if (!mergedMap.has(u.email)) {
+                mergedMap.set(u.email, {
+                    id: u.id,
+                    name: u.profile?.fullName || u.userName || u.email.split('@')[0],
+                    email: u.email,
+                    role: u.type,
+                    projectName: 'CarboniX Core',
+                    projectId: projectIds[0] || 'core', // Default to their first project
+                    location: 'Global',
+                    co2Emissions: 0,
+                    status: 'ACTIVE',
+                    aiSuggestion: null,
+                    createdAt: u.createdAt,
+                    updatedAt: u.updatedAt
+                });
+            }
+            else {
+                const existing = mergedMap.get(u.email);
+                if (existing.status === 'PENDING') {
+                    existing.status = 'ACTIVE';
                 }
             }
         });
-        const total = await prisma_1.prisma.mobileUser.count();
-        const formattedUsers = users.map(u => ({
-            id: u.id,
-            deviceId: u.deviceId || 'Unknown Device',
-            email: u.email,
-            country: u.country || 'US',
-            countryCode: u.country || 'US',
-            cloud: u.defaultProvider === 'AZURE' ? 'Azure' : (u.defaultProvider || 'AWS'),
-            region: u.calculations[0]?.region || 'us-east-1',
-            avgCo2KgPerHour: u.calculations[0]?.co2GramsHour ? u.calculations[0].co2GramsHour / 1000 : 0,
-            calculationsOps: u.calculationCount.toString(),
-            lastActive: u.lastActiveAt.toISOString(),
-            status: u.status
-        }));
+        let allUsers = Array.from(mergedMap.values());
+        allUsers.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        const users = allUsers.slice((page - 1) * pageSize, page * pageSize);
+        const total = allUsers.length;
+        // Only get projects for the current user
+        const projects = await prisma_1.prisma.project.findMany({
+            where: { id: { in: projectIds } },
+            select: { name: true, sdkConnected: true }
+        });
+        const connectedProjectNames = new Set(projects.filter(p => p.sdkConnected).map(p => p.name));
+        let totalEmissions = 0;
+        let connectedCount = 0;
+        const enrichedUsers = users.map(user => {
+            const isConnected = connectedProjectNames.has(user.projectName);
+            const co2 = isConnected ? user.co2Emissions : 0;
+            if (isConnected) {
+                totalEmissions += co2;
+                connectedCount++;
+            }
+            return {
+                ...user,
+                co2Emissions: co2
+            };
+        });
+        const fleetAvg = connectedCount > 0 ? Math.round(totalEmissions / connectedCount) : 0;
         res.json({
-            users: formattedUsers,
+            users: enrichedUsers,
             total,
             page,
-            pageSize
+            pageSize,
+            fleetAvg
         });
     }
     catch (error) {
@@ -132,6 +227,7 @@ const toggleFeatureFlag = async (req, res) => {
     try {
         const { id } = req.params;
         const { enabled } = req.body;
+        const oldFlag = await prisma_1.prisma.featureFlag.findUnique({ where: { id } });
         const updated = await prisma_1.prisma.featureFlag.update({
             where: { id },
             data: {
@@ -140,6 +236,22 @@ const toggleFeatureFlag = async (req, res) => {
                 toggleCount: { increment: 1 }
             }
         });
+        if (oldFlag) {
+            await prisma_1.prisma.auditLog.create({
+                data: {
+                    actorId: 'admin_user',
+                    actorEmail: 'admin@carbonix.ai',
+                    actorRole: 'ADMIN',
+                    action: 'FEATURE_FLAG_TOGGLE',
+                    resource: 'feature_flag',
+                    resourceId: id,
+                    before: { enabled: oldFlag.enabled },
+                    after: { enabled },
+                    ip: req.ip || '127.0.0.1',
+                    userAgent: req.headers['user-agent'] || 'Unknown',
+                }
+            });
+        }
         res.json({ success: true, flag: updated });
     }
     catch (error) {
@@ -149,8 +261,21 @@ const toggleFeatureFlag = async (req, res) => {
 exports.toggleFeatureFlag = toggleFeatureFlag;
 const getApiKeys = async (req, res) => {
     try {
+        const userId = req.user?.id;
+        const userEmail = req.user?.email;
+        if (!userId || !userEmail)
+            return res.status(401).json({ error: 'Unauthorized' });
+        const page = parseInt(req.query.page) || 1;
+        const pageSize = parseInt(req.query.pageSize) || 20;
+        const { teamUserIds } = await resolveTenantContext(userId, userEmail);
         const keys = await prisma_1.prisma.apiKey.findMany({
+            where: { createdBy: { in: teamUserIds } },
+            skip: (page - 1) * pageSize,
+            take: pageSize,
             orderBy: { createdAt: 'desc' }
+        });
+        const total = await prisma_1.prisma.apiKey.count({
+            where: { createdBy: { in: teamUserIds } }
         });
         const formattedKeys = keys.map(k => ({
             id: k.id,
@@ -162,6 +287,9 @@ const getApiKeys = async (req, res) => {
         }));
         res.json({
             keys: formattedKeys,
+            total,
+            page,
+            pageSize,
             monthlyUsagePercent: 42 // placeholder or could compute from sum / limit
         });
     }
@@ -194,6 +322,20 @@ const createApiKey = async (req, res) => {
                 expiresAt
             }
         });
+        await prisma_1.prisma.auditLog.create({
+            data: {
+                actorId: 'admin_user',
+                actorEmail: 'admin@carbonix.ai',
+                actorRole: 'ADMIN',
+                action: 'API_KEY_CREATED',
+                resource: 'api_key',
+                resourceId: apiKey.id,
+                before: {},
+                after: { name, permissions, expiration },
+                ip: req.ip || '127.0.0.1',
+                userAgent: req.headers['user-agent'] || 'Unknown',
+            }
+        });
         // Return the raw key ONLY ONCE
         res.status(201).json({ key: rawKey, id: apiKey.id });
     }
@@ -213,6 +355,20 @@ const revokeApiKey = async (req, res) => {
                 revokedBy: 'admin_user'
             }
         });
+        await prisma_1.prisma.auditLog.create({
+            data: {
+                actorId: 'admin_user',
+                actorEmail: 'admin@carbonix.ai',
+                actorRole: 'ADMIN',
+                action: 'API_KEY_REVOKED',
+                resource: 'api_key',
+                resourceId: id,
+                before: { status: 'ACTIVE' },
+                after: { status: 'REVOKED' },
+                ip: req.ip || '127.0.0.1',
+                userAgent: req.headers['user-agent'] || 'Unknown',
+            }
+        });
         res.json({ success: true });
     }
     catch (error) {
@@ -220,3 +376,354 @@ const revokeApiKey = async (req, res) => {
     }
 };
 exports.revokeApiKey = revokeApiKey;
+const deleteApiKey = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await prisma_1.prisma.apiKey.delete({
+            where: { id }
+        });
+        await prisma_1.prisma.auditLog.create({
+            data: {
+                actorId: 'admin_user',
+                actorEmail: 'admin@carbonix.ai',
+                actorRole: 'ADMIN',
+                action: 'API_KEY_DELETED',
+                resource: 'api_key',
+                resourceId: id,
+                before: {},
+                after: {},
+                ip: req.ip || '127.0.0.1',
+                userAgent: req.headers['user-agent'] || 'Unknown',
+            }
+        });
+        res.json({ success: true });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+exports.deleteApiKey = deleteApiKey;
+const getTeamMembers = async (req, res) => {
+    try {
+        const userId = req.user?.id;
+        const userEmail = req.user?.email;
+        if (!userId || !userEmail)
+            return res.status(401).json({ error: 'Unauthorized' });
+        const { teamUserIds } = await resolveTenantContext(userId, userEmail);
+        const team = await prisma_1.prisma.user.findMany({
+            where: { id: { in: teamUserIds } },
+            orderBy: { createdAt: 'desc' },
+            select: {
+                id: true,
+                userName: true,
+                email: true,
+                type: true,
+                isVerified: true,
+                createdAt: true,
+                profile: {
+                    select: {
+                        fullName: true,
+                        avatarUrl: true
+                    }
+                }
+            }
+        });
+        res.json({ team });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+exports.getTeamMembers = getTeamMembers;
+const syncTeamMembers = async (req, res) => {
+    try {
+        const userId = req.user?.id;
+        const userEmail = req.user?.email;
+        if (!userId || !userEmail)
+            return res.status(401).json({ error: 'Unauthorized' });
+        const { members, projectName } = req.body;
+        const { projectIds } = await resolveTenantContext(userId, userEmail);
+        const targetProjectId = projectIds.length > 0 ? projectIds[0] : 'proj_invite';
+        const synced = [];
+        for (const m of members) {
+            if (!m.name || !m.email)
+                continue;
+            const existing = await prisma_1.prisma.teamMember.findFirst({
+                where: { name: m.name, projectId: targetProjectId }
+            });
+            if (!existing) {
+                const newMember = await prisma_1.prisma.teamMember.create({
+                    data: {
+                        name: m.name,
+                        email: m.email,
+                        role: 'Developer',
+                        projectName: projectName || 'Unknown Project',
+                        projectId: targetProjectId,
+                        location: 'Global',
+                        co2Emissions: Math.floor(Math.random() * 200) + 50,
+                        status: 'ACTIVE',
+                        aiSuggestion: `AI Suggestion: Consider optimizing the database queries running in ${projectName || 'your project'} to reduce compute cycles by an estimated 15%.`
+                    }
+                });
+                synced.push(newMember);
+            }
+            else {
+                const updated = await prisma_1.prisma.teamMember.update({
+                    where: { id: existing.id },
+                    data: { projectName: projectName || existing.projectName }
+                });
+                synced.push(updated);
+            }
+        }
+        res.json({ success: true, count: synced.length, synced });
+        await prisma_1.prisma.auditLog.create({
+            data: {
+                actorId: 'admin_user',
+                actorEmail: 'admin@carbonix.ai',
+                actorRole: 'ADMIN',
+                action: 'CODEBASE_SYNCED',
+                resource: 'project',
+                resourceId: projectName || 'Unknown',
+                before: {},
+                after: { syncedCount: synced.length },
+                ip: req.ip || '127.0.0.1',
+                userAgent: req.headers['user-agent'] || 'Unknown',
+            }
+        });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+exports.syncTeamMembers = syncTeamMembers;
+const inviteUser = async (req, res) => {
+    try {
+        const userId = req.user?.id;
+        const userEmail = req.user?.email;
+        if (!userId || !userEmail)
+            return res.status(401).json({ error: 'Unauthorized' });
+        const { name, email, role, projectName } = req.body;
+        const existingMember = await prisma_1.prisma.teamMember.findUnique({ where: { email } });
+        if (existingMember) {
+            return res.status(400).json({ error: "A team member with this email already exists." });
+        }
+        const inviteLink = `http://localhost:3000/invite?email=${encodeURIComponent(email)}`;
+        await (0, email_1.sendEmail)(email, "You've been invited to CarboniX!", `<div style="font-family:sans-serif;max-width:480px;margin:auto">
+        <h2>Hi ${name || email.split('@')[0]},</h2>
+        <p>You have been invited to join the <strong>${projectName || 'project'}</strong> project on CarboniX as a ${role || 'Developer'}.</p>
+        <p>Please click below to accept the invitation and connect your environment:</p>
+        <p>
+          <a href="${inviteLink}" style="display:inline-block;padding:12px 24px;background:#50FA7B;color:#1e1e2e;text-decoration:none;border-radius:8px;font-weight:600">
+            Accept Invitation
+          </a>
+        </p>
+      </div>`);
+        const { projectIds } = await resolveTenantContext(userId, userEmail);
+        const targetProjectId = projectIds.length > 0 ? projectIds[0] : 'proj_invite';
+        const newMember = await prisma_1.prisma.teamMember.create({
+            data: {
+                name: name || email.split('@')[0],
+                email: email,
+                role: role || 'Developer',
+                projectName: projectName || 'Invited',
+                projectId: targetProjectId,
+                location: 'Pending',
+                co2Emissions: 0,
+                status: 'PENDING',
+                aiSuggestion: 'User has just been invited. Waiting for them to accept and connect their environment.'
+            }
+        });
+        res.json({ success: true, message: `Invite sent to ${email}`, member: newMember });
+        await prisma_1.prisma.auditLog.create({
+            data: {
+                actorId: 'admin_user',
+                actorEmail: 'admin@carbonix.ai',
+                actorRole: 'ADMIN',
+                action: 'TEAM_INVITE',
+                resource: 'team_member',
+                resourceId: newMember.id,
+                before: {},
+                after: { email, role, projectName },
+                ip: req.ip || '127.0.0.1',
+                userAgent: req.headers['user-agent'] || 'Unknown',
+            }
+        });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+exports.inviteUser = inviteUser;
+const removeTeamMember = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await prisma_1.prisma.teamMember.delete({
+            where: { id }
+        });
+        res.json({ success: true, message: 'Teammate removed successfully' });
+        await prisma_1.prisma.auditLog.create({
+            data: {
+                actorId: 'admin_user',
+                actorEmail: 'admin@carbonix.ai',
+                actorRole: 'ADMIN',
+                action: 'TEAM_MEMBER_REMOVED',
+                resource: 'team_member',
+                resourceId: id,
+                before: {},
+                after: {},
+                ip: req.ip || '127.0.0.1',
+                userAgent: req.headers['user-agent'] || 'Unknown',
+            }
+        });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+exports.removeTeamMember = removeTeamMember;
+const getEmissions = async (req, res) => {
+    try {
+        const provider = req.query.provider;
+        const region = req.query.region;
+        const projects = await prisma_1.prisma.project.findMany({ select: { sdkConnected: true } });
+        const isSdkConnected = projects.some(p => p.sdkConnected);
+        if (!isSdkConnected) {
+            return res.json({
+                records: [],
+                metrics: {
+                    totalInstances: 0,
+                    idleInstances: 0,
+                    oversizedInstances: 0,
+                    wastedCarbonKg: 0
+                },
+                isSdkConnected: false
+            });
+        }
+        const where = {};
+        if (provider && provider !== 'All') {
+            where.provider = provider.toUpperCase();
+        }
+        if (region && region !== 'All') {
+            where.region = region;
+        }
+        const records = await prisma_1.prisma.emissionRecord.findMany({
+            where,
+            orderBy: { timestamp: 'desc' },
+            take: 500
+        });
+        const totalInstances = records.length;
+        const idleInstances = records.filter(r => r.isIdle).length;
+        const oversizedInstances = records.filter(r => r.isOversized).length;
+        const wastedCarbonKg = records.reduce((sum, r) => {
+            if (r.isIdle)
+                return sum + r.carbonKg;
+            if (r.isOversized)
+                return sum + (r.carbonKg * 0.5);
+            return sum;
+        }, 0);
+        res.json({
+            records,
+            metrics: {
+                totalInstances,
+                idleInstances,
+                oversizedInstances,
+                wastedCarbonKg
+            },
+            isSdkConnected: true
+        });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+exports.getEmissions = getEmissions;
+const migrateEmission = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { targetRegion } = req.body;
+        if (!targetRegion) {
+            return res.status(400).json({ error: 'Target region is required' });
+        }
+        // Simulate provisioning delay (2 seconds)
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        // Get the current record
+        const record = await prisma_1.prisma.emissionRecord.findUnique({ where: { id } });
+        if (!record) {
+            return res.status(404).json({ error: 'Record not found' });
+        }
+        // Update the record: new region, lower carbon footprint, and clear oversized/idle flags
+        const updatedRecord = await prisma_1.prisma.emissionRecord.update({
+            where: { id },
+            data: {
+                region: targetRegion,
+                carbonKg: record.carbonKg * 0.6, // Simulate 40% carbon savings
+                isIdle: false,
+                isOversized: false,
+                recommendation: `Migrated to ${targetRegion}. Operations nominal.`
+            }
+        });
+        // Audit Log
+        await prisma_1.prisma.auditLog.create({
+            data: {
+                actorId: 'admin_user', // from mocked auth session in the Express backend
+                actorEmail: 'admin@carbonix.ai',
+                actorRole: 'ADMIN',
+                action: 'EMISSION_MIGRATE',
+                resource: 'emission_record',
+                resourceId: id,
+                before: { region: record.region, carbonKg: record.carbonKg },
+                after: { region: targetRegion, carbonKg: updatedRecord.carbonKg },
+                ip: req.ip || '127.0.0.1',
+                userAgent: req.headers['user-agent'] || 'Unknown',
+            }
+        });
+        // Notification
+        await prisma_1.prisma.notification.create({
+            data: {
+                title: 'Emission Instance Migrated',
+                body: `Instance was successfully migrated from ${record.region} to ${targetRegion}, saving an estimated ${(record.carbonKg - updatedRecord.carbonKg).toFixed(2)}kg CO2.`,
+                type: 'BROADCAST',
+                status: 'SENT',
+                targetAudience: 'ALL',
+                createdBy: 'admin_user',
+            }
+        });
+        res.json({ success: true, record: updatedRecord });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+exports.migrateEmission = migrateEmission;
+const getNotifications = async (req, res) => {
+    try {
+        const notifications = await prisma_1.prisma.notification.findMany({
+            where: { createdBy: req.user?.id },
+            orderBy: { createdAt: 'desc' },
+            take: 10
+        });
+        res.json({ success: true, notifications });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+exports.getNotifications = getNotifications;
+const getAuditLogs = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const pageSize = parseInt(req.query.pageSize) || 20;
+        const logs = await prisma_1.prisma.auditLog.findMany({
+            where: { actorId: req.user?.id },
+            orderBy: { createdAt: 'desc' },
+            skip: (page - 1) * pageSize,
+            take: pageSize
+        });
+        const total = await prisma_1.prisma.auditLog.count({ where: { actorId: req.user?.id } });
+        res.json({ success: true, logs, total, page, pageSize });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+exports.getAuditLogs = getAuditLogs;

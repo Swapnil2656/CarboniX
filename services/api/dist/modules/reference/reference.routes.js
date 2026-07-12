@@ -4,6 +4,7 @@ const express_1 = require("express");
 const reference_controller_1 = require("./reference.controller");
 const router = (0, express_1.Router)();
 router.get('/regions', reference_controller_1.getRegions);
+router.get('/regions/ranked', reference_controller_1.getRegionsRanked);
 router.get('/instances', reference_controller_1.getInstances);
 router.get('/providers', reference_controller_1.getProviders);
 exports.default = router;

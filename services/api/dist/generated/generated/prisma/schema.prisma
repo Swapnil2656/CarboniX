@@ -16,6 +16,11 @@ enum CloudProvider {
   AWS
   GCP
   AZURE
+  VERCEL
+  NETLIFY
+  RAILWAY
+  RENDER
+  OTHER
 }
 
 enum CarbonRating {
@@ -124,6 +129,16 @@ model MobileUser {
   theme                String         @default("dark") // light | dark | system
   notificationsEnabled Boolean        @default(true)
   defaultProvider      CloudProvider?
+  weeklyDigestEnabled  Boolean        @default(true)
+  budgetAlertEnabled   Boolean        @default(true)
+  greenTipsEnabled     Boolean        @default(true)
+  carbonBudgetKg       Float          @default(100) // Monthly CO₂ budget in kg
+  preferredUnit        String         @default("kg") // "kg" or "lbs"
+  defaultRegion        String? // e.g., "ap-south-1"
+
+  // Profile fields (for Settings > Profile)
+  avatarUrl String?
+  bio       String?
 
   // Status
   status    MobileUserStatus @default(ACTIVE)
@@ -361,6 +376,21 @@ model Notification {
   updatedAt DateTime @updatedAt
 }
 
+model UserNotification {
+  id     String  @id @default(cuid())
+  userId String
+  title  String
+  body   String
+  type   String // "HIGH_EMISSION" | "BUDGET_ALERT" | "GREEN_TIP" | "WEEKLY_DIGEST" | "SYSTEM"
+  data   Json? // Optional payload (e.g., calculationId, region)
+  isRead Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, isRead])
+}
+
 // ─── Push Tokens ────────────────────────────────────────────
 
 model PushToken {
@@ -444,6 +474,7 @@ enum AgentType {
   ANALYST
   CICD_GATE
   REPORTER
+  ORCHESTRATOR
 }
 
 enum AgentRunStatus {
@@ -535,30 +566,40 @@ model User {
   verificationTokens VerificationToken[]
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
+  ChatHistory        ChatHistory?
 }
 
 model Project {
-  id        String   @id @default(cuid())
-  name      String
-  region    String
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String    @id @default(cuid())
+  name         String
+  region       String?
+  sdkConnected Boolean   @default(false)
+  connectedAt  DateTime?
+  lastPingAt   DateTime?
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@index([userId])
 }
 
 // Created automatically on signup. Add app-specific profile fields here.
 model Profile {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   fullName    String?
   avatarUrl   String?
   phoneNumber String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  // Notification Preferences
+  emailAlerts     Boolean @default(true)
+  pushAlerts      Boolean @default(false)
+  thresholdAlerts Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model VerificationToken {
@@ -567,4 +608,32 @@ model VerificationToken {
   expires DateTime
   userId  String
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── Team Members ─────────────────────────────────────────────
+
+model TeamMember {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  role         String
+  projectId    String
+  projectName  String
+  co2Emissions Float
+  location     String
+  status       String   @default("ACTIVE")
+  aiSuggestion String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ─── AI Chat History ──────────────────────────────────────────
+
+model ChatHistory {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Json     @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

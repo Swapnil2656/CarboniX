@@ -6,9 +6,9 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "strict": true,
-    "moduleResolution": "node16",
+    "moduleResolution": "node",
     "target": "ES2022",
-    "module": "Node16"
+    "module": "CommonJS"
   },
   "include": ["src/**/*"]
 }

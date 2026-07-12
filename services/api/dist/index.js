@@ -13,17 +13,18 @@ const reference_routes_1 = __importDefault(require("./modules/reference/referenc
 const auth_routes_1 = __importDefault(require("./modules/auth/auth.routes"));
 const agents_routes_1 = __importDefault(require("./modules/agents/agents.routes"));
 const admin_routes_1 = __importDefault(require("./modules/admin/admin.routes"));
+const connect_routes_1 = __importDefault(require("./modules/connect/connect.routes"));
 const agents_1 = require("@carbonix/agents");
 const agents_2 = require("@carbonix/agents");
 const agents_3 = require("@carbonix/agents");
 const prisma_1 = require("./lib/prisma");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-const port = process.env.PORT || 4000;
+const port = parseInt(process.env.PORT || "4000", 10);
 const USE_MOCK = process.env.USE_MOCK_AGENTS !== 'false';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 app.use((0, cors_1.default)());
-app.use((0, helmet_1.default)());
+app.use((0, helmet_1.default)({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(express_1.default.json());
 app.get('/api/v1/health', (req, res) => {
     res.json({ message: 'CarboniX API is running!', agents: true, mockMode: USE_MOCK });
@@ -33,6 +34,22 @@ app.use('/api/v1/reference', reference_routes_1.default);
 app.use('/api/v1/auth', auth_routes_1.default);
 app.use('/api/v1/agents', agents_routes_1.default);
 app.use('/api/v1/admin', admin_routes_1.default);
+app.use('/api/v1/connect', connect_routes_1.default);
+app.post('/api/v1/public/accept-invite', async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email)
+            return res.status(400).json({ error: 'Email is required' });
+        await prisma_1.prisma.teamMember.updateMany({
+            where: { email, status: 'PENDING' },
+            data: { status: 'ACTIVE' }
+        });
+        res.json({ success: true, message: 'Invitation accepted!' });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 // ─── Agent Cron Scheduling ───────────────────────────────────
 // Run Collector + Analyst every hour
 node_cron_1.default.schedule('0 * * * *', async () => {
@@ -148,8 +165,11 @@ node_cron_1.default.schedule('0 0 1 * *', async () => {
         console.error('[CRON] Reporter failed:', error.message);
     }
 });
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
     console.log(`Server is running on port ${port}`);
     console.log(`Agent mock mode: ${USE_MOCK ? 'ON (static data)' : 'OFF (live CloudWatch)'}`);
     console.log(`Cron: Collector+Analyst every hour, Reporter on 1st of month`);
 });
+// Trigger restart
+// Trigger restart 2
+app.use((req, res, next) => { console.log('[API REQUEST]', req.method, req.url, req.headers.authorization ? 'HasAuth' : 'NoAuth'); const oldSend = res.send; res.send = function (data) { console.log('[API RESPONSE]', res.statusCode, data); return oldSend.call(res, data); }; next(); });

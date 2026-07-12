@@ -3,7 +3,7 @@
  *
  * Collects cloud infrastructure metrics and calculates carbon emissions.
  * In mock mode (USE_MOCK_AGENTS=true), generates realistic simulated data.
- * In live mode, would connect to AWS CloudWatch (requires AWS credentials).
+ * In live mode, uses AWS CloudWatch and GCP Monitoring.
  */
 export interface EmissionRecordData {
     instanceId: string;

@@ -197,6 +197,5 @@ app.listen(port, '0.0.0.0', () => {
 
 // Trigger restart 2
 
-app.get('/api/v1/test-env', (req, res) => res.json({ secret: process.env.JWT_SECRET }));
 
 app.use((req, res, next) => { console.log('[API REQUEST]', req.method, req.url, req.headers.authorization ? 'HasAuth' : 'NoAuth'); const oldSend = res.send.bind(res); res.send = function(data?: any) { console.log('[API RESPONSE]', res.statusCode, data); return oldSend(data); }; next(); });

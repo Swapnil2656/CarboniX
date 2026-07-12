@@ -16,6 +16,7 @@ router.get('/runs/:id', auth_middleware_1.authenticate, agents_controller_1.getA
 router.post('/trigger/collector', auth_middleware_1.authenticate, agents_controller_1.triggerCollector);
 router.post('/trigger/analyst', auth_middleware_1.authenticate, agents_controller_1.triggerAnalyst);
 router.post('/trigger/reporter', auth_middleware_1.authenticate, agents_controller_1.triggerReporter);
+router.post('/trigger/orchestrator', auth_middleware_1.authenticate, agents_controller_1.triggerOrchestrator);
 // CI/CD Gate (can be called without JWT — uses API key in production)
 router.post('/gate', agents_controller_1.runGate);
 // Data endpoints

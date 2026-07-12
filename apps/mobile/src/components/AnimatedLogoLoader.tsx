@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   noiseOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     opacity: 0.03,
     backgroundColor: 'transparent',
     // In a real app we'd use an Image with resizeMode="repeat" for noise, 

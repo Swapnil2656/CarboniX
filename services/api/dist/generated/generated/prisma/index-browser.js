@@ -137,6 +137,14 @@ exports.Prisma.MobileUserScalarFieldEnum = {
   theme: 'theme',
   notificationsEnabled: 'notificationsEnabled',
   defaultProvider: 'defaultProvider',
+  weeklyDigestEnabled: 'weeklyDigestEnabled',
+  budgetAlertEnabled: 'budgetAlertEnabled',
+  greenTipsEnabled: 'greenTipsEnabled',
+  carbonBudgetKg: 'carbonBudgetKg',
+  preferredUnit: 'preferredUnit',
+  defaultRegion: 'defaultRegion',
+  avatarUrl: 'avatarUrl',
+  bio: 'bio',
   status: 'status',
   banReason: 'banReason',
   bannedAt: 'bannedAt',
@@ -286,6 +294,17 @@ exports.Prisma.NotificationScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.UserNotificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  title: 'title',
+  body: 'body',
+  type: 'type',
+  data: 'data',
+  isRead: 'isRead',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.PushTokenScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -394,6 +413,9 @@ exports.Prisma.ProjectScalarFieldEnum = {
   id: 'id',
   name: 'name',
   region: 'region',
+  sdkConnected: 'sdkConnected',
+  connectedAt: 'connectedAt',
+  lastPingAt: 'lastPingAt',
   userId: 'userId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -405,6 +427,9 @@ exports.Prisma.ProfileScalarFieldEnum = {
   fullName: 'fullName',
   avatarUrl: 'avatarUrl',
   phoneNumber: 'phoneNumber',
+  emailAlerts: 'emailAlerts',
+  pushAlerts: 'pushAlerts',
+  thresholdAlerts: 'thresholdAlerts',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -414,6 +439,29 @@ exports.Prisma.VerificationTokenScalarFieldEnum = {
   token: 'token',
   expires: 'expires',
   userId: 'userId'
+};
+
+exports.Prisma.TeamMemberScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  role: 'role',
+  projectId: 'projectId',
+  projectName: 'projectName',
+  co2Emissions: 'co2Emissions',
+  location: 'location',
+  status: 'status',
+  aiSuggestion: 'aiSuggestion',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ChatHistoryScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  messages: 'messages',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -448,7 +496,12 @@ exports.Prisma.JsonNullValueFilter = {
 exports.CloudProvider = exports.$Enums.CloudProvider = {
   AWS: 'AWS',
   GCP: 'GCP',
-  AZURE: 'AZURE'
+  AZURE: 'AZURE',
+  VERCEL: 'VERCEL',
+  NETLIFY: 'NETLIFY',
+  RAILWAY: 'RAILWAY',
+  RENDER: 'RENDER',
+  OTHER: 'OTHER'
 };
 
 exports.MobileUserStatus = exports.$Enums.MobileUserStatus = {
@@ -542,7 +595,8 @@ exports.AgentType = exports.$Enums.AgentType = {
   COLLECTOR: 'COLLECTOR',
   ANALYST: 'ANALYST',
   CICD_GATE: 'CICD_GATE',
-  REPORTER: 'REPORTER'
+  REPORTER: 'REPORTER',
+  ORCHESTRATOR: 'ORCHESTRATOR'
 };
 
 exports.AgentRunStatus = exports.$Enums.AgentRunStatus = {
@@ -568,6 +622,7 @@ exports.Prisma.ModelName = {
   RemoteConfig: 'RemoteConfig',
   AuditLog: 'AuditLog',
   Notification: 'Notification',
+  UserNotification: 'UserNotification',
   PushToken: 'PushToken',
   Region: 'Region',
   InstanceType: 'InstanceType',
@@ -577,7 +632,9 @@ exports.Prisma.ModelName = {
   User: 'User',
   Project: 'Project',
   Profile: 'Profile',
-  VerificationToken: 'VerificationToken'
+  VerificationToken: 'VerificationToken',
+  TeamMember: 'TeamMember',
+  ChatHistory: 'ChatHistory'
 };
 
 /**
