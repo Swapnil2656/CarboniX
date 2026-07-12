@@ -51,7 +51,17 @@ const calculate = async (req, res) => {
         const equivalent = (0, carbon_engine_1.getEquivalent)(result.co2KgMonth);
         const recommendation = await (0, carbon_engine_1.getRecommendation)(input.provider, input.region, result.co2KgMonth, result.totalFinalEnergyKwh);
         const userId = req.user.id;
-        // Removed dummy user upsert
+        // Ensure user exists to satisfy foreign key constraints (useful for Postman testing)
+        await prisma_1.prisma.mobileUser.upsert({
+            where: { id: userId },
+            update: {},
+            create: {
+                id: userId,
+                email: req.user.email || 'test@carbonix.dev',
+                name: `User ${userId}`,
+                passwordHash: 'hashed_mock_password'
+            }
+        });
         const calculation = await prisma_1.prisma.calculation.create({
             data: {
                 userId: userId,
@@ -88,6 +98,56 @@ const calculate = async (req, res) => {
         Promise.resolve().then(() => __importStar(require('../../lib/redis'))).then(({ redis }) => {
             redis.del(`history:${userId}`).catch(console.error);
         });
+        // --- AUTO NOTIFICATIONS ---
+        const user = await prisma_1.prisma.mobileUser.findUnique({ where: { id: userId } });
+        // 1. High emission alert
+        if (user?.notificationsEnabled && result.co2KgMonth > (user.carbonAlertThreshold || 50)) {
+            await prisma_1.prisma.userNotification.create({
+                data: {
+                    userId,
+                    title: 'High Emission Detected',
+                    body: `Your ${input.provider.toUpperCase()} ${input.region} calculation produced ${result.co2KgMonth.toFixed(1)} kg CO₂ — exceeds your ${user.carbonAlertThreshold}kg threshold.`,
+                    type: 'HIGH_EMISSION',
+                    data: { calculationId: calculation.id, co2Kg: result.co2KgMonth, region: input.region }
+                }
+            });
+        }
+        // 2. Budget alert
+        if (user?.budgetAlertEnabled) {
+            const monthStart = new Date();
+            monthStart.setDate(1);
+            monthStart.setHours(0, 0, 0, 0);
+            const monthlyTotal = await prisma_1.prisma.calculation.aggregate({
+                where: { userId, createdAt: { gte: monthStart } },
+                _sum: { co2KgMonth: true }
+            });
+            const totalKg = monthlyTotal._sum.co2KgMonth || 0;
+            const budget = user.carbonBudgetKg || 100;
+            if (totalKg >= budget * 0.8) {
+                await prisma_1.prisma.userNotification.create({
+                    data: {
+                        userId,
+                        title: totalKg >= budget ? 'Carbon Budget Exceeded' : 'Carbon Budget Warning',
+                        body: `Monthly usage: ${totalKg.toFixed(1)} / ${budget} kg CO₂ (${Math.round((totalKg / budget) * 100)}%)`,
+                        type: 'BUDGET_ALERT',
+                        data: { usedKg: totalKg, budgetKg: budget }
+                    }
+                });
+            }
+        }
+        // 3. Green tip
+        if (user?.greenTipsEnabled && recommendation.reductionPercent && recommendation.reductionPercent > 50) {
+            await prisma_1.prisma.userNotification.create({
+                data: {
+                    userId,
+                    title: 'Greener Region Available',
+                    body: `Switching to ${recommendation.recommendedRegion} could reduce carbon by ${recommendation.reductionPercent}%`,
+                    type: 'GREEN_TIP',
+                    data: { currentRegion: input.region, recommendedRegion: recommendation.recommendedRegion }
+                }
+            });
+        }
+        // --- END AUTO NOTIFICATIONS ---
         res.json({
             success: true,
             data: {
@@ -130,18 +190,31 @@ const recommend = async (req, res) => {
     try {
         const input = req.body;
         const baseResult = await (0, carbon_engine_1.calculateCarbon)(input);
-        const recResult = await (0, carbon_engine_1.calculateCarbon)({ ...input, provider: 'gcp', region: 'eu-north-1' });
-        res.json({
-            success: true,
-            data: {
-                recommended: {
-                    provider: 'gcp',
-                    region: 'eu-north-1',
-                    co2KgMonth: recResult.co2KgMonth,
-                    savingsKg: Math.max(0, baseResult.co2KgMonth - recResult.co2KgMonth)
+        // Get the recommendation from the engine (scoped to the requested provider)
+        const recommendation = await (0, carbon_engine_1.getRecommendation)(input.provider, input.region, baseResult.co2KgMonth, baseResult.totalFinalEnergyKwh);
+        if (recommendation.recommendedRegion) {
+            res.json({
+                success: true,
+                data: {
+                    recommended: {
+                        provider: input.provider,
+                        region: recommendation.recommendedRegion,
+                        co2KgMonth: recommendation.recommendedCo2Kg,
+                        savingsKg: Math.max(0, baseResult.co2KgMonth - (recommendation.recommendedCo2Kg || 0)),
+                        reductionPercent: recommendation.reductionPercent,
+                        message: recommendation.recommendation
+                    }
                 }
-            }
-        });
+            });
+        }
+        else {
+            res.json({
+                success: true,
+                data: {
+                    message: 'You are already in the greenest region for your provider.'
+                }
+            });
+        }
     }
     catch (error) {
         res.status(500).json({ success: false, error: error.message });

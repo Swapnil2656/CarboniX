@@ -19,7 +19,7 @@ import { prisma } from './lib/prisma';
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 4000;
+const port: number = parseInt(process.env.PORT || "4000", 10);
 
 const USE_MOCK = process.env.USE_MOCK_AGENTS !== 'false';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
@@ -197,6 +197,5 @@ app.listen(port, '0.0.0.0', () => {
 
 // Trigger restart 2
 
-app.get('/api/v1/test-env', (req, res) => res.json({ secret: process.env.JWT_SECRET }));
 
-app.use((req, res, next) => { console.log('[API REQUEST]', req.method, req.url, req.headers.authorization ? 'HasAuth' : 'NoAuth'); const oldSend = res.send; res.send = function(data) { console.log('[API RESPONSE]', res.statusCode, data); return oldSend.apply(res, arguments); }; next(); });
+app.use((req, res, next) => { console.log('[API REQUEST]', req.method, req.url, req.headers.authorization ? 'HasAuth' : 'NoAuth'); const oldSend = res.send; res.send = function(data) { console.log('[API RESPONSE]', res.statusCode, data); return oldSend.call(res, data as any); }; next(); });

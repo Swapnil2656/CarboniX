@@ -6,12 +6,13 @@
  * fetching agent runs, and retrieving emission data.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getLatestBRSR = exports.getEmissions = exports.triggerReporter = exports.runGate = exports.triggerAnalyst = exports.triggerCollector = exports.getAgentRun = exports.listAgentRuns = void 0;
+exports.triggerOrchestrator = exports.getLatestBRSR = exports.getEmissions = exports.triggerReporter = exports.runGate = exports.triggerAnalyst = exports.triggerCollector = exports.getAgentRun = exports.listAgentRuns = void 0;
 const prisma_1 = require("../../lib/prisma");
 const agents_1 = require("@carbonix/agents");
 const agents_2 = require("@carbonix/agents");
 const agents_3 = require("@carbonix/agents");
 const agents_4 = require("@carbonix/agents");
+const agents_5 = require("@carbonix/agents");
 const USE_MOCK = process.env.USE_MOCK_AGENTS !== 'false';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 const CARBON_BUDGET = parseFloat(process.env.CARBON_BUDGET_KG_DAY || '10');
@@ -380,3 +381,85 @@ const getLatestBRSR = async (req, res) => {
     }
 };
 exports.getLatestBRSR = getLatestBRSR;
+/**
+ * POST /api/v1/agents/trigger/orchestrator — Execute Blue/Green migrations
+ *
+ * Fetches the latest Analyst Agent recommendations from the DB and passes
+ * all MIGRATE_REGION candidates (or top HIGH-priority ones) to the
+ * Orchestrator Agent for zero-downtime Blue/Green migration execution.
+ */
+const triggerOrchestrator = async (req, res) => {
+    const startTime = Date.now();
+    try {
+        // ── Step 1: Create an AgentRun record ────────────────────────────────
+        const agentRun = await prisma_1.prisma.agentRun.create({
+            data: {
+                agentType: 'ORCHESTRATOR',
+                status: 'RUNNING',
+                triggeredBy: req.user?.id ? 'manual' : 'api',
+            },
+        });
+        // ── Step 2: Fetch latest Analyst recommendations from DB ─────────────
+        const latestAnalystRun = await prisma_1.prisma.agentRun.findFirst({
+            where: { agentType: 'ANALYST', status: 'SUCCESS' },
+            orderBy: { createdAt: 'desc' },
+        });
+        if (!latestAnalystRun || !latestAnalystRun.details) {
+            await prisma_1.prisma.agentRun.update({
+                where: { id: agentRun.id },
+                data: {
+                    status: 'FAILED',
+                    errorMessage: 'No successful Analyst run found. Run the Analyst Agent first.',
+                    completedAt: new Date(),
+                    durationMs: Date.now() - startTime,
+                },
+            });
+            return res.status(400).json({
+                success: false,
+                error: 'No Analyst recommendations available. Run /trigger/analyst first.',
+            });
+        }
+        const details = latestAnalystRun.details;
+        const recommendations = details.recommendations || [];
+        if (recommendations.length === 0) {
+            await prisma_1.prisma.agentRun.update({
+                where: { id: agentRun.id },
+                data: {
+                    status: 'SUCCESS',
+                    summary: 'No recommendations to migrate. All instances are within acceptable thresholds.',
+                    recordsProcessed: 0,
+                    completedAt: new Date(),
+                    durationMs: Date.now() - startTime,
+                },
+            });
+            return res.json({ success: true, data: { message: 'Nothing to orchestrate.' } });
+        }
+        // ── Step 3: Run the Orchestrator (Blue/Green migrations) ─────────────
+        const maxConcurrent = parseInt(req.body?.maxConcurrent) || 3;
+        const result = await (0, agents_5.runOrchestrator)(recommendations, maxConcurrent);
+        // ── Step 4: Persist the orchestration run ────────────────────────────
+        await prisma_1.prisma.agentRun.update({
+            where: { id: agentRun.id },
+            data: {
+                status: 'SUCCESS',
+                summary: result.summary,
+                details: result,
+                recordsProcessed: result.totalMigrations,
+                completedAt: new Date(),
+                durationMs: Date.now() - startTime,
+            },
+        });
+        res.json({
+            success: true,
+            data: {
+                runId: agentRun.id,
+                ...result,
+                durationMs: Date.now() - startTime,
+            },
+        });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+exports.triggerOrchestrator = triggerOrchestrator;

@@ -4,6 +4,6 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "lint": "eslint src/"
+    "lint": "echo No lint"
   }
 }

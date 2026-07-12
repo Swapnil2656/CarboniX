@@ -8,6 +8,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key-for-dev';
 const authenticate = (req, res, next) => {
     const authHeader = req.headers.authorization;
+    console.log('[AUTH] Path:', req.path, 'Header:', authHeader);
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return res.status(401).json({ success: false, error: 'Unauthorized: Missing token' });
     }
