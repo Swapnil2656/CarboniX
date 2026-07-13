@@ -100,8 +100,11 @@ export async function getGridIntensity(region: string): Promise<number> {
 
   let intensity = DEFAULT_GRID_INTENSITIES[region] || 400; // global average fallback
 
-  const apiKey = process.env.EMISSIONS_DEV_API_KEY || 'em_live_BRnhlaMwNsojVQqErueNPGvS36XXrZ1VV6Eo7S';
-  
+  const apiKey = process.env.EMISSIONS_DEV_API_KEY;
+  if (!apiKey) {
+    console.warn('[GridCache] EMISSIONS_DEV_API_KEY is not set. Grid intensity lookups will fail.');
+  }
+
   if (apiKey) {
     try {
       const countryCode = getCountryFromRegion(region);

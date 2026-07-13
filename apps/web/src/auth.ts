@@ -80,7 +80,7 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
         // Generate a standard JWT compatible with the Express API middleware
         token.accessToken = jwt.sign(
           { id: user.id, email: user.email }, 
-          process.env.JWT_SECRET || 'super-secret-key-for-dev',
+          process.env.JWT_SECRET,
           { expiresIn: '1d' }
         );
       }
