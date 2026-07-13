@@ -3,48 +3,56 @@ import { getToken } from "next-auth/jwt";
 import { authConfig } from "./carbonix-auth.config";
 
 export async function middleware(req: NextRequest) {
-  // Auth.js v5 uses specific cookie names based on the protocol
-  const useSecureCookies = req.nextUrl.protocol === "https:";
-  const cookieName = useSecureCookies ? "__Secure-authjs.session-token" : "authjs.session-token";
-  
-  const token = await getToken({ 
-    req, 
-    secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
-    salt: cookieName 
-  });
-  
   const { pathname } = req.nextUrl;
 
-  // ── Unauthenticated access to protected route ──────────────────────────────
-  if (!token && !authConfig.publicRoutes.includes(pathname)) {
+  // ── Always allow NextAuth internal routes and static assets ───────────────
+  // This is a safety net in case the matcher misses something
+  if (pathname.startsWith("/api/auth")) {
+    return NextResponse.next();
+  }
+
+  // ── Public routes — skip all auth checks ──────────────────────────────────
+  // Also add /login/confirm so the post-login redirect doesn't get blocked
+  const isPublic =
+    authConfig.publicRoutes.includes(pathname) ||
+    pathname.startsWith("/login/confirm") ||
+    pathname.startsWith("/onboarding") ||
+    pathname.startsWith("/api/onboarding") ||
+    pathname.startsWith("/verify");
+
+  if (isPublic) {
+    return NextResponse.next();
+  }
+
+  // ── Read the session token ─────────────────────────────────────────────────
+  // On Vercel (HTTPS) the cookie is prefixed with __Secure-
+  const useSecureCookies = req.nextUrl.protocol === "https:";
+  const cookieName = useSecureCookies
+    ? "__Secure-authjs.session-token"
+    : "authjs.session-token";
+
+  const token = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
+    salt: cookieName,
+  });
+
+  // ── Unauthenticated: redirect to sign-in ──────────────────────────────────
+  if (!token) {
     return NextResponse.redirect(new URL(authConfig.routes.signIn, req.url));
   }
 
-  // ── Admin-only prefix guard ────────────────────────────────────────────────
-  if (
-    pathname.startsWith(authConfig.adminPrefix) &&
-    !token
-  ) {
-    const fallback = authConfig.routes.signIn;
-    return NextResponse.redirect(new URL(fallback, req.url));
-  }
-
-  // ── Onboarding Guard ───────────────────────────────────────────────────────
-  if (
-    token && 
-    !token.isOnboarded && 
-    pathname !== "/" &&
-    !pathname.startsWith('/onboarding') && 
-    !pathname.startsWith('/api/onboarding')
-  ) {
+  // ── Onboarding guard ──────────────────────────────────────────────────────
+  if (!token.isOnboarded && pathname !== "/") {
     return NextResponse.redirect(new URL("/onboarding", req.url));
   }
 
   // ── Redirect logged-in users away from auth pages ─────────────────────────
   const authRoutes = ["/login", "/signup", "/analyst/signup", "/content_editor/signup"];
-  if (token && authRoutes.includes(pathname)) {
-    // If they are on an auth page like /login but they are logged in, send them to dashboard
-    const destination = authConfig.roleRedirects[token.type as string] ?? authConfig.defaultRedirect;
+  if (authRoutes.includes(pathname)) {
+    const destination =
+      authConfig.roleRedirects[token.type as string] ??
+      authConfig.defaultRedirect;
     return NextResponse.redirect(new URL(destination, req.url));
   }
 
