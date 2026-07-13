@@ -85,7 +85,8 @@ export async function updateProfile(data: { name?: string; avatarUrl?: string; e
   }
 }
 
-import bcrypt from 'bcryptjs';
+import { revalidatePath } from 'next/cache';
+import bcrypt from 'bcrypt';
 
 export async function updatePassword(currentPassword: string, newPassword: string) {
   const session = await auth();

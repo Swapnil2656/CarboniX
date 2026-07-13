@@ -2,7 +2,7 @@ import NextAuth, { type DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { db } from "./lib/carbonix-auth/prisma-db";
 import { prisma } from "./lib/carbonix-auth/prisma";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { signInSchema } from "./lib/carbonix-auth/zod";
 import { authConfig } from "./carbonix-auth.config";
