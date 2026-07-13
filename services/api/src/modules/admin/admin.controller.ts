@@ -246,8 +246,12 @@ export const getFeatureFlags = async (req: Request, res: Response) => {
   }
 };
 
-export const toggleFeatureFlag = async (req: Request, res: Response) => {
+export const toggleFeatureFlag = async (req: AuthRequest, res: Response) => {
   try {
+    const userId = req.user?.id;
+    const userEmail = req.user?.email;
+    if (!userId || !userEmail) return res.status(401).json({ error: 'Unauthorized' });
+
     const { id } = req.params;
     const { enabled } = req.body;
 
@@ -265,8 +269,8 @@ export const toggleFeatureFlag = async (req: Request, res: Response) => {
     if (oldFlag) {
       await prisma.auditLog.create({
         data: {
-          actorId: 'admin_user',
-          actorEmail: 'admin@carbonix.ai',
+          actorId: userId,
+          actorEmail: userEmail,
           actorRole: 'ADMIN',
           action: 'FEATURE_FLAG_TOGGLE',
           resource: 'feature_flag',
@@ -328,8 +332,12 @@ export const getApiKeys = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const createApiKey = async (req: Request, res: Response) => {
+export const createApiKey = async (req: AuthRequest, res: Response) => {
   try {
+    const userId = req.user?.id;
+    const userEmail = req.user?.email;
+    if (!userId || !userEmail) return res.status(401).json({ error: 'Unauthorized' });
+
     const { name, permissions, expiration } = req.body;
     
     // Generate a random key
@@ -347,7 +355,7 @@ export const createApiKey = async (req: Request, res: Response) => {
         name,
         prefix,
         hashedKey,
-        createdBy: 'admin_user',
+        createdBy: userId,
         permissions: permissions || ['calculate', 'compare', 'recommend', 'history'],
         expiresAt
       }
@@ -355,8 +363,8 @@ export const createApiKey = async (req: Request, res: Response) => {
 
     await prisma.auditLog.create({
       data: {
-        actorId: 'admin_user',
-        actorEmail: 'admin@carbonix.ai',
+        actorId: userId,
+        actorEmail: userEmail,
         actorRole: 'ADMIN',
         action: 'API_KEY_CREATED',
         resource: 'api_key',
@@ -375,22 +383,26 @@ export const createApiKey = async (req: Request, res: Response) => {
   }
 };
 
-export const revokeApiKey = async (req: Request, res: Response) => {
+export const revokeApiKey = async (req: AuthRequest, res: Response) => {
   try {
+    const userId = req.user?.id;
+    const userEmail = req.user?.email;
+    if (!userId || !userEmail) return res.status(401).json({ error: 'Unauthorized' });
+
     const { id } = req.params;
     await prisma.apiKey.update({
       where: { id },
       data: { 
         status: 'REVOKED',
         revokedAt: new Date(),
-        revokedBy: 'admin_user'
+        revokedBy: userId
       }
     });
 
     await prisma.auditLog.create({
       data: {
-        actorId: 'admin_user',
-        actorEmail: 'admin@carbonix.ai',
+        actorId: userId,
+        actorEmail: userEmail,
         actorRole: 'ADMIN',
         action: 'API_KEY_REVOKED',
         resource: 'api_key',
@@ -407,8 +419,12 @@ export const revokeApiKey = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
-export const deleteApiKey = async (req: Request, res: Response) => {
+export const deleteApiKey = async (req: AuthRequest, res: Response) => {
   try {
+    const userId = req.user?.id;
+    const userEmail = req.user?.email;
+    if (!userId || !userEmail) return res.status(401).json({ error: 'Unauthorized' });
+
     const { id } = req.params;
     await prisma.apiKey.delete({
       where: { id }
@@ -416,8 +432,8 @@ export const deleteApiKey = async (req: Request, res: Response) => {
 
     await prisma.auditLog.create({
       data: {
-        actorId: 'admin_user',
-        actorEmail: 'admin@carbonix.ai',
+        actorId: userId,
+        actorEmail: userEmail,
         actorRole: 'ADMIN',
         action: 'API_KEY_DELETED',
         resource: 'api_key',
@@ -514,8 +530,8 @@ export const syncTeamMembers = async (req: AuthRequest, res: Response) => {
 
     await prisma.auditLog.create({
       data: {
-        actorId: 'admin_user',
-        actorEmail: 'admin@carbonix.ai',
+        actorId: userId,
+        actorEmail: userEmail,
         actorRole: 'ADMIN',
         action: 'CODEBASE_SYNCED',
         resource: 'project',
@@ -545,7 +561,8 @@ export const inviteUser = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: "A team member with this email already exists." });
     }
 
-    const inviteLink = `http://localhost:3000/invite?email=${encodeURIComponent(email)}`;
+    const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const inviteLink = `${baseUrl}/invite?email=${encodeURIComponent(email)}`;
     
     await sendEmail(
       email,
@@ -583,8 +600,8 @@ export const inviteUser = async (req: AuthRequest, res: Response) => {
 
     await prisma.auditLog.create({
       data: {
-        actorId: 'admin_user',
-        actorEmail: 'admin@carbonix.ai',
+        actorId: userId,
+        actorEmail: userEmail,
         actorRole: 'ADMIN',
         action: 'TEAM_INVITE',
         resource: 'team_member',
@@ -601,8 +618,12 @@ export const inviteUser = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const removeTeamMember = async (req: Request, res: Response) => {
+export const removeTeamMember = async (req: AuthRequest, res: Response) => {
   try {
+    const userId = req.user?.id;
+    const userEmail = req.user?.email;
+    if (!userId || !userEmail) return res.status(401).json({ error: 'Unauthorized' });
+
     const { id } = req.params;
     
     await prisma.teamMember.delete({
@@ -613,8 +634,8 @@ export const removeTeamMember = async (req: Request, res: Response) => {
 
     await prisma.auditLog.create({
       data: {
-        actorId: 'admin_user',
-        actorEmail: 'admin@carbonix.ai',
+        actorId: userId,
+        actorEmail: userEmail,
         actorRole: 'ADMIN',
         action: 'TEAM_MEMBER_REMOVED',
         resource: 'team_member',
@@ -691,8 +712,12 @@ export const getEmissions = async (req: Request, res: Response) => {
   }
 };
 
-export const migrateEmission = async (req: Request, res: Response) => {
+export const migrateEmission = async (req: AuthRequest, res: Response) => {
   try {
+    const userId = req.user?.id;
+    const userEmail = req.user?.email;
+    if (!userId || !userEmail) return res.status(401).json({ error: 'Unauthorized' });
+
     const { id } = req.params;
     const { targetRegion } = req.body;
 
@@ -724,8 +749,8 @@ export const migrateEmission = async (req: Request, res: Response) => {
     // Audit Log
     await prisma.auditLog.create({
       data: {
-        actorId: 'admin_user', // from mocked auth session in the Express backend
-        actorEmail: 'admin@carbonix.ai',
+        actorId: userId,
+        actorEmail: userEmail,
         actorRole: 'ADMIN',
         action: 'EMISSION_MIGRATE',
         resource: 'emission_record',
@@ -745,7 +770,7 @@ export const migrateEmission = async (req: Request, res: Response) => {
         type: 'BROADCAST',
         status: 'SENT',
         targetAudience: 'ALL',
-        createdBy: 'admin_user',
+        createdBy: userId,
       }
     });
 
