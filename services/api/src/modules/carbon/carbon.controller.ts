@@ -142,6 +142,9 @@ export const calculate = async (req: AuthRequest, res: Response) => {
       calculationId: calculation.id 
     });
   } catch (error: any) {
+    if (error.message && error.message.includes('not found for provider')) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
@@ -165,6 +168,9 @@ export const compare = async (req: Request, res: Response) => {
 
     res.json({ success: true, data: { base: baseResult, options } });
   } catch (error: any) {
+    if (error.message && error.message.includes('not found for provider')) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
@@ -205,6 +211,9 @@ export const recommend = async (req: Request, res: Response) => {
       });
     }
   } catch (error: any) {
+    if (error.message && error.message.includes('not found for provider')) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
@@ -278,6 +287,9 @@ export const ingestTelemetry = async (req: ApiKeyRequest, res: Response) => {
     res.json({ success: true, data: record });
   } catch (error: any) {
     logger.error('Error ingesting telemetry:', error);
+    if (error.message && error.message.includes('not found for provider')) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
