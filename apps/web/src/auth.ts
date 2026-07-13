@@ -102,5 +102,5 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
     },
   },
   session: { strategy: "jwt" },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || process.env.JWT_SECRET,
 });

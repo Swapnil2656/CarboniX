@@ -25,15 +25,19 @@ export async function middleware(req: NextRequest) {
   }
 
   // ── Read the session token ─────────────────────────────────────────────────
-  // On Vercel (HTTPS) the cookie is prefixed with __Secure-
-  const useSecureCookies = req.nextUrl.protocol === "https:";
-  const cookieName = useSecureCookies
+  // Detect exact cookie present in request or fall back based on protocol
+  const secureCookie = req.cookies.get("__Secure-authjs.session-token");
+  const insecureCookie = req.cookies.get("authjs.session-token");
+  const useSecureCookies = !!secureCookie || req.nextUrl.protocol === "https:";
+  const cookieName = secureCookie
     ? "__Secure-authjs.session-token"
-    : "authjs.session-token";
+    : (insecureCookie ? "authjs.session-token" : (useSecureCookies ? "__Secure-authjs.session-token" : "authjs.session-token"));
 
   const token = await getToken({
     req,
-    secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
+    secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || process.env.JWT_SECRET,
+    secureCookie: useSecureCookies,
+    cookieName: cookieName,
     salt: cookieName,
   });
 
