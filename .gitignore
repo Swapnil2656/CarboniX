@@ -48,3 +48,7 @@ Thumbs.db
 # Expo
 .expo/
 *.apk
+
+# Prisma
+generated/
+services/api/src/generated/
