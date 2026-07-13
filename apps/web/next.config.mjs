@@ -15,6 +15,12 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '10mb',
     },
+    outputFileTracingIncludes: {
+      '/**': [
+        './src/generated/prisma/**/*.node',
+        './node_modules/.prisma/client/**/*.node',
+      ],
+    },
   },
 };
 
