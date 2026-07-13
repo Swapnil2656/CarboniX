@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, useWindowDimensions } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, useWindowDimensions, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
 import { colors } from '../../src/theme/colors';
 import { FormInput } from '../../src/components/FormInput';
 import { NeonButton } from '../../src/components/NeonButton';
@@ -9,6 +10,7 @@ import { LOGO_SIZE, LOGO_GAP } from '../../src/constants/layout';
 
 import { useAuthStore } from '../../src/stores/auth.store';
 import { authApi } from '../../src/services/api/endpoints';
+import { API_BASE_URL, setApiBaseUrl } from '../../src/services/api/client';
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
@@ -19,6 +21,22 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const [showServerSettings, setShowServerSettings] = useState(false);
+  const [serverUrl, setServerUrl] = useState(API_BASE_URL);
+  const [serverSavedMessage, setServerSavedMessage] = useState('');
+
+  useEffect(() => {
+    SecureStore.getItemAsync('custom_api_url').then(saved => {
+      if (saved) setServerUrl(saved);
+    });
+  }, []);
+
+  const handleSaveServerUrl = async () => {
+    await setApiBaseUrl(serverUrl);
+    setServerSavedMessage('Server endpoint updated successfully!');
+    setTimeout(() => setServerSavedMessage(''), 3000);
+  };
 
   const handleLogin = async () => {
     setError('');
@@ -42,7 +60,12 @@ export default function LoginScreen() {
         setError(response.error || 'Login failed.');
       }
     } catch (err: any) {
-      setError(err.response?.data?.error || err.message || 'An error occurred during login.');
+      const errMsg = err.response?.data?.error || err.message || 'An error occurred during login.';
+      if (errMsg.toLowerCase().includes('network') || !err.response) {
+        setError(`Network Error: Could not connect to server at ${serverUrl}.\nCheck your Wi-Fi / IP or tap "Server Settings" below to change endpoint.`);
+      } else {
+        setError(errMsg);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -70,6 +93,12 @@ export default function LoginScreen() {
             <Text style={styles.subtitle}>Log in to access your carbon intelligence console.</Text>
           </View>
 
+          {error ? (
+            <View style={{ backgroundColor: 'rgba(220,38,38,0.15)', borderColor: '#DC2626', borderWidth: 1, borderRadius: 8, padding: 12, marginBottom: 16, width: '100%' }}>
+              <Text style={{ color: '#F87171', fontSize: 13, textAlign: 'center', lineHeight: 18 }}>{error}</Text>
+            </View>
+          ) : null}
+
           <View style={styles.formContainer}>
             <FormInput
               label="Email Address"
@@ -90,7 +119,6 @@ export default function LoginScreen() {
               onChangeText={setPassword}
               secureTextEntry
               error={error.includes('all') ? error : undefined}
-
             />
 
             <NeonButton
@@ -100,11 +128,40 @@ export default function LoginScreen() {
               loading={isLoading}
               buttonStyle={styles.loginButton}
             />
-
           </View>
 
+          <TouchableOpacity
+            style={{ marginTop: 24, padding: 8 }}
+            onPress={() => setShowServerSettings(!showServerSettings)}
+          >
+            <Text style={{ color: colors.textMuted, fontSize: 13 }}>
+              {showServerSettings ? '▲ Hide Server Settings' : '▼ Server Settings / API Endpoint'}
+            </Text>
+          </TouchableOpacity>
 
-
+          {showServerSettings && (
+            <View style={{ width: '100%', marginTop: 12, padding: 16, backgroundColor: colors.surface, borderRadius: 12, borderColor: colors.outlineVariant, borderWidth: 1 }}>
+              <Text style={{ color: colors.textBody, fontSize: 12, fontWeight: '600', marginBottom: 6 }}>API BASE URL</Text>
+              <TextInput
+                style={{ backgroundColor: colors.surfaceContainer, color: colors.textBody, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 13, borderColor: colors.outlineVariant, borderWidth: 1, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' }}
+                value={serverUrl}
+                onChangeText={setServerUrl}
+                placeholder="http://192.168.1.X:4000/api/v1"
+                placeholderTextColor={colors.textMuted}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              <TouchableOpacity
+                style={{ backgroundColor: colors.primary, borderRadius: 8, paddingVertical: 10, marginTop: 12, alignItems: 'center' }}
+                onPress={handleSaveServerUrl}
+              >
+                <Text style={{ color: '#000000', fontWeight: 'bold', fontSize: 13 }}>Save Endpoint</Text>
+              </TouchableOpacity>
+              {serverSavedMessage ? (
+                <Text style={{ color: colors.success, fontSize: 12, textAlign: 'center', marginTop: 8 }}>{serverSavedMessage}</Text>
+              ) : null}
+            </View>
+          )}
 
         </View>
       </ScrollView>

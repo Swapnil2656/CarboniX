@@ -20,10 +20,15 @@ const api = axios.create({
   },
 });
 
-// Request interceptor — attach JWT token
+// Request interceptor — attach JWT token and use custom_api_url if saved
 api.interceptors.request.use(
   async (config) => {
     try {
+      const customUrl = await SecureStore.getItemAsync('custom_api_url');
+      if (customUrl) {
+        config.baseURL = customUrl;
+        api.defaults.baseURL = customUrl;
+      }
       const token = await SecureStore.getItemAsync('auth_token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
