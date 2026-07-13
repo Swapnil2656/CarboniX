@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { authConfig } from "./carbonix-auth.config";
+// Production deployment v2 - Cookie check & NEXTAUTH_URL fix
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
