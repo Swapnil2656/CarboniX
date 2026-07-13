@@ -62,9 +62,7 @@ export default function HistoryPage() {
         <div>
           <h1 className="text-section-header text-on-surface">Audit Logs</h1>
           <p className="text-on-surface-variant mt-1">
-            {isAdmin 
-              ? 'Platform-wide history of actions and configuration changes.' 
-              : 'History of your recent actions and configuration changes.'}
+            History of your recent actions and configuration changes.
           </p>
         </div>
         

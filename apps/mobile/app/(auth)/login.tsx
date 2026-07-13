@@ -90,11 +90,7 @@ export default function LoginScreen() {
               onChangeText={setPassword}
               secureTextEntry
               error={error.includes('all') ? error : undefined}
-              rightElement={
-                <TouchableOpacity activeOpacity={0.7}>
-                  <Text style={styles.forgotPassword}>Forgot Password?</Text>
-                </TouchableOpacity>
-              }
+
             />
 
             <NeonButton
@@ -107,20 +103,9 @@ export default function LoginScreen() {
 
           </View>
 
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={() => router.push('/(auth)/signup')} activeOpacity={0.7}>
-              <Text style={styles.signUpText}>Sign Up</Text>
-            </TouchableOpacity>
-          </View>
 
-          <View style={styles.globalFooter}>
-            <View style={styles.nodeStatus}>
-              <View style={styles.nodeStatusDot} />
-              <Text style={styles.nodeStatusText}>NODE STATUS: OPERATIONAL</Text>
-            </View>
-            <Text style={styles.versionText}>© 2024 CARBONIX ENGINE  V2.4.0-STABLE</Text>
-          </View>
+
+
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

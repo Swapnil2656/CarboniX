@@ -34,7 +34,7 @@ async function calculateCarbon(input) {
     const gridIntensity = await (0, gridCache_1.getGridIntensity)(region);
     const co2GramsMonth = totalFinalEnergyKwh * gridIntensity;
     const co2KgMonth = co2GramsMonth / 1000;
-    const co2GramsHour = co2GramsMonth / input.hoursPerMonth;
+    const co2GramsHour = co2GramsMonth / hours;
     return {
         cpuEnergyKwh,
         memoryEnergyKwh,

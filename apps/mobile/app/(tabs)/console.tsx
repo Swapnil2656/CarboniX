@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator, Dimensions, Alert, Modal } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
@@ -83,6 +83,32 @@ export default function DashboardScreen() {
   const router = useRouter();
   
   const [useLbs, setUseLbs] = useState(false);
+  const [analyzingProjectId, setAnalyzingProjectId] = useState<string | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<any>(null);
+
+  const handleAnalyze = async (project: any) => {
+    setAnalyzingProjectId(project.id);
+    try {
+      const payload = {
+        projectName: project.name,
+        instanceType: 't3.medium',
+        provider: project.provider || 'aws',
+        region: project.region || 'us-east-1',
+        cpuUtilization: 0.2,
+        storageGb: 20
+      };
+      const res = await carbonApi.recommend(payload);
+      if (res.success && res.data?.recommended) {
+        setAnalysisResult({ project, currentRegion: payload.region, currentProvider: payload.provider, recommendation: res.data.recommended });
+      } else {
+        Alert.alert("Optimization Status", "Your environment is already optimized! No greener region found for this provider.");
+      }
+    } catch (e: any) {
+      Alert.alert("Error", "Error fetching analysis: " + e.message);
+    } finally {
+      setAnalyzingProjectId(null);
+    }
+  };
 
   useFocusEffect(
     React.useCallback(() => {
@@ -114,7 +140,7 @@ export default function DashboardScreen() {
           <Image source={require('../../assets/carbonix-logo.png')} style={styles.logoImage} />
           <Text style={styles.logo}>CarboniX</Text>
         </View>
-        <TouchableOpacity style={styles.iconBtn} onPress={() => refetch()}>
+        <TouchableOpacity style={styles.iconBtn} onPress={() => { refetch(); Alert.alert('Reloading', 'Dashboard data has been refreshed.'); }}>
           <MaterialIcons name="refresh" size={24} color={isRefetching ? colors.primary : colors.textMuted} />
         </TouchableOpacity>
       </View>
@@ -168,27 +194,7 @@ export default function DashboardScreen() {
               </View>
             </View>
 
-            {/* Quick Actions */}
-            <View style={styles.quickActionsRow}>
-              <TouchableOpacity style={styles.quickActionBtn} onPress={() => router.push('/config')}>
-                <View style={[styles.quickActionIcon, { backgroundColor: 'rgba(255, 229, 160, 0.1)' }]}>
-                  <MaterialIcons name="calculate" size={24} color={colors.primary} />
-                </View>
-                <Text style={styles.quickActionText}>Calculate</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.quickActionBtn} onPress={() => router.push('/compare')}>
-                <View style={[styles.quickActionIcon, { backgroundColor: 'rgba(66, 133, 244, 0.1)' }]}>
-                  <MaterialIcons name="compare-arrows" size={24} color="#4285F4" />
-                </View>
-                <Text style={styles.quickActionText}>Compare</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.quickActionBtn} onPress={() => router.push('/history')}>
-                <View style={[styles.quickActionIcon, { backgroundColor: 'rgba(80, 250, 123, 0.1)' }]}>
-                  <MaterialIcons name="history" size={24} color="#50FA7B" />
-                </View>
-                <Text style={styles.quickActionText}>History</Text>
-              </TouchableOpacity>
-            </View>
+
 
             {/* Active Projects (Web) */}
             <View style={styles.panel}>
@@ -231,6 +237,22 @@ export default function DashboardScreen() {
                           {project.lastPingAt ? timeAgo(project.lastPingAt) : 'Never'}
                         </Text>
                       </View>
+                    </View>
+                    <View style={styles.configFooter}>
+                      <TouchableOpacity 
+                        style={styles.insightBtn} 
+                        onPress={() => handleAnalyze(project)}
+                        disabled={analyzingProjectId === project.id}
+                      >
+                        {analyzingProjectId === project.id ? (
+                          <ActivityIndicator size="small" color={colors.primary} />
+                        ) : (
+                          <>
+                            <MaterialIcons name="auto-awesome" size={16} color={colors.primary} />
+                            <Text style={styles.insightBtnText}>View Insights</Text>
+                          </>
+                        )}
+                      </TouchableOpacity>
                     </View>
                   </View>
                 ))
@@ -280,6 +302,68 @@ export default function DashboardScreen() {
           </>
         )}
       </ScrollView>
+
+      {/* Analysis Modal */}
+      <Modal visible={!!analysisResult} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <MaterialIcons name="auto-awesome" size={24} color={colors.primary} />
+              <Text style={styles.modalTitle}>AI Optimization Found</Text>
+            </View>
+            
+            {analysisResult && (
+              <>
+                <Text style={styles.modalSubtitle}>
+                  CarboniX Agentic AI analyzed {analysisResult.project.name} and found a greener region!
+                </Text>
+                
+                <View style={styles.modalStatsCard}>
+                  <View style={styles.modalStatRow}>
+                    <Text style={styles.modalStatLabel}>Current Target:</Text>
+                    <Text style={styles.modalStatValue}>{analysisResult.currentProvider.toUpperCase()} ({analysisResult.currentRegion})</Text>
+                  </View>
+                  <View style={styles.modalStatRow}>
+                    <Text style={styles.modalStatLabel}>Current Carbon:</Text>
+                    <Text style={[styles.modalStatValue, { color: '#f5c518' }]}>
+                      {(analysisResult.recommendation.co2KgMonth + analysisResult.recommendation.savingsKg).toFixed(2)} kg CO₂e / mo
+                    </Text>
+                  </View>
+                  <View style={styles.modalDivider} />
+                  <View style={styles.modalStatRow}>
+                    <Text style={styles.modalStatLabel}>Recommended:</Text>
+                    <Text style={[styles.modalStatValue, { color: '#50FA7B' }]}>{analysisResult.currentProvider.toUpperCase()} ({analysisResult.recommendation.region})</Text>
+                  </View>
+                  <View style={styles.modalStatRow}>
+                    <Text style={styles.modalStatLabel}>New Carbon:</Text>
+                    <Text style={[styles.modalStatValue, { color: '#50FA7B' }]}>
+                      {analysisResult.recommendation.co2KgMonth.toFixed(2)} kg CO₂e / mo
+                    </Text>
+                  </View>
+                </View>
+                
+                <View style={styles.modalSavingsBox}>
+                  <MaterialIcons name="eco" size={20} color={colors.primary} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.modalSavingsTitle}>Expected Savings</Text>
+                    <Text style={styles.modalSavingsText}>
+                      You can save ~{Math.round(analysisResult.recommendation.reductionPercent)}% carbon emissions ({analysisResult.recommendation.savingsKg.toFixed(2)} kg CO₂e) by making this switch.
+                    </Text>
+                  </View>
+                </View>
+              </>
+            )}
+            
+            <TouchableOpacity 
+              style={styles.modalCloseBtn}
+              onPress={() => setAnalysisResult(null)}
+            >
+              <Text style={styles.modalCloseText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
     </View>
   );
 }
@@ -327,11 +411,7 @@ const styles = StyleSheet.create({
   statTitle: { fontFamily: 'Inter', fontSize: 12, color: colors.textMuted },
   statValue: { fontFamily: 'Inter-Bold', fontSize: 24, color: colors.textHeader },
 
-  // Quick Actions
-  quickActionsRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
-  quickActionBtn: { flex: 1, backgroundColor: '#1E1E1E', borderWidth: 1, borderColor: '#2A2A2A', borderRadius: 12, paddingVertical: 16, alignItems: 'center', gap: 8 },
-  quickActionIcon: { width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center' },
-  quickActionText: { fontFamily: 'Inter-SemiBold', fontSize: 13, color: colors.textHeader },
+
 
   // Panels
   panel: { backgroundColor: '#1E1E1E', borderWidth: 1, borderColor: '#2A2A2A', padding: 16, gap: 16, borderRadius: 12 },
@@ -366,4 +446,24 @@ const styles = StyleSheet.create({
   alertBody: { fontFamily: 'Inter', fontSize: 13, color: colors.textMuted, lineHeight: 18 },
 
   emptyText: { fontFamily: 'Inter', color: colors.textMuted, textAlign: 'center', paddingVertical: 20 },
+
+  // Analysis Modal
+  configFooter: { borderTopWidth: 1, borderTopColor: '#333', marginTop: 12, paddingTop: 12, alignItems: 'flex-end' },
+  insightBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255, 229, 160, 0.1)', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 },
+  insightBtnText: { fontFamily: 'Inter-SemiBold', fontSize: 13, color: colors.primary },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  modalContent: { width: '100%', backgroundColor: '#1E1E1E', borderRadius: 16, padding: 20, borderWidth: 1, borderColor: '#2A2A2A' },
+  modalHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
+  modalTitle: { fontFamily: 'Inter-Bold', fontSize: 18, color: colors.textHeader },
+  modalSubtitle: { fontFamily: 'Inter', fontSize: 14, color: colors.textMuted, marginBottom: 16, lineHeight: 20 },
+  modalStatsCard: { backgroundColor: '#141414', borderRadius: 12, padding: 16, gap: 8, borderWidth: 1, borderColor: '#2A2A2A', marginBottom: 16 },
+  modalStatRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  modalStatLabel: { fontFamily: 'Inter', fontSize: 13, color: colors.textMuted },
+  modalStatValue: { fontFamily: 'JetBrainsMono-Bold', fontSize: 13, color: colors.textHeader },
+  modalDivider: { height: 1, backgroundColor: '#2A2A2A', marginVertical: 4 },
+  modalSavingsBox: { backgroundColor: 'rgba(255, 229, 160, 0.1)', borderWidth: 1, borderColor: 'rgba(255, 229, 160, 0.3)', borderRadius: 12, padding: 12, flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 20 },
+  modalSavingsTitle: { fontFamily: 'Inter-SemiBold', fontSize: 14, color: colors.primary, marginBottom: 2 },
+  modalSavingsText: { fontFamily: 'Inter', fontSize: 12, color: colors.primary, opacity: 0.8, lineHeight: 18 },
+  modalCloseBtn: { alignSelf: 'flex-end', paddingHorizontal: 16, paddingVertical: 10 },
+  modalCloseText: { fontFamily: 'Inter-SemiBold', fontSize: 14, color: colors.textMuted },
 });

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
@@ -64,7 +64,7 @@ export default function CompareProvidersScreen() {
           <Image source={require('../../assets/carbonix-logo.png')} style={styles.logoImage} />
           <Text style={styles.logo}>CarboniX</Text>
         </View>
-        <TouchableOpacity style={styles.iconBtn}>
+        <TouchableOpacity style={styles.iconBtn} onPress={() => Alert.alert('Notifications', 'You have no new notifications.')}>
           <MaterialIcons name="notifications" size={24} color={colors.textMuted} />
         </TouchableOpacity>
       </View>

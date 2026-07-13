@@ -86,9 +86,13 @@ export default function SettingsScreen() {
         {/* Profile Card */}
         <View style={styles.profileCard}>
           <View style={styles.avatarContainer}>
-            <Text style={styles.avatarText}>
-              {profile?.name ? profile.name.substring(0, 2).toUpperCase() : (user?.name ? user.name.substring(0, 2).toUpperCase() : 'ME')}
-            </Text>
+            {profile?.avatarUrl ? (
+              <Image source={{ uri: profile.avatarUrl }} style={{ width: 56, height: 56, borderRadius: 28 }} />
+            ) : (
+              <Text style={styles.avatarText}>
+                {profile?.name ? profile.name.substring(0, 2).toUpperCase() : (user?.name ? user.name.substring(0, 2).toUpperCase() : 'ME')}
+              </Text>
+            )}
           </View>
           <View style={styles.profileInfo}>
             <Text style={styles.profileName}>{profile?.name || user?.name || 'User Name'}</Text>
@@ -108,21 +112,6 @@ export default function SettingsScreen() {
             <MaterialIcons name="notifications-active" size={20} color={colors.primary} />
             <Text style={styles.panelTitle}>NOTIFICATIONS</Text>
           </View>
-
-          <View style={styles.settingRow}>
-            <View style={{ flex: 1, paddingRight: 16 }}>
-              <Text style={styles.settingLabel}>Email Alerts</Text>
-              <Text style={styles.settingDesc}>Receive important notifications via email</Text>
-            </View>
-            <Switch
-              value={emailAlerts}
-              onValueChange={(val) => updateSetting('emailAlerts', val)}
-              trackColor={{ false: '#2A2A2A', true: 'rgba(255, 229, 160, 0.4)' }}
-              thumbColor={emailAlerts ? colors.primary : colors.textMuted}
-            />
-          </View>
-
-          <View style={styles.divider} />
 
           <View style={styles.settingRow}>
             <View style={{ flex: 1, paddingRight: 16 }}>

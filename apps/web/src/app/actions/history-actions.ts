@@ -24,10 +24,8 @@ export async function getHistoryLogs(page = 1, pageSize = 15, search = '') {
         }
       : {};
 
-    // Regular users should only see their own logs
-    if (!isAdmin) {
-      where.actorId = session.user.id;
-    }
+    // Always isolate logs to the current user (as requested)
+    where.actorId = session.user.id;
 
     const [logs, total] = await Promise.all([
       prisma.auditLog.findMany({

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions } from 'react-native';
 import { Tabs, Redirect } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -6,6 +6,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors } from '../../src/theme/colors';
 import { useAuthStore } from '../../src/stores/auth.store';
+import { AiBotModal } from '../../src/components/AiBotModal';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 const tabWidth = width / 5;
@@ -127,7 +129,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
         };
 
         let iconName = 'home';
-        if (route.name === 'config') iconName = 'home';
+        if (route.name === 'config') iconName = 'calculate';
         if (route.name === 'compare') iconName = 'compare-arrows';
         if (route.name === 'console') iconName = 'dashboard';
         if (route.name === 'history') iconName = 'history';
@@ -152,6 +154,9 @@ export default function TabLayout() {
   // AUTH GUARD: Block unauthenticated access to tabs
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const isLoading = useAuthStore(state => state.isLoading);
+  const insets = useSafeAreaInsets();
+
+  const [aiBotVisible, setAiBotVisible] = useState(false);
 
   // While loading token, don't redirect yet
   if (isLoading) return null;
@@ -162,18 +167,22 @@ export default function TabLayout() {
   }
 
   return (
-    <Tabs
-      tabBar={props => <CustomTabBar {...props} />}
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Tabs.Screen name="config" options={{ title: 'Home' }} />
-      <Tabs.Screen name="compare" options={{ title: 'Compare' }} />
-      <Tabs.Screen name="console" options={{ title: 'Dashboard' }} />
-      <Tabs.Screen name="history" options={{ title: 'History' }} />
-      <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
-    </Tabs>
+    <View style={{ flex: 1 }}>
+      <Tabs
+        initialRouteName="console"
+        tabBar={props => <CustomTabBar {...props} />}
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Tabs.Screen name="config" options={{ title: 'Calculator' }} />
+        <Tabs.Screen name="compare" options={{ title: 'Compare' }} />
+        <Tabs.Screen name="console" options={{ title: 'Dashboard' }} />
+        <Tabs.Screen name="history" options={{ title: 'History' }} />
+        <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
+      </Tabs>
+
+    </View>
   );
 }
 
@@ -251,4 +260,20 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 0.5,
   },
+  fab: {
+    position: 'absolute',
+    right: 16,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.success,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    zIndex: 100,
+  }
 });

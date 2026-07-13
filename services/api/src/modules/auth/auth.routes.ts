@@ -4,7 +4,7 @@ import { getProfile, updateProfile, registerPushToken, logout } from './profile.
 import { rateLimit } from '../../middleware/rate-limit.middleware';
 import { authenticate } from '../../middleware/auth.middleware';
 const router = Router();
-const authLimiter = rateLimit(5, 15 * 60 * 1000);
+const authLimiter = rateLimit(100, 15 * 60 * 1000);
 
 router.post('/register', authLimiter, register);
 router.post('/login', authLimiter, login);

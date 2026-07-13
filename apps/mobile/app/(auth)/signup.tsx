@@ -156,10 +156,7 @@ export default function SignupScreen() {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.bottomTrace}>
-            <Text style={styles.traceText}>SECURED BY CARBONIX_SHIELD</Text>
-            <View style={styles.traceLine} />
-          </View>
+
         </View>
       </View>
     </KeyboardAvoidingView>

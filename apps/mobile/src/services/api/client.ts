@@ -2,7 +2,6 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
-import { Platform } from 'react-native';
 
 // 1. Create an Axios instance pointing to the Express backend (services/api)
 // NOTE: During local development, use your machine's local IP address or localhost depending on simulator.

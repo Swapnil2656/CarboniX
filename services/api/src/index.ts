@@ -10,6 +10,7 @@ import authRoutes from './modules/auth/auth.routes';
 import agentRoutes from './modules/agents/agents.routes';
 import adminRoutes from './modules/admin/admin.routes';
 import connectRoutes from './modules/connect/connect.routes';
+import aiRoutes from './modules/ai/ai.routes';
 
 import { runCollector } from '@carbonix/agents';
 import { runAnalyst } from '@carbonix/agents';
@@ -40,6 +41,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/agents', agentRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/connect', connectRoutes);
+app.use('/api/v1/ai', aiRoutes);
 
 app.post('/api/v1/public/accept-invite', async (req, res) => {
   try {

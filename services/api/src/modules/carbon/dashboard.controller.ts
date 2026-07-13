@@ -103,7 +103,9 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
           id: p.id,
           name: p.name,
           region: p.region,
-          sdkConnected: p.sdkConnected
+          sdkConnected: p.sdkConnected,
+          connectedAt: p.connectedAt,
+          lastPingAt: p.lastPingAt
         }));
       }
     }
@@ -128,6 +130,7 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
         changePercent: Number(Math.abs(changePercent).toFixed(1)),
         changeDirection,
         calculationsThisMonth,
+        avgCo2Kg: Number(avgCo2Kg.toFixed(1)),
         carbonRating: { 
           rating: carbonRatingInfo.rating, 
           color: carbonRatingInfo.color, 

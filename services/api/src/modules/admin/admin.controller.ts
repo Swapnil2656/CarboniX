@@ -41,7 +41,7 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
       return res.json({ ...JSON.parse(cached), cached: true });
     }
 
-    const { teamUserIds } = await resolveTenantContext(userId, userEmail);
+    const { teamUserIds, projectIds } = await resolveTenantContext(userId, userEmail);
 
     const apiKeys = await prisma.apiKey.findMany({
       where: { createdBy: { in: teamUserIds } }

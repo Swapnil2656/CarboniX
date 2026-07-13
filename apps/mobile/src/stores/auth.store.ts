@@ -32,12 +32,13 @@ export const useAuthStore = create<AuthState>((set) => ({
   isLoading: true,
 
   setAuth: async (user, token) => {
+    // Update state synchronously first so router can navigate immediately
+    set({ user, token, isAuthenticated: true, isLoading: false });
     try {
       await SecureStore.setItemAsync('auth_token', token);
     } catch (e) {
       console.warn('SecureStore failed to save token:', e);
     }
-    set({ user, token, isAuthenticated: true, isLoading: false });
   },
 
   clearAuth: async () => {

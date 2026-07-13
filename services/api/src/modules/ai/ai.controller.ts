@@ -1,0 +1,330 @@
+import { Response } from 'express';
+import { AuthRequest } from '../../middleware/auth.middleware';
+import { prisma } from '../../lib/prisma';
+
+export type Role = 'user' | 'model' | 'function';
+
+export interface ChatMessage {
+  role: Role;
+  content: string;
+  name?: string;
+}
+
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+const SYSTEM_PROMPT = `
+You are CarboniX AI, an agentic AI assistant integrated into the CarboniX dashboard.
+You help users track their codebase deployments, manage cloud regions, and send notifications.
+
+You have access to the following tools:
+1. switchProjectRegion: Switch the cloud region for a deployed project to optimize carbon emissions.
+2. pushMobileNotification: Send a push notification to a user's mobile app.
+3. getProjectStatus: Retrieve real-time data about a project's current deployment.
+
+When a user asks you to perform an action, use the tools provided.
+Be concise and helpful. Use a professional but friendly tone.
+`;
+
+const tools = [
+  {
+    name: 'switchProjectRegion',
+    description: 'Switch the region of a deployed project to a new cloud region.',
+    parameters: {
+      type: 'OBJECT',
+      properties: {
+        projectId: { type: 'STRING', description: 'The ID of the project to update.' },
+        region: { type: 'STRING', description: 'The new region code (e.g., us-east-1, eu-west-1).' },
+      },
+      required: ['projectId', 'region'],
+    },
+  },
+  {
+    name: 'pushMobileNotification',
+    description: 'Send a push notification to the user on their mobile device.',
+    parameters: {
+      type: 'OBJECT',
+      properties: {
+        userId: { type: 'STRING', description: 'The ID of the user to notify.' },
+        title: { type: 'STRING', description: 'The title of the notification.' },
+        body: { type: 'STRING', description: 'The main content of the notification.' },
+      },
+      required: ['userId', 'title', 'body'],
+    },
+  },
+  {
+    name: 'getProjectStatus',
+    description: 'Get the current status, region, and emission metrics of a project.',
+    parameters: {
+      type: 'OBJECT',
+      properties: {
+        projectId: { type: 'STRING', description: 'The ID of the project.' },
+      },
+      required: ['projectId'],
+    },
+  },
+];
+
+async function callGeminiApi(history: ChatMessage[]) {
+  if (!GEMINI_API_KEY) {
+    return {
+      candidates: [{
+        content: {
+          parts: [{ text: "AI features are currently disabled. Please configure GEMINI_API_KEY on the server to enable CarboniX Assistant." }]
+        }
+      }]
+    };
+  }
+
+  const contents = history.map((msg) => {
+    if (msg.role === 'function') {
+      return {
+        role: 'function',
+        parts: [{
+          functionResponse: {
+            name: msg.name,
+            response: { result: msg.content }
+          }
+        }]
+      };
+    }
+    
+    if (msg.role === 'model' && msg.name) {
+      return {
+        role: 'model',
+        parts: [{
+          functionCall: {
+            name: msg.name,
+            args: JSON.parse(msg.content)
+          }
+        }]
+      };
+    }
+
+    return {
+      role: msg.role === 'user' ? 'user' : 'model',
+      parts: [{ text: msg.content }],
+    };
+  });
+
+  const body = {
+    systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+    contents,
+    tools: [{ functionDeclarations: tools }],
+  };
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${GEMINI_API_KEY}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    }
+  );
+
+  if (!response.ok) {
+    const errText = await response.text();
+    console.error('Gemini API Error details:', errText);
+    
+    let detailedMsg = 'Failed to generate response from Gemini. See console.';
+    try {
+      const errJson = JSON.parse(errText);
+      if (errJson.error && errJson.error.message) {
+        detailedMsg = errJson.error.message;
+      }
+    } catch(e) {}
+    
+    throw new Error(`Gemini API Error: ${detailedMsg}`);
+  }
+
+  return response.json();
+}
+
+async function executeTool(name: string, args: any, adminUserId: string) {
+  switch (name) {
+    case 'switchProjectRegion': {
+      const { projectId, region } = args;
+      
+      const oldProject = await prisma.project.findUnique({ where: { id: projectId } });
+      if (!oldProject) throw new Error('Project not found');
+
+      const project = await prisma.project.update({
+        where: { id: projectId },
+        data: { region },
+      });
+
+      await prisma.auditLog.create({
+        data: {
+          actorId: adminUserId,
+          actorEmail: 'system@carbonix.ai',
+          actorRole: 'SYSTEM',
+          action: 'PROJECT_REGION_SWITCH',
+          resource: 'project',
+          resourceId: projectId,
+          before: { region: oldProject.region },
+          after: { region },
+          ip: 'AI Agent (Mobile)',
+          userAgent: 'CarboniX Mobile',
+        }
+      });
+
+      await prisma.notification.create({
+        data: {
+          title: 'Project Region Changed',
+          body: `Project '${project.name}' was switched from ${oldProject.region || 'unknown'} to ${region} to optimize carbon emissions.`,
+          type: 'BROADCAST',
+          status: 'SENT',
+          targetAudience: 'ALL',
+          createdBy: adminUserId,
+        }
+      });
+
+      // Removed redis cache invalidation as redis is not available in the API utils
+      return `Successfully switched project '${project.name}' to region '${region}'.`;
+    }
+    case 'pushMobileNotification': {
+      const { userId, title, body } = args;
+      await prisma.notification.create({
+        data: {
+          title,
+          body,
+          type: 'TARGETED',
+          status: 'SENDING',
+          targetAudience: 'CUSTOM',
+          targetUserIds: [userId],
+          createdBy: adminUserId,
+          totalRecipients: 1,
+        },
+      });
+      return `Notification '${title}' sent successfully.`;
+    }
+    case 'getProjectStatus': {
+      const { projectId } = args;
+      const project = await prisma.project.findUnique({
+        where: { id: projectId },
+      });
+      if (!project) return 'Project not found.';
+      return `Project '${project.name}' is currently deployed in region '${project.region}'. It is active and tracking carbon emissions.`;
+    }
+    default:
+      return `Unknown tool: ${name}`;
+  }
+}
+
+export const getHistory = async (req: AuthRequest, res: Response) => {
+  try {
+    const adminUserId = req.user!.id;
+    const history = await prisma.chatHistory.findUnique({
+      where: { userId: adminUserId },
+    });
+
+    if (history) {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      if (history.updatedAt < thirtyDaysAgo) {
+        await prisma.chatHistory.delete({ where: { userId: adminUserId } });
+        return res.json({ success: true, messages: [] });
+      }
+
+      return res.json({ success: true, messages: history.messages });
+    }
+
+    return res.json({ success: true, messages: [] });
+  } catch (error: any) {
+    console.error('Failed to get chat history:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+export const clearHistory = async (req: AuthRequest, res: Response) => {
+  try {
+    const adminUserId = req.user!.id;
+    await prisma.chatHistory.delete({ where: { userId: adminUserId } });
+    res.json({ success: true });
+  } catch (error: any) {
+    if (error.code === 'P2025') {
+      return res.json({ success: true });
+    }
+    console.error('Failed to clear chat history:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+export const chat = async (req: AuthRequest, res: Response) => {
+  try {
+    const adminUserId = req.user!.id;
+    const { message, history } = req.body;
+    
+    if (!message || !history) {
+      return res.status(400).json({ success: false, error: 'Message and history are required.' });
+    }
+
+    const updatedHistory: ChatMessage[] = [...history, { role: 'user', content: message }];
+    
+    let aiData = await callGeminiApi(updatedHistory);
+    let candidate = aiData?.candidates?.[0];
+    
+    if (!candidate) {
+      return res.status(500).json({ success: false, error: 'No response from AI.' });
+    }
+
+    while (candidate.content?.parts?.[0]?.functionCall) {
+      const call = candidate.content.parts[0].functionCall;
+      const functionName = call.name;
+      const functionArgs = call.args;
+
+      updatedHistory.push({
+        role: 'model',
+        name: functionName,
+        content: JSON.stringify(functionArgs),
+      });
+
+      let resultStr = '';
+      try {
+        resultStr = await executeTool(functionName, functionArgs, adminUserId);
+      } catch (e: any) {
+        resultStr = `Error executing ${functionName}: ${e.message}`;
+      }
+
+      updatedHistory.push({
+        role: 'function',
+        name: functionName,
+        content: resultStr,
+      });
+
+      try {
+        aiData = await callGeminiApi(updatedHistory);
+        candidate = aiData?.candidates?.[0];
+        if (!candidate) break;
+      } catch (geminiError: any) {
+        console.error('Gemini API Error after tool execution:', geminiError);
+        updatedHistory.push({
+          role: 'model',
+          content: `I executed the action successfully, but encountered an API error generating my response: ${geminiError.message}`
+        });
+        return res.json({ success: true, updatedHistory });
+      }
+    }
+
+    if (candidate?.content?.parts?.[0]?.text) {
+      const text = candidate.content.parts[0].text;
+      updatedHistory.push({ role: 'model', content: text });
+      
+      await prisma.chatHistory.upsert({
+        where: { userId: adminUserId },
+        update: { messages: updatedHistory as any },
+        create: {
+          userId: adminUserId,
+          messages: updatedHistory as any,
+        },
+      });
+
+      return res.json({ success: true, text, updatedHistory });
+    }
+
+    return res.status(500).json({ success: false, error: 'Unexpected AI response format.' });
+  } catch (error: any) {
+    console.error('Agent Action Error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};

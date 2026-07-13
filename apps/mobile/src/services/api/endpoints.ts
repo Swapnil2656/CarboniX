@@ -23,7 +23,7 @@ export const carbonApi = {
     return response.data;
   },
   getDashboard: async () => {
-    const response = await apiClient.get('/admin/dashboard');
+    const response = await apiClient.get('/carbon/dashboard');
     return response.data;
   },
   getNotifications: async () => {
@@ -50,6 +50,10 @@ export const agentsApi = {
 
 // Admin API Endpoints
 export const adminApi = {
+  getAuditLogs: async (params?: { page?: number; pageSize?: number }) => {
+    const response = await apiClient.get('/admin/audit-logs', { params });
+    return response.data;
+  },
   getDashboardStats: async () => {
     const response = await apiClient.get('/admin/dashboard');
     return response.data;
@@ -124,6 +128,22 @@ export const referenceApi = {
   },
   getRegionsRanked: async (provider: string) => {
     const response = await apiClient.get('/reference/regions/ranked', { params: { provider } });
+    return response.data;
+  }
+};
+
+// AI Agent Endpoints
+export const aiApi = {
+  getHistory: async () => {
+    const response = await apiClient.get('/ai/history');
+    return response.data;
+  },
+  clearHistory: async () => {
+    const response = await apiClient.delete('/ai/history');
+    return response.data;
+  },
+  chat: async (message: string, history: any[]) => {
+    const response = await apiClient.post('/ai/chat', { message, history });
     return response.data;
   }
 };
