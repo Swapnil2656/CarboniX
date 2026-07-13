@@ -1,9 +1,11 @@
 import axios from 'axios';
 import { useAuthStore } from '../stores/auth.store';
 
+import { Platform } from 'react-native';
+
 // For local testing: if using Android emulator, use 10.0.2.2. If iOS/web, use localhost.
-// Alternatively, process.env.EXPO_PUBLIC_API_URL could be used.
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+const fallbackUrl = Platform.OS === 'android' ? 'http://10.0.2.2:4000/api/v1' : 'http://localhost:4000/api/v1';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || fallbackUrl;
 
 export const api = axios.create({
   baseURL: API_URL,

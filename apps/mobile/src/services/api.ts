@@ -7,8 +7,10 @@
 
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+const fallbackUrl = Platform.OS === 'android' ? 'http://10.0.2.2:4000/api/v1' : 'http://localhost:4000/api/v1';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || fallbackUrl;
 
 const api = axios.create({
   baseURL: API_URL,

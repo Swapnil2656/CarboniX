@@ -1,10 +1,12 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 
 // 1. Create an Axios instance pointing to the Express backend (services/api)
 // NOTE: During local development, use your machine's local IP address or localhost depending on simulator.
 // For physical devices connected via USB, we use 127.0.0.1 with adb reverse
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://127.0.0.1:4000/api/v1';
+const fallbackUrl = Platform.OS === 'android' ? 'http://10.0.2.2:4000/api/v1' : 'http://localhost:4000/api/v1';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || fallbackUrl;
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
