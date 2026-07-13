@@ -20,8 +20,10 @@ export async function signInUser(data: { email: string; password: string }) {
     await signIn("credentials", {
       email: data.email,
       password: data.password,
-      redirect: false,
+      redirectTo: "/login/confirm",
     });
+    // This return is theoretically unreachable because signIn throws a NEXT_REDIRECT,
+    // but we keep it just in case NextAuth changes behavior.
     return { success: true };
   } catch (error) {
     if (error && typeof error === "object" && "digest" in error && typeof error.digest === "string" && error.digest.startsWith("NEXT_REDIRECT")) {
