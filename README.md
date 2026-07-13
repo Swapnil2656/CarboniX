@@ -72,8 +72,10 @@ There is no "Cost Explorer for Carbon." To estimate emissions today, developers 
 
 ## 🧠 Team: Carbonix
 
-- **Swapnil Sen** – Developer
-- **Kumari Khushi** – Developer
+- **Swapnil Sen** – Lead Developer & Architecture
+- **Kumari Khushi** – Full Stack Developer
+- **Vishal Parmar** – Mobile Developer
+- **Rudresh** – Web Developer
 
 ### Our Approach
 **Why we chose this problem:** Infrastructure has both a financial cost and a carbon cost, but only one is easily measurable. We built Carbonix to make sustainability programmable.
