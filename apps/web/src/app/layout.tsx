@@ -4,7 +4,6 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 import dynamic from 'next/dynamic';
 
-const AgentChat = dynamic(() => import('@/components/admin/AgentChat'), { ssr: false });
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -23,7 +22,6 @@ export default function RootLayout({
       <body className={`antialiased ${inter.className}`}>
         <Providers>
           {children}
-          <AgentChat />
         </Providers>
       </body>
     </html>

@@ -3,6 +3,9 @@
 import React, { useState } from 'react';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { AdminHeader } from '@/components/admin/AdminHeader';
+import dynamic from 'next/dynamic';
+
+const AgentChat = dynamic(() => import('@/components/admin/AgentChat'), { ssr: false });
 
 export default function AdminLayout({
   children,
@@ -26,6 +29,7 @@ export default function AdminLayout({
           </div>
         </main>
       </div>
+      <AgentChat />
     </div>
   );
 }

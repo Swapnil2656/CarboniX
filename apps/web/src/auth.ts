@@ -24,15 +24,7 @@ declare module "next-auth" {
   }
 }
 
-declare module "next-auth/jwt" {
-  interface JWT {
-    id: string;
-    type?: string;
-    isOnboarded?: boolean;
-    accessToken?: string;
-    avatarUrl?: string;
-  }
-}
+
 
 export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
   providers: [
@@ -71,7 +63,7 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
     signIn: authConfig.routes.signIn,
   },
   callbacks: {
-    async jwt({ token, user, trigger, session }) {
+    async jwt({ token, user, trigger, session }: any) {
       if (user) {
         token.id = user.id as string;
         token.type = user.type;
@@ -95,7 +87,7 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: any) {
       if (token?.id) {
         session.user.id = token.id;
         session.user.type = token.type as string;
