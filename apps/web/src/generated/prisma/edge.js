@@ -575,7 +575,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "D:\\CarboniX\\apps\\web\\src\\generated\\prisma",
+      "value": "/Users/swapnilsen/CarboniX/apps/web/src/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -584,7 +584,7 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "windows",
+        "value": "darwin-arm64",
         "native": true
       },
       {
@@ -601,12 +601,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "D:\\CarboniX\\apps\\web\\prisma\\schema.prisma",
+    "sourceFilePath": "/Users/swapnilsen/CarboniX/apps/web/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "../../../prisma",
   "clientVersion": "5.22.0",
