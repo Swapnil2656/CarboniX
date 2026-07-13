@@ -14,6 +14,7 @@ const auth_routes_1 = __importDefault(require("./modules/auth/auth.routes"));
 const agents_routes_1 = __importDefault(require("./modules/agents/agents.routes"));
 const admin_routes_1 = __importDefault(require("./modules/admin/admin.routes"));
 const connect_routes_1 = __importDefault(require("./modules/connect/connect.routes"));
+const ai_routes_1 = __importDefault(require("./modules/ai/ai.routes"));
 const agents_1 = require("@carbonix/agents");
 const agents_2 = require("@carbonix/agents");
 const agents_3 = require("@carbonix/agents");
@@ -36,6 +37,7 @@ app.use('/api/v1/auth', auth_routes_1.default);
 app.use('/api/v1/agents', agents_routes_1.default);
 app.use('/api/v1/admin', admin_routes_1.default);
 app.use('/api/v1/connect', connect_routes_1.default);
+app.use('/api/v1/ai', ai_routes_1.default);
 app.post('/api/v1/public/accept-invite', async (req, res) => {
     try {
         const { email } = req.body;
@@ -166,10 +168,19 @@ node_cron_1.default.schedule('0 0 1 * *', async () => {
         console.error('[CRON] Reporter failed:', error.message);
     }
 });
-app.listen(port, '0.0.0.0', () => {
+const server = app.listen(port, '0.0.0.0', () => {
     console.log(`Server is running on port ${port}`);
     console.log(`Agent mock mode: ${USE_MOCK ? 'ON (static data)' : 'OFF (live CloudWatch)'}`);
     console.log(`Cron: Collector+Analyst every hour, Reporter on 1st of month`);
 });
-// Trigger restart
-// Trigger restart 2
+const gracefulShutdown = async (signal) => {
+    console.log(`${signal} signal received: closing HTTP server`);
+    server.close(async () => {
+        console.log('HTTP server closed');
+        await prisma_1.prisma.$disconnect();
+        console.log('Prisma disconnected');
+        process.exit(0);
+    });
+};
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));

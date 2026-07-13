@@ -249,14 +249,58 @@ export const calculateEmissions = async (req: Request, res: Response) => {
   }
 };
 
+async function resolveProjectForApiKey(apiKey: any, projectName?: string): Promise<string | null> {
+  if (!apiKey || !apiKey.createdBy) return null;
+  if (apiKey.projectId) return apiKey.projectId;
+
+  if (projectName && typeof projectName === 'string') {
+    const proj = await prisma.project.findFirst({
+      where: {
+        userId: apiKey.createdBy,
+        name: { equals: projectName.trim(), mode: 'insensitive' }
+      }
+    });
+    if (proj) return proj.id;
+  }
+
+  if (apiKey.name && typeof apiKey.name === 'string') {
+    const derivedName = apiKey.name.replace(/\s+(Default\s+)?Key$/i, '').trim();
+    if (derivedName && derivedName !== apiKey.name) {
+      const proj = await prisma.project.findFirst({
+        where: {
+          userId: apiKey.createdBy,
+          name: { equals: derivedName, mode: 'insensitive' }
+        }
+      });
+      if (proj) return proj.id;
+    }
+  }
+
+  const projects = await prisma.project.findMany({
+    where: { userId: apiKey.createdBy },
+    orderBy: { createdAt: 'desc' }
+  });
+  if (projects.length === 1) return projects[0].id;
+  return projects[0]?.id || null;
+}
+
 export const verifyKey = async (req: ApiKeyRequest, res: Response) => {
   try {
-    // If the middleware passed, the key is valid.
-    if (req.apiKey?.projectId) {
-      await prisma.project.update({
-        where: { id: req.apiKey.projectId },
-        data: { sdkConnected: true, lastPingAt: new Date() }
-      });
+    if (req.apiKey) {
+      const { projectName } = req.body || {};
+      const projectId = await resolveProjectForApiKey(req.apiKey, projectName);
+      if (projectId) {
+        const now = new Date();
+        const existingProject = await prisma.project.findUnique({ where: { id: projectId } });
+        await prisma.project.update({
+          where: { id: projectId },
+          data: {
+            sdkConnected: true,
+            lastPingAt: now,
+            connectedAt: existingProject?.connectedAt || now
+          }
+        });
+      }
     }
     res.json({ success: true, message: 'Key is valid', apiKey: req.apiKey });
   } catch (error: any) {
@@ -285,11 +329,20 @@ export const ingestTelemetry = async (req: ApiKeyRequest, res: Response) => {
     const result = await calculateCarbon(input);
     
     // Update the project's sdkConnected status
-    if (req.apiKey?.projectId) {
-      await prisma.project.update({
-        where: { id: req.apiKey.projectId },
-        data: { sdkConnected: true, lastPingAt: new Date() }
-      });
+    if (req.apiKey) {
+      const projectId = await resolveProjectForApiKey(req.apiKey, projectName);
+      if (projectId) {
+        const now = new Date();
+        const existingProject = await prisma.project.findUnique({ where: { id: projectId } });
+        await prisma.project.update({
+          where: { id: projectId },
+          data: {
+            sdkConnected: true,
+            lastPingAt: now,
+            connectedAt: existingProject?.connectedAt || now
+          }
+        });
+      }
     }
 
     // Create the EmissionRecord

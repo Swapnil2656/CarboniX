@@ -39,14 +39,38 @@ const getDashboard = async (req, res) => {
         if (cached) {
             return res.json({ ...JSON.parse(cached), cached: true });
         }
-        const { teamUserIds } = await resolveTenantContext(userId, userEmail);
+        const { teamUserIds, projectIds } = await resolveTenantContext(userId, userEmail);
+        const filterProjectId = req.query.projectId;
+        const filterProjectName = req.query.projectName;
+        let targetProjectIds = projectIds;
+        let targetProjectName = null;
+        if (filterProjectId && filterProjectId !== 'all' && filterProjectId !== 'All') {
+            targetProjectIds = targetProjectIds.filter(id => id === filterProjectId);
+            const proj = await prisma_1.prisma.project.findUnique({ where: { id: filterProjectId } });
+            if (proj)
+                targetProjectName = proj.name;
+        }
+        else if (filterProjectName && filterProjectName !== 'all' && filterProjectName !== 'All') {
+            targetProjectName = filterProjectName;
+            const projs = await prisma_1.prisma.project.findMany({
+                where: {
+                    id: { in: projectIds },
+                    name: { equals: filterProjectName.trim(), mode: 'insensitive' }
+                }
+            });
+            if (projs.length > 0) {
+                targetProjectIds = projs.map(p => p.id);
+            }
+        }
+        const emissionWhere = targetProjectName ? { instanceName: { equals: targetProjectName, mode: 'insensitive' } } : {};
         const apiKeys = await prisma_1.prisma.apiKey.findMany({
             where: { createdBy: { in: teamUserIds } }
         });
         const totalApiCalls = apiKeys.reduce((acc, key) => acc + key.totalRequests, 0);
         const activeSessions = await prisma_1.prisma.session.count({ where: { isActive: true } });
-        // Average grid intensity across all emission records
+        // Average grid intensity across emission records
         const emissionStats = await prisma_1.prisma.emissionRecord.aggregate({
+            where: emissionWhere,
             _avg: { gridIntensity: true },
         });
         const avgCo2Kg = emissionStats._avg.gridIntensity ? Math.round(emissionStats._avg.gridIntensity) : 0;
@@ -54,6 +78,7 @@ const getDashboard = async (req, res) => {
         // Group emission records by provider
         const providerGroups = await prisma_1.prisma.emissionRecord.groupBy({
             by: ['provider'],
+            where: emissionWhere,
             _count: true,
         });
         const totalRecords = providerGroups.reduce((acc, g) => acc + g._count, 0);
@@ -93,6 +118,20 @@ const getDashboard = async (req, res) => {
         });
         // We do not currently track individual endpoint hits, so return empty array
         const topEndpoints = [];
+        // Fetch projects for the user to display in mobile/web dashboard
+        const projects = await prisma_1.prisma.project.findMany({
+            where: { id: { in: projectIds } },
+            select: {
+                id: true,
+                name: true,
+                region: true,
+                sdkConnected: true,
+                connectedAt: true,
+                lastPingAt: true,
+                createdAt: true
+            },
+            orderBy: { createdAt: 'desc' }
+        });
         const responseData = {
             totalApiCalls,
             activeSessions: activeSessions || 125, // fallback if no sessions
@@ -105,7 +144,8 @@ const getDashboard = async (req, res) => {
                 { provider: 'GCP', percent: 35 },
                 { provider: 'Azure', percent: 20 }
             ],
-            liveApiStream: []
+            liveApiStream: [],
+            activeProjects: projects
         };
         try {
             await redis_1.redis.setex(cacheKey, 30, JSON.stringify(responseData));
@@ -225,6 +265,10 @@ const getFeatureFlags = async (req, res) => {
 exports.getFeatureFlags = getFeatureFlags;
 const toggleFeatureFlag = async (req, res) => {
     try {
+        const userId = req.user?.id;
+        const userEmail = req.user?.email;
+        if (!userId || !userEmail)
+            return res.status(401).json({ error: 'Unauthorized' });
         const { id } = req.params;
         const { enabled } = req.body;
         const oldFlag = await prisma_1.prisma.featureFlag.findUnique({ where: { id } });
@@ -239,8 +283,8 @@ const toggleFeatureFlag = async (req, res) => {
         if (oldFlag) {
             await prisma_1.prisma.auditLog.create({
                 data: {
-                    actorId: 'admin_user',
-                    actorEmail: 'admin@carbonix.ai',
+                    actorId: userId,
+                    actorEmail: userEmail,
                     actorRole: 'ADMIN',
                     action: 'FEATURE_FLAG_TOGGLE',
                     resource: 'feature_flag',
@@ -300,6 +344,10 @@ const getApiKeys = async (req, res) => {
 exports.getApiKeys = getApiKeys;
 const createApiKey = async (req, res) => {
     try {
+        const userId = req.user?.id;
+        const userEmail = req.user?.email;
+        if (!userId || !userEmail)
+            return res.status(401).json({ error: 'Unauthorized' });
         const { name, permissions, expiration } = req.body;
         // Generate a random key
         const rawKey = 'cx_' + crypto_1.default.randomBytes(32).toString('hex');
@@ -317,15 +365,15 @@ const createApiKey = async (req, res) => {
                 name,
                 prefix,
                 hashedKey,
-                createdBy: 'admin_user',
+                createdBy: userId,
                 permissions: permissions || ['calculate', 'compare', 'recommend', 'history'],
                 expiresAt
             }
         });
         await prisma_1.prisma.auditLog.create({
             data: {
-                actorId: 'admin_user',
-                actorEmail: 'admin@carbonix.ai',
+                actorId: userId,
+                actorEmail: userEmail,
                 actorRole: 'ADMIN',
                 action: 'API_KEY_CREATED',
                 resource: 'api_key',
@@ -346,19 +394,23 @@ const createApiKey = async (req, res) => {
 exports.createApiKey = createApiKey;
 const revokeApiKey = async (req, res) => {
     try {
+        const userId = req.user?.id;
+        const userEmail = req.user?.email;
+        if (!userId || !userEmail)
+            return res.status(401).json({ error: 'Unauthorized' });
         const { id } = req.params;
         await prisma_1.prisma.apiKey.update({
             where: { id },
             data: {
                 status: 'REVOKED',
                 revokedAt: new Date(),
-                revokedBy: 'admin_user'
+                revokedBy: userId
             }
         });
         await prisma_1.prisma.auditLog.create({
             data: {
-                actorId: 'admin_user',
-                actorEmail: 'admin@carbonix.ai',
+                actorId: userId,
+                actorEmail: userEmail,
                 actorRole: 'ADMIN',
                 action: 'API_KEY_REVOKED',
                 resource: 'api_key',
@@ -378,14 +430,18 @@ const revokeApiKey = async (req, res) => {
 exports.revokeApiKey = revokeApiKey;
 const deleteApiKey = async (req, res) => {
     try {
+        const userId = req.user?.id;
+        const userEmail = req.user?.email;
+        if (!userId || !userEmail)
+            return res.status(401).json({ error: 'Unauthorized' });
         const { id } = req.params;
         await prisma_1.prisma.apiKey.delete({
             where: { id }
         });
         await prisma_1.prisma.auditLog.create({
             data: {
-                actorId: 'admin_user',
-                actorEmail: 'admin@carbonix.ai',
+                actorId: userId,
+                actorEmail: userEmail,
                 actorRole: 'ADMIN',
                 action: 'API_KEY_DELETED',
                 resource: 'api_key',
@@ -478,8 +534,8 @@ const syncTeamMembers = async (req, res) => {
         res.json({ success: true, count: synced.length, synced });
         await prisma_1.prisma.auditLog.create({
             data: {
-                actorId: 'admin_user',
-                actorEmail: 'admin@carbonix.ai',
+                actorId: userId,
+                actorEmail: userEmail,
                 actorRole: 'ADMIN',
                 action: 'CODEBASE_SYNCED',
                 resource: 'project',
@@ -507,7 +563,8 @@ const inviteUser = async (req, res) => {
         if (existingMember) {
             return res.status(400).json({ error: "A team member with this email already exists." });
         }
-        const inviteLink = `http://localhost:3000/invite?email=${encodeURIComponent(email)}`;
+        const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+        const inviteLink = `${baseUrl}/invite?email=${encodeURIComponent(email)}`;
         await (0, email_1.sendEmail)(email, "You've been invited to CarboniX!", `<div style="font-family:sans-serif;max-width:480px;margin:auto">
         <h2>Hi ${name || email.split('@')[0]},</h2>
         <p>You have been invited to join the <strong>${projectName || 'project'}</strong> project on CarboniX as a ${role || 'Developer'}.</p>
@@ -536,8 +593,8 @@ const inviteUser = async (req, res) => {
         res.json({ success: true, message: `Invite sent to ${email}`, member: newMember });
         await prisma_1.prisma.auditLog.create({
             data: {
-                actorId: 'admin_user',
-                actorEmail: 'admin@carbonix.ai',
+                actorId: userId,
+                actorEmail: userEmail,
                 actorRole: 'ADMIN',
                 action: 'TEAM_INVITE',
                 resource: 'team_member',
@@ -556,6 +613,10 @@ const inviteUser = async (req, res) => {
 exports.inviteUser = inviteUser;
 const removeTeamMember = async (req, res) => {
     try {
+        const userId = req.user?.id;
+        const userEmail = req.user?.email;
+        if (!userId || !userEmail)
+            return res.status(401).json({ error: 'Unauthorized' });
         const { id } = req.params;
         await prisma_1.prisma.teamMember.delete({
             where: { id }
@@ -563,8 +624,8 @@ const removeTeamMember = async (req, res) => {
         res.json({ success: true, message: 'Teammate removed successfully' });
         await prisma_1.prisma.auditLog.create({
             data: {
-                actorId: 'admin_user',
-                actorEmail: 'admin@carbonix.ai',
+                actorId: userId,
+                actorEmail: userEmail,
                 actorRole: 'ADMIN',
                 action: 'TEAM_MEMBER_REMOVED',
                 resource: 'team_member',
@@ -585,7 +646,11 @@ const getEmissions = async (req, res) => {
     try {
         const provider = req.query.provider;
         const region = req.query.region;
-        const projects = await prisma_1.prisma.project.findMany({ select: { sdkConnected: true } });
+        const projectFilter = (req.query.project || req.query.projectId || req.query.projectName);
+        const projects = await prisma_1.prisma.project.findMany({
+            select: { id: true, name: true, sdkConnected: true },
+            orderBy: { createdAt: 'desc' }
+        });
         const isSdkConnected = projects.some(p => p.sdkConnected);
         if (!isSdkConnected) {
             return res.json({
@@ -596,7 +661,8 @@ const getEmissions = async (req, res) => {
                     oversizedInstances: 0,
                     wastedCarbonKg: 0
                 },
-                isSdkConnected: false
+                isSdkConnected: false,
+                projects
             });
         }
         const where = {};
@@ -605,6 +671,13 @@ const getEmissions = async (req, res) => {
         }
         if (region && region !== 'All') {
             where.region = region;
+        }
+        if (projectFilter && projectFilter !== 'All' && projectFilter !== 'all') {
+            let targetName = projectFilter;
+            const matchingProj = projects.find(p => p.id === projectFilter || p.name.toLowerCase() === projectFilter.toLowerCase());
+            if (matchingProj)
+                targetName = matchingProj.name;
+            where.instanceName = { equals: targetName, mode: 'insensitive' };
         }
         const records = await prisma_1.prisma.emissionRecord.findMany({
             where,
@@ -629,7 +702,8 @@ const getEmissions = async (req, res) => {
                 oversizedInstances,
                 wastedCarbonKg
             },
-            isSdkConnected: true
+            isSdkConnected: true,
+            projects
         });
     }
     catch (error) {
@@ -639,6 +713,10 @@ const getEmissions = async (req, res) => {
 exports.getEmissions = getEmissions;
 const migrateEmission = async (req, res) => {
     try {
+        const userId = req.user?.id;
+        const userEmail = req.user?.email;
+        if (!userId || !userEmail)
+            return res.status(401).json({ error: 'Unauthorized' });
         const { id } = req.params;
         const { targetRegion } = req.body;
         if (!targetRegion) {
@@ -665,8 +743,8 @@ const migrateEmission = async (req, res) => {
         // Audit Log
         await prisma_1.prisma.auditLog.create({
             data: {
-                actorId: 'admin_user', // from mocked auth session in the Express backend
-                actorEmail: 'admin@carbonix.ai',
+                actorId: userId,
+                actorEmail: userEmail,
                 actorRole: 'ADMIN',
                 action: 'EMISSION_MIGRATE',
                 resource: 'emission_record',
@@ -685,7 +763,7 @@ const migrateEmission = async (req, res) => {
                 type: 'BROADCAST',
                 status: 'SENT',
                 targetAudience: 'ALL',
-                createdBy: 'admin_user',
+                createdBy: userId,
             }
         });
         res.json({ success: true, record: updatedRecord });

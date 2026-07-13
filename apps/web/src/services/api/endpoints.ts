@@ -50,8 +50,8 @@ export const referenceApi = {
 
 // ─── Admin Endpoints ─────────────────────────────────────────────────────────
 export const adminApi = {
-  getEmissions: async (provider = 'All', region = 'All'): Promise<import('@/types/admin').EmissionsResponse> => {
-    return fetchClient(`/admin/emissions?provider=${provider}&region=${region}`, {
+  getEmissions: async (provider = 'All', region = 'All', project = 'All'): Promise<any> => {
+    return fetchClient(`/admin/emissions?provider=${encodeURIComponent(provider)}&region=${encodeURIComponent(region)}&project=${encodeURIComponent(project)}`, {
       method: 'GET',
     });
   },
@@ -75,8 +75,12 @@ export const adminApi = {
     });
   },
 
-  getDashboard: async (): Promise<DashboardData> => {
-    return fetchClient('/admin/dashboard', {
+  getDashboard: async (projectId?: string, projectName?: string): Promise<DashboardData> => {
+    const params = new URLSearchParams();
+    if (projectId && projectId !== 'all') params.append('projectId', projectId);
+    if (projectName && projectName !== 'all') params.append('projectName', projectName);
+    const qs = params.toString();
+    return fetchClient(`/admin/dashboard${qs ? `?${qs}` : ''}`, {
       method: 'GET',
     });
   },

@@ -16,20 +16,26 @@ const register = async (req, res) => {
         if (!email || !password || !name) {
             return res.status(400).json({ success: false, error: 'Missing required fields' });
         }
-        const existingUser = await prisma_1.prisma.mobileUser.findUnique({ where: { email } });
+        const existingUser = await prisma_1.prisma.user.findUnique({ where: { email } });
         if (existingUser) {
             return res.status(400).json({ success: false, error: 'Email already in use' });
         }
         const passwordHash = await bcryptjs_1.default.hash(password, 10);
-        const user = await prisma_1.prisma.mobileUser.create({
+        const user = await prisma_1.prisma.user.create({
             data: {
                 email,
-                passwordHash,
-                name
+                userName: name,
+                password: passwordHash,
+                type: 'USER',
+                profile: {
+                    create: {
+                        fullName: name
+                    }
+                }
             }
         });
         const token = jsonwebtoken_1.default.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '30d' });
-        res.json({ success: true, data: { user: { id: user.id, name: user.name, email: user.email }, token } });
+        res.json({ success: true, data: { user: { id: user.id, name: user.userName, email: user.email }, token } });
     }
     catch (error) {
         res.status(500).json({ success: false, error: 'Internal server error' });
@@ -42,16 +48,16 @@ const login = async (req, res) => {
         if (!email || !password) {
             return res.status(400).json({ success: false, error: 'Missing required fields' });
         }
-        const user = await prisma_1.prisma.mobileUser.findUnique({ where: { email } });
+        const user = await prisma_1.prisma.user.findUnique({ where: { email } });
         if (!user) {
             return res.status(401).json({ success: false, error: 'Invalid credentials' });
         }
-        const isValid = await bcryptjs_1.default.compare(password, user.passwordHash);
+        const isValid = await bcryptjs_1.default.compare(password, user.password);
         if (!isValid) {
             return res.status(401).json({ success: false, error: 'Invalid credentials' });
         }
         const token = jsonwebtoken_1.default.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '30d' });
-        res.json({ success: true, data: { user: { id: user.id, name: user.name, email: user.email }, token } });
+        res.json({ success: true, data: { user: { id: user.id, name: user.userName, email: user.email }, token } });
     }
     catch (error) {
         res.status(500).json({ success: false, error: 'Internal server error' });

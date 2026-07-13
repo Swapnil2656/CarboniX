@@ -77,10 +77,27 @@ const getDashboard = async (req, res) => {
             changePercent = 100;
             changeDirection = 'up';
         }
-        // 5. Get budget info
+        // 5. Get budget info and active web projects
         const user = await prisma_1.prisma.mobileUser.findUnique({ where: { id: userId } });
         const budgetLimitKg = user?.carbonBudgetKg || 100;
         const percentUsed = Math.round((totalCo2ThisMonth / budgetLimitKg) * 100);
+        let webProjects = [];
+        if (user?.email) {
+            const webUser = await prisma_1.prisma.user.findUnique({
+                where: { email: user.email },
+                include: { projects: true }
+            });
+            if (webUser?.projects) {
+                webProjects = webUser.projects.map(p => ({
+                    id: p.id,
+                    name: p.name,
+                    region: p.region,
+                    sdkConnected: p.sdkConnected,
+                    connectedAt: p.connectedAt,
+                    lastPingAt: p.lastPingAt
+                }));
+            }
+        }
         // 7. Get recent alerts
         const recentAlerts = await prisma_1.prisma.userNotification.findMany({
             where: { userId },
@@ -99,6 +116,7 @@ const getDashboard = async (req, res) => {
                 changePercent: Number(Math.abs(changePercent).toFixed(1)),
                 changeDirection,
                 calculationsThisMonth,
+                avgCo2Kg: Number(avgCo2Kg.toFixed(1)),
                 carbonRating: {
                     rating: carbonRatingInfo.rating,
                     color: carbonRatingInfo.color,
@@ -110,6 +128,7 @@ const getDashboard = async (req, res) => {
                     percentUsed,
                     isOverBudget: percentUsed > 100
                 },
+                activeProjects: webProjects,
                 activeConfigurations: Array.from(activeConfigsMap.values()),
                 weeklySparkline,
                 recentAlerts

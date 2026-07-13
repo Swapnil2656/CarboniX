@@ -96,6 +96,10 @@ const ENTRY_FILE_CANDIDATES = [
   'server.js', 'server.ts', 'index.js', 'index.ts', 'app.js', 'app.ts',
   'src/server.js', 'src/server.ts', 'src/index.js', 'src/index.ts',
   'src/app.js', 'src/app.ts', 'main.js', 'main.ts',
+  'backend/server.js', 'backend/server.ts', 'backend/index.js', 'backend/index.ts', 'backend/app.js', 'backend/app.ts',
+  'backend/src/server.js', 'backend/src/server.ts', 'backend/src/index.js', 'backend/src/index.ts',
+  'taskflow/backend/server.js', 'taskflow/backend/server.ts', 'taskflow/backend/index.js', 'taskflow/backend/index.ts',
+  'api/index.js', 'api/index.ts', 'api/server.js', 'api/server.ts'
 ];
 
 async function detectEntryFile(cwd: string): Promise<string | null> {
@@ -106,6 +110,21 @@ async function detectEntryFile(cwd: string): Promise<string | null> {
   for (const c of ENTRY_FILE_CANDIDATES) {
     if (await fileExists(path.join(cwd, c))) return c;
   }
+  try {
+    const { glob } = require('tinyglobby');
+    const files = await glob(['**/{server,app,index,main}.{js,ts,py}', '**/src/{server,app,index,main}.{js,ts,py}'], {
+      cwd,
+      ignore: ['**/node_modules/**', '**/dist/**', '**/build/**', '**/.next/**'],
+      onlyFiles: true
+    });
+    if (files && files.length > 0) {
+      const sorted = files.sort((a: string, b: string) => {
+        const score = (f: string) => (f.includes('backend') ? 3 : f.includes('api') ? 2 : f.includes('src') ? 1 : 0);
+        return score(b) - score(a) || a.length - b.length;
+      });
+      return sorted[0];
+    }
+  } catch (_) {}
   return null;
 }
 
@@ -263,6 +282,34 @@ program
       }
     }
 
+    // ── Step 6: Link codebase & unlock Dashboard ───────────────────────────────
+    process.stdout.write(pc.gray('  Linking codebase with CarboniX... '));
+    try {
+      await axios.post(`${baseUrl}/api/v1/connect/ping`, {
+        apiKey,
+        sdkVersion: '0.2.1',
+        nodeModulesHasSdk: await fileExists(path.join(cwd, 'node_modules/@carbonix/sdk')),
+        sdkConfigExists: true,
+        configFileName: 'carbonix.config.js',
+        environment: process.env.NODE_ENV || 'localhost',
+        projectName,
+      }, {
+        headers: { 'Authorization': `Bearer ${apiKey}` },
+        timeout: 5000,
+      });
+      console.log(pc.green('✅ Linked & Unlocked'));
+    } catch {
+      try {
+        await axios.post(`${baseUrl}/api/v1/carbon/verify-key`, { projectName }, {
+          headers: { 'Authorization': `Bearer ${apiKey}` },
+          timeout: 4000,
+        });
+        console.log(pc.green('✅ Linked'));
+      } catch {
+        console.log(pc.yellow('⚠️ Linked offline / queued'));
+      }
+    }
+
     // ── Success Banner ────────────────────────────────────────────────────────
     console.log('');
     console.log(pc.green('  ┌─────────────────────────────────────────────────────┐'));
@@ -277,9 +324,10 @@ program
     console.log(pc.green('  ├─────────────────────────────────────────────────────┤'));
     console.log(pc.green('  │') + pc.white('  Next steps:                                        ') + pc.green('│'));
     console.log(pc.green('  │') + pc.gray('  › Start your server — live data flows to Dashboard ') + pc.green('│'));
-    console.log(pc.green('  │') + pc.gray('  › carbonix status   — check live connection         ') + pc.green('│'));
-    console.log(pc.green('  │') + pc.gray('  › carbonix app analyze — AI region optimizer        ') + pc.green('│'));
+    console.log(pc.green('  │') + pc.gray('  › npx @carbonix/cli status   — check live status   ') + pc.green('│'));
+    console.log(pc.green('  │') + pc.gray('  › npx @carbonix/cli analyze  — AI region optimizer ') + pc.green('│'));
     console.log(pc.green('  └─────────────────────────────────────────────────────┘'));
+    console.log(pc.gray('  Tip: Run "npm install -g @carbonix/cli" to use the "carbonix" command anywhere.'));
     console.log('');
   });
 

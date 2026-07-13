@@ -55,11 +55,33 @@ async function handleConnect(req, res) {
             return res.status(401).json({ success: false, error: ERROR_CODES.INVALID_KEY });
         }
         // ── 3. Find the associated project ──────────────────────────────────────
-        // The API key is scoped to a user, so we find projects by the key's creator
-        const project = await prisma_1.prisma.project.findFirst({
-            where: { userId: keyRecord.createdBy },
-            orderBy: { createdAt: 'desc' },
-        });
+        // The API key is scoped to a user, so we try finding project by name first or exact match
+        let project = null;
+        if (req.body.projectName && typeof req.body.projectName === 'string') {
+            project = await prisma_1.prisma.project.findFirst({
+                where: {
+                    userId: keyRecord.createdBy,
+                    name: { equals: req.body.projectName.trim(), mode: 'insensitive' },
+                },
+            });
+        }
+        if (!project && keyRecord.name) {
+            const derivedName = keyRecord.name.replace(/\s+(Default\s+)?Key$/i, '').trim();
+            if (derivedName && derivedName !== keyRecord.name) {
+                project = await prisma_1.prisma.project.findFirst({
+                    where: {
+                        userId: keyRecord.createdBy,
+                        name: { equals: derivedName, mode: 'insensitive' },
+                    },
+                });
+            }
+        }
+        if (!project) {
+            project = await prisma_1.prisma.project.findFirst({
+                where: { userId: keyRecord.createdBy },
+                orderBy: { createdAt: 'desc' },
+            });
+        }
         if (!project) {
             return res.status(404).json({ success: false, error: ERROR_CODES.PROJECT_NOT_FOUND });
         }

@@ -43,6 +43,31 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
 
     const { teamUserIds, projectIds } = await resolveTenantContext(userId, userEmail);
 
+    const filterProjectId = req.query.projectId as string | undefined;
+    const filterProjectName = req.query.projectName as string | undefined;
+
+    let targetProjectIds = projectIds;
+    let targetProjectName: string | null = null;
+
+    if (filterProjectId && filterProjectId !== 'all' && filterProjectId !== 'All') {
+      targetProjectIds = targetProjectIds.filter(id => id === filterProjectId);
+      const proj = await prisma.project.findUnique({ where: { id: filterProjectId } });
+      if (proj) targetProjectName = proj.name;
+    } else if (filterProjectName && filterProjectName !== 'all' && filterProjectName !== 'All') {
+      targetProjectName = filterProjectName;
+      const projs = await prisma.project.findMany({
+        where: {
+          id: { in: projectIds },
+          name: { equals: filterProjectName.trim(), mode: 'insensitive' }
+        }
+      });
+      if (projs.length > 0) {
+        targetProjectIds = projs.map(p => p.id);
+      }
+    }
+
+    const emissionWhere: any = targetProjectName ? { instanceName: { equals: targetProjectName, mode: 'insensitive' } } : {};
+
     const apiKeys = await prisma.apiKey.findMany({
       where: { createdBy: { in: teamUserIds } }
     });
@@ -50,8 +75,9 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
 
     const activeSessions = await prisma.session.count({ where: { isActive: true } });
     
-    // Average grid intensity across all emission records
+    // Average grid intensity across emission records
     const emissionStats = await prisma.emissionRecord.aggregate({
+      where: emissionWhere,
       _avg: { gridIntensity: true },
     });
     const avgCo2Kg = emissionStats._avg.gridIntensity ? Math.round(emissionStats._avg.gridIntensity) : 0;
@@ -61,6 +87,7 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
     // Group emission records by provider
     const providerGroups = await prisma.emissionRecord.groupBy({
       by: ['provider'],
+      where: emissionWhere,
       _count: true,
     });
     const totalRecords = providerGroups.reduce((acc, g) => acc + g._count, 0);
@@ -672,8 +699,12 @@ export const getEmissions = async (req: Request, res: Response) => {
   try {
     const provider = req.query.provider as string;
     const region = req.query.region as string;
+    const projectFilter = (req.query.project || req.query.projectId || req.query.projectName) as string;
 
-    const projects = await prisma.project.findMany({ select: { sdkConnected: true } });
+    const projects = await prisma.project.findMany({
+      select: { id: true, name: true, sdkConnected: true },
+      orderBy: { createdAt: 'desc' }
+    });
     const isSdkConnected = projects.some(p => p.sdkConnected);
 
     if (!isSdkConnected) {
@@ -685,7 +716,8 @@ export const getEmissions = async (req: Request, res: Response) => {
           oversizedInstances: 0,
           wastedCarbonKg: 0
         },
-        isSdkConnected: false
+        isSdkConnected: false,
+        projects
       });
     }
 
@@ -695,6 +727,12 @@ export const getEmissions = async (req: Request, res: Response) => {
     }
     if (region && region !== 'All') {
       where.region = region;
+    }
+    if (projectFilter && projectFilter !== 'All' && projectFilter !== 'all') {
+      let targetName = projectFilter;
+      const matchingProj = projects.find(p => p.id === projectFilter || p.name.toLowerCase() === projectFilter.toLowerCase());
+      if (matchingProj) targetName = matchingProj.name;
+      where.instanceName = { equals: targetName, mode: 'insensitive' };
     }
 
     const records = await prisma.emissionRecord.findMany({
@@ -721,7 +759,8 @@ export const getEmissions = async (req: Request, res: Response) => {
         oversizedInstances,
         wastedCarbonKg
       },
-      isSdkConnected: true
+      isSdkConnected: true,
+      projects
     });
   } catch (error: any) {
     res.status(500).json({ error: 'Internal server error' });

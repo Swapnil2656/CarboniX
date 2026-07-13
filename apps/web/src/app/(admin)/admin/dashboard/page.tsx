@@ -54,6 +54,7 @@ export default function DashboardPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [selectedProject, setSelectedProject] = useState('all');
   const router = useRouter();
 
   const handleAnalyze = async (project: Project) => {
@@ -80,7 +81,7 @@ export default function DashboardPage() {
     }
   };
 
-  const fetchProjectsData = useCallback(async (pageToFetch = currentPage, isInitial = false) => {
+  const fetchProjectsData = useCallback(async (pageToFetch = currentPage, isInitial = false, projFilter = selectedProject) => {
     try {
       if (isInitial) {
         setLoading(true);
@@ -89,7 +90,7 @@ export default function DashboardPage() {
 
       const [res, statsRes] = await Promise.all([
         getProjects(pageToFetch, 5),
-        adminApi.getDashboard().catch(() => null)
+        adminApi.getDashboard(projFilter === 'all' ? undefined : projFilter).catch(() => null)
       ]);
 
       if (res.success) {
@@ -110,23 +111,23 @@ export default function DashboardPage() {
     } finally {
       if (isInitial) setLoading(false);
     }
-  }, []);
+  }, [selectedProject, currentPage]);
 
   useEffect(() => {
-    fetchProjectsData(1, true);
+    fetchProjectsData(1, true, selectedProject);
   }, []); // Initial load
 
   useEffect(() => {
     // Auto refresh every 5 seconds to catch SDK connection pings on the current page
-    const interval = setInterval(() => fetchProjectsData(currentPage, false), 5000);
+    const interval = setInterval(() => fetchProjectsData(currentPage, false, selectedProject), 5000);
     return () => clearInterval(interval);
-  }, [fetchProjectsData, currentPage]);
+  }, [fetchProjectsData, currentPage, selectedProject]);
 
   // ── Derived state ────────────────────────────────────────────────────────
-  const activeDeployments = projects.length;
-  const firstProject = projects[0] || null;
-  const isConnected = firstProject?.sdkConnected ?? false;
-  const showBanner = firstProject && !isConnected && !dismissedBanner;
+  const activeDeployments = selectedProject === 'all' ? projects.length : (projects.some(p => p.id === selectedProject) ? 1 : 0);
+  const selectedProjectObj = projects.find(p => p.id === selectedProject) || projects[0] || null;
+  const isConnected = selectedProject === 'all' ? projects.some(p => p.sdkConnected) : (projects.find(p => p.id === selectedProject)?.sdkConnected ?? false);
+  const showBanner = selectedProjectObj && !selectedProjectObj.sdkConnected && !dismissedBanner;
 
   // ── Pre-deployment estimate card labels ──────────────────────────────────
   const estimatedCo2 = BASELINE_ESTIMATE_KG;
@@ -134,20 +135,38 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-6 relative min-h-screen">
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
         <div>
           <h1 className="text-section-header text-on-surface">Dashboard</h1>
           <p className="text-on-surface-variant mt-1">Track your deployments and carbon footprint.</p>
         </div>
+        <div className="flex items-center gap-3">
+          <select
+            className="bg-surface-container border border-outline-variant rounded-lg px-3 py-2 text-sm text-on-surface outline-none focus:border-primary"
+            value={selectedProject}
+            onChange={(e) => {
+              const val = e.target.value;
+              setSelectedProject(val);
+              fetchProjectsData(1, true, val);
+            }}
+          >
+            <option value="all">All Projects</option>
+            {projects.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name} {p.sdkConnected ? '(Connected)' : '(Awaiting SDK)'}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      {error && <ErrorBanner message={error} onRetry={() => fetchProjectsData(currentPage, true)} />}
+      {error && <ErrorBanner message={error} onRetry={() => fetchProjectsData(currentPage, true, selectedProject)} />}
 
       {/* ── SDK Connection Banner ──────────────────────────────────────── */}
-      {showBanner && (
+      {showBanner && selectedProjectObj && (
         <SdkConnectionBanner
-          projectName={firstProject.name}
-          projectId={firstProject.id}
+          projectName={selectedProjectObj.name}
+          projectId={selectedProjectObj.id}
           onDismiss={() => setDismissedBanner(true)}
         />
       )}
@@ -184,7 +203,7 @@ export default function DashboardPage() {
             isLoading={loading}
           />
         </div>
-      ) : firstProject ? (
+      ) : selectedProjectObj ? (
         /* PRE-DEPLOYMENT ESTIMATES — shown when project exists but SDK not connected yet */
         <div>
           <div className="flex items-center gap-2 mb-3">

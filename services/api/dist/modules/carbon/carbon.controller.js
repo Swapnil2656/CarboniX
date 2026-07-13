@@ -65,7 +65,7 @@ const calculate = async (req, res) => {
         const calculation = await prisma_1.prisma.calculation.create({
             data: {
                 userId: userId,
-                provider: input.provider,
+                provider: input.provider.toUpperCase(),
                 region: input.region,
                 regionName: input.region, // Can be enhanced later
                 instanceType: input.instanceType,
@@ -160,28 +160,44 @@ const calculate = async (req, res) => {
         });
     }
     catch (error) {
+        if (error.message && error.message.includes('not found for provider')) {
+            return res.status(400).json({ success: false, error: error.message });
+        }
         res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.calculate = calculate;
 const compare = async (req, res) => {
     try {
-        const input = req.body;
-        const baseResult = await (0, carbon_engine_1.calculateCarbon)(input);
-        // Generate comparison options
+        // Add default values for compare if missing
+        const input = {
+            provider: req.body.provider || 'aws',
+            region: req.body.region || 'us-east-1',
+            instanceType: req.body.instanceType || (req.body.provider === 'gcp' ? 'e2-standard-8' : req.body.provider === 'azure' ? 'Standard_D8s_v3' : 'm5.2xlarge'),
+            instanceCount: req.body.instanceCount || 1,
+            hoursPerMonth: req.body.durationHours || req.body.hoursPerMonth || 730,
+            cpuUtilization: req.body.cpuUtilization || 0.5,
+            storageGb: req.body.storageGb || 500,
+            ramGb: req.body.memoryGb || req.body.ramGb || 32,
+        };
+        const baseResult = { ...await (0, carbon_engine_1.calculateCarbon)(input), provider: input.provider, region: input.region };
+        // Generate comparison options mapping equivalent instance types
         const options = [];
         if (input.provider !== 'aws' || input.region !== 'eu-west-1') {
-            options.push(await (0, carbon_engine_1.calculateCarbon)({ ...input, provider: 'aws', region: 'eu-west-1' }));
+            options.push({ ...await (0, carbon_engine_1.calculateCarbon)({ ...input, provider: 'aws', region: 'eu-west-1', instanceType: 'm5.2xlarge' }), provider: 'aws', region: 'eu-west-1' });
         }
         if (input.provider !== 'gcp' || input.region !== 'eu-north-1') {
-            options.push(await (0, carbon_engine_1.calculateCarbon)({ ...input, provider: 'gcp', region: 'eu-north-1' }));
+            options.push({ ...await (0, carbon_engine_1.calculateCarbon)({ ...input, provider: 'gcp', region: 'eu-north-1', instanceType: 'e2-standard-8' }), provider: 'gcp', region: 'eu-north-1' });
         }
         if (input.provider !== 'azure' || input.region !== 'northeurope') {
-            options.push(await (0, carbon_engine_1.calculateCarbon)({ ...input, provider: 'azure', region: 'northeurope' }));
+            options.push({ ...await (0, carbon_engine_1.calculateCarbon)({ ...input, provider: 'azure', region: 'northeurope', instanceType: 'Standard_D8s_v3' }), provider: 'azure', region: 'northeurope' });
         }
         res.json({ success: true, data: { base: baseResult, options } });
     }
     catch (error) {
+        if (error.message && error.message.includes('not found for provider')) {
+            return res.status(400).json({ success: false, error: error.message });
+        }
         res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
@@ -217,6 +233,9 @@ const recommend = async (req, res) => {
         }
     }
     catch (error) {
+        if (error.message && error.message.includes('not found for provider')) {
+            return res.status(400).json({ success: false, error: error.message });
+        }
         res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
@@ -239,9 +258,60 @@ const calculateEmissions = async (req, res) => {
     }
 };
 exports.calculateEmissions = calculateEmissions;
+async function resolveProjectForApiKey(apiKey, projectName) {
+    if (!apiKey || !apiKey.createdBy)
+        return null;
+    if (apiKey.projectId)
+        return apiKey.projectId;
+    if (projectName && typeof projectName === 'string') {
+        const proj = await prisma_1.prisma.project.findFirst({
+            where: {
+                userId: apiKey.createdBy,
+                name: { equals: projectName.trim(), mode: 'insensitive' }
+            }
+        });
+        if (proj)
+            return proj.id;
+    }
+    if (apiKey.name && typeof apiKey.name === 'string') {
+        const derivedName = apiKey.name.replace(/\s+(Default\s+)?Key$/i, '').trim();
+        if (derivedName && derivedName !== apiKey.name) {
+            const proj = await prisma_1.prisma.project.findFirst({
+                where: {
+                    userId: apiKey.createdBy,
+                    name: { equals: derivedName, mode: 'insensitive' }
+                }
+            });
+            if (proj)
+                return proj.id;
+        }
+    }
+    const projects = await prisma_1.prisma.project.findMany({
+        where: { userId: apiKey.createdBy },
+        orderBy: { createdAt: 'desc' }
+    });
+    if (projects.length === 1)
+        return projects[0].id;
+    return projects[0]?.id || null;
+}
 const verifyKey = async (req, res) => {
     try {
-        // If the middleware passed, the key is valid.
+        if (req.apiKey) {
+            const { projectName } = req.body || {};
+            const projectId = await resolveProjectForApiKey(req.apiKey, projectName);
+            if (projectId) {
+                const now = new Date();
+                const existingProject = await prisma_1.prisma.project.findUnique({ where: { id: projectId } });
+                await prisma_1.prisma.project.update({
+                    where: { id: projectId },
+                    data: {
+                        sdkConnected: true,
+                        lastPingAt: now,
+                        connectedAt: existingProject?.connectedAt || now
+                    }
+                });
+            }
+        }
         res.json({ success: true, message: 'Key is valid', apiKey: req.apiKey });
     }
     catch (error) {
@@ -265,6 +335,22 @@ const ingestTelemetry = async (req, res) => {
             ramGb: 0
         };
         const result = await (0, carbon_engine_1.calculateCarbon)(input);
+        // Update the project's sdkConnected status
+        if (req.apiKey) {
+            const projectId = await resolveProjectForApiKey(req.apiKey, projectName);
+            if (projectId) {
+                const now = new Date();
+                const existingProject = await prisma_1.prisma.project.findUnique({ where: { id: projectId } });
+                await prisma_1.prisma.project.update({
+                    where: { id: projectId },
+                    data: {
+                        sdkConnected: true,
+                        lastPingAt: now,
+                        connectedAt: existingProject?.connectedAt || now
+                    }
+                });
+            }
+        }
         // Create the EmissionRecord
         const record = await prisma_1.prisma.emissionRecord.create({
             data: {
@@ -285,6 +371,9 @@ const ingestTelemetry = async (req, res) => {
     }
     catch (error) {
         logger_1.logger.error('Error ingesting telemetry:', error);
+        if (error.message && error.message.includes('not found for provider')) {
+            return res.status(400).json({ success: false, error: error.message });
+        }
         res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };

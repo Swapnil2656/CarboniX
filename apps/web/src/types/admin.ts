@@ -117,8 +117,11 @@ export interface EmissionRecord {
   carbonKg: number;
   isIdle: boolean;
   isOversized: boolean;
-  recommendation: string | null;
+  recommendation?: string | null;
   timestamp: string;
+  isOptimized?: boolean;
+  _recommendedRegion?: string;
+  _recommendedCarbonKg?: number;
 }
 
 export interface EmissionsMetrics {
@@ -132,4 +135,5 @@ export interface EmissionsResponse {
   records: EmissionRecord[];
   metrics: EmissionsMetrics;
   isSdkConnected?: boolean;
+  projects?: { id: string; name: string; sdkConnected: boolean }[];
 }

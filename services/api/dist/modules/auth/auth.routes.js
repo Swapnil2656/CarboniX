@@ -6,7 +6,7 @@ const profile_controller_1 = require("./profile.controller");
 const rate_limit_middleware_1 = require("../../middleware/rate-limit.middleware");
 const auth_middleware_1 = require("../../middleware/auth.middleware");
 const router = (0, express_1.Router)();
-const authLimiter = (0, rate_limit_middleware_1.rateLimit)(5, 15 * 60 * 1000);
+const authLimiter = (0, rate_limit_middleware_1.rateLimit)(100, 15 * 60 * 1000);
 router.post('/register', authLimiter, auth_controller_1.register);
 router.post('/login', authLimiter, auth_controller_1.login);
 router.post('/subscribe', auth_controller_1.subscribe);

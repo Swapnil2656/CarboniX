@@ -29,6 +29,7 @@ export default function EmissionsPage() {
   
   const [filterProvider, setFilterProvider] = useState('All');
   const [filterRegion, setFilterRegion] = useState('All');
+  const [filterProject, setFilterProject] = useState('All');
 
   // Actions State
   const [analyzingId, setAnalyzingId] = useState<string | null>(null);
@@ -42,7 +43,7 @@ export default function EmissionsPage() {
     try {
       setLoading(true);
       setError(null);
-      const res = await adminApi.getEmissions(filterProvider, filterRegion);
+      const res = await adminApi.getEmissions(filterProvider, filterRegion, filterProject);
       setData(res);
       setLocalRecords(res.records || []);
     } catch (err) {
@@ -55,13 +56,13 @@ export default function EmissionsPage() {
 
   useEffect(() => {
     fetchData();
-  }, [filterProvider, filterRegion]);
+  }, [filterProvider, filterRegion, filterProject]);
 
   const handleAnalyze = async (record: EmissionRecord) => {
     setAnalyzingId(record.id);
     try {
       const payload = {
-        projectName: 'CarboniX', // Mock project for now
+        projectName: record.instanceName || 'CarboniX',
         instanceType: record.instanceType,
         provider: record.provider,
         region: record.region,
@@ -73,20 +74,23 @@ export default function EmissionsPage() {
       setLocalRecords((prev) => 
         prev.map((r) => {
           if (r.id === record.id) {
+            const recObj = res.data?.recommended;
+            const recMessage = recObj 
+              ? `AI: ${recObj.message || `Move to ${recObj.region}`}` 
+              : 'Already in an optimal region.';
             return {
               ...r,
-              recommendation: res.data?.recommended 
-                ? `AI: ${res.data.recommended.message}` 
-                : 'Already in an optimal region.',
-              // We'll store the recommended region temporarily in a custom field for the UI buttons to use
-              _recommendedRegion: res.data?.recommended?.region
-            } as EmissionRecord & { _recommendedRegion?: string };
+              recommendation: recMessage,
+              _recommendedRegion: recObj?.region,
+              _recommendedCarbonKg: recObj?.projectedCarbonKg
+            };
           }
           return r;
         })
       );
-    } catch (err: any) {
-      alert("Error analyzing instance: " + err.message);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to analyze: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
       setAnalyzingId(null);
     }
@@ -95,16 +99,25 @@ export default function EmissionsPage() {
   const handleAutoMigrate = async (recordId: string, targetRegion: string) => {
     setMigratingId(recordId);
     try {
-      const res = await adminApi.migrateEmission(recordId, targetRegion);
-      if (res.success) {
-        window.dispatchEvent(new Event('dataUpdated'));
-        // Update local state to reflect new region and lowered carbon
-        setLocalRecords((prev) =>
-          prev.map((r) => (r.id === recordId ? res.record : r))
-        );
-      }
-    } catch (err: any) {
-      alert("Migration failed: " + err.message);
+      await adminApi.migrateEmission(recordId, targetRegion);
+      setLocalRecords((prev) => 
+        prev.map((r) => {
+          if (r.id === recordId) {
+            return {
+              ...r,
+              region: targetRegion,
+              carbonKg: r._recommendedCarbonKg || (r.carbonKg * 0.7),
+              isOptimized: true,
+              recommendation: 'Optimized via Auto Migrate',
+              _recommendedRegion: undefined
+            };
+          }
+          return r;
+        })
+      );
+    } catch (err) {
+      console.error(err);
+      setError('Migration failed: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
       setMigratingId(null);
     }
@@ -122,6 +135,20 @@ export default function EmissionsPage() {
         </div>
         
         <div className="flex flex-wrap items-center gap-3">
+          <select
+            className="bg-surface-container border border-outline-variant rounded-lg px-3 py-2 text-sm text-on-surface outline-none focus:border-primary disabled:opacity-50"
+            value={filterProject}
+            onChange={(e) => setFilterProject(e.target.value)}
+            disabled={!isConnected}
+          >
+            <option value="All">All Codebases</option>
+            {data?.projects?.map((p: any) => (
+              <option key={p.id} value={p.id}>
+                {p.name} {p.sdkConnected ? '' : '(Awaiting SDK)'}
+              </option>
+            ))}
+          </select>
+
           <select
             className="bg-surface-container border border-outline-variant rounded-lg px-3 py-2 text-sm text-on-surface outline-none focus:border-primary disabled:opacity-50"
             value={filterProvider}
