@@ -116,6 +116,7 @@ The process is fragmented, inaccessible, and impossible to integrate into modern
 
 ### Team Members:  
 - Swapnil Sen (Developer) 
+- Kumari Khushi (Developer)
 
 ### Your Approach:
 - **Why you chose this problem:** Infrastructure has both a financial cost and a carbon cost, but only one is easily measurable. We built Carbonix to make sustainability programmable.
@@ -127,11 +128,12 @@ The process is fragmented, inaccessible, and impossible to integrate into modern
 ## 🛠️ Tech Stack
 
 ### Core Technologies Used:
-- **Frontend / Mobile:** Expo SDK, React Native, TypeScript, Expo Router, Reanimated, Victory Native
+- **Frontend (Web):** Next.js 14, React, TailwindCSS, Framer Motion, Three.js
+- **Frontend (Mobile):** Expo SDK, React Native, TypeScript, Expo Router
 - **Backend:** Node.js, Express.js, TypeScript 
-- **Database:** PostgreSQL (or MongoDB)
+- **Database:** PostgreSQL with Prisma ORM
 - **APIs:** REST API, OpenAPI/Swagger 
-- **Hosting / DevOps:** EAS Build, EAS Workflows, Railway (or Render), Turborepo
+- **Hosting / DevOps:** Vercel (Web), EAS Build (Mobile), Turborepo
 
 ### Additional Technologies Used (Optional):
 - [ ] AI / ML  
@@ -191,7 +193,7 @@ This project is built using a monorepo architecture (Turborepo).
 # 1. Install all dependencies across the monorepo
 npm install
 
-# 2. Build the shared packages (SDK & Types)
+# 2. Build the shared packages (SDK, Core & Types)
 npm run build 
 
 # 3. Start development servers
@@ -199,7 +201,8 @@ npm run dev
 
 # Alternatively, run services independently:
 npm run dev --workspace=services/api       # Start Backend
-npm run dev --workspace=apps/expo-app      # Start Mobile App
+npm run dev --workspace=apps/web           # Start Web Dashboard
+npm run start --workspace=mobile           # Start Mobile App
 ```
 
 ---
