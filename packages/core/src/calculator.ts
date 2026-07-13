@@ -69,7 +69,7 @@ export async function calculateCarbon(input: CalculationInput): Promise<Calculat
   const co2GramsMonth = totalFinalEnergyKwh * gridIntensity;
   const co2KgMonth = co2GramsMonth / 1000;
   
-  const co2GramsHour = co2GramsMonth / input.hoursPerMonth;
+  const co2GramsHour = co2GramsMonth / hours;
 
   return {
     cpuEnergyKwh,
