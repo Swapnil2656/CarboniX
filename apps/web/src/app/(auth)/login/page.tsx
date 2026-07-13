@@ -27,12 +27,18 @@ export default function LoginPage() {
   const onSubmit = async (data: FormData) => {
     setLoading(true);
     setError(null);
-    const result = await signInUser(data);
-    if (result?.error) {
-      setError(result.error);
+    try {
+      const result = await signInUser(data);
+      if (result?.error) {
+        setError(result.error);
+        setLoading(false);
+      } else {
+        router.push("/login/confirm");
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "An unexpected server error occurred.");
       setLoading(false);
-    } else {
-      router.push("/login/confirm");
     }
   };
 

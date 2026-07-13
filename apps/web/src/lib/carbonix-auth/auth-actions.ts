@@ -24,6 +24,9 @@ export async function signInUser(data: { email: string; password: string }) {
     });
     return { success: true };
   } catch (error) {
+    if (error && typeof error === "object" && "digest" in error && typeof error.digest === "string" && error.digest.startsWith("NEXT_REDIRECT")) {
+      throw error;
+    }
     if (error instanceof AuthError) {
       return { error: error.cause?.err?.message || "Invalid credentials" };
     }
