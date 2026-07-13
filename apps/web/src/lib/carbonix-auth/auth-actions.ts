@@ -17,25 +17,24 @@ export async function signInUser(data: { email: string; password: string }) {
   }
 
   try {
+    // Use redirect:false so Next.js does NOT throw NEXT_REDIRECT.
+    // When called from a client component, NEXT_REDIRECT leaks into the
+    // client-side catch block and silently resets loading state.
+    // We return { success: true } and let the client call router.push.
     await signIn("credentials", {
       email: data.email,
       password: data.password,
-      redirectTo: "/login/confirm",
+      redirect: false,
     });
-    // This return is theoretically unreachable because signIn throws a NEXT_REDIRECT,
-    // but we keep it just in case NextAuth changes behavior.
     return { success: true };
   } catch (error) {
-    if (error && typeof error === "object" && "digest" in error && typeof error.digest === "string" && error.digest.startsWith("NEXT_REDIRECT")) {
-      throw error;
-    }
     if (error instanceof AuthError) {
-      return { error: error.cause?.err?.message || "Invalid credentials" };
+      return { error: error.cause?.err?.message || "Invalid credentials. Please check your email and password." };
     }
     if (error instanceof Error) {
       return { error: error.message };
     }
-    return { error: "Something went wrong" };
+    return { error: "Something went wrong. Please try again." };
   }
 }
 
