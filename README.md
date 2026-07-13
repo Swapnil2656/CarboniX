@@ -70,7 +70,7 @@ There is no "Cost Explorer for Carbon." To estimate emissions today, developers 
 
 ---
 
-## 🧠 Team: Carbonix
+## 🧠 Team: Metanova
 
 - **Swapnil Sen** – Lead Developer & Architecture
 - **Kumari Khushi** – Full Stack Developer
