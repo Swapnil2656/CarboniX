@@ -165,9 +165,9 @@ The process is fragmented, inaccessible, and impossible to integrate into modern
 
 ## 📽️ Demo & Deliverables
 
-- **Demo Video Link (Mandatory):** [TBD]  
-- **Deployment Link (Recommended):** [TBD]  
-- **Pitch Deck / PPT (Optional):** [TBD]  
+- **Demo Video Link (Mandatory):** [Please insert your video link here]  
+- **Deployment Link (Recommended):** [https://carboni-x-web.vercel.app/](https://carboni-x-web.vercel.app/)  
+- **Pitch Deck / PPT (Optional):** [Please insert your pitch deck link here]  
 
 ---
 
