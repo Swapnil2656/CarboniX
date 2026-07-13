@@ -118,7 +118,7 @@ const getDashboard = async (req, res) => {
     }
     catch (error) {
         logger_1.logger.error('Error fetching dashboard:', error);
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.getDashboard = getDashboard;

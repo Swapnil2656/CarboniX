@@ -142,7 +142,7 @@ export const calculate = async (req: AuthRequest, res: Response) => {
       calculationId: calculation.id 
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
 
@@ -165,7 +165,7 @@ export const compare = async (req: Request, res: Response) => {
 
     res.json({ success: true, data: { base: baseResult, options } });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
 
@@ -205,7 +205,7 @@ export const recommend = async (req: Request, res: Response) => {
       });
     }
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
 
@@ -225,7 +225,7 @@ export const calculateEmissions = async (req: Request, res: Response) => {
     res.json(result);
   } catch (error: any) {
     logger.error('Error calculating emissions:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
 
@@ -234,7 +234,7 @@ export const verifyKey = async (req: ApiKeyRequest, res: Response) => {
     // If the middleware passed, the key is valid.
     res.json({ success: true, message: 'Key is valid', apiKey: req.apiKey });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
 
@@ -278,6 +278,6 @@ export const ingestTelemetry = async (req: ApiKeyRequest, res: Response) => {
     res.json({ success: true, data: record });
   } catch (error: any) {
     logger.error('Error ingesting telemetry:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };

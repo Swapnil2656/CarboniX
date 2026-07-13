@@ -160,7 +160,7 @@ const calculate = async (req, res) => {
         });
     }
     catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.calculate = calculate;
@@ -182,7 +182,7 @@ const compare = async (req, res) => {
         res.json({ success: true, data: { base: baseResult, options } });
     }
     catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.compare = compare;
@@ -217,7 +217,7 @@ const recommend = async (req, res) => {
         }
     }
     catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.recommend = recommend;
@@ -235,7 +235,7 @@ const calculateEmissions = async (req, res) => {
     }
     catch (error) {
         logger_1.logger.error('Error calculating emissions:', error);
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.calculateEmissions = calculateEmissions;
@@ -245,7 +245,7 @@ const verifyKey = async (req, res) => {
         res.json({ success: true, message: 'Key is valid', apiKey: req.apiKey });
     }
     catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.verifyKey = verifyKey;
@@ -285,7 +285,7 @@ const ingestTelemetry = async (req, res) => {
     }
     catch (error) {
         logger_1.logger.error('Error ingesting telemetry:', error);
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.ingestTelemetry = ingestTelemetry;

@@ -43,7 +43,7 @@ export const listAgentRuns = async (req: Request, res: Response) => {
       pagination: { total, limit, offset },
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
 
@@ -62,7 +62,7 @@ export const getAgentRun = async (req: Request, res: Response) => {
 
     res.json({ success: true, data: run });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
 
@@ -139,7 +139,7 @@ export const triggerCollector = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
 
@@ -237,7 +237,7 @@ export const triggerAnalyst = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
 
@@ -295,7 +295,7 @@ export const runGate = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
 
@@ -370,7 +370,7 @@ export const triggerReporter = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
 
@@ -388,7 +388,7 @@ export const getEmissions = async (req: Request, res: Response) => {
 
     res.json({ success: true, data: records });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
 
@@ -411,7 +411,7 @@ export const getLatestBRSR = async (req: Request, res: Response) => {
 
     res.json({ success: true, data: latestReport.details });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
 
@@ -500,7 +500,7 @@ export const triggerOrchestrator = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
 

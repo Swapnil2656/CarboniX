@@ -53,7 +53,7 @@ app.post('/api/v1/public/accept-invite', async (req, res) => {
     
     res.json({ success: true, message: 'Invitation accepted!' });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

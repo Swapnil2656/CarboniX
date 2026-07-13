@@ -36,7 +36,7 @@ export const getProfile = async (req: AuthRequest, res: Response) => {
     res.json({ success: true, data: user });
   } catch (error: any) {
     logger.error('Error fetching profile:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
 
@@ -84,7 +84,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
     res.json({ success: true, data: updatedUser });
   } catch (error: any) {
     logger.error('Error updating profile:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
 
@@ -112,7 +112,7 @@ export const registerPushToken = async (req: AuthRequest, res: Response) => {
     res.json({ success: true });
   } catch (error: any) {
     logger.error('Error registering push token:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
 
@@ -130,6 +130,6 @@ export const logout = async (req: AuthRequest, res: Response) => {
     res.json({ success: true });
   } catch (error: any) {
     logger.error('Error during logout:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };

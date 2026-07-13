@@ -116,7 +116,7 @@ const getDashboard = async (req, res) => {
         res.json(responseData);
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 exports.getDashboard = getDashboard;
@@ -199,7 +199,7 @@ const getUsers = async (req, res) => {
         });
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 exports.getUsers = getUsers;
@@ -219,7 +219,7 @@ const getFeatureFlags = async (req, res) => {
         res.json({ flags: formattedFlags });
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 exports.getFeatureFlags = getFeatureFlags;
@@ -255,7 +255,7 @@ const toggleFeatureFlag = async (req, res) => {
         res.json({ success: true, flag: updated });
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 exports.toggleFeatureFlag = toggleFeatureFlag;
@@ -294,7 +294,7 @@ const getApiKeys = async (req, res) => {
         });
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 exports.getApiKeys = getApiKeys;
@@ -340,7 +340,7 @@ const createApiKey = async (req, res) => {
         res.status(201).json({ key: rawKey, id: apiKey.id });
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 exports.createApiKey = createApiKey;
@@ -372,7 +372,7 @@ const revokeApiKey = async (req, res) => {
         res.json({ success: true });
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 exports.revokeApiKey = revokeApiKey;
@@ -399,7 +399,7 @@ const deleteApiKey = async (req, res) => {
         res.json({ success: true });
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 exports.deleteApiKey = deleteApiKey;
@@ -431,7 +431,7 @@ const getTeamMembers = async (req, res) => {
         res.json({ team });
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 exports.getTeamMembers = getTeamMembers;
@@ -492,7 +492,7 @@ const syncTeamMembers = async (req, res) => {
         });
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 exports.syncTeamMembers = syncTeamMembers;
@@ -550,7 +550,7 @@ const inviteUser = async (req, res) => {
         });
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 exports.inviteUser = inviteUser;
@@ -577,7 +577,7 @@ const removeTeamMember = async (req, res) => {
         });
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 exports.removeTeamMember = removeTeamMember;
@@ -633,7 +633,7 @@ const getEmissions = async (req, res) => {
         });
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 exports.getEmissions = getEmissions;
@@ -691,7 +691,7 @@ const migrateEmission = async (req, res) => {
         res.json({ success: true, record: updatedRecord });
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 exports.migrateEmission = migrateEmission;
@@ -705,7 +705,7 @@ const getNotifications = async (req, res) => {
         res.json({ success: true, notifications });
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 exports.getNotifications = getNotifications;
@@ -723,7 +723,7 @@ const getAuditLogs = async (req, res) => {
         res.json({ success: true, logs, total, page, pageSize });
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 exports.getAuditLogs = getAuditLogs;

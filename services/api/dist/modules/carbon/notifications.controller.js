@@ -15,7 +15,7 @@ const getNotifications = async (req, res) => {
     }
     catch (error) {
         logger_1.logger.error('Error fetching notifications:', error);
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.getNotifications = getNotifications;
@@ -35,7 +35,7 @@ const markNotificationRead = async (req, res) => {
     }
     catch (error) {
         logger_1.logger.error('Error marking notification as read:', error);
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.markNotificationRead = markNotificationRead;

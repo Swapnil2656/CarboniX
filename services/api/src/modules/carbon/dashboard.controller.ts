@@ -130,6 +130,6 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
     });
   } catch (error: any) {
     logger.error('Error fetching dashboard:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };

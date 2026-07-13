@@ -30,7 +30,7 @@ const register = async (req, res) => {
         res.json({ success: true, data: { user: { id: user.id, name: user.name, email: user.email }, token } });
     }
     catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.register = register;
@@ -52,7 +52,7 @@ const login = async (req, res) => {
         res.json({ success: true, data: { user: { id: user.id, name: user.name, email: user.email }, token } });
     }
     catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.login = login;
@@ -66,7 +66,7 @@ const subscribe = async (req, res) => {
         res.json({ success: true, message: 'Subscribed successfully' });
     }
     catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.subscribe = subscribe;

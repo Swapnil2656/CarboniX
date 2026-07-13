@@ -67,7 +67,7 @@ export const getHistory = async (req: AuthRequest, res: Response) => {
 
     res.json({ success: true, data: enhancedHistory, summary });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
 
@@ -92,6 +92,6 @@ export const deleteCalculation = async (req: AuthRequest, res: Response) => {
 
     res.json({ success: true });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };

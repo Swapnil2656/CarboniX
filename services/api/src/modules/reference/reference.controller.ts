@@ -96,6 +96,6 @@ export const getRegionsRanked = async (req: Request, res: Response) => {
     return res.json({ success: true, data: enrichedRegions });
   } catch (error: any) {
     console.error('Failed to fetch ranked regions', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };

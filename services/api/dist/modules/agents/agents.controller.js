@@ -39,7 +39,7 @@ const listAgentRuns = async (req, res) => {
         });
     }
     catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.listAgentRuns = listAgentRuns;
@@ -57,7 +57,7 @@ const getAgentRun = async (req, res) => {
         res.json({ success: true, data: run });
     }
     catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.getAgentRun = getAgentRun;
@@ -130,7 +130,7 @@ const triggerCollector = async (req, res) => {
         });
     }
     catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.triggerCollector = triggerCollector;
@@ -218,7 +218,7 @@ const triggerAnalyst = async (req, res) => {
         });
     }
     catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.triggerAnalyst = triggerAnalyst;
@@ -271,7 +271,7 @@ const runGate = async (req, res) => {
         });
     }
     catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.runGate = runGate;
@@ -338,7 +338,7 @@ const triggerReporter = async (req, res) => {
         });
     }
     catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.triggerReporter = triggerReporter;
@@ -355,7 +355,7 @@ const getEmissions = async (req, res) => {
         res.json({ success: true, data: records });
     }
     catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.getEmissions = getEmissions;
@@ -377,7 +377,7 @@ const getLatestBRSR = async (req, res) => {
         res.json({ success: true, data: latestReport.details });
     }
     catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.getLatestBRSR = getLatestBRSR;
@@ -459,7 +459,7 @@ const triggerOrchestrator = async (req, res) => {
         });
     }
     catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 exports.triggerOrchestrator = triggerOrchestrator;
