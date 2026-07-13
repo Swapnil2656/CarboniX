@@ -22,7 +22,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaEnvelope, FaLock, FaUser, FaUserPlus } from "react-icons/fa";
 import { z } from "zod";
-import { userType } from "@/generated/prisma";
+import { userType } from "@prisma/client";
 
 type FormData = z.infer<typeof signUpSchema>;
 

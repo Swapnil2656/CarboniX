@@ -3,7 +3,7 @@
  * Wraps Prisma calls for user, verificationToken, and profile (created on signup).
  * Extend this for your app-specific models.
  */
-import { userType } from "@/generated/prisma";
+import { userType } from "@prisma/client";
 import { prisma } from "./prisma";
 
 export const db = {

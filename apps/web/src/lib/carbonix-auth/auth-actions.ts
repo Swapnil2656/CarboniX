@@ -7,7 +7,7 @@ import { prisma } from "./prisma";
 import { createUserSchema, signInSchema } from "./zod";
 import crypto from "crypto";
 import { sendEmail } from "./email";
-import { userType } from "@/generated/prisma";
+import { userType } from "@prisma/client";
 import { authConfig } from "@/carbonix-auth.config";
 
 export async function signInUser(data: { email: string; password: string }) {
