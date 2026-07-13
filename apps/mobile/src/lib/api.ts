@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../stores/auth.store';
 
 // For local testing: if using Android emulator, use 10.0.2.2. If iOS/web, use localhost.
 // Alternatively, process.env.EXPO_PUBLIC_API_URL could be used.

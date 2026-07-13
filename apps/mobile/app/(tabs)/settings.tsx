@@ -7,13 +7,13 @@ import * as SecureStore from 'expo-secure-store';
 import { useRouter } from 'expo-router';
 
 import { colors } from '../../src/theme/colors';
-import { useAuthStore } from '../../src/store/authStore';
+import { useAuthStore } from '../../src/stores/auth.store';
 import { authApi } from '../../src/services/api/endpoints';
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { user, logout } = useAuthStore();
+  const { user, clearAuth } = useAuthStore();
 
   const [profile, setProfile] = useState<any>(null);
 
@@ -43,7 +43,7 @@ export default function SettingsScreen() {
         setProfile(res.data);
       }
     } catch (e) {
-      console.log('Error fetching profile', e);
+      console.error('Error fetching profile', e);
     }
   };
 
@@ -59,7 +59,7 @@ export default function SettingsScreen() {
       if (savedBudget) setBudgetLimit(savedBudget);
       if (savedLbs) setUseLbs(savedLbs === 'true');
     } catch (e) {
-      console.log('Error loading settings', e);
+      console.error('Error loading settings', e);
     }
   };
 
@@ -67,9 +67,9 @@ export default function SettingsScreen() {
     try {
       await authApi.logout();
     } catch (e) {
-      console.log('Logout API error', e);
+      console.error('Logout API error', e);
     } finally {
-      await logout();
+      await clearAuth();
       router.replace('/login');
     }
   };
@@ -78,7 +78,7 @@ export default function SettingsScreen() {
     try {
       await SecureStore.setItemAsync(key, value);
     } catch (e) {
-      console.log('Error saving setting', e);
+      console.error('Error saving setting', e);
     }
   };
 

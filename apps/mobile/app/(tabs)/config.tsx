@@ -88,6 +88,7 @@ export default function ConfigScreen() {
         scrollRef.current?.scrollTo({ y: 0, animated: true });
       }, 100);
     } catch (error: any) {
+      console.error('Calculation Failed:', error);
       Alert.alert('Calculation Failed', error?.message || 'Something went wrong');
     } finally {
       setLoading(false);

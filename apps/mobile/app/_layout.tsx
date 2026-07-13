@@ -60,7 +60,7 @@ export default function RootLayout() {
         console.log('Fonts loaded successfully!');
         setLoaded(true);
       } catch (e: any) {
-        console.log('Error loading fonts:', e);
+        console.error('Error loading fonts:', e);
         setError(e);
       }
     }
