@@ -8,9 +8,11 @@ import { authenticateApiKey } from '../../middleware/apiKey.middleware';
 
 const router = Router();
 
+import { authenticateHybrid } from '../../middleware/hybrid.middleware';
+
 router.post('/calculate', authenticate, calculate);
 router.post('/compare', authenticate, compare);
-router.post('/recommend', authenticate, recommend);
+router.post('/recommend', authenticateHybrid, recommend);
 
 // New endpoint for direct emissions calculation
 router.post('/calculate-emissions', calculateEmissions);

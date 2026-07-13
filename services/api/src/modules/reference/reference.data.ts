@@ -79,6 +79,16 @@ export const instanceTypes = [
     isPopular: true
   },
   {
+    id: 'instance-5',
+    provider: 'AWS',
+    name: 't3.small',
+    category: 'GENERAL',
+    vcpu: 2,
+    memoryGb: 2,
+    cpuTdpWatts: 55,
+    isPopular: true
+  },
+  {
     id: 'instance-2',
     provider: 'AWS',
     name: 't3.medium',
