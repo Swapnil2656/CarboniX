@@ -86,7 +86,7 @@ export async function updateProfile(data: { name?: string; avatarUrl?: string; e
 }
 
 import { revalidatePath } from 'next/cache';
-import bcrypt from 'bcrypt';
+import { compare, hash } from 'bcrypt-ts';
 
 export async function updatePassword(currentPassword: string, newPassword: string) {
   const session = await auth();
@@ -107,13 +107,13 @@ export async function updatePassword(currentPassword: string, newPassword: strin
     }
 
     // Verify current password
-    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    const isPasswordValid = await compare(currentPassword, user.password);
     if (!isPasswordValid) {
       return { success: false, error: "Incorrect current password" };
     }
 
     // Hash the new password
-    const newHashedPassword = await bcrypt.hash(newPassword, 10);
+    const newHashedPassword = await hash(newPassword, 10);
 
     // Update the password in the database
     await prisma.user.update({

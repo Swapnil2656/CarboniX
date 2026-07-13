@@ -2,7 +2,7 @@ import NextAuth, { type DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { db } from "./lib/carbonix-auth/prisma-db";
 import { prisma } from "./lib/carbonix-auth/prisma";
-import bcrypt from "bcrypt";
+import { compare } from "bcrypt-ts";
 import jwt from "jsonwebtoken";
 import { signInSchema } from "./lib/carbonix-auth/zod";
 import { authConfig } from "./carbonix-auth.config";
@@ -50,7 +50,7 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
         });
         if (!user) throw new Error("No account found with that email");
 
-        const isValid = await bcrypt.compare(password, user.password);
+        const isValid = await compare(password, user.password);
         if (!isValid) throw new Error("Invalid password");
 
         // Temporarily bypassed for development

@@ -1,6 +1,6 @@
 "use server";
 import { signIn } from "@/auth";
-import bcrypt from "bcrypt";
+import { hash } from "bcrypt-ts";
 import { AuthError } from "next-auth";
 import { db } from "./prisma-db";
 import { prisma } from "./prisma";
@@ -60,7 +60,7 @@ export async function signUp(data: {
   const existingTeamMembers = await prisma.$queryRaw<any[]>`SELECT id FROM "TeamMember" WHERE email = ${email} LIMIT 1`;
   const isInvited = existingTeamMembers && existingTeamMembers.length > 0;
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await hash(password, 10);
 
   const user = await db.user.create({ 
     userName, 
