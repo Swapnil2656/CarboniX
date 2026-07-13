@@ -2,6 +2,8 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
+import { Platform } from 'react-native';
+
 // 1. Create an Axios instance pointing to the Express backend (services/api)
 // NOTE: During local development, use your machine's local IP address or localhost depending on simulator.
 // For physical devices connected via USB, we use 127.0.0.1 with adb reverse
@@ -18,7 +20,7 @@ export const apiClient = axios.create({
 // 2. Add interceptors to attach the JWT token (if authenticated)
 apiClient.interceptors.request.use(async (config) => {
   try {
-    const token = await SecureStore.getItemAsync('carbonix_token');
+    const token = await SecureStore.getItemAsync('auth_token');
     if (config.headers) {
       config.headers.Authorization = `Bearer ${token || 'mock-token-for-dev'}`;
     }

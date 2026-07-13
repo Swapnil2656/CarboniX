@@ -54,8 +54,8 @@ export default function ConfigScreen() {
 
   useEffect(() => {
     // Select first region automatically when regions load
-    if (regions.length > 0 && !regions.find((r: any) => r.regionName === region)) {
-      setRegion(regions[0].regionName);
+    if (regions.length > 0 && !regions.find((r: any) => r.code === region)) {
+      setRegion(regions[0].code);
     }
   }, [regions]);
 
@@ -109,12 +109,10 @@ export default function ConfigScreen() {
   const resultRegion = resultData?.region || region;
   const drivingKm = resultData?.co2KgMonth ? Math.round(resultData.co2KgMonth * 4.3) : 0;
   
-  const getRatingColor = (rating: string) => {
-    if (rating === 'A') return '#50FA7B';
-    if (rating === 'B') return '#90ff9e';
-    if (rating === 'C') return '#f5c518';
-    if (rating === 'D') return '#ffb86c';
-    if (rating === 'F') return '#ff5555';
+  const getRatingColor = (category: string) => {
+    if (category === 'green' || category === 'A') return '#50FA7B';
+    if (category === 'yellow' || category === 'B' || category === 'C') return '#f5c518';
+    if (category === 'red' || category === 'D' || category === 'F') return '#ff5555';
     return colors.textMuted;
   };
 
@@ -207,21 +205,21 @@ export default function ConfigScreen() {
           ) : (
             <View style={styles.regionList}>
               {regions.map((r: any) => {
-                const color = getRatingColor(r.rating);
+                const color = getRatingColor(r.category);
                 return (
                   <TouchableOpacity 
-                    key={r.regionName} 
-                    style={[styles.regionCard, region === r.regionName && { borderColor: color, backgroundColor: color + '15' }]}
-                    onPress={() => setRegion(r.regionName)}
+                    key={r.code} 
+                    style={[styles.regionCard, region === r.code && { borderColor: color, backgroundColor: color + '15' }]}
+                    onPress={() => setRegion(r.code)}
                   >
                     <View style={styles.regionLeft}>
                       <View style={[styles.regionDot, { backgroundColor: color }]} />
-                      <Text style={[styles.regionName, region === r.regionName && { color: colors.textHeader }]}>{r.regionName}</Text>
+                      <Text style={[styles.regionName, region === r.code && { color: colors.textHeader }]}>{r.code}</Text>
                     </View>
                     <View style={styles.regionRight}>
-                      <Text style={styles.regionCo2}>{r.gridCarbonIntensity.toFixed(0)} g/kWh</Text>
+                      <Text style={styles.regionCo2}>{r.gridIntensity?.toFixed(0) || 'N/A'} g/kWh</Text>
                       <View style={[styles.regionBadge, { backgroundColor: color + '30', borderColor: color }]}>
-                        <Text style={[styles.regionBadgeText, { color }]}>{r.rating}</Text>
+                        <Text style={[styles.regionBadgeText, { color }]}>{r.category ? r.category.charAt(0).toUpperCase() : 'N/A'}</Text>
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -309,9 +307,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20, backgroundColor: colors.surface,
     borderBottomWidth: 1, borderBottomColor: colors.outlineVariant,
   },
-  topBarLeft: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  logoImage: { width: 40, height: 40, resizeMode: 'contain' },
-  logo: { fontFamily: 'Inter-Bold', fontSize: 20, fontWeight: '900', color: colors.primary, letterSpacing: -0.5 },
+  topBarLeft: { flexDirection: 'row', alignItems: 'center' },
+  logoImage: { width: 56, height: 56, resizeMode: 'contain' },
+  logo: { fontFamily: 'Inter-Bold', fontSize: 20, fontWeight: '900', color: colors.primary, letterSpacing: -0.5, marginLeft: -8 },
   content: { paddingHorizontal: 20, paddingVertical: 24, paddingBottom: 100, gap: 16 },
   header: { gap: 4 },
   title: { fontFamily: 'Inter-Bold', fontSize: 36, color: colors.textHeader, letterSpacing: -1 },

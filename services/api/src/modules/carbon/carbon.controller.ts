@@ -38,7 +38,7 @@ export const calculate = async (req: AuthRequest, res: Response) => {
     const calculation = await prisma.calculation.create({
       data: {
         userId: userId,
-        provider: input.provider as any,
+        provider: input.provider.toUpperCase() as any,
         region: input.region,
         regionName: input.region, // Can be enhanced later
         instanceType: input.instanceType,
@@ -151,19 +151,30 @@ export const calculate = async (req: AuthRequest, res: Response) => {
 
 export const compare = async (req: Request, res: Response) => {
   try {
-    const input: CalculationInput = req.body;
-    const baseResult = await calculateCarbon(input);
+    // Add default values for compare if missing
+    const input: CalculationInput = {
+      provider: req.body.provider || 'aws',
+      region: req.body.region || 'us-east-1',
+      instanceType: req.body.instanceType || (req.body.provider === 'gcp' ? 'e2-standard-8' : req.body.provider === 'azure' ? 'Standard_D8s_v3' : 'm5.2xlarge'),
+      instanceCount: req.body.instanceCount || 1,
+      hoursPerMonth: req.body.durationHours || req.body.hoursPerMonth || 730,
+      cpuUtilization: req.body.cpuUtilization || 0.5,
+      storageGb: req.body.storageGb || 500,
+      ramGb: req.body.memoryGb || req.body.ramGb || 32,
+    };
+
+    const baseResult = { ...await calculateCarbon(input), provider: input.provider, region: input.region };
     
-    // Generate comparison options
+    // Generate comparison options mapping equivalent instance types
     const options = [];
     if (input.provider !== 'aws' || input.region !== 'eu-west-1') {
-      options.push(await calculateCarbon({ ...input, provider: 'aws', region: 'eu-west-1' }));
+      options.push({ ...await calculateCarbon({ ...input, provider: 'aws', region: 'eu-west-1', instanceType: 'm5.2xlarge' }), provider: 'aws', region: 'eu-west-1' });
     }
     if (input.provider !== 'gcp' || input.region !== 'eu-north-1') {
-      options.push(await calculateCarbon({ ...input, provider: 'gcp', region: 'eu-north-1' }));
+      options.push({ ...await calculateCarbon({ ...input, provider: 'gcp', region: 'eu-north-1', instanceType: 'e2-standard-8' }), provider: 'gcp', region: 'eu-north-1' });
     }
     if (input.provider !== 'azure' || input.region !== 'northeurope') {
-      options.push(await calculateCarbon({ ...input, provider: 'azure', region: 'northeurope' }));
+      options.push({ ...await calculateCarbon({ ...input, provider: 'azure', region: 'northeurope', instanceType: 'Standard_D8s_v3' }), provider: 'azure', region: 'northeurope' });
     }
 
     res.json({ success: true, data: { base: baseResult, options } });

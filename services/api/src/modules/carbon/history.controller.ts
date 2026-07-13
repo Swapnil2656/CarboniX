@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { prisma } from '../../lib/prisma';
 import { AuthRequest } from '../../middleware/auth.middleware';
 import { redis } from '../../lib/redis';
+import * as fs from 'fs';
 
 export const getHistory = async (req: AuthRequest, res: Response) => {
   try {

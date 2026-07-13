@@ -6252,3 +6252,428 @@
 {"_e":"metro:client_log","_t":1783710172416,"level":"log","data":["Fonts loaded successfully!"]}
 {"_e":"metro:client_log","_t":1783710204966,"level":"error","data":["Failed to fetch history:","[AxiosError: Network Error]"]}
 {"_e":"metro:client_log","_t":1783710314886,"level":"error","data":["Failed to compare:","[AxiosError: Network Error]"]}
+{"_e":"root:init","_t":1783882230169,"format":"v0-jsonl","version":"56.1.19"}
+{"_e":"env:mode","_t":1783882230169,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783882230170,"mode":"development","files":["../../../.env"],"env":{"EXPO_PUBLIC_API_URL":"http://localhost:4000/api/v1","EXPO_PUBLIC_APP_VERSION":"1.0.0","EXPO_PUBLIC_ENVIRONMENT":"development"}}
+{"_e":"devserver:start","_t":1783882230367,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783882230740,"serverRoot":"../../../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":true,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783882231166,"atlas":false,"workers":7,"host":"::","port":8081}
+{"_e":"root:init","_t":1783882337717,"format":"v0-jsonl","version":"56.1.19"}
+{"_e":"env:mode","_t":1783882337717,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783882337719,"mode":"development","files":["../../../.env"],"env":{"EXPO_PUBLIC_API_URL":"http://localhost:4000/api/v1","EXPO_PUBLIC_APP_VERSION":"1.0.0","EXPO_PUBLIC_ENVIRONMENT":"development"}}
+{"_e":"devserver:start","_t":1783882337888,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783882338228,"serverRoot":"../../../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":true,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783882338549,"atlas":false,"workers":7,"host":"::","port":8081}
+{"_e":"root:init","_t":1783882538735,"format":"v0-jsonl","version":"56.1.19"}
+{"_e":"env:mode","_t":1783882538736,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783882538737,"mode":"development","files":["../../../.env"],"env":{"EXPO_PUBLIC_API_URL":"http://localhost:4000/api/v1","EXPO_PUBLIC_APP_VERSION":"1.0.0","EXPO_PUBLIC_ENVIRONMENT":"development"}}
+{"_e":"devserver:start","_t":1783882538930,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783882539324,"serverRoot":"../../../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":true,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783882539694,"atlas":false,"workers":7,"host":"::","port":8081}
+{"_e":"root:init","_t":1783882589279,"format":"v0-jsonl","version":"56.1.19"}
+{"_e":"env:mode","_t":1783882589280,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783882589281,"mode":"development","files":["../../../.env"],"env":{"EXPO_PUBLIC_API_URL":"http://localhost:4000/api/v1","EXPO_PUBLIC_APP_VERSION":"1.0.0","EXPO_PUBLIC_ENVIRONMENT":"development"}}
+{"_e":"devserver:start","_t":1783882589446,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783882589780,"serverRoot":"../../../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":true,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783882590079,"atlas":false,"workers":7,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783882616188,"id":"4","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783882616189,"id":"4","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1783882616191,"id":"4","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1783882616421,"id":"4","progress":0.010000000000000002,"total":1,"current":1}
+{"_e":"metro:bundling:progress","_t":1783882616522,"id":"4","progress":0.16000000000000003,"total":10,"current":4}
+{"_e":"metro:bundling:progress","_t":1783882616634,"id":"4","progress":0.25,"total":10,"current":5}
+{"_e":"metro:bundling:progress","_t":1783882616737,"id":"4","progress":0.25,"total":86,"current":28}
+{"_e":"metro:bundling:progress","_t":1783882616842,"id":"4","progress":0.25,"total":211,"current":41}
+{"_e":"metro:bundling:progress","_t":1783882616943,"id":"4","progress":0.25,"total":302,"current":82}
+{"_e":"metro:bundling:progress","_t":1783882617043,"id":"4","progress":0.25,"total":366,"current":118}
+{"_e":"metro:bundling:progress","_t":1783882617143,"id":"4","progress":0.25,"total":525,"current":205}
+{"_e":"metro:bundling:progress","_t":1783882617243,"id":"4","progress":0.25,"total":709,"current":304}
+{"_e":"metro:bundling:progress","_t":1783882617343,"id":"4","progress":0.25,"total":876,"current":432}
+{"_e":"metro:bundling:progress","_t":1783882617444,"id":"4","progress":0.28743839263916016,"total":1024,"current":549}
+{"_e":"metro:bundling:progress","_t":1783882617543,"id":"4","progress":0.307156336188126,"total":1079,"current":598}
+{"_e":"metro:bundling:progress","_t":1783882617644,"id":"4","progress":0.3474897503023292,"total":1179,"current":695}
+{"_e":"metro:bundling:progress","_t":1783882617744,"id":"4","progress":0.3778747646611119,"total":1264,"current":777}
+{"_e":"metro:bundling:progress","_t":1783882617845,"id":"4","progress":0.4417073027192221,"total":1297,"current":862}
+{"_e":"metro:bundling:progress","_t":1783882617945,"id":"4","progress":0.5346516977527224,"total":1343,"current":982}
+{"_e":"metro:bundling:progress","_t":1783882618045,"id":"4","progress":0.5379885263905404,"total":1392,"current":1021}
+{"_e":"metro:bundling:progress","_t":1783882618145,"id":"4","progress":0.569637750261861,"total":1423,"current":1074}
+{"_e":"metro:bundling:progress","_t":1783882618245,"id":"4","progress":0.6468549221739707,"total":1451,"current":1167}
+{"_e":"metro:bundling:progress","_t":1783882618345,"id":"4","progress":0.724212422863835,"total":1490,"current":1268}
+{"_e":"metro:bundling:progress","_t":1783882618445,"id":"4","progress":0.742041569289133,"total":1537,"current":1324}
+{"_e":"metro:bundling:progress","_t":1783882618545,"id":"4","progress":0.7482578900952739,"total":1578,"current":1365}
+{"_e":"metro:bundling:progress","_t":1783882618646,"id":"4","progress":0.7596870010373822,"total":1581,"current":1378}
+{"_e":"metro:bundling:progress","_t":1783882618746,"id":"4","progress":0.8017413856836958,"total":1587,"current":1421}
+{"_e":"metro:bundling:progress","_t":1783882618849,"id":"4","progress":0.8519828568412153,"total":1611,"current":1487}
+{"_e":"metro:bundling:progress","_t":1783882618955,"id":"4","progress":0.8700561779821784,"total":1651,"current":1540}
+{"_e":"metro:bundling:progress","_t":1783882619055,"id":"4","progress":0.9142533904966011,"total":1711,"current":1636}
+{"_e":"metro:bundling:progress","_t":1783882619155,"id":"4","progress":0.9142533904966011,"total":1866,"current":1756}
+{"_e":"metro:bundling:progress","_t":1783882619255,"id":"4","progress":0.9439272151564072,"total":1969,"current":1913}
+{"_e":"metro:bundling:progress","_t":1783882619356,"id":"4","progress":0.999,"total":1990,"current":1990}
+{"_e":"metro:bundling:done","_t":1783882619425,"id":"4","total":1990,"ms":3236.101333}
+{"_e":"metro:client_log","_t":1783882636448,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783882639948,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:bundling:started","_t":1783882676591,"id":"h","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783882676592,"id":"h","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1783882676645,"id":"h","total":1,"ms":53.930291}
+{"_e":"metro:client_log","_t":1783882696648,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783882696733,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:bundling:started","_t":1783882809699,"id":"i","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783882809699,"id":"i","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1783882809753,"id":"i","total":1,"ms":54.034584}
+{"_e":"metro:client_log","_t":1783882827655,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783882827769,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:bundling:started","_t":1783883142787,"id":"m","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783883142788,"id":"m","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1783883142842,"id":"m","total":1,"ms":54.927375}
+{"_e":"metro:client_log","_t":1783883156603,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783883160395,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:client_log","_t":1783883350185,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783883350185,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:bundling:started","_t":1783883426226,"id":"y","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783883426226,"id":"y","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1783883426272,"id":"y","total":1,"ms":45.535167}
+{"_e":"metro:bundling:started","_t":1783883426536,"id":"z","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783883426536,"id":"z","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1783883426584,"id":"z","total":1,"ms":47.827542}
+{"_e":"metro:client_log","_t":1783883445456,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783883445456,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:client_log","_t":1783883447739,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783883447853,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:client_log","_t":1783883506714,"level":"log","data":["Error fetching regions","[AxiosError: Network Error]"]}
+{"_e":"metro:client_log","_t":1783883510096,"level":"error","data":["Failed to fetch history:","[AxiosError: Network Error]"]}
+{"_e":"metro:client_log","_t":1783883596482,"level":"error","data":["Failed to fetch history:","[AxiosError: Request failed with status code 500]"]}
+{"_e":"metro:client_log","_t":1783883597043,"level":"error","data":["[TypeError: Cannot read property 'toFixed' of undefined]"]}
+{"_e":"metro:client_log","_t":1783883943916,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783883943929,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:client_log","_t":1783884070783,"level":"error","data":["Failed to compare:","[AxiosError: Request failed with status code 500]"]}
+{"_e":"metro:client_log","_t":1783884120620,"level":"log","data":["Error fetching profile","[AxiosError: Request failed with status code 404]"]}
+{"_e":"metro:client_log","_t":1783884250931,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783884250932,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:client_log","_t":1783884253112,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783884253116,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:bundling:started","_t":1783884273718,"id":"18","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783884273718,"id":"18","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1783884273787,"id":"18","total":1,"ms":68.547583}
+{"_e":"metro:client_log","_t":1783884291598,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783884291599,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:client_log","_t":1783884301475,"level":"error","data":["[TypeError: Cannot read property 'toUpperCase' of undefined]"]}
+{"_e":"metro:client_log","_t":1783884320052,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783884320133,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:client_log","_t":1783884355154,"level":"log","data":["Error fetching profile","[AxiosError: Request failed with status code 404]"]}
+{"_e":"metro:bundling:started","_t":1783884370167,"id":"1b","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783884370168,"id":"1b","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1783884370213,"id":"1b","total":1,"ms":45.627584}
+{"_e":"metro:client_log","_t":1783884386855,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783884386856,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:client_log","_t":1783884403009,"level":"error","data":["Failed to fetch history:","[AxiosError: Request failed with status code 500]"]}
+{"_e":"metro:client_log","_t":1783884405811,"level":"log","data":["Error fetching profile","[AxiosError: Request failed with status code 404]"]}
+{"_e":"metro:client_log","_t":1783884413592,"level":"log","data":["Error fetching profile","[AxiosError: Request failed with status code 404]"]}
+{"_e":"metro:client_log","_t":1783884730555,"level":"error","data":["[TypeError: Cannot read property 'toUpperCase' of undefined]"]}
+{"_e":"metro:bundling:started","_t":1783884751133,"id":"1f","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783884751133,"id":"1f","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1783884751166,"id":"1f","total":1,"ms":33.210666}
+{"_e":"metro:client_log","_t":1783884765306,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783884765306,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:client_log","_t":1783884834753,"level":"error","data":["[TypeError: Cannot read property 'toUpperCase' of undefined]"]}
+{"_e":"metro:bundling:started","_t":1783884962001,"id":"1i","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783884962001,"id":"1i","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1783884962032,"id":"1i","total":1,"ms":30.676334}
+{"_e":"metro:client_log","_t":1783884976291,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783884976291,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:client_log","_t":1783885046716,"level":"error","data":["Encountered two children with the same key, `aws`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version."]}
+{"_e":"metro:client_log","_t":1783885046806,"level":"error","data":["Encountered two children with the same key, `chart-aws`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version."]}
+{"_e":"metro:bundling:started","_t":1783885093471,"id":"1l","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783885093472,"id":"1l","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1783885093531,"id":"1l","total":1,"ms":59.426625}
+{"_e":"metro:client_log","_t":1783885107100,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783885107101,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:client_log","_t":1783885152110,"level":"error","data":["Failed to fetch history:","[AxiosError: Request failed with status code 500]"]}
+{"_e":"metro:client_log","_t":1783885238216,"level":"error","data":["[Error: PanGestureHandler must be used as a descendant of GestureHandlerRootView. Otherwise the gestures will not be recognized. See https://docs.swmansion.com/react-native-gesture-handler/docs/fundamentals/installation for more details.]"]}
+{"_e":"metro:server_log","_t":1783885911987,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783885911987,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783885911988,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783885911988,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783885911988,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783885911988,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783885911988,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"root:init","_t":1783886463131,"format":"v0-jsonl","version":"56.1.19"}
+{"_e":"env:mode","_t":1783886463132,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783886463133,"mode":"development","files":["../../../.env"],"env":{"EXPO_PUBLIC_API_URL":"http://10.83.20.141:4000/api/v1","EXPO_PUBLIC_APP_VERSION":"1.0.0","EXPO_PUBLIC_ENVIRONMENT":"development"}}
+{"_e":"devserver:start","_t":1783886463340,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783886463763,"serverRoot":"../../../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":true,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783886464198,"atlas":false,"workers":7,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783886472796,"id":"4","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783886472796,"id":"4","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1783886472799,"id":"4","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1783886472898,"id":"4","progress":0.1709298987106811,"total":387,"current":160}
+{"_e":"metro:bundling:progress","_t":1783886472998,"id":"4","progress":0.3132367217217687,"total":863,"current":483}
+{"_e":"metro:bundling:progress","_t":1783886473099,"id":"4","progress":0.48388284807724735,"total":1232,"current":857}
+{"_e":"metro:bundling:progress","_t":1783886473199,"id":"4","progress":0.7044435158673471,"total":1394,"current":1170}
+{"_e":"metro:bundling:progress","_t":1783886473299,"id":"4","progress":0.8848074382539298,"total":1651,"current":1553}
+{"_e":"metro:bundling:progress","_t":1783886473399,"id":"4","progress":0.9689008312877446,"total":1978,"current":1947}
+{"_e":"metro:bundling:done","_t":1783886473453,"id":"4","total":1978,"ms":657.16025}
+{"_e":"metro:client_log","_t":1783886475490,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783886475490,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:client_log","_t":1783886489001,"level":"error","data":["Failed to fetch history:","{\"error\": \"Stream isn't writeable and enableOfflineQueue options is false\", \"success\": false}"]}
+{"_e":"metro:bundling:started","_t":1783886590105,"id":"8","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783886590105,"id":"8","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1783886590145,"id":"8","total":1,"ms":39.859458}
+{"_e":"metro:client_log","_t":1783886591712,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783886591742,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:client_log","_t":1783886599601,"level":"error","data":["[Error: PanGestureHandler must be used as a descendant of GestureHandlerRootView. Otherwise the gestures will not be recognized. See https://docs.swmansion.com/react-native-gesture-handler/docs/fundamentals/installation for more details.]"]}
+{"_e":"metro:client_log","_t":1783886633130,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783886633141,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:server_log","_t":1783887788992,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783887788995,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783888334975,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783888722766,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783890112111,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:bundling:started","_t":1783906554353,"id":"b","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783906554354,"id":"b","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1783906554515,"id":"b","total":1,"ms":161.430709}
+{"_e":"metro:client_log","_t":1783906556019,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783906556053,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:server_log","_t":1783907402858,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783907402859,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783908750048,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:bundling:started","_t":1783908771595,"id":"d","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783908771595,"id":"d","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1783908771601,"id":"d","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1783908771701,"id":"d","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1783908771743,"id":"d","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1783908771967,"id":"d","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1783908771999,"id":"d","total":1,"ms":404.217334}
+{"_e":"metro:client_log","_t":1783908773655,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783908773687,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:client_log","_t":1783908782105,"level":"log","data":["Error fetching regions","[AxiosError: Network Error]"]}
+{"_e":"metro:client_log","_t":1783908794103,"level":"error","data":["Failed to fetch history:","Network Error"]}
+{"_e":"metro:client_log","_t":1783908797604,"level":"log","data":["Error fetching profile","[AxiosError: Network Error]"]}
+{"_e":"metro:server_log","_t":1783908957424,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783908957425,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783909456906,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783910644465,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783911237210,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783911437051,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"root:init","_t":1783913932368,"format":"v0-jsonl","version":"56.1.19"}
+{"_e":"env:mode","_t":1783913932369,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783913932370,"mode":"development","files":["../../../.env"],"env":{"EXPO_PUBLIC_API_URL":"http://10.83.20.141:4000/api/v1","EXPO_PUBLIC_APP_VERSION":"1.0.0","EXPO_PUBLIC_ENVIRONMENT":"development"}}
+{"_e":"devserver:start","_t":1783913932596,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783913933008,"serverRoot":"../../../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":true,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783913933640,"atlas":false,"workers":7,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783913939982,"id":"4","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783913939982,"id":"4","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1783913939985,"id":"4","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1783913940227,"id":"4","progress":0.010000000000000002,"total":1,"current":1}
+{"_e":"metro:bundling:progress","_t":1783913940328,"id":"4","progress":0.16000000000000003,"total":10,"current":4}
+{"_e":"metro:bundling:progress","_t":1783913940514,"id":"4","progress":0.25,"total":10,"current":5}
+{"_e":"metro:bundling:progress","_t":1783913940614,"id":"4","progress":0.25,"total":82,"current":23}
+{"_e":"metro:bundling:progress","_t":1783913940716,"id":"4","progress":0.25,"total":135,"current":46}
+{"_e":"metro:bundling:progress","_t":1783913940817,"id":"4","progress":0.25,"total":255,"current":57}
+{"_e":"metro:bundling:progress","_t":1783913940919,"id":"4","progress":0.25,"total":316,"current":97}
+{"_e":"metro:bundling:progress","_t":1783913941019,"id":"4","progress":0.25,"total":423,"current":162}
+{"_e":"metro:bundling:progress","_t":1783913941119,"id":"4","progress":0.25,"total":500,"current":218}
+{"_e":"metro:bundling:progress","_t":1783913941219,"id":"4","progress":0.25,"total":703,"current":300}
+{"_e":"metro:bundling:progress","_t":1783913941319,"id":"4","progress":0.25,"total":799,"current":394}
+{"_e":"metro:bundling:progress","_t":1783913941419,"id":"4","progress":0.28678073397234916,"total":915,"current":490}
+{"_e":"metro:bundling:progress","_t":1783913941520,"id":"4","progress":0.29550015317309253,"total":1078,"current":586}
+{"_e":"metro:bundling:progress","_t":1783913941620,"id":"4","progress":0.3363175894172616,"total":1126,"current":653}
+{"_e":"metro:bundling:progress","_t":1783913941720,"id":"4","progress":0.3363175894172616,"total":1200,"current":689}
+{"_e":"metro:bundling:progress","_t":1783913941820,"id":"4","progress":0.36908357062007885,"total":1223,"current":743}
+{"_e":"metro:bundling:progress","_t":1783913941920,"id":"4","progress":0.4291045583438509,"total":1235,"current":809}
+{"_e":"metro:bundling:progress","_t":1783913942021,"id":"4","progress":0.4690568836280043,"total":1263,"current":865}
+{"_e":"metro:bundling:progress","_t":1783913942121,"id":"4","progress":0.5183106322459963,"total":1289,"current":928}
+{"_e":"metro:bundling:progress","_t":1783913942221,"id":"4","progress":0.6005377938633195,"total":1333,"current":1033}
+{"_e":"metro:bundling:progress","_t":1783913942322,"id":"4","progress":0.6414167123502232,"total":1356,"current":1086}
+{"_e":"metro:bundling:progress","_t":1783913942424,"id":"4","progress":0.6696377264737696,"total":1376,"current":1126}
+{"_e":"metro:bundling:progress","_t":1783913942525,"id":"4","progress":0.6700542110912489,"total":1411,"current":1155}
+{"_e":"metro:bundling:progress","_t":1783913942625,"id":"4","progress":0.6794173771467586,"total":1434,"current":1182}
+{"_e":"metro:bundling:progress","_t":1783913942729,"id":"4","progress":0.6925586491316162,"total":1472,"current":1225}
+{"_e":"metro:bundling:progress","_t":1783913942829,"id":"4","progress":0.7280108019533592,"total":1499,"current":1279}
+{"_e":"metro:bundling:progress","_t":1783913942929,"id":"4","progress":0.7412326088727945,"total":1539,"current":1325}
+{"_e":"metro:bundling:progress","_t":1783913943029,"id":"4","progress":0.7802208263132582,"total":1551,"current":1370}
+{"_e":"metro:bundling:progress","_t":1783913943130,"id":"4","progress":0.7802208263132582,"total":1577,"current":1388}
+{"_e":"metro:bundling:progress","_t":1783913943230,"id":"4","progress":0.7832753166640661,"total":1583,"current":1401}
+{"_e":"metro:bundling:progress","_t":1783913943330,"id":"4","progress":0.7917322280465604,"total":1597,"current":1421}
+{"_e":"metro:bundling:progress","_t":1783913943433,"id":"4","progress":0.8079787905567478,"total":1602,"current":1440}
+{"_e":"metro:bundling:progress","_t":1783913943534,"id":"4","progress":0.8241835954522967,"total":1606,"current":1458}
+{"_e":"metro:bundling:progress","_t":1783913943634,"id":"4","progress":0.8392413575522683,"total":1621,"current":1485}
+{"_e":"metro:bundling:progress","_t":1783913943734,"id":"4","progress":0.8506818543145452,"total":1635,"current":1508}
+{"_e":"metro:bundling:progress","_t":1783913943834,"id":"4","progress":0.8715620551238069,"total":1656,"current":1546}
+{"_e":"metro:bundling:progress","_t":1783913943934,"id":"4","progress":0.8973888438441755,"total":1689,"current":1600}
+{"_e":"metro:bundling:progress","_t":1783913944034,"id":"4","progress":0.8973888438441755,"total":1752,"current":1653}
+{"_e":"metro:bundling:progress","_t":1783913944135,"id":"4","progress":0.9126596441479063,"total":1791,"current":1711}
+{"_e":"metro:bundling:progress","_t":1783913944235,"id":"4","progress":0.9126596441479063,"total":1894,"current":1787}
+{"_e":"metro:bundling:progress","_t":1783913944335,"id":"4","progress":0.9365564063532904,"total":1954,"current":1891}
+{"_e":"metro:bundling:progress","_t":1783913944436,"id":"4","progress":0.9979899502568299,"total":1989,"current":1987}
+{"_e":"metro:bundling:done","_t":1783913944574,"id":"4","total":1989,"ms":4591.456541}
+{"_e":"metro:client_log","_t":1783913946294,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783913946324,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:client_log","_t":1783913957521,"level":"error","data":["[ReferenceError: Property 'loadSettings' doesn't exist]"]}
+{"_e":"metro:client_log","_t":1783914033844,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783914033853,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:bundling:started","_t":1783914879261,"id":"a","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783914879262,"id":"a","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1783914879267,"id":"a","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1783914879376,"id":"a","total":1,"ms":114.124041}
+{"_e":"metro:client_log","_t":1783914881263,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783914881264,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:bundling:started","_t":1783915320050,"id":"c","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783915320050,"id":"c","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1783915320053,"id":"c","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1783915320134,"id":"c","total":1,"ms":84.291875}
+{"_e":"metro:client_log","_t":1783915322123,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783915322123,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:bundling:started","_t":1783915346223,"id":"d","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783915346223,"id":"d","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1783915346265,"id":"d","total":1,"ms":41.702375}
+{"_e":"metro:client_log","_t":1783915348077,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783915348145,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:client_log","_t":1783915488031,"level":"log","data":["Error fetching profile","[AxiosError: Network Error]"]}
+{"_e":"metro:client_log","_t":1783915516700,"level":"log","data":["Logout API error","[AxiosError: Network Error]"]}
+{"_e":"metro:client_log","_t":1783915518753,"level":"log","data":["Logout API error","[AxiosError: Network Error]"]}
+{"_e":"metro:client_log","_t":1783915518757,"level":"log","data":["Logout API error","[AxiosError: Network Error]"]}
+{"_e":"root:init","_t":1783915585672,"format":"v0-jsonl","version":"56.1.19"}
+{"_e":"env:mode","_t":1783915585673,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783915585674,"mode":"development","files":["../../../.env"],"env":{"EXPO_PUBLIC_APP_VERSION":"1.0.0","EXPO_PUBLIC_ENVIRONMENT":"development"}}
+{"_e":"devserver:start","_t":1783915585867,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783915586261,"serverRoot":"../../../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":true,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783915586730,"atlas":false,"workers":7,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783915592754,"id":"3","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783915592755,"id":"3","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1783915592758,"id":"3","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1783915592972,"id":"3","progress":0.010000000000000002,"total":1,"current":1}
+{"_e":"metro:bundling:progress","_t":1783915593072,"id":"3","progress":0.1111111111111111,"total":24,"current":8}
+{"_e":"metro:bundling:progress","_t":1783915593184,"id":"3","progress":0.1111111111111111,"total":51,"current":17}
+{"_e":"metro:bundling:progress","_t":1783915593287,"id":"3","progress":0.2177777777777778,"total":75,"current":35}
+{"_e":"metro:bundling:progress","_t":1783915593390,"id":"3","progress":0.31640625,"total":128,"current":72}
+{"_e":"metro:bundling:progress","_t":1783915593490,"id":"3","progress":0.31640625,"total":265,"current":105}
+{"_e":"metro:bundling:progress","_t":1783915593590,"id":"3","progress":0.31640625,"total":370,"current":148}
+{"_e":"metro:bundling:progress","_t":1783915593690,"id":"3","progress":0.31640625,"total":420,"current":189}
+{"_e":"metro:bundling:progress","_t":1783915593791,"id":"3","progress":0.31640625,"total":486,"current":241}
+{"_e":"metro:bundling:progress","_t":1783915593891,"id":"3","progress":0.3243573696145125,"total":525,"current":299}
+{"_e":"metro:bundling:progress","_t":1783915593991,"id":"3","progress":0.3588948586718766,"total":651,"current":390}
+{"_e":"metro:bundling:progress","_t":1783915594091,"id":"3","progress":0.3588948586718766,"total":895,"current":498}
+{"_e":"metro:bundling:progress","_t":1783915594192,"id":"3","progress":0.3588948586718766,"total":990,"current":583}
+{"_e":"metro:bundling:progress","_t":1783915594291,"id":"3","progress":0.39150495091327014,"total":1066,"current":667}
+{"_e":"metro:bundling:progress","_t":1783915594392,"id":"3","progress":0.4629358758472665,"total":1117,"current":760}
+{"_e":"metro:bundling:progress","_t":1783915594492,"id":"3","progress":0.4846129589230881,"total":1244,"current":866}
+{"_e":"metro:bundling:progress","_t":1783915594593,"id":"3","progress":0.4850888206192894,"total":1308,"current":911}
+{"_e":"metro:bundling:progress","_t":1783915594693,"id":"3","progress":0.5006634527089072,"total":1320,"current":934}
+{"_e":"metro:bundling:progress","_t":1783915594793,"id":"3","progress":0.5424719423428592,"total":1336,"current":984}
+{"_e":"metro:bundling:progress","_t":1783915594893,"id":"3","progress":0.595037025434864,"total":1356,"current":1046}
+{"_e":"metro:bundling:progress","_t":1783915594994,"id":"3","progress":0.6309623656368307,"total":1376,"current":1093}
+{"_e":"metro:bundling:progress","_t":1783915595094,"id":"3","progress":0.6625472653295124,"total":1403,"current":1142}
+{"_e":"metro:bundling:progress","_t":1783915595194,"id":"3","progress":0.6767696377005024,"total":1421,"current":1169}
+{"_e":"metro:bundling:progress","_t":1783915595294,"id":"3","progress":0.7157941490890731,"total":1429,"current":1209}
+{"_e":"metro:bundling:progress","_t":1783915595395,"id":"3","progress":0.7515916684315853,"total":1443,"current":1251}
+{"_e":"metro:bundling:progress","_t":1783915595527,"id":"3","progress":0.7611058263971462,"total":1450,"current":1265}
+{"_e":"metro:bundling:progress","_t":1783915595627,"id":"3","progress":0.7611058263971462,"total":1489,"current":1298}
+{"_e":"metro:bundling:progress","_t":1783915595727,"id":"3","progress":0.7611058263971462,"total":1521,"current":1321}
+{"_e":"metro:bundling:progress","_t":1783915595827,"id":"3","progress":0.7855363927114423,"total":1548,"current":1372}
+{"_e":"metro:bundling:progress","_t":1783915595927,"id":"3","progress":0.8274907627592444,"total":1583,"current":1440}
+{"_e":"metro:bundling:progress","_t":1783915596029,"id":"3","progress":0.8314155071122077,"total":1599,"current":1458}
+{"_e":"metro:bundling:progress","_t":1783915596130,"id":"3","progress":0.8412153261319584,"total":1630,"current":1495}
+{"_e":"metro:bundling:progress","_t":1783915596230,"id":"3","progress":0.8561632046331612,"total":1633,"current":1511}
+{"_e":"metro:bundling:progress","_t":1783915596330,"id":"3","progress":0.8811832082430013,"total":1648,"current":1547}
+{"_e":"metro:bundling:progress","_t":1783915596430,"id":"3","progress":0.8998069765102358,"total":1692,"current":1605}
+{"_e":"metro:bundling:progress","_t":1783915596530,"id":"3","progress":0.9304466658964156,"total":1723,"current":1662}
+{"_e":"metro:bundling:progress","_t":1783915596631,"id":"3","progress":0.9304466658964156,"total":1851,"current":1730}
+{"_e":"metro:bundling:progress","_t":1783915596731,"id":"3","progress":0.9304466658964156,"total":1908,"current":1815}
+{"_e":"metro:bundling:progress","_t":1783915596831,"id":"3","progress":0.9369057747217528,"total":1965,"current":1902}
+{"_e":"metro:bundling:progress","_t":1783915596931,"id":"3","progress":0.9949736194170006,"total":1987,"current":1982}
+{"_e":"metro:bundling:progress","_t":1783915597031,"id":"3","progress":0.999,"total":1988,"current":1988}
+{"_e":"metro:bundling:done","_t":1783915597105,"id":"3","total":1988,"ms":4350.919}
+{"_e":"metro:client_log","_t":1783915599222,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783915599222,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"root:init","_t":1783915870424,"format":"v0-jsonl","version":"56.1.19"}
+{"_e":"env:mode","_t":1783915870425,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783915870426,"mode":"development","files":["../../../.env"],"env":{"EXPO_PUBLIC_API_URL":"http://10.219.19.247:4000/api/v1","EXPO_PUBLIC_APP_VERSION":"1.0.0","EXPO_PUBLIC_ENVIRONMENT":"development"}}
+{"_e":"devserver:start","_t":1783915870619,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783915871004,"serverRoot":"../../../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":true,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783915871465,"atlas":false,"workers":7,"host":"::","port":8081}
+{"_e":"root:init","_t":1783915892434,"format":"v0-jsonl","version":"56.1.19"}
+{"_e":"env:mode","_t":1783915892434,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783915892435,"mode":"development","files":["../../../.env"],"env":{"EXPO_PUBLIC_API_URL":"http://10.219.19.247:4000/api/v1","EXPO_PUBLIC_APP_VERSION":"1.0.0","EXPO_PUBLIC_ENVIRONMENT":"development"}}
+{"_e":"devserver:start","_t":1783915892592,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783915892909,"serverRoot":"../../../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":true,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783915893271,"atlas":false,"workers":7,"host":"::","port":8081}
+{"_e":"metro:server_log","_t":1783916190472,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"root:init","_t":1783916312702,"format":"v0-jsonl","version":"56.1.19"}
+{"_e":"env:mode","_t":1783916312702,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783916312704,"mode":"development","files":["../../../.env"],"env":{"EXPO_PUBLIC_API_URL":"http://10.219.19.247:4000/api/v1","EXPO_PUBLIC_APP_VERSION":"1.0.0","EXPO_PUBLIC_ENVIRONMENT":"development"}}
+{"_e":"devserver:start","_t":1783916312896,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783916313413,"serverRoot":"../../../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":true,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783916313825,"atlas":false,"workers":7,"host":"::","port":8081}
+{"_e":"root:init","_t":1783916486588,"format":"v0-jsonl","version":"56.1.19"}
+{"_e":"env:mode","_t":1783916486588,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783916486590,"mode":"development","files":["../../../.env"],"env":{"EXPO_PUBLIC_API_URL":"http://10.0.2.2:4000/api/v1","EXPO_PUBLIC_APP_VERSION":"1.0.0","EXPO_PUBLIC_ENVIRONMENT":"development"}}
+{"_e":"devserver:start","_t":1783916489601,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783916489947,"serverRoot":"../../../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":true,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783916490322,"atlas":false,"workers":7,"host":"::1","port":8082}
+{"_e":"metro:bundling:started","_t":1783916497551,"id":"4","platform":"android","environment":null,"entry":"apps/mobile/node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:progress","_t":1783916497551,"id":"4","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1783916497553,"id":"4","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1783916497753,"id":"4","progress":0.010000000000000002,"total":1,"current":1}
+{"_e":"metro:bundling:progress","_t":1783916497855,"id":"4","progress":0.03515625,"total":32,"current":6}
+{"_e":"metro:bundling:progress","_t":1783916497974,"id":"4","progress":0.03515625,"total":43,"current":8}
+{"_e":"metro:bundling:progress","_t":1783916498094,"id":"4","progress":0.07438016528925619,"total":55,"current":15}
+{"_e":"metro:bundling:progress","_t":1783916498193,"id":"4","progress":0.15168975069252078,"total":95,"current":37}
+{"_e":"metro:bundling:progress","_t":1783916498293,"id":"4","progress":0.15168975069252078,"total":267,"current":66}
+{"_e":"metro:bundling:progress","_t":1783916498393,"id":"4","progress":0.15168975069252078,"total":458,"current":108}
+{"_e":"metro:bundling:progress","_t":1783916498493,"id":"4","progress":0.15168975069252078,"total":542,"current":169}
+{"_e":"metro:bundling:progress","_t":1783916498593,"id":"4","progress":0.15168975069252078,"total":619,"current":222}
+{"_e":"metro:bundling:progress","_t":1783916498693,"id":"4","progress":0.18968317174515237,"total":760,"current":331}
+{"_e":"metro:bundling:progress","_t":1783916498796,"id":"4","progress":0.22016913051161371,"total":861,"current":404}
+{"_e":"metro:bundling:progress","_t":1783916498898,"id":"4","progress":0.2896616588814544,"total":890,"current":479}
+{"_e":"metro:bundling:progress","_t":1783916498998,"id":"4","progress":0.3193648969168325,"total":929,"current":525}
+{"_e":"metro:bundling:progress","_t":1783916499098,"id":"4","progress":0.3463007133064314,"total":989,"current":582}
+{"_e":"metro:bundling:progress","_t":1783916499198,"id":"4","progress":0.37834537304280536,"total":1073,"current":660}
+{"_e":"metro:bundling:progress","_t":1783916499298,"id":"4","progress":0.4221006212032334,"total":1139,"current":740}
+{"_e":"metro:bundling:progress","_t":1783916499398,"id":"4","progress":0.458671922488902,"total":1165,"current":789}
+{"_e":"metro:bundling:progress","_t":1783916499499,"id":"4","progress":0.458671922488902,"total":1205,"current":808}
+{"_e":"metro:bundling:progress","_t":1783916499599,"id":"4","progress":0.46042080807738867,"total":1263,"current":857}
+{"_e":"metro:bundling:progress","_t":1783916499700,"id":"4","progress":0.482310584775709,"total":1342,"current":932}
+{"_e":"metro:bundling:progress","_t":1783916499800,"id":"4","progress":0.5369992360372301,"total":1381,"current":1012}
+{"_e":"metro:bundling:progress","_t":1783916499900,"id":"4","progress":0.5968616692808812,"total":1429,"current":1104}
+{"_e":"metro:bundling:progress","_t":1783916500001,"id":"4","progress":0.6548510082037505,"total":1452,"current":1175}
+{"_e":"metro:bundling:progress","_t":1783916500101,"id":"4","progress":0.680211183320097,"total":1495,"current":1233}
+{"_e":"metro:bundling:progress","_t":1783916500201,"id":"4","progress":0.6931478891197645,"total":1499,"current":1248}
+{"_e":"metro:bundling:progress","_t":1783916500301,"id":"4","progress":0.7239033210251719,"total":1515,"current":1289}
+{"_e":"metro:bundling:progress","_t":1783916500401,"id":"4","progress":0.7367453227017562,"total":1553,"current":1333}
+{"_e":"metro:bundling:progress","_t":1783916500502,"id":"4","progress":0.7732829428067522,"total":1575,"current":1385}
+{"_e":"metro:bundling:progress","_t":1783916500602,"id":"4","progress":0.7976722656249999,"total":1600,"current":1429}
+{"_e":"metro:bundling:progress","_t":1783916500702,"id":"4","progress":0.8075693937180425,"total":1628,"current":1463}
+{"_e":"metro:bundling:progress","_t":1783916500802,"id":"4","progress":0.829678529312229,"total":1638,"current":1492}
+{"_e":"metro:bundling:progress","_t":1783916500902,"id":"4","progress":0.829678529312229,"total":1696,"current":1536}
+{"_e":"metro:bundling:progress","_t":1783916501003,"id":"4","progress":0.8395673336938887,"total":1720,"current":1576}
+{"_e":"metro:bundling:progress","_t":1783916501106,"id":"4","progress":0.8581282666875012,"total":1738,"current":1610}
+{"_e":"metro:bundling:progress","_t":1783916501206,"id":"4","progress":0.8581282666875012,"total":1816,"current":1653}
+{"_e":"metro:bundling:progress","_t":1783916501306,"id":"4","progress":0.8665806851133312,"total":1838,"current":1711}
+{"_e":"metro:bundling:progress","_t":1783916501408,"id":"4","progress":0.880428824422331,"total":1848,"current":1734}
+{"_e":"metro:bundling:progress","_t":1783916501508,"id":"4","progress":0.9052691111320578,"total":1854,"current":1764}
+{"_e":"metro:bundling:progress","_t":1783916501611,"id":"4","progress":0.9433836211304187,"total":1915,"current":1860}
+{"_e":"metro:bundling:progress","_t":1783916501711,"id":"4","progress":0.9668947064228001,"total":1977,"current":1944}
+{"_e":"metro:bundling:progress","_t":1783916501811,"id":"4","progress":0.999,"total":1988,"current":1988}
+{"_e":"metro:bundling:done","_t":1783916501923,"id":"4","total":1988,"ms":4372.328875}
+{"_e":"metro:client_log","_t":1783916503028,"level":"log","data":["Starting font load..."]}
+{"_e":"metro:client_log","_t":1783916503069,"level":"log","data":["Fonts loaded successfully!"]}
+{"_e":"metro:client_log","_t":1783916553442,"level":"log","data":["Error fetching profile","[AxiosError: Network Error]"]}
+{"_e":"metro:client_log","_t":1783916575225,"level":"log","data":["Logout API error","[AxiosError: Request failed with status code 500]"]}
+{"_e":"metro:client_log","_t":1783916575735,"level":"log","data":["Logout API error","[AxiosError: Request failed with status code 500]"]}
+{"_e":"metro:server_log","_t":1783916832143,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783916832302,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783917283120,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783917283120,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783917858059,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783917858069,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783917990444,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783917990445,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783918347962,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783919126605,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783920159830,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783920159831,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783920323812,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783920323812,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783920737497,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783920848115,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}
+{"_e":"metro:server_log","_t":1783920848115,"level":"error","data":["[timeout] connection terminated with Device for app='%s' on device='%s' after not responding for %s seconds.","host.exp.exponent","sdk_gphone16k_arm64 - 17 - API 37","60"]}

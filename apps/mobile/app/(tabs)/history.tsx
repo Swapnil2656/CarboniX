@@ -47,8 +47,8 @@ export default function HistoryScreen() {
         setHistoryData(res.data);
         setSummary(res.summary);
       }
-    } catch (err) {
-      console.error('Failed to fetch history:', err);
+    } catch (err: any) {
+      console.error('Failed to fetch history:', err.response?.data || err.message || err);
     } finally {
       setLoading(false);
     }
@@ -260,9 +260,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20, backgroundColor: colors.surface,
     borderBottomWidth: 1, borderBottomColor: colors.outlineVariant,
   },
-  topBarLeft: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  logoImage: { width: 40, height: 40, resizeMode: 'contain' },
-  logo: { fontFamily: 'Inter-Bold', fontSize: 20, fontWeight: '900', color: colors.primary, letterSpacing: -0.5 },
+  topBarLeft: { flexDirection: 'row', alignItems: 'center' },
+  logoImage: { width: 56, height: 56, resizeMode: 'contain' },
+  logo: { fontFamily: 'Inter-Bold', fontSize: 20, fontWeight: '900', color: colors.primary, letterSpacing: -0.5, marginLeft: -8 },
   iconBtn: { padding: 8, borderRadius: 12 },
   content: { paddingHorizontal: 20, paddingVertical: 24, paddingBottom: 100, gap: 16 },
   header: { gap: 4 },

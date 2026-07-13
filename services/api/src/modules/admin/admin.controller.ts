@@ -103,6 +103,21 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
     // We do not currently track individual endpoint hits, so return empty array
     const topEndpoints: any[] = [];
 
+    // Fetch projects for the user to display in mobile/web dashboard
+    const projects = await prisma.project.findMany({
+      where: { id: { in: projectIds } },
+      select: {
+        id: true,
+        name: true,
+        region: true,
+        sdkConnected: true,
+        connectedAt: true,
+        lastPingAt: true,
+        createdAt: true
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
     const responseData = {
       totalApiCalls,
       activeSessions: activeSessions || 125, // fallback if no sessions
@@ -115,7 +130,8 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
         { provider: 'GCP', percent: 35 },
         { provider: 'Azure', percent: 20 }
       ],
-      liveApiStream: []
+      liveApiStream: [],
+      activeProjects: projects
     };
 
     try {

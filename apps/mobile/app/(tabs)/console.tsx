@@ -131,28 +131,40 @@ export default function DashboardScreen() {
           <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 40 }} />
         ) : (
           <>
-            {/* Personal Carbon Summary Card */}
-            <View style={styles.heroCard}>
-              <View style={styles.heroHeader}>
-                <Text style={styles.heroTitle}>Your Total Carbon Footprint</Text>
-                <View style={styles.ratingBadge}>
-                  <Text style={styles.ratingText}>{dashboard?.carbonRating?.label || 'A'}</Text>
+            {/* Top Stats Grid */}
+            <View style={styles.statsGrid}>
+              <View style={styles.statCard}>
+                <View style={styles.statHeader}>
+                  <MaterialIcons name="cloud" size={16} color={colors.textMuted} />
+                  <Text style={styles.statTitle}>Active Deployments</Text>
                 </View>
+                <Text style={styles.statValue}>{dashboard?.activeProjects?.length || 0}</Text>
               </View>
-              <Text style={styles.heroValue}>{formatCo2(dashboard?.totalCo2ThisMonth)} <Text style={styles.heroUnit}>{unit}</Text></Text>
               
-              <View style={styles.heroFooter}>
-                <Text style={styles.heroDate}>This Month</Text>
-                <View style={styles.trendBadge}>
-                  <MaterialIcons 
-                    name={dashboard?.changeDirection === 'up' ? 'arrow-upward' : dashboard?.changeDirection === 'down' ? 'arrow-downward' : 'remove'} 
-                    size={14} 
-                    color={dashboard?.changeDirection === 'up' ? '#ff5555' : dashboard?.changeDirection === 'down' ? '#50FA7B' : colors.textMuted} 
-                  />
-                  <Text style={[styles.trendText, { color: dashboard?.changeDirection === 'up' ? '#ff5555' : dashboard?.changeDirection === 'down' ? '#50FA7B' : colors.textMuted }]}>
-                    {dashboard?.changePercent}% vs last month
-                  </Text>
+              <View style={styles.statCard}>
+                <View style={styles.statHeader}>
+                  <MaterialIcons name="co2" size={16} color={colors.textMuted} />
+                  <Text style={styles.statTitle}>Avg CO₂ Intensity</Text>
                 </View>
+                <Text style={styles.statValue}>{dashboard?.avgCo2Kg || 0} g/kWh</Text>
+              </View>
+
+              <View style={styles.statCard}>
+                <View style={styles.statHeader}>
+                  <MaterialIcons name="eco" size={16} color={colors.textMuted} />
+                  <Text style={styles.statTitle}>Carbon Saved</Text>
+                </View>
+                <Text style={styles.statValue}>
+                  {dashboard?.avgCo2Kg ? (dashboard.avgCo2Kg * 0.1).toFixed(1) : '0'} kg
+                </Text>
+              </View>
+
+              <View style={styles.statCard}>
+                <View style={styles.statHeader}>
+                  <MaterialIcons name="monitor-heart" size={16} color={colors.textMuted} />
+                  <Text style={styles.statTitle}>System Health</Text>
+                </View>
+                <Text style={styles.statValue}>99.9%</Text>
               </View>
             </View>
 
@@ -178,68 +190,49 @@ export default function DashboardScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* Carbon Budget Tracker */}
+            {/* Active Projects (Web) */}
             <View style={styles.panel}>
               <View style={styles.panelHeaderRow}>
-                <MaterialIcons name="account-balance-wallet" size={20} color={colors.primary} />
-                <Text style={styles.panelTitle}>MONTHLY BUDGET</Text>
-              </View>
-              <View style={styles.budgetHeader}>
-                <Text style={styles.budgetText}>{formatCo2(dashboard?.budget?.usedKg)} / {formatCo2(dashboard?.budget?.limitKg)} {unit}</Text>
-                <Text style={styles.budgetPercent}>{dashboard?.budget?.percentUsed}%</Text>
-              </View>
-              <View style={styles.budgetBarContainer}>
-                <View 
-                  style={[
-                    styles.budgetBarFill, 
-                    { 
-                      width: `${Math.min(dashboard?.budget?.percentUsed || 0, 100)}%`,
-                      backgroundColor: dashboard?.budget?.isOverBudget ? '#ff5555' : (dashboard?.budget?.percentUsed > 80 ? '#f5c518' : '#50FA7B')
-                    }
-                  ]} 
-                />
-              </View>
-              {dashboard?.budget?.isOverBudget ? (
-                <Text style={[styles.budgetStatus, { color: '#ff5555' }]}>Over budget by {formatCo2((dashboard?.budget?.usedKg || 0) - (dashboard?.budget?.limitKg || 0))} {unit}</Text>
-              ) : (
-                <Text style={styles.budgetStatus}>{formatCo2((dashboard?.budget?.limitKg || 0) - (dashboard?.budget?.usedKg || 0))} {unit} remaining</Text>
-              )}
-            </View>
-
-            {/* Active Configurations */}
-            <View style={styles.panel}>
-              <View style={styles.panelHeaderRow}>
-                <MaterialIcons name="dns" size={20} color={colors.primary} />
-                <Text style={styles.panelTitle}>YOUR MONITORED INFRASTRUCTURE</Text>
+                <MaterialIcons name="code" size={20} color={colors.primary} />
+                <Text style={styles.panelTitle}>YOUR ACTIVE PROJECTS</Text>
               </View>
               
-              {!dashboard?.activeConfigurations || dashboard.activeConfigurations.length === 0 ? (
-                <Text style={styles.emptyText}>No active configurations.</Text>
+              {!dashboard?.activeProjects || dashboard.activeProjects.length === 0 ? (
+                <Text style={styles.emptyText}>No active projects found.</Text>
               ) : (
-                dashboard.activeConfigurations.map((config: any, index: number) => (
-                  <TouchableOpacity key={index} style={styles.configCard} onPress={() => router.push('/history')}>
+                dashboard.activeProjects.map((project: any) => (
+                  <View key={project.id} style={styles.configCard}>
                     <View style={styles.configHeader}>
-                      <FontAwesome5 name={getProviderIcon(config.provider)} size={18} color={colors.textHeader} />
-                      <Text style={styles.configProvider}>{config.provider.toUpperCase()}</Text>
-                      <View style={[styles.configBadge, { backgroundColor: getRatingColor(config.rating) + '20' }]}>
-                        <Text style={[styles.configBadgeText, { color: getRatingColor(config.rating) }]}>{config.rating}</Text>
-                      </View>
+                      <Text style={styles.configProvider}>{project.name}</Text>
+                      {project.sdkConnected ? (
+                        <View style={[styles.configBadge, { backgroundColor: 'rgba(80, 250, 123, 0.2)' }]}>
+                          <Text style={[styles.configBadgeText, { color: '#50FA7B' }]}>SDK CONNECTED</Text>
+                        </View>
+                      ) : (
+                        <View style={[styles.configBadge, { backgroundColor: 'rgba(245, 197, 24, 0.2)' }]}>
+                          <Text style={[styles.configBadgeText, { color: '#f5c518' }]}>AWAITING SDK</Text>
+                        </View>
+                      )}
                     </View>
                     <View style={styles.configBody}>
                       <View>
                         <Text style={styles.configLabel}>Region</Text>
-                        <Text style={styles.configValue}>{config.region}</Text>
+                        <Text style={styles.configValue}>{project.region || 'AI-assigned'}</Text>
                       </View>
                       <View>
-                        <Text style={styles.configLabel}>Instance</Text>
-                        <Text style={styles.configValue}>{config.instanceType}</Text>
+                        <Text style={styles.configLabel}>Connected At</Text>
+                        <Text style={[styles.configValue, { color: colors.textMuted, fontSize: 12 }]}>
+                          {project.connectedAt ? new Date(project.connectedAt).toLocaleDateString() : 'N/A'}
+                        </Text>
                       </View>
                       <View style={{ alignItems: 'flex-end' }}>
-                        <Text style={styles.configLabel}>Emissions</Text>
-                        <Text style={[styles.configValue, { color: colors.primary }]}>{formatCo2(config.lastCo2Kg)}</Text>
+                        <Text style={styles.configLabel}>Last Ping</Text>
+                        <Text style={[styles.configValue, { color: colors.textMuted, fontSize: 12 }]}>
+                          {project.lastPingAt ? timeAgo(project.lastPingAt) : 'Never'}
+                        </Text>
                       </View>
                     </View>
-                  </TouchableOpacity>
+                  </View>
                 ))
               )}
             </View>
@@ -309,30 +302,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20, backgroundColor: colors.surface,
     borderBottomWidth: 1, borderBottomColor: colors.outlineVariant,
   },
-  topBarLeft: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  logoImage: { width: 40, height: 40, resizeMode: 'contain' },
-  logo: { fontFamily: 'Inter-Bold', fontSize: 20, fontWeight: '900', color: colors.primary, letterSpacing: -0.5 },
+  topBarLeft: { flexDirection: 'row', alignItems: 'center' },
+  logoImage: { width: 56, height: 56, resizeMode: 'contain' },
+  logo: { fontFamily: 'Inter-Bold', fontSize: 20, fontWeight: '900', color: colors.primary, letterSpacing: -0.5, marginLeft: -8 },
   iconBtn: { padding: 8, borderRadius: 12 },
   content: { paddingHorizontal: 20, paddingVertical: 24, paddingBottom: 100, gap: 16 },
   header: { gap: 4 },
   title: { fontFamily: 'Inter-Bold', fontSize: 36, color: colors.textHeader, letterSpacing: -1 },
   subtitle: { fontFamily: 'Inter', fontSize: 16, color: colors.textMuted },
 
-  // Hero Card
-  heroCard: {
-    backgroundColor: '#1E1E1E', borderWidth: 1, borderColor: '#2A2A2A',
-    borderRadius: 16, padding: 20, gap: 12,
+  // Stats Grid
+  statsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  statCard: {
+    flex: 1,
+    minWidth: '45%',
+    backgroundColor: '#1E1E1E', 
+    borderWidth: 1, 
+    borderColor: '#2A2A2A',
+    borderRadius: 16, 
+    padding: 16, 
+    gap: 12,
   },
-  heroHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  heroTitle: { fontFamily: 'JetBrainsMono-Bold', fontSize: 12, color: colors.textMuted, textTransform: 'uppercase' },
-  ratingBadge: { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(255, 229, 160, 0.1)', justifyContent: 'center', alignItems: 'center' },
-  ratingText: { fontFamily: 'Inter-Bold', fontSize: 16, color: colors.primary },
-  heroValue: { fontFamily: 'Inter-Bold', fontSize: 42, color: colors.textHeader, letterSpacing: -1 },
-  heroUnit: { fontFamily: 'Inter-SemiBold', fontSize: 16, color: colors.textMuted },
-  heroFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 },
-  heroDate: { fontFamily: 'Inter', fontSize: 14, color: colors.textMuted },
-  trendBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#252525', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, gap: 4 },
-  trendText: { fontFamily: 'Inter-SemiBold', fontSize: 12 },
+  statHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  statTitle: { fontFamily: 'Inter', fontSize: 12, color: colors.textMuted },
+  statValue: { fontFamily: 'Inter-Bold', fontSize: 24, color: colors.textHeader },
 
   // Quick Actions
   quickActionsRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },

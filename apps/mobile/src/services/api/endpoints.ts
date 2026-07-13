@@ -23,7 +23,7 @@ export const carbonApi = {
     return response.data;
   },
   getDashboard: async () => {
-    const response = await apiClient.get('/carbon/dashboard');
+    const response = await apiClient.get('/admin/dashboard');
     return response.data;
   },
   getNotifications: async () => {

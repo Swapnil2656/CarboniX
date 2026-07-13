@@ -26,7 +26,7 @@ export default function CompareProvidersScreen() {
       const res = await referenceApi.getRegionsRanked(provider);
       if (res.data) {
         setRegions(res.data);
-        setRegion(res.data[0]?.regionName || '');
+        setRegion(res.data[0]?.code || '');
       }
     } catch (e) {
       console.log('Error fetching regions', e);
@@ -95,7 +95,7 @@ export default function CompareProvidersScreen() {
               <View style={styles.pickerWrapper}>
                 <Picker selectedValue={region} onValueChange={setRegion} style={styles.picker} dropdownIconColor={colors.textHeader}>
                   {regions.map((r: any) => (
-                    <Picker.Item key={r.regionName} label={r.regionName} value={r.regionName} />
+                    <Picker.Item key={r.code} label={r.name || r.code} value={r.code} />
                   ))}
                 </Picker>
               </View>
@@ -152,7 +152,7 @@ export default function CompareProvidersScreen() {
                       if (res.provider === 'azure') cardStyle = styles.cardAzure;
 
                       return (
-                        <View key={res.provider} style={[styles.card, cardStyle]}>
+                        <View key={`${res.provider}-${res.region}`} style={[styles.card, cardStyle]}>
                           <View>
                             <View style={styles.gcpTitleRow}>
                               <Text style={[styles.providerName, isWinner && { color: '#50FA7B' }]}>{res.provider.toUpperCase()}</Text>
@@ -189,7 +189,7 @@ export default function CompareProvidersScreen() {
                         const widthPct = Math.max(2, (res.co2KgMonth / worst.co2KgMonth) * 100);
 
                         return (
-                          <View key={`chart-${res.provider}`} style={styles.barGroup}>
+                          <View key={`chart-${res.provider}-${res.region}`} style={styles.barGroup}>
                             <View style={styles.barHeader}>
                               <Text style={[styles.barProvider, isWinner && { color: '#50FA7B' }]}>{res.provider.toUpperCase()}</Text>
                               <Text style={[styles.barVal, isWinner ? { color: '#50FA7B' } : { color: colors.textHeader }]}>{res.co2KgMonth.toFixed(1)}</Text>
@@ -225,9 +225,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20, backgroundColor: colors.surface,
     borderBottomWidth: 1, borderBottomColor: colors.outlineVariant,
   },
-  topBarLeft: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  logoImage: { width: 40, height: 40, resizeMode: 'contain' },
-  logo: { fontFamily: 'Inter-Bold', fontSize: 20, fontWeight: '900', color: colors.primary, letterSpacing: -0.5 },
+  topBarLeft: { flexDirection: 'row', alignItems: 'center' },
+  logoImage: { width: 56, height: 56, resizeMode: 'contain' },
+  logo: { fontFamily: 'Inter-Bold', fontSize: 20, fontWeight: '900', color: colors.primary, letterSpacing: -0.5, marginLeft: -8 },
   iconBtn: { padding: 8, borderRadius: 12 },
   main: { paddingHorizontal: 20, paddingVertical: 24, paddingBottom: 100, gap: 16 },
   header: { gap: 4 },
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   configCol: { flex: 1, gap: 4 },
   label: { fontFamily: 'JetBrainsMono-Bold', fontSize: 11, color: colors.textMuted, letterSpacing: 1 },
   pickerWrapper: { backgroundColor: '#252525', borderWidth: 1, borderColor: '#2A2A2A', borderRadius: 10, overflow: 'hidden' },
-  picker: { color: colors.textHeader, fontFamily: 'JetBrains Mono', height: 48 },
+  picker: { color: colors.textHeader, fontFamily: 'JetBrains Mono', minHeight: 52 },
   workloadBadge: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'rgba(255, 229, 160, 0.1)', padding: 12, borderRadius: 10, borderWidth: 1, borderColor: 'rgba(255, 229, 160, 0.2)' },
   workloadText: { fontFamily: 'Inter-SemiBold', fontSize: 12, color: colors.primary },
   primaryBtn: { backgroundColor: colors.primary, paddingVertical: 14, borderRadius: 10, alignItems: 'center' },

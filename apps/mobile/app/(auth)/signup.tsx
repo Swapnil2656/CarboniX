@@ -4,11 +4,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { colors } from '../../src/theme/colors';
 import { FormInput } from '../../src/components/FormInput';
-import { SocialButton } from '../../src/components/SocialButton';
 import { MaterialIcons } from '@expo/vector-icons';
 import { LOGO_SIZE, LOGO_GAP } from '../../src/constants/layout';
 
 import { useAuthStore } from '../../src/stores/auth.store';
+import { authApi } from '../../src/services/api/endpoints';
 
 export default function SignupScreen() {
   const insets = useSafeAreaInsets();
@@ -31,7 +31,7 @@ export default function SignupScreen() {
 
   const entropy = getEntropyState();
 
-  const handleSignup = () => {
+  const handleSignup = async () => {
     setError('');
     if (!name || !email || !password) {
       setError('Please fill in all fields.');
@@ -46,17 +46,27 @@ export default function SignupScreen() {
       return;
     }
     setIsLoading(true);
-    // Simulate signup
-    setTimeout(() => {
-      setAuth({ id: '2', email, name, type: 'user' }, 'mock-token');
-      router.replace('/(tabs)/config');
-    }, 1500);
+
+    try {
+      const response = await authApi.signup({ name, email, password });
+      if (response.success && response.data) {
+        const { user, token } = response.data;
+        setAuth({ id: user.id, email: user.email, name: user.name, type: 'user' }, token);
+        router.replace('/(tabs)/config');
+      } else {
+        setError(response.error || 'Signup failed.');
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.error || err.message || 'An error occurred during signup.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={[styles.abstractGlow, { width: windowWidth * 1.5, height: windowWidth * 1.5, borderRadius: windowWidth * 0.75, top: -(windowWidth * 0.5) }]} />
 
@@ -137,17 +147,6 @@ export default function SignupScreen() {
               )}
             </TouchableOpacity>
 
-            <View style={styles.dividerContainer}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>OR AUTH VIA</Text>
-              <View style={styles.dividerLine} />
-            </View>
-
-            <View style={styles.socialContainer}>
-              <SocialButton provider="google" title="Google" variant="brutalist" />
-              <View style={{ width: 16 }} />
-              <SocialButton provider="github" title="GitHub" variant="brutalist" />
-            </View>
           </View>
 
           <View style={styles.footer}>

@@ -5,10 +5,10 @@ import { useRouter } from 'expo-router';
 import { colors } from '../../src/theme/colors';
 import { FormInput } from '../../src/components/FormInput';
 import { NeonButton } from '../../src/components/NeonButton';
-import { SocialButton } from '../../src/components/SocialButton';
 import { LOGO_SIZE, LOGO_GAP } from '../../src/constants/layout';
 
 import { useAuthStore } from '../../src/stores/auth.store';
+import { authApi } from '../../src/services/api/endpoints';
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
@@ -20,7 +20,7 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setError('');
     if (!email || !password) {
       setError('Please fill in all fields.');
@@ -31,18 +31,27 @@ export default function LoginScreen() {
       return;
     }
     setIsLoading(true);
-    // Simulate login
-    setTimeout(() => {
-      setAuth({ id: '1', email, name: email.split('@')[0], type: 'user' }, 'mock-token');
-      // Navigate to main app
-      router.replace('/(tabs)/config');
-    }, 1500);
+    
+    try {
+      const response = await authApi.login({ email, password });
+      if (response.success && response.data) {
+        const { user, token } = response.data;
+        setAuth({ id: user.id, email: user.email, name: user.name, type: 'user' }, token);
+        router.replace('/(tabs)/config');
+      } else {
+        setError(response.error || 'Login failed.');
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.error || err.message || 'An error occurred during login.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       {/* Background Decor */}
       <View style={[styles.bgGlow1, { width: windowWidth * 0.8, height: windowWidth * 0.8, borderRadius: windowWidth * 0.4, top: -(windowWidth * 0.25), left: -(windowWidth * 0.15) }]} />
@@ -96,17 +105,6 @@ export default function LoginScreen() {
               buttonStyle={styles.loginButton}
             />
 
-            <View style={styles.dividerContainer}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or continue with</Text>
-              <View style={styles.dividerLine} />
-            </View>
-
-            <View style={styles.socialContainer}>
-              <SocialButton provider="github" title="GitHub" />
-              <View style={{ width: 16 }} />
-              <SocialButton provider="google" title="Google" />
-            </View>
           </View>
 
           <View style={styles.footer}>

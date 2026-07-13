@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity, Image, Alert, Linking, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MaterialIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import * as SecureStore from 'expo-secure-store';
 import { useRouter } from 'expo-router';
@@ -18,21 +18,11 @@ export default function SettingsScreen() {
   const [profile, setProfile] = useState<any>(null);
 
   // Notification Preferences
-  const [highEmissionAlerts, setHighEmissionAlerts] = useState(true);
-  const [weeklySummary, setWeeklySummary] = useState(false);
-  const [budgetAlerts, setBudgetAlerts] = useState(true);
-  const [greenTips, setGreenTips] = useState(true);
-
-  // Defaults
-  const [defaultProvider, setDefaultProvider] = useState('aws');
-  const [defaultRegion, setDefaultRegion] = useState('us-east-1');
-  const [budgetLimit, setBudgetLimit] = useState('100');
-
-  // Display
-  const [useLbs, setUseLbs] = useState(false);
+  const [emailAlerts, setEmailAlerts] = useState(true);
+  const [pushAlerts, setPushAlerts] = useState(false);
+  const [thresholdAlerts, setThresholdAlerts] = useState(true);
 
   useEffect(() => {
-    loadSettings();
     fetchProfile();
   }, []);
 
@@ -41,23 +31,22 @@ export default function SettingsScreen() {
       const res = await authApi.getProfile();
       if (res.success) {
         setProfile(res.data);
+        setEmailAlerts(res.data.emailAlerts ?? true);
+        setPushAlerts(res.data.pushAlerts ?? false);
+        setThresholdAlerts(res.data.thresholdAlerts ?? true);
       }
     } catch (e) {
       console.error('Error fetching profile', e);
     }
   };
 
-  const loadSettings = async () => {
+  const updateSetting = async (key: string, value: boolean) => {
     try {
-      const savedProvider = await SecureStore.getItemAsync('defaultProvider');
-      const savedRegion = await SecureStore.getItemAsync('defaultRegion');
-      const savedBudget = await SecureStore.getItemAsync('budgetLimit');
-      const savedLbs = await SecureStore.getItemAsync('useLbs');
-      
-      if (savedProvider) setDefaultProvider(savedProvider);
-      if (savedRegion) setDefaultRegion(savedRegion);
-      if (savedBudget) setBudgetLimit(savedBudget);
-      if (savedLbs) setUseLbs(savedLbs === 'true');
+      if (key === 'emailAlerts') setEmailAlerts(value);
+      if (key === 'pushAlerts') setPushAlerts(value);
+      if (key === 'thresholdAlerts') setThresholdAlerts(value);
+
+      await authApi.updateProfile({ [key]: value });
     } catch (e) {
       console.error('Error loading settings', e);
     }
@@ -70,7 +59,7 @@ export default function SettingsScreen() {
       console.error('Logout API error', e);
     } finally {
       await clearAuth();
-      router.replace('/login');
+      router.replace('/(auth)/login');
     }
   };
 
@@ -98,13 +87,15 @@ export default function SettingsScreen() {
         <View style={styles.profileCard}>
           <View style={styles.avatarContainer}>
             <Text style={styles.avatarText}>
-              {user?.name ? user.name.substring(0, 2).toUpperCase() : 'ME'}
+              {profile?.name ? profile.name.substring(0, 2).toUpperCase() : (user?.name ? user.name.substring(0, 2).toUpperCase() : 'ME')}
             </Text>
           </View>
           <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>{user?.name || 'User Name'}</Text>
-            <Text style={styles.profileEmail}>{user?.email || 'user@example.com'}</Text>
-            <Text style={styles.profileDate}>Member since June 2026</Text>
+            <Text style={styles.profileName}>{profile?.name || user?.name || 'User Name'}</Text>
+            <Text style={styles.profileEmail}>{profile?.email || user?.email || 'user@example.com'}</Text>
+            <Text style={styles.profileDate}>
+              Member since {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'June 2026'}
+            </Text>
           </View>
           <View style={styles.ratingBadge}>
             <Text style={styles.ratingText}>{profile?.carbonRating || 'A'}</Text>
@@ -120,14 +111,14 @@ export default function SettingsScreen() {
 
           <View style={styles.settingRow}>
             <View style={{ flex: 1, paddingRight: 16 }}>
-              <Text style={styles.settingLabel}>High Emission Alerts</Text>
-              <Text style={styles.settingDesc}>Notify when calculation exceeds 50 kg CO₂</Text>
+              <Text style={styles.settingLabel}>Email Alerts</Text>
+              <Text style={styles.settingDesc}>Receive important notifications via email</Text>
             </View>
             <Switch
-              value={highEmissionAlerts}
-              onValueChange={setHighEmissionAlerts}
+              value={emailAlerts}
+              onValueChange={(val) => updateSetting('emailAlerts', val)}
               trackColor={{ false: '#2A2A2A', true: 'rgba(255, 229, 160, 0.4)' }}
-              thumbColor={highEmissionAlerts ? colors.primary : colors.textMuted}
+              thumbColor={emailAlerts ? colors.primary : colors.textMuted}
             />
           </View>
 
@@ -135,14 +126,14 @@ export default function SettingsScreen() {
 
           <View style={styles.settingRow}>
             <View style={{ flex: 1, paddingRight: 16 }}>
-              <Text style={styles.settingLabel}>Weekly Summary</Text>
-              <Text style={styles.settingDesc}>Receive a carbon footprint digest every Monday</Text>
+              <Text style={styles.settingLabel}>Push Alerts</Text>
+              <Text style={styles.settingDesc}>Receive real-time push notifications on this device</Text>
             </View>
             <Switch
-              value={weeklySummary}
-              onValueChange={setWeeklySummary}
+              value={pushAlerts}
+              onValueChange={(val) => updateSetting('pushAlerts', val)}
               trackColor={{ false: '#2A2A2A', true: 'rgba(255, 229, 160, 0.4)' }}
-              thumbColor={weeklySummary ? colors.primary : colors.textMuted}
+              thumbColor={pushAlerts ? colors.primary : colors.textMuted}
             />
           </View>
 
@@ -150,130 +141,19 @@ export default function SettingsScreen() {
 
           <View style={styles.settingRow}>
             <View style={{ flex: 1, paddingRight: 16 }}>
-              <Text style={styles.settingLabel}>Budget Alerts</Text>
-              <Text style={styles.settingDesc}>Notify when monthly carbon budget reaches 80%</Text>
+              <Text style={styles.settingLabel}>Threshold Alerts</Text>
+              <Text style={styles.settingDesc}>Notify when approaching carbon budgets</Text>
             </View>
             <Switch
-              value={budgetAlerts}
-              onValueChange={setBudgetAlerts}
+              value={thresholdAlerts}
+              onValueChange={(val) => updateSetting('thresholdAlerts', val)}
               trackColor={{ false: '#2A2A2A', true: 'rgba(255, 229, 160, 0.4)' }}
-              thumbColor={budgetAlerts ? colors.primary : colors.textMuted}
-            />
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.settingRow}>
-            <View style={{ flex: 1, paddingRight: 16 }}>
-              <Text style={styles.settingLabel}>Green Region Tips</Text>
-              <Text style={styles.settingDesc}>Get notified about cleaner region alternatives</Text>
-            </View>
-            <Switch
-              value={greenTips}
-              onValueChange={setGreenTips}
-              trackColor={{ false: '#2A2A2A', true: 'rgba(255, 229, 160, 0.4)' }}
-              thumbColor={greenTips ? colors.primary : colors.textMuted}
+              thumbColor={thresholdAlerts ? colors.primary : colors.textMuted}
             />
           </View>
         </View>
 
-        {/* Default Configuration */}
-        <View style={styles.panel}>
-          <View style={styles.panelHeaderRow}>
-            <MaterialIcons name="settings-applications" size={20} color={colors.primary} />
-            <Text style={styles.panelTitle}>DEFAULTS</Text>
-          </View>
-          
-          <View style={styles.settingRowCol}>
-            <View style={{ marginBottom: 8 }}>
-              <Text style={styles.settingLabel}>Default Cloud Provider</Text>
-            </View>
-            <View style={styles.pickerWrapperFull}>
-              <Picker
-                selectedValue={defaultProvider}
-                onValueChange={(val) => { setDefaultProvider(val); saveSetting('defaultProvider', val); }}
-                style={styles.picker}
-                dropdownIconColor={colors.textMuted}
-              >
-                <Picker.Item label="AWS" value="aws" />
-                <Picker.Item label="GCP" value="gcp" />
-                <Picker.Item label="Azure" value="azure" />
-              </Picker>
-            </View>
-          </View>
 
-          <View style={styles.divider} />
-
-          <View style={styles.settingRowCol}>
-            <View style={{ marginBottom: 8 }}>
-              <Text style={styles.settingLabel}>Default Region</Text>
-            </View>
-            <View style={styles.pickerWrapperFull}>
-              <Picker
-                selectedValue={defaultRegion}
-                onValueChange={(val) => { setDefaultRegion(val); saveSetting('defaultRegion', val); }}
-                style={styles.picker}
-                dropdownIconColor={colors.textMuted}
-              >
-                <Picker.Item label="us-east-1" value="us-east-1" />
-                <Picker.Item label="eu-west-1" value="eu-west-1" />
-                <Picker.Item label="ap-south-1" value="ap-south-1" />
-                <Picker.Item label="eu-north-1" value="eu-north-1" />
-              </Picker>
-            </View>
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.settingRowCol}>
-            <View style={{ marginBottom: 8 }}>
-              <Text style={styles.settingLabel}>Carbon Budget (kg CO₂/mo)</Text>
-            </View>
-            <TextInput
-              style={styles.input}
-              value={budgetLimit}
-              onChangeText={(val) => { setBudgetLimit(val); saveSetting('budgetLimit', val); }}
-              keyboardType="numeric"
-              placeholderTextColor={colors.textMuted}
-            />
-          </View>
-        </View>
-
-        {/* Appearance */}
-        <View style={styles.panel}>
-          <View style={styles.panelHeaderRow}>
-            <MaterialIcons name="palette" size={20} color={colors.primary} />
-            <Text style={styles.panelTitle}>DISPLAY</Text>
-          </View>
-
-          <View style={styles.settingRow}>
-            <View style={{ flex: 1, paddingRight: 16 }}>
-              <Text style={styles.settingLabel}>Use Imperial Units (lbs)</Text>
-              <Text style={styles.settingDesc}>Display CO₂ in pounds instead of kilograms</Text>
-            </View>
-            <Switch
-              value={useLbs}
-              onValueChange={(val) => { setUseLbs(val); saveSetting('useLbs', val ? 'true' : 'false'); }}
-              trackColor={{ false: '#2A2A2A', true: 'rgba(255, 229, 160, 0.4)' }}
-              thumbColor={useLbs ? colors.primary : colors.textMuted}
-            />
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.settingRow}>
-            <View style={{ flex: 1, paddingRight: 16 }}>
-              <Text style={styles.settingLabel}>Light Theme</Text>
-              <Text style={styles.settingDesc}>Coming soon</Text>
-            </View>
-            <Switch
-              value={false}
-              disabled
-              trackColor={{ false: '#1A1A1A', true: 'rgba(255, 229, 160, 0.4)' }}
-              thumbColor={'#333'}
-            />
-          </View>
-        </View>
 
         {/* About & Support */}
         <View style={styles.panel}>
@@ -282,23 +162,16 @@ export default function SettingsScreen() {
             <Text style={styles.panelTitle}>ABOUT</Text>
           </View>
 
-          <TouchableOpacity style={styles.linkRow} onPress={() => Linking.openURL('https://carbonix.example.com/docs')}>
+          <TouchableOpacity style={styles.linkRow} onPress={() => Linking.openURL('http://10.0.2.2:3000/docs')}>
             <Text style={styles.linkText}>View Documentation</Text>
             <MaterialIcons name="open-in-new" size={16} color={colors.textMuted} />
           </TouchableOpacity>
 
           <View style={styles.divider} />
 
-          <TouchableOpacity style={styles.linkRow} onPress={() => Linking.openURL('mailto:support@carbonix.example.com')}>
+          <TouchableOpacity style={styles.linkRow} onPress={() => Linking.openURL('mailto:swapnilsen2656@gmail.com')}>
             <Text style={styles.linkText}>Report a Bug</Text>
             <MaterialIcons name="mail-outline" size={16} color={colors.textMuted} />
-          </TouchableOpacity>
-
-          <View style={styles.divider} />
-
-          <TouchableOpacity style={styles.linkRow}>
-            <Text style={styles.linkText}>Rate the App</Text>
-            <MaterialIcons name="star-rate" size={16} color={colors.textMuted} />
           </TouchableOpacity>
         </View>
 
@@ -334,12 +207,11 @@ const styles = StyleSheet.create({
   },
   topBarLeft: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
+    alignItems: 'center'
   },
   logoImage: {
-    width: 40,
-    height: 40,
+    width: 56,
+    height: 56,
     resizeMode: 'contain',
   },
   logo: {
@@ -348,6 +220,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: colors.primary,
     letterSpacing: -0.5,
+    marginLeft: -8
   },
   content: {
     paddingHorizontal: 20,
@@ -453,36 +326,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2A2A2A',
     borderRadius: 12,
   },
-  settingRowCol: {
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    alignItems: 'stretch',
-  },
-  pickerWrapperFull: {
-    width: '100%',
-    backgroundColor: '#0F0F0F',
-    borderWidth: 1,
-    borderColor: '#2A2A2A',
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  picker: {
-    color: colors.textHeader,
-    fontFamily: 'JetBrains Mono',
-    height: 52,
-    width: '100%',
-  },
-  input: {
-    backgroundColor: '#0F0F0F',
-    borderWidth: 1,
-    borderColor: '#2A2A2A',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    color: colors.textHeader,
-    fontFamily: 'JetBrains Mono',
-    fontSize: 16,
-  },
+
   linkRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
