@@ -143,7 +143,7 @@ function detectProvider(envVars: Record<string, string>): string {
   if (process.env.RAILWAY_ENVIRONMENT  || envVars.RAILWAY_ENVIRONMENT)   return 'railway';
   if (process.env.RENDER               || envVars.RENDER)                return 'render';
   if (process.env.GOOGLE_CLOUD_PROJECT || envVars.GOOGLE_CLOUD_PROJECT)  return 'gcp';
-  if (process.env.ARM_REGION           || envVars.AZURE_REGION)          return 'azure';
+  if (process.env.ARM_REGION           || envVars.ARM_REGION || process.env.AZURE_REGION || envVars.AZURE_REGION) return 'azure';
   return 'aws';
 }
 

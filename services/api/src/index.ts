@@ -28,6 +28,8 @@ app.use(cors());
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(express.json());
 
+app.use((req, res, next) => { console.log('[API REQUEST]', req.method, req.url, req.headers.authorization ? 'HasAuth' : 'NoAuth'); const oldSend = res.send.bind(res); res.send = function(data?: any) { console.log('[API RESPONSE]', res.statusCode, data); return oldSend(data); }; next(); });
+
 app.get('/api/v1/health', (req, res) => {
   res.json({ message: 'CarboniX API is running!', agents: true, mockMode: USE_MOCK });
 });
@@ -196,6 +198,3 @@ app.listen(port, '0.0.0.0', () => {
 // Trigger restart
 
 // Trigger restart 2
-
-
-app.use((req, res, next) => { console.log('[API REQUEST]', req.method, req.url, req.headers.authorization ? 'HasAuth' : 'NoAuth'); const oldSend = res.send.bind(res); res.send = function(data?: any) { console.log('[API RESPONSE]', res.statusCode, data); return oldSend(data); }; next(); });
