@@ -21,7 +21,13 @@ export const getHistory = async (req: AuthRequest, res: Response) => {
     }
 
     const cacheKey = `history:${userId}:${JSON.stringify(req.query)}`;
-    const cached = await redis.get(cacheKey);
+    let cached = null;
+    try {
+      cached = await redis.get(cacheKey);
+    } catch (e) {
+      console.warn('[REDIS] Cache read failed, falling back to DB');
+    }
+    
     if (cached) {
       return res.json({ success: true, data: JSON.parse(cached).data, summary: JSON.parse(cached).summary, cached: true });
     }
@@ -63,7 +69,11 @@ export const getHistory = async (req: AuthRequest, res: Response) => {
       topProvider
     };
 
-    await redis.setex(cacheKey, 60, JSON.stringify({ data: enhancedHistory, summary }));
+    try {
+      await redis.setex(cacheKey, 60, JSON.stringify({ data: enhancedHistory, summary }));
+    } catch (e) {
+      console.warn('[REDIS] Cache write failed');
+    }
 
     res.json({ success: true, data: enhancedHistory, summary });
   } catch (error: any) {
@@ -84,11 +94,15 @@ export const deleteCalculation = async (req: AuthRequest, res: Response) => {
     await prisma.calculation.delete({ where: { id } });
 
     // Invalidate history cache
-    const keys = await redis.keys(`history:${userId}:*`);
-    if (keys.length > 0) {
-      await redis.del(...keys);
+    try {
+      const keys = await redis.keys(`history:${userId}:*`);
+      if (keys.length > 0) {
+        await redis.del(...keys);
+      }
+      await redis.del(`history:${userId}`);
+    } catch (e) {
+      console.warn('[REDIS] Cache invalidation failed');
     }
-    await redis.del(`history:${userId}`);
 
     res.json({ success: true });
   } catch (error: any) {

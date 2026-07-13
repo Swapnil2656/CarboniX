@@ -188,13 +188,21 @@ cron.schedule('0 0 1 * *', async () => {
   }
 });
 
-app.listen(port, '0.0.0.0', () => {
+const server = app.listen(port, '0.0.0.0', () => {
   console.log(`Server is running on port ${port}`);
   console.log(`Agent mock mode: ${USE_MOCK ? 'ON (static data)' : 'OFF (live CloudWatch)'}`);
   console.log(`Cron: Collector+Analyst every hour, Reporter on 1st of month`);
 });
 
+const gracefulShutdown = async (signal: string) => {
+  console.log(`${signal} signal received: closing HTTP server`);
+  server.close(async () => {
+    console.log('HTTP server closed');
+    await prisma.$disconnect();
+    console.log('Prisma disconnected');
+    process.exit(0);
+  });
+};
 
-// Trigger restart
-
-// Trigger restart 2
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
