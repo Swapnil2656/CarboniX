@@ -6,7 +6,8 @@
     "dev": "rm -rf .next && dotenv -e ../../.env -- next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "echo No lint"
+    "lint": "echo No lint",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
