@@ -23,7 +23,8 @@ function InviteContent() {
     
     try {
       // Direct fetch since this is public unauthenticated endpoint
-      const res = await fetch('http://localhost:4000/api/v1/public/accept-invite', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+      const res = await fetch(`${apiUrl}/public/accept-invite`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
