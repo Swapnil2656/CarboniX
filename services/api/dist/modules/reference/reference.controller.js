@@ -70,7 +70,7 @@ const getRegionsRanked = async (req, res) => {
                 country: r.country,
                 gridIntensity,
                 category,
-                // We omit estimatedCo2Kg here as it requires full calculate params
+                // We omit estimatedCo2Kg here as it requires full calculate params 
                 // (which can be added later if UI passes them)
             };
         }));

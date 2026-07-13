@@ -14,19 +14,24 @@ async function calculateCarbon(input) {
     }
     const cpuTdpWatts = instance.cpuTdpWatts;
     const memoryGb = input.ramGb || instance.memoryGb;
+    // Fallbacks to prevent NaN
+    const cpuUtil = input.cpuUtilization ?? 1.0;
+    const storage = input.storageGb || 0;
+    const count = input.instanceCount || 1;
+    const hours = input.hoursPerMonth || 730;
     // Master Formulas:
     // CPU Energy = CPU TDP (Watts) × utilization% × hours × instance_count / 1000
-    const cpuEnergyKwh = (cpuTdpWatts * input.cpuUtilization * input.hoursPerMonth * input.instanceCount) / 1000;
+    const cpuEnergyKwh = (cpuTdpWatts * cpuUtil * hours * count) / 1000;
     // Memory Energy = RAM (GB) × 0.00038 kW/GB × hours × instance_count
-    // 0.38 W/GB / 1000 = 0.00038
-    const memoryEnergyKwh = memoryGb * 0.00038 * input.hoursPerMonth * input.instanceCount;
+    const memoryEnergyKwh = memoryGb * 0.00038 * hours * count;
     // Storage Energy = Disk (GB) × 0.0016 W/GB × hours × instance_count / 1000
     // 0.0016 W/GB / 1000 = 0.0000016 kW/GB
-    const storageEnergyKwh = input.storageGb * 0.0000016 * input.hoursPerMonth * input.instanceCount;
+    const storageEnergyKwh = storage * 0.0000016 * hours * count;
     const totalItEnergyKwh = cpuEnergyKwh + memoryEnergyKwh + storageEnergyKwh;
-    const pue = (0, gridCache_1.getProviderPue)(provider, input.region);
+    const region = input.region.toLowerCase();
+    const pue = (0, gridCache_1.getProviderPue)(provider, region);
     const totalFinalEnergyKwh = totalItEnergyKwh * pue;
-    const gridIntensity = await (0, gridCache_1.getGridIntensity)(input.region);
+    const gridIntensity = await (0, gridCache_1.getGridIntensity)(region);
     const co2GramsMonth = totalFinalEnergyKwh * gridIntensity;
     const co2KgMonth = co2GramsMonth / 1000;
     const co2GramsHour = co2GramsMonth / input.hoursPerMonth;

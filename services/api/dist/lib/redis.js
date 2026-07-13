@@ -8,6 +8,7 @@ const ioredis_1 = __importDefault(require("ioredis"));
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 const globalForRedis = global;
 exports.redis = globalForRedis.redisClient || new ioredis_1.default(REDIS_URL, {
+    lazyConnect: true,
     maxRetriesPerRequest: 1,
     enableOfflineQueue: false,
     retryStrategy: (times) => {

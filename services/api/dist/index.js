@@ -20,12 +20,13 @@ const agents_3 = require("@carbonix/agents");
 const prisma_1 = require("./lib/prisma");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-const port = parseInt(process.env.PORT || "4000", 10);
+const port = Number(process.env.PORT) || 4000;
 const USE_MOCK = process.env.USE_MOCK_AGENTS !== 'false';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 app.use((0, cors_1.default)());
 app.use((0, helmet_1.default)({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(express_1.default.json());
+app.use((req, res, next) => { console.log('[API REQUEST]', req.method, req.url, req.headers.authorization ? 'HasAuth' : 'NoAuth'); const oldSend = res.send.bind(res); res.send = function (data) { console.log('[API RESPONSE]', res.statusCode, data); return oldSend(data); }; next(); });
 app.get('/api/v1/health', (req, res) => {
     res.json({ message: 'CarboniX API is running!', agents: true, mockMode: USE_MOCK });
 });
@@ -172,4 +173,3 @@ app.listen(port, '0.0.0.0', () => {
 });
 // Trigger restart
 // Trigger restart 2
-app.use((req, res, next) => { console.log('[API REQUEST]', req.method, req.url, req.headers.authorization ? 'HasAuth' : 'NoAuth'); const oldSend = res.send; res.send = function (data) { console.log('[API RESPONSE]', res.statusCode, data); return oldSend.call(res, data); }; next(); });
