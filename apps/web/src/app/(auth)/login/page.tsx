@@ -1,6 +1,5 @@
 "use client";
 
-import { signInUser } from "@/lib/carbonix-auth/auth-actions";
 import { signInSchema } from "@/lib/carbonix-auth/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -11,6 +10,7 @@ import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { MagicDust } from "@/components/ui/magic-dust-shader";
+import { signIn } from "next-auth/react";
 
 type FormData = z.infer<typeof signInSchema>;
 
@@ -28,16 +28,29 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     try {
-      const result = await signInUser(data);
-      if (result?.error) {
-        setError(result.error);
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+
+      if (!result) {
+        setError("An unexpected error occurred. Please try again.");
         setLoading(false);
-      } else {
-        router.push("/login/confirm");
+        return;
       }
+
+      if (result.error) {
+        setError("Invalid email or password. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      // Success — navigate to confirm page which will redirect based on role
+      router.push("/login/confirm");
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || "An unexpected server error occurred.");
+      console.error("Sign in error:", err);
+      setError(err.message || "An unexpected error occurred.");
       setLoading(false);
     }
   };
