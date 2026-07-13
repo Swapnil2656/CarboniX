@@ -1,9 +1,18 @@
-import { NextResponse } from "next/server";
-import { auth } from "./auth";
+import { NextResponse, NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 import { authConfig } from "./carbonix-auth.config";
 
-export default auth((req) => {
-  const token = req.auth;
+export async function middleware(req: NextRequest) {
+  // Auth.js v5 uses specific cookie names based on the protocol
+  const useSecureCookies = req.nextUrl.protocol === "https:";
+  const cookieName = useSecureCookies ? "__Secure-authjs.session-token" : "authjs.session-token";
+  
+  const token = await getToken({ 
+    req, 
+    secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
+    salt: cookieName 
+  });
+  
   const { pathname } = req.nextUrl;
 
   // ── Unauthenticated access to protected route ──────────────────────────────
@@ -23,7 +32,7 @@ export default auth((req) => {
   // ── Onboarding Guard ───────────────────────────────────────────────────────
   if (
     token && 
-    !token.user?.isOnboarded && 
+    !token.isOnboarded && 
     pathname !== "/" &&
     !pathname.startsWith('/onboarding') && 
     !pathname.startsWith('/api/onboarding')
@@ -35,12 +44,12 @@ export default auth((req) => {
   const authRoutes = ["/login", "/signup", "/analyst/signup", "/content_editor/signup"];
   if (token && authRoutes.includes(pathname)) {
     // If they are on an auth page like /login but they are logged in, send them to dashboard
-    const destination = authConfig.roleRedirects[token.user?.type as string] ?? authConfig.defaultRedirect;
+    const destination = authConfig.roleRedirects[token.type as string] ?? authConfig.defaultRedirect;
     return NextResponse.redirect(new URL(destination, req.url));
   }
 
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico|.*\\.png$|.*\\.apk$).*)"],
