@@ -2,7 +2,7 @@
   <img width="100%" alt="Carbonix Cover" src="https://github.com/user-attachments/assets/c698b2cd-da84-4cb0-9276-125c6a7244aa" />
 </div>
 
-# 🚀 Carbonix
+# 🚀 CarboniX
 
 > **Postman for sustainability APIs** — a mobile-first developer tool that tells you the carbon cost of your cloud infrastructure and exposes it as an open API any developer can build on.
 

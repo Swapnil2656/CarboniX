@@ -10,13 +10,13 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Tell webpack to NOT bundle these server-only native modules.
-  // Without this, you get: "Cannot read properties of undefined (reading 'call')"
-  serverExternalPackages: ["@prisma/client", "bcrypt-ts", "jsonwebtoken"],
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb',
     },
+    // Next.js 14: tell webpack NOT to bundle these native Node.js packages.
+    // Prevents "Cannot read properties of undefined (reading 'call')" errors.
+    serverComponentsExternalPackages: ["@prisma/client", "bcrypt-ts", "jsonwebtoken"],
   },
 };
 
