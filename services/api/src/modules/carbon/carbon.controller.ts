@@ -252,6 +252,12 @@ export const calculateEmissions = async (req: Request, res: Response) => {
 export const verifyKey = async (req: ApiKeyRequest, res: Response) => {
   try {
     // If the middleware passed, the key is valid.
+    if (req.apiKey?.projectId) {
+      await prisma.project.update({
+        where: { id: req.apiKey.projectId },
+        data: { sdkConnected: true, lastPingAt: new Date() }
+      });
+    }
     res.json({ success: true, message: 'Key is valid', apiKey: req.apiKey });
   } catch (error: any) {
     res.status(500).json({ success: false, error: 'Internal server error' });
@@ -278,6 +284,14 @@ export const ingestTelemetry = async (req: ApiKeyRequest, res: Response) => {
 
     const result = await calculateCarbon(input);
     
+    // Update the project's sdkConnected status
+    if (req.apiKey?.projectId) {
+      await prisma.project.update({
+        where: { id: req.apiKey.projectId },
+        data: { sdkConnected: true, lastPingAt: new Date() }
+      });
+    }
+
     // Create the EmissionRecord
     const record = await prisma.emissionRecord.create({
       data: {
