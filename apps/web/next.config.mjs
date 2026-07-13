@@ -1,5 +1,6 @@
 import path from "path";
 import { fileURLToPath } from "url";
+import { PrismaPlugin } from "@prisma/nextjs-monorepo-workaround-plugin";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -15,12 +16,12 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '10mb',
     },
-    outputFileTracingIncludes: {
-      '/**': [
-        './src/generated/prisma/**/*.node',
-        './node_modules/.prisma/client/**/*.node',
-      ],
-    },
+  },
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.plugins = [...config.plugins, new PrismaPlugin()];
+    }
+    return config;
   },
 };
 
