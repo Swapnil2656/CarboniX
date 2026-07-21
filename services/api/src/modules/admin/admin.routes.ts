@@ -16,7 +16,10 @@ import {
   getEmissions,
   migrateEmission,
   getNotifications,
-  getAuditLogs
+  getAuditLogs,
+  deleteProject,
+  disconnectProject,
+  getProjectStats
 } from './admin.controller';
 
 const router = Router();
@@ -29,6 +32,9 @@ router.post('/emissions/:id/migrate', migrateEmission);
 router.get('/notifications', getNotifications);
 router.get('/audit-logs', getAuditLogs);
 router.get('/users', getUsers);
+router.delete('/projects/:id', deleteProject);
+router.post('/projects/:id/disconnect', disconnectProject);
+router.get('/projects/:id/stats', getProjectStats);
 router.delete('/users/:id', removeTeamMember);
 router.post('/users/sync', syncTeamMembers);
 router.post('/users/invite', inviteUser);

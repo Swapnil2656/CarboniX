@@ -485,6 +485,8 @@ enum AgentRunStatus {
 
 model AgentRun {
   id          String         @id @default(cuid())
+  projectId   String?
+  project     Project?       @relation(fields: [projectId], references: [id], onDelete: Cascade)
   agentType   AgentType
   status      AgentRunStatus @default(RUNNING)
   triggeredBy String         @default("cron") // "cron" | "manual" | "webhook"
@@ -507,8 +509,10 @@ model AgentRun {
 }
 
 model EmissionRecord {
-  id         String  @id @default(cuid())
+  id         String   @id @default(cuid())
   agentRunId String? // Links to the AgentRun that created this
+  projectId  String?
+  project    Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   // Instance identification
   instanceId   String // e.g., "i-0abc123def" or mock ID
@@ -570,16 +574,24 @@ model User {
 }
 
 model Project {
-  id           String    @id @default(cuid())
-  name         String
-  region       String?
-  sdkConnected Boolean   @default(false)
-  connectedAt  DateTime?
-  lastPingAt   DateTime?
-  userId       String
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id             String         @id @default(cuid())
+  name           String
+  region         String?
+  provider       CloudProvider?
+  isDeployed     Boolean        @default(false)
+  deploymentUrl  String?
+  sdkConnected   Boolean        @default(false)
+  connectedAt    DateTime?
+  lastPingAt     DateTime?
+  carbonBudgetKg Float?         @default(100) // Monthly CO₂ budget in kg
+  userId         String
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  agentRuns       AgentRun[]
+  emissionRecords EmissionRecord[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
 }

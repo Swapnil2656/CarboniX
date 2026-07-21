@@ -13,7 +13,7 @@ import { runGateAgent } from '@carbonix/agents';
 import { runReporter } from '@carbonix/agents';
 import { runOrchestrator, Recommendation } from '@carbonix/agents';
 
-const USE_MOCK = process.env.USE_MOCK_AGENTS !== 'false';
+const USE_MOCK = process.env.USE_MOCK_AGENTS === 'true';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 const CARBON_BUDGET = parseFloat(process.env.CARBON_BUDGET_KG_DAY || '10');
 
@@ -71,6 +71,7 @@ export const getAgentRun = async (req: Request, res: Response) => {
  */
 export const triggerCollector = async (req: Request, res: Response) => {
   try {
+    const { projectId } = req.body;
     const startTime = Date.now();
 
     // Create the AgentRun record
@@ -79,6 +80,7 @@ export const triggerCollector = async (req: Request, res: Response) => {
         agentType: 'COLLECTOR',
         status: 'RUNNING',
         triggeredBy: 'manual',
+        projectId: projectId || null,
       },
     });
 
@@ -89,6 +91,7 @@ export const triggerCollector = async (req: Request, res: Response) => {
     const createdRecords = await prisma.emissionRecord.createMany({
       data: result.records.map(r => ({
         agentRunId: agentRun.id,
+        projectId: projectId || null,
         instanceId: r.instanceId,
         instanceType: r.instanceType,
         provider: r.provider as any,
@@ -305,9 +308,11 @@ export const runGate = async (req: Request, res: Response) => {
 export const triggerReporter = async (req: Request, res: Response) => {
   try {
     const startTime = Date.now();
+    const projectId = req.query.projectId as string | undefined;
 
     // Get all emission records (from latest collector run or all recent)
     const records = await prisma.emissionRecord.findMany({
+      where: projectId ? { projectId } : undefined,
       orderBy: { timestamp: 'desc' },
       take: 100,
     });
@@ -321,6 +326,7 @@ export const triggerReporter = async (req: Request, res: Response) => {
 
     const agentRun = await prisma.agentRun.create({
       data: {
+        projectId,
         agentType: 'REPORTER',
         status: 'RUNNING',
         triggeredBy: 'manual',

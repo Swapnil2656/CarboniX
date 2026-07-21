@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { colors } from '../../src/theme/colors';
-import { carbonApi } from '../../src/services/api/endpoints';
+import { carbonApi, adminApi } from '../../src/services/api/endpoints';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CHART_WIDTH = SCREEN_WIDTH - 72; // padding + panel padding
@@ -89,12 +89,19 @@ export default function DashboardScreen() {
   const handleAnalyze = async (project: any) => {
     setAnalyzingProjectId(project.id);
     try {
+      const emRes = await adminApi.getEmissions('All', 'All', project.id);
+      if (!emRes.records || emRes.records.length === 0) {
+        Alert.alert("Not enough data yet to analyze. Wait for telemetry.");
+        setAnalyzingProjectId(null);
+        return;
+      }
+      const latest = emRes.records[0];
       const payload = {
         projectName: project.name,
-        instanceType: 't3.medium',
-        provider: project.provider || 'aws',
-        region: project.region || 'us-east-1',
-        cpuUtilization: 0.2,
+        instanceType: latest.instanceType || 't3.medium',
+        provider: latest.provider || project.provider || 'aws',
+        region: latest.region || project.region || 'us-east-1',
+        cpuUtilization: latest.cpuUtilization || 0.2,
         storageGb: 20
       };
       const res = await carbonApi.recommend(payload);
@@ -223,7 +230,7 @@ export default function DashboardScreen() {
                     <View style={styles.configBody}>
                       <View>
                         <Text style={styles.configLabel}>Region</Text>
-                        <Text style={styles.configValue}>{project.region || 'AI-assigned'}</Text>
+                        <Text style={styles.configValue}>{project.region || 'Not detected yet'}</Text>
                       </View>
                       <View>
                         <Text style={styles.configLabel}>Connected At</Text>
@@ -240,6 +247,13 @@ export default function DashboardScreen() {
                     </View>
                     <View style={styles.configFooter}>
                       <TouchableOpacity 
+                        style={[styles.insightBtn, { marginRight: 8 }]} 
+                        onPress={() => router.push(`/project/${project.id}`)}
+                      >
+                        <MaterialIcons name="chevron-right" size={16} color={colors.primary} />
+                        <Text style={styles.insightBtnText}>View Project</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity 
                         style={styles.insightBtn} 
                         onPress={() => handleAnalyze(project)}
                         disabled={analyzingProjectId === project.id}
@@ -249,7 +263,7 @@ export default function DashboardScreen() {
                         ) : (
                           <>
                             <MaterialIcons name="auto-awesome" size={16} color={colors.primary} />
-                            <Text style={styles.insightBtnText}>View Insights</Text>
+                            <Text style={styles.insightBtnText}>Analyze</Text>
                           </>
                         )}
                       </TouchableOpacity>

@@ -45,6 +45,8 @@ export async function handleConnect(req: Request, res: Response) {
       sdkConfigExists,     // boolean: does carbonix.config.js / .carbonixrc exist?
       configFileName,      // string: which config file was found (for logging)
       environment,         // 'localhost' | 'production' | 'ci'
+      region,              // string (optional)
+      provider,            // 'AWS' | 'GCP' | 'AZURE' (optional)
     } = req.body;
 
     // ── 1. Validate required fields ──────────────────────────────────────────
@@ -135,10 +137,9 @@ export async function handleConnect(req: Request, res: Response) {
         sdkConnected: true,
         lastPingAt: now,
         connectedAt: wasAlreadyConnected ? project.connectedAt : now,
-        // If CLI told us the environment, save it as region label for display
-        ...(environment === 'localhost' && !project.region
-          ? { region: 'localhost (pre-deployment)' }
-          : {}),
+        isDeployed: environment !== 'localhost',
+        ...(region ? { region } : environment === 'localhost' && !project.region ? { region: 'localhost (pre-deployment)' } : {}),
+        ...(provider ? { provider: provider.toUpperCase() } : {}),
       },
     });
 

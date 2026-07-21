@@ -363,6 +363,7 @@ exports.Prisma.ProviderScalarFieldEnum = {
 
 exports.Prisma.AgentRunScalarFieldEnum = {
   id: 'id',
+  projectId: 'projectId',
   agentType: 'agentType',
   status: 'status',
   triggeredBy: 'triggeredBy',
@@ -379,6 +380,7 @@ exports.Prisma.AgentRunScalarFieldEnum = {
 exports.Prisma.EmissionRecordScalarFieldEnum = {
   id: 'id',
   agentRunId: 'agentRunId',
+  projectId: 'projectId',
   instanceId: 'instanceId',
   instanceType: 'instanceType',
   provider: 'provider',
@@ -413,9 +415,13 @@ exports.Prisma.ProjectScalarFieldEnum = {
   id: 'id',
   name: 'name',
   region: 'region',
+  provider: 'provider',
+  isDeployed: 'isDeployed',
+  deploymentUrl: 'deploymentUrl',
   sdkConnected: 'sdkConnected',
   connectedAt: 'connectedAt',
   lastPingAt: 'lastPingAt',
+  carbonBudgetKg: 'carbonBudgetKg',
   userId: 'userId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

@@ -60,12 +60,19 @@ export default function DashboardPage() {
   const handleAnalyze = async (project: Project) => {
     setAnalyzingProjectId(project.id);
     try {
+      const emRes = await adminApi.getEmissions('All', 'All', project.id);
+      if (!emRes.records || emRes.records.length === 0) {
+        alert("Not enough data yet to analyze. Wait for telemetry.");
+        setAnalyzingProjectId(null);
+        return;
+      }
+      const latest = emRes.records[0];
       const payload = {
         projectName: project.name,
-        instanceType: 't3.medium',
-        provider: project.provider || 'aws',
-        region: project.region || 'us-east-1',
-        cpuUtilization: 0.2,
+        instanceType: latest.instanceType || 't3.medium',
+        provider: latest.provider || project.provider || 'aws',
+        region: latest.region || project.region || 'us-east-1',
+        cpuUtilization: latest.cpuUtilization || 0.2,
         storageGb: 20
       };
       const res = await carbonApi.recommend(payload);
@@ -280,7 +287,7 @@ export default function DashboardPage() {
                     <td className="py-4 text-sm font-medium text-on-surface">{p.name}</td>
                     <td className="py-4 text-sm">
                       <span className="bg-surface-container border border-outline-variant text-on-surface-variant px-2 py-1 rounded text-xs">
-                        {p.region || 'AI-assigned'}
+                        {p.region || 'Not detected yet'}
                       </span>
                     </td>
                     <td className="py-4 text-sm">
@@ -296,7 +303,13 @@ export default function DashboardPage() {
                         </span>
                       )}
                     </td>
-                    <td className="py-4 text-sm text-on-surface-variant text-right">
+                    <td className="py-4 text-sm text-on-surface-variant text-right flex justify-end gap-2">
+                      <button
+                        onClick={() => router.push(`/admin/project/${p.id}`)}
+                        className="bg-surface-container hover:bg-outline-variant text-on-surface px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border border-outline-variant"
+                      >
+                        View
+                      </button>
                       <button
                         onClick={() => handleAnalyze(p)}
                         disabled={analyzingProjectId === p.id}

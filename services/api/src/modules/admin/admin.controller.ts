@@ -66,7 +66,7 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
       }
     }
 
-    const emissionWhere: any = targetProjectName ? { instanceName: { equals: targetProjectName, mode: 'insensitive' } } : {};
+    const emissionWhere: any = { projectId: { in: targetProjectIds } };
 
     const apiKeys = await prisma.apiKey.findMany({
       where: { createdBy: { in: teamUserIds } }
@@ -169,6 +169,7 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
 
     res.json(responseData);
   } catch (error: any) {
+    console.error('[getDashboard] Internal server error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -695,13 +696,20 @@ export const removeTeamMember = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const getEmissions = async (req: Request, res: Response) => {
+export const getEmissions = async (req: AuthRequest, res: Response) => {
   try {
+    const userId = req.user?.id;
+    const userEmail = req.user?.email;
+    if (!userId || !userEmail) return res.status(401).json({ error: 'Unauthorized' });
+
+    const { projectIds } = await resolveTenantContext(userId, userEmail);
+
     const provider = req.query.provider as string;
     const region = req.query.region as string;
     const projectFilter = (req.query.project || req.query.projectId || req.query.projectName) as string;
 
     const projects = await prisma.project.findMany({
+      where: { id: { in: projectIds } },
       select: { id: true, name: true, sdkConnected: true },
       orderBy: { createdAt: 'desc' }
     });
@@ -721,7 +729,7 @@ export const getEmissions = async (req: Request, res: Response) => {
       });
     }
 
-    const where: any = {};
+    const where: any = { projectId: { in: projectIds } };
     if (provider && provider !== 'All') {
       where.provider = provider.toUpperCase();
     }
@@ -729,10 +737,10 @@ export const getEmissions = async (req: Request, res: Response) => {
       where.region = region;
     }
     if (projectFilter && projectFilter !== 'All' && projectFilter !== 'all') {
-      let targetName = projectFilter;
       const matchingProj = projects.find(p => p.id === projectFilter || p.name.toLowerCase() === projectFilter.toLowerCase());
-      if (matchingProj) targetName = matchingProj.name;
-      where.instanceName = { equals: targetName, mode: 'insensitive' };
+      if (matchingProj) {
+        where.projectId = matchingProj.id;
+      }
     }
 
     const records = await prisma.emissionRecord.findMany({
@@ -763,6 +771,8 @@ export const getEmissions = async (req: Request, res: Response) => {
       projects
     });
   } catch (error: any) {
+    console.error('[getEmissions] Internal server error:', error);
+    require('fs').writeFileSync('emissions-error.log', error.stack || error.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -864,6 +874,154 @@ export const getAuditLogs = async (req: AuthRequest, res: Response) => {
     
     res.json({ success: true, logs, total, page, pageSize });
   } catch (error: any) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const deleteProject = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { projectIds } = await resolveTenantContext(req.user!.id, req.user!.email);
+    if (!projectIds.includes(id)) return res.status(403).json({ error: 'Forbidden' });
+    
+    await prisma.project.delete({ where: { id } });
+    res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const disconnectProject = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { projectIds } = await resolveTenantContext(req.user!.id, req.user!.email);
+    if (!projectIds.includes(id)) return res.status(403).json({ error: 'Forbidden' });
+    
+    await prisma.project.update({
+      where: { id },
+      data: { sdkConnected: false, isDeployed: false }
+    });
+    res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const getProjectStats = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { projectIds } = await resolveTenantContext(req.user!.id, req.user!.email);
+    if (!projectIds.includes(id)) return res.status(403).json({ error: 'Forbidden' });
+
+    const project = await prisma.project.findUnique({ where: { id } });
+    if (!project) return res.status(404).json({ error: 'Project not found' });
+
+    // Fetch emissions for the last 30 days
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const emissions = await prisma.emissionRecord.findMany({
+      where: { projectId: id, timestamp: { gte: thirtyDaysAgo } },
+      orderBy: { timestamp: 'asc' }
+    });
+
+    // Cost logic
+    const uniqueTypes = [...new Set(emissions.map(e => e.instanceType))];
+    const instanceTypes = await prisma.instanceType.findMany({
+      where: { name: { in: uniqueTypes } }
+    });
+    const costMap = new Map(instanceTypes.map(t => [t.name, t.onDemandHourlyUsd || 0]));
+
+    const history30d = Array.from({ length: 30 }).map((_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (29 - i));
+      const dayStr = d.toISOString().split('T')[0];
+      const dayRecords = emissions.filter(e => e.timestamp.toISOString().split('T')[0] === dayStr);
+      let dayCost = 0;
+      for (const r of dayRecords) {
+        dayCost += (costMap.get(r.instanceType) || 0);
+      }
+      return {
+        date: dayStr,
+        carbonKg: dayRecords.reduce((sum, r) => sum + r.carbonKg, 0),
+        costUsd: dayCost
+      };
+    });
+    const history7d = history30d.slice(-7);
+
+    const todayKg = history30d[history30d.length - 1].carbonKg;
+    const yesterdayKg = history30d[history30d.length - 2].carbonKg;
+    let trendPercent = null;
+    let isNew = false;
+    if (yesterdayKg > 0) {
+      trendPercent = ((todayKg - yesterdayKg) / yesterdayKg) * 100;
+    } else if (todayKg > 0) {
+      isNew = true;
+    }
+
+    // Budget check
+    const monthStart = new Date();
+    monthStart.setDate(1);
+    monthStart.setHours(0,0,0,0);
+    const mtdRecords = emissions.filter(e => e.timestamp >= monthStart);
+    const totalMonthKg = mtdRecords.reduce((sum, r) => sum + r.carbonKg, 0);
+
+    if (project.carbonBudgetKg && totalMonthKg >= project.carbonBudgetKg * 0.8) {
+      // Check if we already alerted recently to prevent spam? (Simplifying for now)
+      await prisma.userNotification.create({
+        data: {
+          userId: req.user!.id,
+          title: totalMonthKg >= project.carbonBudgetKg ? 'Carbon Budget Exceeded' : 'Carbon Budget Warning',
+          body: `Project "${project.name}" monthly usage: ${totalMonthKg.toFixed(1)} / ${project.carbonBudgetKg} kg CO₂`,
+          type: 'BUDGET_ALERT',
+          data: { projectId: project.id, usedKg: totalMonthKg, budgetKg: project.carbonBudgetKg }
+        }
+      });
+    }
+
+    // API Keys
+    const apiKeys = await prisma.apiKey.findMany({
+       where: { createdBy: req.user!.id, name: { contains: project.name, mode: 'insensitive' } }
+    });
+
+    // Greener Region
+    let greenerRegion = null;
+    if (project.isDeployed && project.provider) {
+       const regions = await prisma.region.findMany({ where: { provider: project.provider } });
+       const currentRegion = regions.find(r => r.name === project.region);
+       if (currentRegion) {
+         const sorted = regions.sort((a,b) => a.gridIntensity - b.gridIntensity);
+         const best = sorted[0];
+         if (best && best.gridIntensity < currentRegion.gridIntensity * 0.9) {
+           greenerRegion = best;
+         }
+       }
+    }
+
+    const isStale = project.lastPingAt ? (new Date().getTime() - project.lastPingAt.getTime()) > 24 * 60 * 60 * 1000 : true;
+
+    // Latest records for overview
+    const latestEmissions = await prisma.emissionRecord.findMany({
+      where: { projectId: id },
+      orderBy: { timestamp: 'desc' },
+      take: 50 // some records for the table
+    });
+
+    const stats = {
+      project,
+      idleInstances: latestEmissions.filter(e => e.isIdle).length,
+      oversizedInstances: latestEmissions.filter(e => e.isOversized).length,
+      carbonTrend: { todayKg, trendPercent, isNew },
+      history7d,
+      history30d,
+      totalMonthKg,
+      apiKeys,
+      greenerRegion,
+      isStale,
+      instances: latestEmissions
+    };
+    res.json({ success: true, data: stats });
+  } catch (error: any) {
+    console.error('[getProjectStats] Internal server error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };

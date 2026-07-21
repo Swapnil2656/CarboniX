@@ -2887,6 +2887,46 @@ export namespace Prisma {
 
 
   /**
+   * Count Type ProjectCountOutputType
+   */
+
+  export type ProjectCountOutputType = {
+    agentRuns: number
+    emissionRecords: number
+  }
+
+  export type ProjectCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agentRuns?: boolean | ProjectCountOutputTypeCountAgentRunsArgs
+    emissionRecords?: boolean | ProjectCountOutputTypeCountEmissionRecordsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ProjectCountOutputType without action
+   */
+  export type ProjectCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectCountOutputType
+     */
+    select?: ProjectCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ProjectCountOutputType without action
+   */
+  export type ProjectCountOutputTypeCountAgentRunsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AgentRunWhereInput
+  }
+
+  /**
+   * ProjectCountOutputType without action
+   */
+  export type ProjectCountOutputTypeCountEmissionRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EmissionRecordWhereInput
+  }
+
+
+  /**
    * Models
    */
 
@@ -16550,6 +16590,7 @@ export namespace Prisma {
 
   export type AgentRunMinAggregateOutputType = {
     id: string | null
+    projectId: string | null
     agentType: $Enums.AgentType | null
     status: $Enums.AgentRunStatus | null
     triggeredBy: string | null
@@ -16564,6 +16605,7 @@ export namespace Prisma {
 
   export type AgentRunMaxAggregateOutputType = {
     id: string | null
+    projectId: string | null
     agentType: $Enums.AgentType | null
     status: $Enums.AgentRunStatus | null
     triggeredBy: string | null
@@ -16578,6 +16620,7 @@ export namespace Prisma {
 
   export type AgentRunCountAggregateOutputType = {
     id: number
+    projectId: number
     agentType: number
     status: number
     triggeredBy: number
@@ -16605,6 +16648,7 @@ export namespace Prisma {
 
   export type AgentRunMinAggregateInputType = {
     id?: true
+    projectId?: true
     agentType?: true
     status?: true
     triggeredBy?: true
@@ -16619,6 +16663,7 @@ export namespace Prisma {
 
   export type AgentRunMaxAggregateInputType = {
     id?: true
+    projectId?: true
     agentType?: true
     status?: true
     triggeredBy?: true
@@ -16633,6 +16678,7 @@ export namespace Prisma {
 
   export type AgentRunCountAggregateInputType = {
     id?: true
+    projectId?: true
     agentType?: true
     status?: true
     triggeredBy?: true
@@ -16735,6 +16781,7 @@ export namespace Prisma {
 
   export type AgentRunGroupByOutputType = {
     id: string
+    projectId: string | null
     agentType: $Enums.AgentType
     status: $Enums.AgentRunStatus
     triggeredBy: string
@@ -16769,6 +16816,7 @@ export namespace Prisma {
 
   export type AgentRunSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    projectId?: boolean
     agentType?: boolean
     status?: boolean
     triggeredBy?: boolean
@@ -16780,10 +16828,12 @@ export namespace Prisma {
     completedAt?: boolean
     durationMs?: boolean
     createdAt?: boolean
+    project?: boolean | AgentRun$projectArgs<ExtArgs>
   }, ExtArgs["result"]["agentRun"]>
 
   export type AgentRunSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    projectId?: boolean
     agentType?: boolean
     status?: boolean
     triggeredBy?: boolean
@@ -16795,10 +16845,12 @@ export namespace Prisma {
     completedAt?: boolean
     durationMs?: boolean
     createdAt?: boolean
+    project?: boolean | AgentRun$projectArgs<ExtArgs>
   }, ExtArgs["result"]["agentRun"]>
 
   export type AgentRunSelectScalar = {
     id?: boolean
+    projectId?: boolean
     agentType?: boolean
     status?: boolean
     triggeredBy?: boolean
@@ -16812,12 +16864,21 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
+  export type AgentRunInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | AgentRun$projectArgs<ExtArgs>
+  }
+  export type AgentRunIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | AgentRun$projectArgs<ExtArgs>
+  }
 
   export type $AgentRunPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "AgentRun"
-    objects: {}
+    objects: {
+      project: Prisma.$ProjectPayload<ExtArgs> | null
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      projectId: string | null
       agentType: $Enums.AgentType
       status: $Enums.AgentRunStatus
       triggeredBy: string
@@ -17193,6 +17254,7 @@ export namespace Prisma {
    */
   export interface Prisma__AgentRunClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    project<T extends AgentRun$projectArgs<ExtArgs> = {}>(args?: Subset<T, AgentRun$projectArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -17223,6 +17285,7 @@ export namespace Prisma {
    */ 
   interface AgentRunFieldRefs {
     readonly id: FieldRef<"AgentRun", 'String'>
+    readonly projectId: FieldRef<"AgentRun", 'String'>
     readonly agentType: FieldRef<"AgentRun", 'AgentType'>
     readonly status: FieldRef<"AgentRun", 'AgentRunStatus'>
     readonly triggeredBy: FieldRef<"AgentRun", 'String'>
@@ -17247,6 +17310,10 @@ export namespace Prisma {
      */
     select?: AgentRunSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentRunInclude<ExtArgs> | null
+    /**
      * Filter, which AgentRun to fetch.
      */
     where: AgentRunWhereUniqueInput
@@ -17261,6 +17328,10 @@ export namespace Prisma {
      */
     select?: AgentRunSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentRunInclude<ExtArgs> | null
+    /**
      * Filter, which AgentRun to fetch.
      */
     where: AgentRunWhereUniqueInput
@@ -17274,6 +17345,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the AgentRun
      */
     select?: AgentRunSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentRunInclude<ExtArgs> | null
     /**
      * Filter, which AgentRun to fetch.
      */
@@ -17319,6 +17394,10 @@ export namespace Prisma {
      */
     select?: AgentRunSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentRunInclude<ExtArgs> | null
+    /**
      * Filter, which AgentRun to fetch.
      */
     where?: AgentRunWhereInput
@@ -17363,6 +17442,10 @@ export namespace Prisma {
      */
     select?: AgentRunSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentRunInclude<ExtArgs> | null
+    /**
      * Filter, which AgentRuns to fetch.
      */
     where?: AgentRunWhereInput
@@ -17402,6 +17485,10 @@ export namespace Prisma {
      */
     select?: AgentRunSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentRunInclude<ExtArgs> | null
+    /**
      * The data needed to create a AgentRun.
      */
     data: XOR<AgentRunCreateInput, AgentRunUncheckedCreateInput>
@@ -17431,6 +17518,10 @@ export namespace Prisma {
      */
     data: AgentRunCreateManyInput | AgentRunCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentRunIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -17441,6 +17532,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the AgentRun
      */
     select?: AgentRunSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentRunInclude<ExtArgs> | null
     /**
      * The data needed to update a AgentRun.
      */
@@ -17474,6 +17569,10 @@ export namespace Prisma {
      */
     select?: AgentRunSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentRunInclude<ExtArgs> | null
+    /**
      * The filter to search for the AgentRun to update in case it exists.
      */
     where: AgentRunWhereUniqueInput
@@ -17496,6 +17595,10 @@ export namespace Prisma {
      */
     select?: AgentRunSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentRunInclude<ExtArgs> | null
+    /**
      * Filter which AgentRun to delete.
      */
     where: AgentRunWhereUniqueInput
@@ -17512,6 +17615,21 @@ export namespace Prisma {
   }
 
   /**
+   * AgentRun.project
+   */
+  export type AgentRun$projectArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Project
+     */
+    select?: ProjectSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectInclude<ExtArgs> | null
+    where?: ProjectWhereInput
+  }
+
+  /**
    * AgentRun without action
    */
   export type AgentRunDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -17519,6 +17637,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the AgentRun
      */
     select?: AgentRunSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentRunInclude<ExtArgs> | null
   }
 
 
@@ -17557,6 +17679,7 @@ export namespace Prisma {
   export type EmissionRecordMinAggregateOutputType = {
     id: string | null
     agentRunId: string | null
+    projectId: string | null
     instanceId: string | null
     instanceType: string | null
     provider: $Enums.CloudProvider | null
@@ -17578,6 +17701,7 @@ export namespace Prisma {
   export type EmissionRecordMaxAggregateOutputType = {
     id: string | null
     agentRunId: string | null
+    projectId: string | null
     instanceId: string | null
     instanceType: string | null
     provider: $Enums.CloudProvider | null
@@ -17599,6 +17723,7 @@ export namespace Prisma {
   export type EmissionRecordCountAggregateOutputType = {
     id: number
     agentRunId: number
+    projectId: number
     instanceId: number
     instanceType: number
     provider: number
@@ -17642,6 +17767,7 @@ export namespace Prisma {
   export type EmissionRecordMinAggregateInputType = {
     id?: true
     agentRunId?: true
+    projectId?: true
     instanceId?: true
     instanceType?: true
     provider?: true
@@ -17663,6 +17789,7 @@ export namespace Prisma {
   export type EmissionRecordMaxAggregateInputType = {
     id?: true
     agentRunId?: true
+    projectId?: true
     instanceId?: true
     instanceType?: true
     provider?: true
@@ -17684,6 +17811,7 @@ export namespace Prisma {
   export type EmissionRecordCountAggregateInputType = {
     id?: true
     agentRunId?: true
+    projectId?: true
     instanceId?: true
     instanceType?: true
     provider?: true
@@ -17792,6 +17920,7 @@ export namespace Prisma {
   export type EmissionRecordGroupByOutputType = {
     id: string
     agentRunId: string | null
+    projectId: string | null
     instanceId: string
     instanceType: string
     provider: $Enums.CloudProvider
@@ -17832,6 +17961,7 @@ export namespace Prisma {
   export type EmissionRecordSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     agentRunId?: boolean
+    projectId?: boolean
     instanceId?: boolean
     instanceType?: boolean
     provider?: boolean
@@ -17848,11 +17978,13 @@ export namespace Prisma {
     isOversized?: boolean
     recommendation?: boolean
     timestamp?: boolean
+    project?: boolean | EmissionRecord$projectArgs<ExtArgs>
   }, ExtArgs["result"]["emissionRecord"]>
 
   export type EmissionRecordSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     agentRunId?: boolean
+    projectId?: boolean
     instanceId?: boolean
     instanceType?: boolean
     provider?: boolean
@@ -17869,11 +18001,13 @@ export namespace Prisma {
     isOversized?: boolean
     recommendation?: boolean
     timestamp?: boolean
+    project?: boolean | EmissionRecord$projectArgs<ExtArgs>
   }, ExtArgs["result"]["emissionRecord"]>
 
   export type EmissionRecordSelectScalar = {
     id?: boolean
     agentRunId?: boolean
+    projectId?: boolean
     instanceId?: boolean
     instanceType?: boolean
     provider?: boolean
@@ -17892,13 +18026,22 @@ export namespace Prisma {
     timestamp?: boolean
   }
 
+  export type EmissionRecordInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | EmissionRecord$projectArgs<ExtArgs>
+  }
+  export type EmissionRecordIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | EmissionRecord$projectArgs<ExtArgs>
+  }
 
   export type $EmissionRecordPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "EmissionRecord"
-    objects: {}
+    objects: {
+      project: Prisma.$ProjectPayload<ExtArgs> | null
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       agentRunId: string | null
+      projectId: string | null
       instanceId: string
       instanceType: string
       provider: $Enums.CloudProvider
@@ -18279,6 +18422,7 @@ export namespace Prisma {
    */
   export interface Prisma__EmissionRecordClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    project<T extends EmissionRecord$projectArgs<ExtArgs> = {}>(args?: Subset<T, EmissionRecord$projectArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -18310,6 +18454,7 @@ export namespace Prisma {
   interface EmissionRecordFieldRefs {
     readonly id: FieldRef<"EmissionRecord", 'String'>
     readonly agentRunId: FieldRef<"EmissionRecord", 'String'>
+    readonly projectId: FieldRef<"EmissionRecord", 'String'>
     readonly instanceId: FieldRef<"EmissionRecord", 'String'>
     readonly instanceType: FieldRef<"EmissionRecord", 'String'>
     readonly provider: FieldRef<"EmissionRecord", 'CloudProvider'>
@@ -18339,6 +18484,10 @@ export namespace Prisma {
      */
     select?: EmissionRecordSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmissionRecordInclude<ExtArgs> | null
+    /**
      * Filter, which EmissionRecord to fetch.
      */
     where: EmissionRecordWhereUniqueInput
@@ -18353,6 +18502,10 @@ export namespace Prisma {
      */
     select?: EmissionRecordSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmissionRecordInclude<ExtArgs> | null
+    /**
      * Filter, which EmissionRecord to fetch.
      */
     where: EmissionRecordWhereUniqueInput
@@ -18366,6 +18519,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the EmissionRecord
      */
     select?: EmissionRecordSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmissionRecordInclude<ExtArgs> | null
     /**
      * Filter, which EmissionRecord to fetch.
      */
@@ -18411,6 +18568,10 @@ export namespace Prisma {
      */
     select?: EmissionRecordSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmissionRecordInclude<ExtArgs> | null
+    /**
      * Filter, which EmissionRecord to fetch.
      */
     where?: EmissionRecordWhereInput
@@ -18455,6 +18616,10 @@ export namespace Prisma {
      */
     select?: EmissionRecordSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmissionRecordInclude<ExtArgs> | null
+    /**
      * Filter, which EmissionRecords to fetch.
      */
     where?: EmissionRecordWhereInput
@@ -18494,6 +18659,10 @@ export namespace Prisma {
      */
     select?: EmissionRecordSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmissionRecordInclude<ExtArgs> | null
+    /**
      * The data needed to create a EmissionRecord.
      */
     data: XOR<EmissionRecordCreateInput, EmissionRecordUncheckedCreateInput>
@@ -18523,6 +18692,10 @@ export namespace Prisma {
      */
     data: EmissionRecordCreateManyInput | EmissionRecordCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmissionRecordIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -18533,6 +18706,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the EmissionRecord
      */
     select?: EmissionRecordSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmissionRecordInclude<ExtArgs> | null
     /**
      * The data needed to update a EmissionRecord.
      */
@@ -18566,6 +18743,10 @@ export namespace Prisma {
      */
     select?: EmissionRecordSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmissionRecordInclude<ExtArgs> | null
+    /**
      * The filter to search for the EmissionRecord to update in case it exists.
      */
     where: EmissionRecordWhereUniqueInput
@@ -18588,6 +18769,10 @@ export namespace Prisma {
      */
     select?: EmissionRecordSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmissionRecordInclude<ExtArgs> | null
+    /**
      * Filter which EmissionRecord to delete.
      */
     where: EmissionRecordWhereUniqueInput
@@ -18604,6 +18789,21 @@ export namespace Prisma {
   }
 
   /**
+   * EmissionRecord.project
+   */
+  export type EmissionRecord$projectArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Project
+     */
+    select?: ProjectSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectInclude<ExtArgs> | null
+    where?: ProjectWhereInput
+  }
+
+  /**
    * EmissionRecord without action
    */
   export type EmissionRecordDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -18611,6 +18811,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the EmissionRecord
      */
     select?: EmissionRecordSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmissionRecordInclude<ExtArgs> | null
   }
 
 
@@ -19678,17 +19882,31 @@ export namespace Prisma {
 
   export type AggregateProject = {
     _count: ProjectCountAggregateOutputType | null
+    _avg: ProjectAvgAggregateOutputType | null
+    _sum: ProjectSumAggregateOutputType | null
     _min: ProjectMinAggregateOutputType | null
     _max: ProjectMaxAggregateOutputType | null
+  }
+
+  export type ProjectAvgAggregateOutputType = {
+    carbonBudgetKg: number | null
+  }
+
+  export type ProjectSumAggregateOutputType = {
+    carbonBudgetKg: number | null
   }
 
   export type ProjectMinAggregateOutputType = {
     id: string | null
     name: string | null
     region: string | null
+    provider: $Enums.CloudProvider | null
+    isDeployed: boolean | null
+    deploymentUrl: string | null
     sdkConnected: boolean | null
     connectedAt: Date | null
     lastPingAt: Date | null
+    carbonBudgetKg: number | null
     userId: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -19698,9 +19916,13 @@ export namespace Prisma {
     id: string | null
     name: string | null
     region: string | null
+    provider: $Enums.CloudProvider | null
+    isDeployed: boolean | null
+    deploymentUrl: string | null
     sdkConnected: boolean | null
     connectedAt: Date | null
     lastPingAt: Date | null
+    carbonBudgetKg: number | null
     userId: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -19710,9 +19932,13 @@ export namespace Prisma {
     id: number
     name: number
     region: number
+    provider: number
+    isDeployed: number
+    deploymentUrl: number
     sdkConnected: number
     connectedAt: number
     lastPingAt: number
+    carbonBudgetKg: number
     userId: number
     createdAt: number
     updatedAt: number
@@ -19720,13 +19946,25 @@ export namespace Prisma {
   }
 
 
+  export type ProjectAvgAggregateInputType = {
+    carbonBudgetKg?: true
+  }
+
+  export type ProjectSumAggregateInputType = {
+    carbonBudgetKg?: true
+  }
+
   export type ProjectMinAggregateInputType = {
     id?: true
     name?: true
     region?: true
+    provider?: true
+    isDeployed?: true
+    deploymentUrl?: true
     sdkConnected?: true
     connectedAt?: true
     lastPingAt?: true
+    carbonBudgetKg?: true
     userId?: true
     createdAt?: true
     updatedAt?: true
@@ -19736,9 +19974,13 @@ export namespace Prisma {
     id?: true
     name?: true
     region?: true
+    provider?: true
+    isDeployed?: true
+    deploymentUrl?: true
     sdkConnected?: true
     connectedAt?: true
     lastPingAt?: true
+    carbonBudgetKg?: true
     userId?: true
     createdAt?: true
     updatedAt?: true
@@ -19748,9 +19990,13 @@ export namespace Prisma {
     id?: true
     name?: true
     region?: true
+    provider?: true
+    isDeployed?: true
+    deploymentUrl?: true
     sdkConnected?: true
     connectedAt?: true
     lastPingAt?: true
+    carbonBudgetKg?: true
     userId?: true
     createdAt?: true
     updatedAt?: true
@@ -19795,6 +20041,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: ProjectAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ProjectSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: ProjectMinAggregateInputType
@@ -19825,6 +20083,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: ProjectCountAggregateInputType | true
+    _avg?: ProjectAvgAggregateInputType
+    _sum?: ProjectSumAggregateInputType
     _min?: ProjectMinAggregateInputType
     _max?: ProjectMaxAggregateInputType
   }
@@ -19833,13 +20093,19 @@ export namespace Prisma {
     id: string
     name: string
     region: string | null
+    provider: $Enums.CloudProvider | null
+    isDeployed: boolean
+    deploymentUrl: string | null
     sdkConnected: boolean
     connectedAt: Date | null
     lastPingAt: Date | null
+    carbonBudgetKg: number | null
     userId: string
     createdAt: Date
     updatedAt: Date
     _count: ProjectCountAggregateOutputType | null
+    _avg: ProjectAvgAggregateOutputType | null
+    _sum: ProjectSumAggregateOutputType | null
     _min: ProjectMinAggregateOutputType | null
     _max: ProjectMaxAggregateOutputType | null
   }
@@ -19862,22 +20128,33 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     region?: boolean
+    provider?: boolean
+    isDeployed?: boolean
+    deploymentUrl?: boolean
     sdkConnected?: boolean
     connectedAt?: boolean
     lastPingAt?: boolean
+    carbonBudgetKg?: boolean
     userId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    agentRuns?: boolean | Project$agentRunsArgs<ExtArgs>
+    emissionRecords?: boolean | Project$emissionRecordsArgs<ExtArgs>
+    _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["project"]>
 
   export type ProjectSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
     region?: boolean
+    provider?: boolean
+    isDeployed?: boolean
+    deploymentUrl?: boolean
     sdkConnected?: boolean
     connectedAt?: boolean
     lastPingAt?: boolean
+    carbonBudgetKg?: boolean
     userId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -19888,9 +20165,13 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     region?: boolean
+    provider?: boolean
+    isDeployed?: boolean
+    deploymentUrl?: boolean
     sdkConnected?: boolean
     connectedAt?: boolean
     lastPingAt?: boolean
+    carbonBudgetKg?: boolean
     userId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -19898,6 +20179,9 @@ export namespace Prisma {
 
   export type ProjectInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    agentRuns?: boolean | Project$agentRunsArgs<ExtArgs>
+    emissionRecords?: boolean | Project$emissionRecordsArgs<ExtArgs>
+    _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ProjectIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -19907,14 +20191,20 @@ export namespace Prisma {
     name: "Project"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
+      agentRuns: Prisma.$AgentRunPayload<ExtArgs>[]
+      emissionRecords: Prisma.$EmissionRecordPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       name: string
       region: string | null
+      provider: $Enums.CloudProvider | null
+      isDeployed: boolean
+      deploymentUrl: string | null
       sdkConnected: boolean
       connectedAt: Date | null
       lastPingAt: Date | null
+      carbonBudgetKg: number | null
       userId: string
       createdAt: Date
       updatedAt: Date
@@ -20283,6 +20573,8 @@ export namespace Prisma {
   export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    agentRuns<T extends Project$agentRunsArgs<ExtArgs> = {}>(args?: Subset<T, Project$agentRunsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentRunPayload<ExtArgs>, T, "findMany"> | Null>
+    emissionRecords<T extends Project$emissionRecordsArgs<ExtArgs> = {}>(args?: Subset<T, Project$emissionRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmissionRecordPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -20315,9 +20607,13 @@ export namespace Prisma {
     readonly id: FieldRef<"Project", 'String'>
     readonly name: FieldRef<"Project", 'String'>
     readonly region: FieldRef<"Project", 'String'>
+    readonly provider: FieldRef<"Project", 'CloudProvider'>
+    readonly isDeployed: FieldRef<"Project", 'Boolean'>
+    readonly deploymentUrl: FieldRef<"Project", 'String'>
     readonly sdkConnected: FieldRef<"Project", 'Boolean'>
     readonly connectedAt: FieldRef<"Project", 'DateTime'>
     readonly lastPingAt: FieldRef<"Project", 'DateTime'>
+    readonly carbonBudgetKg: FieldRef<"Project", 'Float'>
     readonly userId: FieldRef<"Project", 'String'>
     readonly createdAt: FieldRef<"Project", 'DateTime'>
     readonly updatedAt: FieldRef<"Project", 'DateTime'>
@@ -20636,6 +20932,46 @@ export namespace Prisma {
      * Filter which Projects to delete
      */
     where?: ProjectWhereInput
+  }
+
+  /**
+   * Project.agentRuns
+   */
+  export type Project$agentRunsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentRun
+     */
+    select?: AgentRunSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentRunInclude<ExtArgs> | null
+    where?: AgentRunWhereInput
+    orderBy?: AgentRunOrderByWithRelationInput | AgentRunOrderByWithRelationInput[]
+    cursor?: AgentRunWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AgentRunScalarFieldEnum | AgentRunScalarFieldEnum[]
+  }
+
+  /**
+   * Project.emissionRecords
+   */
+  export type Project$emissionRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmissionRecord
+     */
+    select?: EmissionRecordSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmissionRecordInclude<ExtArgs> | null
+    where?: EmissionRecordWhereInput
+    orderBy?: EmissionRecordOrderByWithRelationInput | EmissionRecordOrderByWithRelationInput[]
+    cursor?: EmissionRecordWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EmissionRecordScalarFieldEnum | EmissionRecordScalarFieldEnum[]
   }
 
   /**
@@ -24786,6 +25122,7 @@ export namespace Prisma {
 
   export const AgentRunScalarFieldEnum: {
     id: 'id',
+    projectId: 'projectId',
     agentType: 'agentType',
     status: 'status',
     triggeredBy: 'triggeredBy',
@@ -24805,6 +25142,7 @@ export namespace Prisma {
   export const EmissionRecordScalarFieldEnum: {
     id: 'id',
     agentRunId: 'agentRunId',
+    projectId: 'projectId',
     instanceId: 'instanceId',
     instanceType: 'instanceType',
     provider: 'provider',
@@ -24845,9 +25183,13 @@ export namespace Prisma {
     id: 'id',
     name: 'name',
     region: 'region',
+    provider: 'provider',
+    isDeployed: 'isDeployed',
+    deploymentUrl: 'deploymentUrl',
     sdkConnected: 'sdkConnected',
     connectedAt: 'connectedAt',
     lastPingAt: 'lastPingAt',
+    carbonBudgetKg: 'carbonBudgetKg',
     userId: 'userId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -26663,6 +27005,7 @@ export namespace Prisma {
     OR?: AgentRunWhereInput[]
     NOT?: AgentRunWhereInput | AgentRunWhereInput[]
     id?: StringFilter<"AgentRun"> | string
+    projectId?: StringNullableFilter<"AgentRun"> | string | null
     agentType?: EnumAgentTypeFilter<"AgentRun"> | $Enums.AgentType
     status?: EnumAgentRunStatusFilter<"AgentRun"> | $Enums.AgentRunStatus
     triggeredBy?: StringFilter<"AgentRun"> | string
@@ -26674,10 +27017,12 @@ export namespace Prisma {
     completedAt?: DateTimeNullableFilter<"AgentRun"> | Date | string | null
     durationMs?: IntNullableFilter<"AgentRun"> | number | null
     createdAt?: DateTimeFilter<"AgentRun"> | Date | string
+    project?: XOR<ProjectNullableRelationFilter, ProjectWhereInput> | null
   }
 
   export type AgentRunOrderByWithRelationInput = {
     id?: SortOrder
+    projectId?: SortOrderInput | SortOrder
     agentType?: SortOrder
     status?: SortOrder
     triggeredBy?: SortOrder
@@ -26689,6 +27034,7 @@ export namespace Prisma {
     completedAt?: SortOrderInput | SortOrder
     durationMs?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    project?: ProjectOrderByWithRelationInput
   }
 
   export type AgentRunWhereUniqueInput = Prisma.AtLeast<{
@@ -26696,6 +27042,7 @@ export namespace Prisma {
     AND?: AgentRunWhereInput | AgentRunWhereInput[]
     OR?: AgentRunWhereInput[]
     NOT?: AgentRunWhereInput | AgentRunWhereInput[]
+    projectId?: StringNullableFilter<"AgentRun"> | string | null
     agentType?: EnumAgentTypeFilter<"AgentRun"> | $Enums.AgentType
     status?: EnumAgentRunStatusFilter<"AgentRun"> | $Enums.AgentRunStatus
     triggeredBy?: StringFilter<"AgentRun"> | string
@@ -26707,10 +27054,12 @@ export namespace Prisma {
     completedAt?: DateTimeNullableFilter<"AgentRun"> | Date | string | null
     durationMs?: IntNullableFilter<"AgentRun"> | number | null
     createdAt?: DateTimeFilter<"AgentRun"> | Date | string
+    project?: XOR<ProjectNullableRelationFilter, ProjectWhereInput> | null
   }, "id">
 
   export type AgentRunOrderByWithAggregationInput = {
     id?: SortOrder
+    projectId?: SortOrderInput | SortOrder
     agentType?: SortOrder
     status?: SortOrder
     triggeredBy?: SortOrder
@@ -26734,6 +27083,7 @@ export namespace Prisma {
     OR?: AgentRunScalarWhereWithAggregatesInput[]
     NOT?: AgentRunScalarWhereWithAggregatesInput | AgentRunScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"AgentRun"> | string
+    projectId?: StringNullableWithAggregatesFilter<"AgentRun"> | string | null
     agentType?: EnumAgentTypeWithAggregatesFilter<"AgentRun"> | $Enums.AgentType
     status?: EnumAgentRunStatusWithAggregatesFilter<"AgentRun"> | $Enums.AgentRunStatus
     triggeredBy?: StringWithAggregatesFilter<"AgentRun"> | string
@@ -26753,6 +27103,7 @@ export namespace Prisma {
     NOT?: EmissionRecordWhereInput | EmissionRecordWhereInput[]
     id?: StringFilter<"EmissionRecord"> | string
     agentRunId?: StringNullableFilter<"EmissionRecord"> | string | null
+    projectId?: StringNullableFilter<"EmissionRecord"> | string | null
     instanceId?: StringFilter<"EmissionRecord"> | string
     instanceType?: StringFilter<"EmissionRecord"> | string
     provider?: EnumCloudProviderFilter<"EmissionRecord"> | $Enums.CloudProvider
@@ -26769,11 +27120,13 @@ export namespace Prisma {
     isOversized?: BoolFilter<"EmissionRecord"> | boolean
     recommendation?: StringNullableFilter<"EmissionRecord"> | string | null
     timestamp?: DateTimeFilter<"EmissionRecord"> | Date | string
+    project?: XOR<ProjectNullableRelationFilter, ProjectWhereInput> | null
   }
 
   export type EmissionRecordOrderByWithRelationInput = {
     id?: SortOrder
     agentRunId?: SortOrderInput | SortOrder
+    projectId?: SortOrderInput | SortOrder
     instanceId?: SortOrder
     instanceType?: SortOrder
     provider?: SortOrder
@@ -26790,6 +27143,7 @@ export namespace Prisma {
     isOversized?: SortOrder
     recommendation?: SortOrderInput | SortOrder
     timestamp?: SortOrder
+    project?: ProjectOrderByWithRelationInput
   }
 
   export type EmissionRecordWhereUniqueInput = Prisma.AtLeast<{
@@ -26798,6 +27152,7 @@ export namespace Prisma {
     OR?: EmissionRecordWhereInput[]
     NOT?: EmissionRecordWhereInput | EmissionRecordWhereInput[]
     agentRunId?: StringNullableFilter<"EmissionRecord"> | string | null
+    projectId?: StringNullableFilter<"EmissionRecord"> | string | null
     instanceId?: StringFilter<"EmissionRecord"> | string
     instanceType?: StringFilter<"EmissionRecord"> | string
     provider?: EnumCloudProviderFilter<"EmissionRecord"> | $Enums.CloudProvider
@@ -26814,11 +27169,13 @@ export namespace Prisma {
     isOversized?: BoolFilter<"EmissionRecord"> | boolean
     recommendation?: StringNullableFilter<"EmissionRecord"> | string | null
     timestamp?: DateTimeFilter<"EmissionRecord"> | Date | string
+    project?: XOR<ProjectNullableRelationFilter, ProjectWhereInput> | null
   }, "id">
 
   export type EmissionRecordOrderByWithAggregationInput = {
     id?: SortOrder
     agentRunId?: SortOrderInput | SortOrder
+    projectId?: SortOrderInput | SortOrder
     instanceId?: SortOrder
     instanceType?: SortOrder
     provider?: SortOrder
@@ -26848,6 +27205,7 @@ export namespace Prisma {
     NOT?: EmissionRecordScalarWhereWithAggregatesInput | EmissionRecordScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"EmissionRecord"> | string
     agentRunId?: StringNullableWithAggregatesFilter<"EmissionRecord"> | string | null
+    projectId?: StringNullableWithAggregatesFilter<"EmissionRecord"> | string | null
     instanceId?: StringWithAggregatesFilter<"EmissionRecord"> | string
     instanceType?: StringWithAggregatesFilter<"EmissionRecord"> | string
     provider?: EnumCloudProviderWithAggregatesFilter<"EmissionRecord"> | $Enums.CloudProvider
@@ -26957,26 +27315,38 @@ export namespace Prisma {
     id?: StringFilter<"Project"> | string
     name?: StringFilter<"Project"> | string
     region?: StringNullableFilter<"Project"> | string | null
+    provider?: EnumCloudProviderNullableFilter<"Project"> | $Enums.CloudProvider | null
+    isDeployed?: BoolFilter<"Project"> | boolean
+    deploymentUrl?: StringNullableFilter<"Project"> | string | null
     sdkConnected?: BoolFilter<"Project"> | boolean
     connectedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     lastPingAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    carbonBudgetKg?: FloatNullableFilter<"Project"> | number | null
     userId?: StringFilter<"Project"> | string
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
     user?: XOR<UserRelationFilter, UserWhereInput>
+    agentRuns?: AgentRunListRelationFilter
+    emissionRecords?: EmissionRecordListRelationFilter
   }
 
   export type ProjectOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
     region?: SortOrderInput | SortOrder
+    provider?: SortOrderInput | SortOrder
+    isDeployed?: SortOrder
+    deploymentUrl?: SortOrderInput | SortOrder
     sdkConnected?: SortOrder
     connectedAt?: SortOrderInput | SortOrder
     lastPingAt?: SortOrderInput | SortOrder
+    carbonBudgetKg?: SortOrderInput | SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
+    agentRuns?: AgentRunOrderByRelationAggregateInput
+    emissionRecords?: EmissionRecordOrderByRelationAggregateInput
   }
 
   export type ProjectWhereUniqueInput = Prisma.AtLeast<{
@@ -26986,28 +27356,40 @@ export namespace Prisma {
     NOT?: ProjectWhereInput | ProjectWhereInput[]
     name?: StringFilter<"Project"> | string
     region?: StringNullableFilter<"Project"> | string | null
+    provider?: EnumCloudProviderNullableFilter<"Project"> | $Enums.CloudProvider | null
+    isDeployed?: BoolFilter<"Project"> | boolean
+    deploymentUrl?: StringNullableFilter<"Project"> | string | null
     sdkConnected?: BoolFilter<"Project"> | boolean
     connectedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     lastPingAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    carbonBudgetKg?: FloatNullableFilter<"Project"> | number | null
     userId?: StringFilter<"Project"> | string
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
     user?: XOR<UserRelationFilter, UserWhereInput>
+    agentRuns?: AgentRunListRelationFilter
+    emissionRecords?: EmissionRecordListRelationFilter
   }, "id">
 
   export type ProjectOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
     region?: SortOrderInput | SortOrder
+    provider?: SortOrderInput | SortOrder
+    isDeployed?: SortOrder
+    deploymentUrl?: SortOrderInput | SortOrder
     sdkConnected?: SortOrder
     connectedAt?: SortOrderInput | SortOrder
     lastPingAt?: SortOrderInput | SortOrder
+    carbonBudgetKg?: SortOrderInput | SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ProjectCountOrderByAggregateInput
+    _avg?: ProjectAvgOrderByAggregateInput
     _max?: ProjectMaxOrderByAggregateInput
     _min?: ProjectMinOrderByAggregateInput
+    _sum?: ProjectSumOrderByAggregateInput
   }
 
   export type ProjectScalarWhereWithAggregatesInput = {
@@ -27017,9 +27399,13 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Project"> | string
     name?: StringWithAggregatesFilter<"Project"> | string
     region?: StringNullableWithAggregatesFilter<"Project"> | string | null
+    provider?: EnumCloudProviderNullableWithAggregatesFilter<"Project"> | $Enums.CloudProvider | null
+    isDeployed?: BoolWithAggregatesFilter<"Project"> | boolean
+    deploymentUrl?: StringNullableWithAggregatesFilter<"Project"> | string | null
     sdkConnected?: BoolWithAggregatesFilter<"Project"> | boolean
     connectedAt?: DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
     lastPingAt?: DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
+    carbonBudgetKg?: FloatNullableWithAggregatesFilter<"Project"> | number | null
     userId?: StringWithAggregatesFilter<"Project"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
@@ -28991,10 +29377,12 @@ export namespace Prisma {
     completedAt?: Date | string | null
     durationMs?: number | null
     createdAt?: Date | string
+    project?: ProjectCreateNestedOneWithoutAgentRunsInput
   }
 
   export type AgentRunUncheckedCreateInput = {
     id?: string
+    projectId?: string | null
     agentType: $Enums.AgentType
     status?: $Enums.AgentRunStatus
     triggeredBy?: string
@@ -29021,10 +29409,12 @@ export namespace Prisma {
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     durationMs?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneWithoutAgentRunsNestedInput
   }
 
   export type AgentRunUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    projectId?: NullableStringFieldUpdateOperationsInput | string | null
     agentType?: EnumAgentTypeFieldUpdateOperationsInput | $Enums.AgentType
     status?: EnumAgentRunStatusFieldUpdateOperationsInput | $Enums.AgentRunStatus
     triggeredBy?: StringFieldUpdateOperationsInput | string
@@ -29040,6 +29430,7 @@ export namespace Prisma {
 
   export type AgentRunCreateManyInput = {
     id?: string
+    projectId?: string | null
     agentType: $Enums.AgentType
     status?: $Enums.AgentRunStatus
     triggeredBy?: string
@@ -29070,6 +29461,7 @@ export namespace Prisma {
 
   export type AgentRunUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    projectId?: NullableStringFieldUpdateOperationsInput | string | null
     agentType?: EnumAgentTypeFieldUpdateOperationsInput | $Enums.AgentType
     status?: EnumAgentRunStatusFieldUpdateOperationsInput | $Enums.AgentRunStatus
     triggeredBy?: StringFieldUpdateOperationsInput | string
@@ -29102,11 +29494,13 @@ export namespace Prisma {
     isOversized?: boolean
     recommendation?: string | null
     timestamp?: Date | string
+    project?: ProjectCreateNestedOneWithoutEmissionRecordsInput
   }
 
   export type EmissionRecordUncheckedCreateInput = {
     id?: string
     agentRunId?: string | null
+    projectId?: string | null
     instanceId: string
     instanceType: string
     provider: $Enums.CloudProvider
@@ -29144,11 +29538,13 @@ export namespace Prisma {
     isOversized?: BoolFieldUpdateOperationsInput | boolean
     recommendation?: NullableStringFieldUpdateOperationsInput | string | null
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneWithoutEmissionRecordsNestedInput
   }
 
   export type EmissionRecordUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     agentRunId?: NullableStringFieldUpdateOperationsInput | string | null
+    projectId?: NullableStringFieldUpdateOperationsInput | string | null
     instanceId?: StringFieldUpdateOperationsInput | string
     instanceType?: StringFieldUpdateOperationsInput | string
     provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
@@ -29170,6 +29566,7 @@ export namespace Prisma {
   export type EmissionRecordCreateManyInput = {
     id?: string
     agentRunId?: string | null
+    projectId?: string | null
     instanceId: string
     instanceType: string
     provider: $Enums.CloudProvider
@@ -29212,6 +29609,7 @@ export namespace Prisma {
   export type EmissionRecordUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     agentRunId?: NullableStringFieldUpdateOperationsInput | string | null
+    projectId?: NullableStringFieldUpdateOperationsInput | string | null
     instanceId?: StringFieldUpdateOperationsInput | string
     instanceType?: StringFieldUpdateOperationsInput | string
     provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
@@ -29334,57 +29732,85 @@ export namespace Prisma {
     id?: string
     name: string
     region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
     sdkConnected?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    carbonBudgetKg?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProjectsInput
+    agentRuns?: AgentRunCreateNestedManyWithoutProjectInput
+    emissionRecords?: EmissionRecordCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateInput = {
     id?: string
     name: string
     region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
     sdkConnected?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    carbonBudgetKg?: number | null
     userId: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    agentRuns?: AgentRunUncheckedCreateNestedManyWithoutProjectInput
+    emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
     sdkConnected?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProjectsNestedInput
+    agentRuns?: AgentRunUpdateManyWithoutProjectNestedInput
+    emissionRecords?: EmissionRecordUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
     sdkConnected?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     userId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agentRuns?: AgentRunUncheckedUpdateManyWithoutProjectNestedInput
+    emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateManyInput = {
     id?: string
     name: string
     region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
     sdkConnected?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    carbonBudgetKg?: number | null
     userId: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -29394,9 +29820,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
     sdkConnected?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29405,9 +29835,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
     sdkConnected?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     userId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31178,8 +31612,14 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
+  export type ProjectNullableRelationFilter = {
+    is?: ProjectWhereInput | null
+    isNot?: ProjectWhereInput | null
+  }
+
   export type AgentRunCountOrderByAggregateInput = {
     id?: SortOrder
+    projectId?: SortOrder
     agentType?: SortOrder
     status?: SortOrder
     triggeredBy?: SortOrder
@@ -31200,6 +31640,7 @@ export namespace Prisma {
 
   export type AgentRunMaxOrderByAggregateInput = {
     id?: SortOrder
+    projectId?: SortOrder
     agentType?: SortOrder
     status?: SortOrder
     triggeredBy?: SortOrder
@@ -31214,6 +31655,7 @@ export namespace Prisma {
 
   export type AgentRunMinOrderByAggregateInput = {
     id?: SortOrder
+    projectId?: SortOrder
     agentType?: SortOrder
     status?: SortOrder
     triggeredBy?: SortOrder
@@ -31270,6 +31712,7 @@ export namespace Prisma {
   export type EmissionRecordCountOrderByAggregateInput = {
     id?: SortOrder
     agentRunId?: SortOrder
+    projectId?: SortOrder
     instanceId?: SortOrder
     instanceType?: SortOrder
     provider?: SortOrder
@@ -31301,6 +31744,7 @@ export namespace Prisma {
   export type EmissionRecordMaxOrderByAggregateInput = {
     id?: SortOrder
     agentRunId?: SortOrder
+    projectId?: SortOrder
     instanceId?: SortOrder
     instanceType?: SortOrder
     provider?: SortOrder
@@ -31322,6 +31766,7 @@ export namespace Prisma {
   export type EmissionRecordMinOrderByAggregateInput = {
     id?: SortOrder
     agentRunId?: SortOrder
+    projectId?: SortOrder
     instanceId?: SortOrder
     instanceType?: SortOrder
     provider?: SortOrder
@@ -31438,25 +31883,57 @@ export namespace Prisma {
     isNot?: UserWhereInput
   }
 
+  export type AgentRunListRelationFilter = {
+    every?: AgentRunWhereInput
+    some?: AgentRunWhereInput
+    none?: AgentRunWhereInput
+  }
+
+  export type EmissionRecordListRelationFilter = {
+    every?: EmissionRecordWhereInput
+    some?: EmissionRecordWhereInput
+    none?: EmissionRecordWhereInput
+  }
+
+  export type AgentRunOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type EmissionRecordOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type ProjectCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
     region?: SortOrder
+    provider?: SortOrder
+    isDeployed?: SortOrder
+    deploymentUrl?: SortOrder
     sdkConnected?: SortOrder
     connectedAt?: SortOrder
     lastPingAt?: SortOrder
+    carbonBudgetKg?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type ProjectAvgOrderByAggregateInput = {
+    carbonBudgetKg?: SortOrder
   }
 
   export type ProjectMaxOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
     region?: SortOrder
+    provider?: SortOrder
+    isDeployed?: SortOrder
+    deploymentUrl?: SortOrder
     sdkConnected?: SortOrder
     connectedAt?: SortOrder
     lastPingAt?: SortOrder
+    carbonBudgetKg?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -31466,12 +31943,20 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     region?: SortOrder
+    provider?: SortOrder
+    isDeployed?: SortOrder
+    deploymentUrl?: SortOrder
     sdkConnected?: SortOrder
     connectedAt?: SortOrder
     lastPingAt?: SortOrder
+    carbonBudgetKg?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type ProjectSumOrderByAggregateInput = {
+    carbonBudgetKg?: SortOrder
   }
 
   export type ProfileCountOrderByAggregateInput = {
@@ -31852,6 +32337,12 @@ export namespace Prisma {
     set?: $Enums.StorageType
   }
 
+  export type ProjectCreateNestedOneWithoutAgentRunsInput = {
+    create?: XOR<ProjectCreateWithoutAgentRunsInput, ProjectUncheckedCreateWithoutAgentRunsInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutAgentRunsInput
+    connect?: ProjectWhereUniqueInput
+  }
+
   export type EnumAgentTypeFieldUpdateOperationsInput = {
     set?: $Enums.AgentType
   }
@@ -31866,6 +32357,32 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type ProjectUpdateOneWithoutAgentRunsNestedInput = {
+    create?: XOR<ProjectCreateWithoutAgentRunsInput, ProjectUncheckedCreateWithoutAgentRunsInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutAgentRunsInput
+    upsert?: ProjectUpsertWithoutAgentRunsInput
+    disconnect?: ProjectWhereInput | boolean
+    delete?: ProjectWhereInput | boolean
+    connect?: ProjectWhereUniqueInput
+    update?: XOR<XOR<ProjectUpdateToOneWithWhereWithoutAgentRunsInput, ProjectUpdateWithoutAgentRunsInput>, ProjectUncheckedUpdateWithoutAgentRunsInput>
+  }
+
+  export type ProjectCreateNestedOneWithoutEmissionRecordsInput = {
+    create?: XOR<ProjectCreateWithoutEmissionRecordsInput, ProjectUncheckedCreateWithoutEmissionRecordsInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutEmissionRecordsInput
+    connect?: ProjectWhereUniqueInput
+  }
+
+  export type ProjectUpdateOneWithoutEmissionRecordsNestedInput = {
+    create?: XOR<ProjectCreateWithoutEmissionRecordsInput, ProjectUncheckedCreateWithoutEmissionRecordsInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutEmissionRecordsInput
+    upsert?: ProjectUpsertWithoutEmissionRecordsInput
+    disconnect?: ProjectWhereInput | boolean
+    delete?: ProjectWhereInput | boolean
+    connect?: ProjectWhereUniqueInput
+    update?: XOR<XOR<ProjectUpdateToOneWithWhereWithoutEmissionRecordsInput, ProjectUpdateWithoutEmissionRecordsInput>, ProjectUncheckedUpdateWithoutEmissionRecordsInput>
   }
 
   export type ProfileCreateNestedOneWithoutUserInput = {
@@ -32026,12 +32543,96 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type AgentRunCreateNestedManyWithoutProjectInput = {
+    create?: XOR<AgentRunCreateWithoutProjectInput, AgentRunUncheckedCreateWithoutProjectInput> | AgentRunCreateWithoutProjectInput[] | AgentRunUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: AgentRunCreateOrConnectWithoutProjectInput | AgentRunCreateOrConnectWithoutProjectInput[]
+    createMany?: AgentRunCreateManyProjectInputEnvelope
+    connect?: AgentRunWhereUniqueInput | AgentRunWhereUniqueInput[]
+  }
+
+  export type EmissionRecordCreateNestedManyWithoutProjectInput = {
+    create?: XOR<EmissionRecordCreateWithoutProjectInput, EmissionRecordUncheckedCreateWithoutProjectInput> | EmissionRecordCreateWithoutProjectInput[] | EmissionRecordUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: EmissionRecordCreateOrConnectWithoutProjectInput | EmissionRecordCreateOrConnectWithoutProjectInput[]
+    createMany?: EmissionRecordCreateManyProjectInputEnvelope
+    connect?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+  }
+
+  export type AgentRunUncheckedCreateNestedManyWithoutProjectInput = {
+    create?: XOR<AgentRunCreateWithoutProjectInput, AgentRunUncheckedCreateWithoutProjectInput> | AgentRunCreateWithoutProjectInput[] | AgentRunUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: AgentRunCreateOrConnectWithoutProjectInput | AgentRunCreateOrConnectWithoutProjectInput[]
+    createMany?: AgentRunCreateManyProjectInputEnvelope
+    connect?: AgentRunWhereUniqueInput | AgentRunWhereUniqueInput[]
+  }
+
+  export type EmissionRecordUncheckedCreateNestedManyWithoutProjectInput = {
+    create?: XOR<EmissionRecordCreateWithoutProjectInput, EmissionRecordUncheckedCreateWithoutProjectInput> | EmissionRecordCreateWithoutProjectInput[] | EmissionRecordUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: EmissionRecordCreateOrConnectWithoutProjectInput | EmissionRecordCreateOrConnectWithoutProjectInput[]
+    createMany?: EmissionRecordCreateManyProjectInputEnvelope
+    connect?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+  }
+
   export type UserUpdateOneRequiredWithoutProjectsNestedInput = {
     create?: XOR<UserCreateWithoutProjectsInput, UserUncheckedCreateWithoutProjectsInput>
     connectOrCreate?: UserCreateOrConnectWithoutProjectsInput
     upsert?: UserUpsertWithoutProjectsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutProjectsInput, UserUpdateWithoutProjectsInput>, UserUncheckedUpdateWithoutProjectsInput>
+  }
+
+  export type AgentRunUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<AgentRunCreateWithoutProjectInput, AgentRunUncheckedCreateWithoutProjectInput> | AgentRunCreateWithoutProjectInput[] | AgentRunUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: AgentRunCreateOrConnectWithoutProjectInput | AgentRunCreateOrConnectWithoutProjectInput[]
+    upsert?: AgentRunUpsertWithWhereUniqueWithoutProjectInput | AgentRunUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: AgentRunCreateManyProjectInputEnvelope
+    set?: AgentRunWhereUniqueInput | AgentRunWhereUniqueInput[]
+    disconnect?: AgentRunWhereUniqueInput | AgentRunWhereUniqueInput[]
+    delete?: AgentRunWhereUniqueInput | AgentRunWhereUniqueInput[]
+    connect?: AgentRunWhereUniqueInput | AgentRunWhereUniqueInput[]
+    update?: AgentRunUpdateWithWhereUniqueWithoutProjectInput | AgentRunUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: AgentRunUpdateManyWithWhereWithoutProjectInput | AgentRunUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: AgentRunScalarWhereInput | AgentRunScalarWhereInput[]
+  }
+
+  export type EmissionRecordUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<EmissionRecordCreateWithoutProjectInput, EmissionRecordUncheckedCreateWithoutProjectInput> | EmissionRecordCreateWithoutProjectInput[] | EmissionRecordUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: EmissionRecordCreateOrConnectWithoutProjectInput | EmissionRecordCreateOrConnectWithoutProjectInput[]
+    upsert?: EmissionRecordUpsertWithWhereUniqueWithoutProjectInput | EmissionRecordUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: EmissionRecordCreateManyProjectInputEnvelope
+    set?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+    disconnect?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+    delete?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+    connect?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+    update?: EmissionRecordUpdateWithWhereUniqueWithoutProjectInput | EmissionRecordUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: EmissionRecordUpdateManyWithWhereWithoutProjectInput | EmissionRecordUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: EmissionRecordScalarWhereInput | EmissionRecordScalarWhereInput[]
+  }
+
+  export type AgentRunUncheckedUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<AgentRunCreateWithoutProjectInput, AgentRunUncheckedCreateWithoutProjectInput> | AgentRunCreateWithoutProjectInput[] | AgentRunUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: AgentRunCreateOrConnectWithoutProjectInput | AgentRunCreateOrConnectWithoutProjectInput[]
+    upsert?: AgentRunUpsertWithWhereUniqueWithoutProjectInput | AgentRunUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: AgentRunCreateManyProjectInputEnvelope
+    set?: AgentRunWhereUniqueInput | AgentRunWhereUniqueInput[]
+    disconnect?: AgentRunWhereUniqueInput | AgentRunWhereUniqueInput[]
+    delete?: AgentRunWhereUniqueInput | AgentRunWhereUniqueInput[]
+    connect?: AgentRunWhereUniqueInput | AgentRunWhereUniqueInput[]
+    update?: AgentRunUpdateWithWhereUniqueWithoutProjectInput | AgentRunUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: AgentRunUpdateManyWithWhereWithoutProjectInput | AgentRunUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: AgentRunScalarWhereInput | AgentRunScalarWhereInput[]
+  }
+
+  export type EmissionRecordUncheckedUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<EmissionRecordCreateWithoutProjectInput, EmissionRecordUncheckedCreateWithoutProjectInput> | EmissionRecordCreateWithoutProjectInput[] | EmissionRecordUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: EmissionRecordCreateOrConnectWithoutProjectInput | EmissionRecordCreateOrConnectWithoutProjectInput[]
+    upsert?: EmissionRecordUpsertWithWhereUniqueWithoutProjectInput | EmissionRecordUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: EmissionRecordCreateManyProjectInputEnvelope
+    set?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+    disconnect?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+    delete?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+    connect?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+    update?: EmissionRecordUpdateWithWhereUniqueWithoutProjectInput | EmissionRecordUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: EmissionRecordUpdateManyWithWhereWithoutProjectInput | EmissionRecordUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: EmissionRecordScalarWhereInput | EmissionRecordScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutProfileInput = {
@@ -33157,6 +33758,174 @@ export namespace Prisma {
     calculations?: CalculationUncheckedUpdateManyWithoutUserNestedInput
   }
 
+  export type ProjectCreateWithoutAgentRunsInput = {
+    id?: string
+    name: string
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    sdkConnected?: boolean
+    connectedAt?: Date | string | null
+    lastPingAt?: Date | string | null
+    carbonBudgetKg?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutProjectsInput
+    emissionRecords?: EmissionRecordCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectUncheckedCreateWithoutAgentRunsInput = {
+    id?: string
+    name: string
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    sdkConnected?: boolean
+    connectedAt?: Date | string | null
+    lastPingAt?: Date | string | null
+    carbonBudgetKg?: number | null
+    userId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectCreateOrConnectWithoutAgentRunsInput = {
+    where: ProjectWhereUniqueInput
+    create: XOR<ProjectCreateWithoutAgentRunsInput, ProjectUncheckedCreateWithoutAgentRunsInput>
+  }
+
+  export type ProjectUpsertWithoutAgentRunsInput = {
+    update: XOR<ProjectUpdateWithoutAgentRunsInput, ProjectUncheckedUpdateWithoutAgentRunsInput>
+    create: XOR<ProjectCreateWithoutAgentRunsInput, ProjectUncheckedCreateWithoutAgentRunsInput>
+    where?: ProjectWhereInput
+  }
+
+  export type ProjectUpdateToOneWithWhereWithoutAgentRunsInput = {
+    where?: ProjectWhereInput
+    data: XOR<ProjectUpdateWithoutAgentRunsInput, ProjectUncheckedUpdateWithoutAgentRunsInput>
+  }
+
+  export type ProjectUpdateWithoutAgentRunsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutProjectsNestedInput
+    emissionRecords?: EmissionRecordUpdateManyWithoutProjectNestedInput
+  }
+
+  export type ProjectUncheckedUpdateWithoutAgentRunsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    userId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutProjectNestedInput
+  }
+
+  export type ProjectCreateWithoutEmissionRecordsInput = {
+    id?: string
+    name: string
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    sdkConnected?: boolean
+    connectedAt?: Date | string | null
+    lastPingAt?: Date | string | null
+    carbonBudgetKg?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutProjectsInput
+    agentRuns?: AgentRunCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectUncheckedCreateWithoutEmissionRecordsInput = {
+    id?: string
+    name: string
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    sdkConnected?: boolean
+    connectedAt?: Date | string | null
+    lastPingAt?: Date | string | null
+    carbonBudgetKg?: number | null
+    userId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    agentRuns?: AgentRunUncheckedCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectCreateOrConnectWithoutEmissionRecordsInput = {
+    where: ProjectWhereUniqueInput
+    create: XOR<ProjectCreateWithoutEmissionRecordsInput, ProjectUncheckedCreateWithoutEmissionRecordsInput>
+  }
+
+  export type ProjectUpsertWithoutEmissionRecordsInput = {
+    update: XOR<ProjectUpdateWithoutEmissionRecordsInput, ProjectUncheckedUpdateWithoutEmissionRecordsInput>
+    create: XOR<ProjectCreateWithoutEmissionRecordsInput, ProjectUncheckedCreateWithoutEmissionRecordsInput>
+    where?: ProjectWhereInput
+  }
+
+  export type ProjectUpdateToOneWithWhereWithoutEmissionRecordsInput = {
+    where?: ProjectWhereInput
+    data: XOR<ProjectUpdateWithoutEmissionRecordsInput, ProjectUncheckedUpdateWithoutEmissionRecordsInput>
+  }
+
+  export type ProjectUpdateWithoutEmissionRecordsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutProjectsNestedInput
+    agentRuns?: AgentRunUpdateManyWithoutProjectNestedInput
+  }
+
+  export type ProjectUncheckedUpdateWithoutEmissionRecordsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    userId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agentRuns?: AgentRunUncheckedUpdateManyWithoutProjectNestedInput
+  }
+
   export type ProfileCreateWithoutUserInput = {
     id?: string
     fullName?: string | null
@@ -33190,22 +33959,34 @@ export namespace Prisma {
     id?: string
     name: string
     region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
     sdkConnected?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    carbonBudgetKg?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    agentRuns?: AgentRunCreateNestedManyWithoutProjectInput
+    emissionRecords?: EmissionRecordCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutUserInput = {
     id?: string
     name: string
     region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
     sdkConnected?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    carbonBudgetKg?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    agentRuns?: AgentRunUncheckedCreateNestedManyWithoutProjectInput
+    emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutUserInput = {
@@ -33317,9 +34098,13 @@ export namespace Prisma {
     id?: StringFilter<"Project"> | string
     name?: StringFilter<"Project"> | string
     region?: StringNullableFilter<"Project"> | string | null
+    provider?: EnumCloudProviderNullableFilter<"Project"> | $Enums.CloudProvider | null
+    isDeployed?: BoolFilter<"Project"> | boolean
+    deploymentUrl?: StringNullableFilter<"Project"> | string | null
     sdkConnected?: BoolFilter<"Project"> | boolean
     connectedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     lastPingAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    carbonBudgetKg?: FloatNullableFilter<"Project"> | number | null
     userId?: StringFilter<"Project"> | string
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
@@ -33411,6 +34196,98 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutProjectsInput, UserUncheckedCreateWithoutProjectsInput>
   }
 
+  export type AgentRunCreateWithoutProjectInput = {
+    id?: string
+    agentType: $Enums.AgentType
+    status?: $Enums.AgentRunStatus
+    triggeredBy?: string
+    summary?: string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    recordsProcessed?: number
+    errorMessage?: string | null
+    startedAt?: Date | string
+    completedAt?: Date | string | null
+    durationMs?: number | null
+    createdAt?: Date | string
+  }
+
+  export type AgentRunUncheckedCreateWithoutProjectInput = {
+    id?: string
+    agentType: $Enums.AgentType
+    status?: $Enums.AgentRunStatus
+    triggeredBy?: string
+    summary?: string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    recordsProcessed?: number
+    errorMessage?: string | null
+    startedAt?: Date | string
+    completedAt?: Date | string | null
+    durationMs?: number | null
+    createdAt?: Date | string
+  }
+
+  export type AgentRunCreateOrConnectWithoutProjectInput = {
+    where: AgentRunWhereUniqueInput
+    create: XOR<AgentRunCreateWithoutProjectInput, AgentRunUncheckedCreateWithoutProjectInput>
+  }
+
+  export type AgentRunCreateManyProjectInputEnvelope = {
+    data: AgentRunCreateManyProjectInput | AgentRunCreateManyProjectInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EmissionRecordCreateWithoutProjectInput = {
+    id?: string
+    agentRunId?: string | null
+    instanceId: string
+    instanceType: string
+    provider: $Enums.CloudProvider
+    region: string
+    instanceName?: string | null
+    cpuUtilization: number
+    memoryUtilization?: number | null
+    networkInGb?: number | null
+    networkOutGb?: number | null
+    energyKwh: number
+    gridIntensity: number
+    carbonKg: number
+    isIdle?: boolean
+    isOversized?: boolean
+    recommendation?: string | null
+    timestamp?: Date | string
+  }
+
+  export type EmissionRecordUncheckedCreateWithoutProjectInput = {
+    id?: string
+    agentRunId?: string | null
+    instanceId: string
+    instanceType: string
+    provider: $Enums.CloudProvider
+    region: string
+    instanceName?: string | null
+    cpuUtilization: number
+    memoryUtilization?: number | null
+    networkInGb?: number | null
+    networkOutGb?: number | null
+    energyKwh: number
+    gridIntensity: number
+    carbonKg: number
+    isIdle?: boolean
+    isOversized?: boolean
+    recommendation?: string | null
+    timestamp?: Date | string
+  }
+
+  export type EmissionRecordCreateOrConnectWithoutProjectInput = {
+    where: EmissionRecordWhereUniqueInput
+    create: XOR<EmissionRecordCreateWithoutProjectInput, EmissionRecordUncheckedCreateWithoutProjectInput>
+  }
+
+  export type EmissionRecordCreateManyProjectInputEnvelope = {
+    data: EmissionRecordCreateManyProjectInput | EmissionRecordCreateManyProjectInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutProjectsInput = {
     update: XOR<UserUpdateWithoutProjectsInput, UserUncheckedUpdateWithoutProjectsInput>
     create: XOR<UserCreateWithoutProjectsInput, UserUncheckedCreateWithoutProjectsInput>
@@ -33450,6 +34327,82 @@ export namespace Prisma {
     profile?: ProfileUncheckedUpdateOneWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     ChatHistory?: ChatHistoryUncheckedUpdateOneWithoutUserNestedInput
+  }
+
+  export type AgentRunUpsertWithWhereUniqueWithoutProjectInput = {
+    where: AgentRunWhereUniqueInput
+    update: XOR<AgentRunUpdateWithoutProjectInput, AgentRunUncheckedUpdateWithoutProjectInput>
+    create: XOR<AgentRunCreateWithoutProjectInput, AgentRunUncheckedCreateWithoutProjectInput>
+  }
+
+  export type AgentRunUpdateWithWhereUniqueWithoutProjectInput = {
+    where: AgentRunWhereUniqueInput
+    data: XOR<AgentRunUpdateWithoutProjectInput, AgentRunUncheckedUpdateWithoutProjectInput>
+  }
+
+  export type AgentRunUpdateManyWithWhereWithoutProjectInput = {
+    where: AgentRunScalarWhereInput
+    data: XOR<AgentRunUpdateManyMutationInput, AgentRunUncheckedUpdateManyWithoutProjectInput>
+  }
+
+  export type AgentRunScalarWhereInput = {
+    AND?: AgentRunScalarWhereInput | AgentRunScalarWhereInput[]
+    OR?: AgentRunScalarWhereInput[]
+    NOT?: AgentRunScalarWhereInput | AgentRunScalarWhereInput[]
+    id?: StringFilter<"AgentRun"> | string
+    projectId?: StringNullableFilter<"AgentRun"> | string | null
+    agentType?: EnumAgentTypeFilter<"AgentRun"> | $Enums.AgentType
+    status?: EnumAgentRunStatusFilter<"AgentRun"> | $Enums.AgentRunStatus
+    triggeredBy?: StringFilter<"AgentRun"> | string
+    summary?: StringNullableFilter<"AgentRun"> | string | null
+    details?: JsonNullableFilter<"AgentRun">
+    recordsProcessed?: IntFilter<"AgentRun"> | number
+    errorMessage?: StringNullableFilter<"AgentRun"> | string | null
+    startedAt?: DateTimeFilter<"AgentRun"> | Date | string
+    completedAt?: DateTimeNullableFilter<"AgentRun"> | Date | string | null
+    durationMs?: IntNullableFilter<"AgentRun"> | number | null
+    createdAt?: DateTimeFilter<"AgentRun"> | Date | string
+  }
+
+  export type EmissionRecordUpsertWithWhereUniqueWithoutProjectInput = {
+    where: EmissionRecordWhereUniqueInput
+    update: XOR<EmissionRecordUpdateWithoutProjectInput, EmissionRecordUncheckedUpdateWithoutProjectInput>
+    create: XOR<EmissionRecordCreateWithoutProjectInput, EmissionRecordUncheckedCreateWithoutProjectInput>
+  }
+
+  export type EmissionRecordUpdateWithWhereUniqueWithoutProjectInput = {
+    where: EmissionRecordWhereUniqueInput
+    data: XOR<EmissionRecordUpdateWithoutProjectInput, EmissionRecordUncheckedUpdateWithoutProjectInput>
+  }
+
+  export type EmissionRecordUpdateManyWithWhereWithoutProjectInput = {
+    where: EmissionRecordScalarWhereInput
+    data: XOR<EmissionRecordUpdateManyMutationInput, EmissionRecordUncheckedUpdateManyWithoutProjectInput>
+  }
+
+  export type EmissionRecordScalarWhereInput = {
+    AND?: EmissionRecordScalarWhereInput | EmissionRecordScalarWhereInput[]
+    OR?: EmissionRecordScalarWhereInput[]
+    NOT?: EmissionRecordScalarWhereInput | EmissionRecordScalarWhereInput[]
+    id?: StringFilter<"EmissionRecord"> | string
+    agentRunId?: StringNullableFilter<"EmissionRecord"> | string | null
+    projectId?: StringNullableFilter<"EmissionRecord"> | string | null
+    instanceId?: StringFilter<"EmissionRecord"> | string
+    instanceType?: StringFilter<"EmissionRecord"> | string
+    provider?: EnumCloudProviderFilter<"EmissionRecord"> | $Enums.CloudProvider
+    region?: StringFilter<"EmissionRecord"> | string
+    instanceName?: StringNullableFilter<"EmissionRecord"> | string | null
+    cpuUtilization?: FloatFilter<"EmissionRecord"> | number
+    memoryUtilization?: FloatNullableFilter<"EmissionRecord"> | number | null
+    networkInGb?: FloatNullableFilter<"EmissionRecord"> | number | null
+    networkOutGb?: FloatNullableFilter<"EmissionRecord"> | number | null
+    energyKwh?: FloatFilter<"EmissionRecord"> | number
+    gridIntensity?: FloatFilter<"EmissionRecord"> | number
+    carbonKg?: FloatFilter<"EmissionRecord"> | number
+    isIdle?: BoolFilter<"EmissionRecord"> | boolean
+    isOversized?: BoolFilter<"EmissionRecord"> | boolean
+    recommendation?: StringNullableFilter<"EmissionRecord"> | string | null
+    timestamp?: DateTimeFilter<"EmissionRecord"> | Date | string
   }
 
   export type UserCreateWithoutProfileInput = {
@@ -33884,9 +34837,13 @@ export namespace Prisma {
     id?: string
     name: string
     region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
     sdkConnected?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    carbonBudgetKg?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -33901,31 +34858,47 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
     sdkConnected?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agentRuns?: AgentRunUpdateManyWithoutProjectNestedInput
+    emissionRecords?: EmissionRecordUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
     sdkConnected?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agentRuns?: AgentRunUncheckedUpdateManyWithoutProjectNestedInput
+    emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
     sdkConnected?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -33948,6 +34921,150 @@ export namespace Prisma {
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type AgentRunCreateManyProjectInput = {
+    id?: string
+    agentType: $Enums.AgentType
+    status?: $Enums.AgentRunStatus
+    triggeredBy?: string
+    summary?: string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    recordsProcessed?: number
+    errorMessage?: string | null
+    startedAt?: Date | string
+    completedAt?: Date | string | null
+    durationMs?: number | null
+    createdAt?: Date | string
+  }
+
+  export type EmissionRecordCreateManyProjectInput = {
+    id?: string
+    agentRunId?: string | null
+    instanceId: string
+    instanceType: string
+    provider: $Enums.CloudProvider
+    region: string
+    instanceName?: string | null
+    cpuUtilization: number
+    memoryUtilization?: number | null
+    networkInGb?: number | null
+    networkOutGb?: number | null
+    energyKwh: number
+    gridIntensity: number
+    carbonKg: number
+    isIdle?: boolean
+    isOversized?: boolean
+    recommendation?: string | null
+    timestamp?: Date | string
+  }
+
+  export type AgentRunUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentType?: EnumAgentTypeFieldUpdateOperationsInput | $Enums.AgentType
+    status?: EnumAgentRunStatusFieldUpdateOperationsInput | $Enums.AgentRunStatus
+    triggeredBy?: StringFieldUpdateOperationsInput | string
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    recordsProcessed?: IntFieldUpdateOperationsInput | number
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationMs?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgentRunUncheckedUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentType?: EnumAgentTypeFieldUpdateOperationsInput | $Enums.AgentType
+    status?: EnumAgentRunStatusFieldUpdateOperationsInput | $Enums.AgentRunStatus
+    triggeredBy?: StringFieldUpdateOperationsInput | string
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    recordsProcessed?: IntFieldUpdateOperationsInput | number
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationMs?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgentRunUncheckedUpdateManyWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentType?: EnumAgentTypeFieldUpdateOperationsInput | $Enums.AgentType
+    status?: EnumAgentRunStatusFieldUpdateOperationsInput | $Enums.AgentRunStatus
+    triggeredBy?: StringFieldUpdateOperationsInput | string
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    recordsProcessed?: IntFieldUpdateOperationsInput | number
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationMs?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmissionRecordUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentRunId?: NullableStringFieldUpdateOperationsInput | string | null
+    instanceId?: StringFieldUpdateOperationsInput | string
+    instanceType?: StringFieldUpdateOperationsInput | string
+    provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
+    region?: StringFieldUpdateOperationsInput | string
+    instanceName?: NullableStringFieldUpdateOperationsInput | string | null
+    cpuUtilization?: FloatFieldUpdateOperationsInput | number
+    memoryUtilization?: NullableFloatFieldUpdateOperationsInput | number | null
+    networkInGb?: NullableFloatFieldUpdateOperationsInput | number | null
+    networkOutGb?: NullableFloatFieldUpdateOperationsInput | number | null
+    energyKwh?: FloatFieldUpdateOperationsInput | number
+    gridIntensity?: FloatFieldUpdateOperationsInput | number
+    carbonKg?: FloatFieldUpdateOperationsInput | number
+    isIdle?: BoolFieldUpdateOperationsInput | boolean
+    isOversized?: BoolFieldUpdateOperationsInput | boolean
+    recommendation?: NullableStringFieldUpdateOperationsInput | string | null
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmissionRecordUncheckedUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentRunId?: NullableStringFieldUpdateOperationsInput | string | null
+    instanceId?: StringFieldUpdateOperationsInput | string
+    instanceType?: StringFieldUpdateOperationsInput | string
+    provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
+    region?: StringFieldUpdateOperationsInput | string
+    instanceName?: NullableStringFieldUpdateOperationsInput | string | null
+    cpuUtilization?: FloatFieldUpdateOperationsInput | number
+    memoryUtilization?: NullableFloatFieldUpdateOperationsInput | number | null
+    networkInGb?: NullableFloatFieldUpdateOperationsInput | number | null
+    networkOutGb?: NullableFloatFieldUpdateOperationsInput | number | null
+    energyKwh?: FloatFieldUpdateOperationsInput | number
+    gridIntensity?: FloatFieldUpdateOperationsInput | number
+    carbonKg?: FloatFieldUpdateOperationsInput | number
+    isIdle?: BoolFieldUpdateOperationsInput | boolean
+    isOversized?: BoolFieldUpdateOperationsInput | boolean
+    recommendation?: NullableStringFieldUpdateOperationsInput | string | null
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmissionRecordUncheckedUpdateManyWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentRunId?: NullableStringFieldUpdateOperationsInput | string | null
+    instanceId?: StringFieldUpdateOperationsInput | string
+    instanceType?: StringFieldUpdateOperationsInput | string
+    provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
+    region?: StringFieldUpdateOperationsInput | string
+    instanceName?: NullableStringFieldUpdateOperationsInput | string | null
+    cpuUtilization?: FloatFieldUpdateOperationsInput | number
+    memoryUtilization?: NullableFloatFieldUpdateOperationsInput | number | null
+    networkInGb?: NullableFloatFieldUpdateOperationsInput | number | null
+    networkOutGb?: NullableFloatFieldUpdateOperationsInput | number | null
+    energyKwh?: FloatFieldUpdateOperationsInput | number
+    gridIntensity?: FloatFieldUpdateOperationsInput | number
+    carbonKg?: FloatFieldUpdateOperationsInput | number
+    isIdle?: BoolFieldUpdateOperationsInput | boolean
+    isOversized?: BoolFieldUpdateOperationsInput | boolean
+    recommendation?: NullableStringFieldUpdateOperationsInput | string | null
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
 
 
   /**
@@ -33961,6 +35078,10 @@ export namespace Prisma {
      * @deprecated Use UserCountOutputTypeDefaultArgs instead
      */
     export type UserCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = UserCountOutputTypeDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use ProjectCountOutputTypeDefaultArgs instead
+     */
+    export type ProjectCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ProjectCountOutputTypeDefaultArgs<ExtArgs>
     /**
      * @deprecated Use MobileUserDefaultArgs instead
      */

@@ -62,6 +62,22 @@ export const adminApi = {
     const response = await apiClient.get('/admin/users', { params });
     return response.data;
   },
+  getEmissions: async (provider = 'All', region = 'All', project = 'All') => {
+    const response = await apiClient.get('/admin/emissions', { params: { provider, region, project } });
+    return response.data;
+  },
+  deleteProject: async (id: string) => {
+    const response = await apiClient.delete(`/admin/projects/${id}`);
+    return response.data;
+  },
+  disconnectProject: async (id: string) => {
+    const response = await apiClient.post(`/admin/projects/${id}/disconnect`);
+    return response.data;
+  },
+  getProjectStats: async (id: string) => {
+    const response = await apiClient.get(`/admin/projects/${id}/stats`);
+    return response.data;
+  },
   getApiKeys: async () => {
     const response = await apiClient.get('/admin/api-keys');
     return response.data;

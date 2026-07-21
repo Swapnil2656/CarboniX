@@ -48,7 +48,7 @@ export const StatCard: React.FC<StatCardProps> = ({ title, value, icon, trend, i
           </div>
         )}
       </div>
-      <div className="text-headline text-on-surface mt-2">{value}</div>
+      <div className="text-headline text-on-surface mt-2 truncate" title={String(value)}>{value}</div>
     </div>
   );
 };

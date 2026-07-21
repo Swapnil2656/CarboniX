@@ -1,0 +1,46 @@
+PrismaClientValidationError: 
+Invalid `prisma.emissionRecord.findMany()` invocation in
+/Users/swapnilsen/CarboniX/services/api/src/modules/admin/admin.controller.ts:919:57
+
+  916 const project = await prisma.project.findUnique({ where: { id } });
+  917 if (!project) return res.status(404).json({ error: 'Project not found' });
+  918 
+→ 919 const latestEmissions = await prisma.emissionRecord.findMany({
+        where: {
+          projectId: "cmrfc3vj60003dg0wp35upsrn"
+        },
+        orderBy: {
+          createdAt: "desc",
+          ~~~~~~~~~
+      ?   id?: SortOrder,
+      ?   agentRunId?: SortOrder | SortOrderInput,
+      ?   projectId?: SortOrder | SortOrderInput,
+      ?   instanceId?: SortOrder,
+      ?   instanceType?: SortOrder,
+      ?   provider?: SortOrder,
+      ?   region?: SortOrder,
+      ?   instanceName?: SortOrder | SortOrderInput,
+      ?   cpuUtilization?: SortOrder,
+      ?   memoryUtilization?: SortOrder | SortOrderInput,
+      ?   networkInGb?: SortOrder | SortOrderInput,
+      ?   networkOutGb?: SortOrder | SortOrderInput,
+      ?   energyKwh?: SortOrder,
+      ?   gridIntensity?: SortOrder,
+      ?   carbonKg?: SortOrder,
+      ?   isIdle?: SortOrder,
+      ?   isOversized?: SortOrder,
+      ?   recommendation?: SortOrder | SortOrderInput,
+      ?   timestamp?: SortOrder,
+      ?   project?: ProjectOrderByWithRelationInput
+        },
+        take: 1
+      })
+
+Unknown argument `createdAt`. Available options are marked with ?.
+    at wn (/Users/swapnilsen/CarboniX/services/api/src/generated/prisma/runtime/library.js:29:1363)
+    at $n.handleRequestError (/Users/swapnilsen/CarboniX/services/api/src/generated/prisma/runtime/library.js:121:6958)
+    at $n.handleAndLogRequestError (/Users/swapnilsen/CarboniX/services/api/src/generated/prisma/runtime/library.js:121:6623)
+    at $n.request (/Users/swapnilsen/CarboniX/services/api/src/generated/prisma/runtime/library.js:121:6307)
+    at async l (/Users/swapnilsen/CarboniX/services/api/src/generated/prisma/runtime/library.js:130:9633)
+    at async getProjectStats (/Users/swapnilsen/CarboniX/services/api/src/modules/admin/admin.controller.ts:919:29)
+    at async run (/Users/swapnilsen/CarboniX/services/api/src/test-controller.ts:27:3)

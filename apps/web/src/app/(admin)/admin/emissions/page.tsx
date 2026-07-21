@@ -131,7 +131,10 @@ export default function EmissionsPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-section-header text-on-surface">Resource Emissions</h1>
-          <p className="text-on-surface-variant mt-1">Granular view of actual cloud infrastructure emissions and resource utilization.</p>
+          <p className="text-on-surface-variant mt-1">
+            Granular view of actual cloud infrastructure emissions and resource utilization.
+            Each row represents one cloud instance CarboniX has measured, showing estimated energy use and carbon output. Measurements are sourced via background scans and active SDK pings.
+          </p>
         </div>
         
         <div className="flex flex-wrap items-center gap-3">

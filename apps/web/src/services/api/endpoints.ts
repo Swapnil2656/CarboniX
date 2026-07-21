@@ -56,6 +56,18 @@ export const adminApi = {
     });
   },
 
+  deleteProject: async (id: string): Promise<any> => {
+    return fetchClient(`/admin/projects/${id}`, { method: 'DELETE' });
+  },
+
+  disconnectProject: async (id: string): Promise<any> => {
+    return fetchClient(`/admin/projects/${id}/disconnect`, { method: 'POST' });
+  },
+
+  getProjectStats: async (id: string): Promise<any> => {
+    return fetchClient(`/admin/projects/${id}/stats`, { method: 'GET' });
+  },
+
   migrateEmission: async (id: string, targetRegion: string): Promise<any> => {
     return fetchClient(`/admin/emissions/${id}/migrate`, {
       method: 'POST',
