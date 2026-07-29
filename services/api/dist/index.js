@@ -22,7 +22,7 @@ const prisma_1 = require("./lib/prisma");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = Number(process.env.PORT) || 4000;
-const USE_MOCK = process.env.USE_MOCK_AGENTS !== 'false';
+const USE_MOCK = process.env.USE_MOCK_AGENTS === 'true';
 const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY || '';
 app.use((0, cors_1.default)());
 app.use((0, helmet_1.default)({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
@@ -56,6 +56,10 @@ app.post('/api/v1/public/accept-invite', async (req, res) => {
 // ─── Agent Cron Scheduling ───────────────────────────────────
 // Run Collector + Analyst every hour
 node_cron_1.default.schedule('0 * * * *', async () => {
+    if (!USE_MOCK) {
+        console.log('[CRON] Skipping hourly collector (mock mode disabled, waiting for live ingest)...');
+        return;
+    }
     console.log('[CRON] Running Collector + Analyst agents...');
     try {
         const startTime = Date.now();
@@ -120,6 +124,25 @@ node_cron_1.default.schedule('0 * * * *', async () => {
             },
         });
         console.log(`[CRON] Analyst done: ${analystResult.summary}`);
+        // 3. Enact Real Agentic Actions for Agentic Projects
+        const agenticProjects = await prisma_1.prisma.project.findMany({
+            where: { agenticMode: true },
+            include: { platformCredentials: true }
+        });
+        for (const project of agenticProjects) {
+            // Find a region migration recommendation to enact
+            const migrationRec = analystResult.recommendations.find(r => r.recommendedAction === 'MIGRATE_REGION');
+            if (migrationRec) {
+                console.log(`[CRON] Agentic Action: Enacting region switch for project ${project.name} (${project.id})...`);
+                try {
+                    const result = await (0, agents_1.enactRegionSwitch)(project.id, project.name, migrationRec, project.platformCredentials.map(c => ({ provider: c.provider, token: c.token })));
+                    console.log(`[CRON] Platform action result:`, result.message);
+                }
+                catch (e) {
+                    console.error(`[CRON] Failed to enact platform action for ${project.name}:`, e);
+                }
+            }
+        }
     }
     catch (error) {
         console.error('[CRON] Agent pipeline failed:', error.message);

@@ -19,3 +19,4 @@ __exportStar(require("./gridCache"), exports);
 __exportStar(require("./rating"), exports);
 __exportStar(require("./equivalents"), exports);
 __exportStar(require("./recommendations"), exports);
+__exportStar(require("./ai"), exports);

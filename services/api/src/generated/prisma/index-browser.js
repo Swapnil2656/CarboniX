@@ -211,6 +211,7 @@ exports.Prisma.ApiKeyScalarFieldEnum = {
   prefix: 'prefix',
   hashedKey: 'hashedKey',
   createdBy: 'createdBy',
+  projectId: 'projectId',
   permissions: 'permissions',
   requestsPerMinute: 'requestsPerMinute',
   requestsPerDay: 'requestsPerDay',
@@ -419,6 +420,7 @@ exports.Prisma.ProjectScalarFieldEnum = {
   isDeployed: 'isDeployed',
   deploymentUrl: 'deploymentUrl',
   sdkConnected: 'sdkConnected',
+  agenticMode: 'agenticMode',
   connectedAt: 'connectedAt',
   lastPingAt: 'lastPingAt',
   carbonBudgetKg: 'carbonBudgetKg',
@@ -436,6 +438,7 @@ exports.Prisma.ProfileScalarFieldEnum = {
   emailAlerts: 'emailAlerts',
   pushAlerts: 'pushAlerts',
   thresholdAlerts: 'thresholdAlerts',
+  expoPushToken: 'expoPushToken',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -466,6 +469,15 @@ exports.Prisma.ChatHistoryScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   messages: 'messages',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PlatformCredentialScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  provider: 'provider',
+  token: 'token',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -640,7 +652,8 @@ exports.Prisma.ModelName = {
   Profile: 'Profile',
   VerificationToken: 'VerificationToken',
   TeamMember: 'TeamMember',
-  ChatHistory: 'ChatHistory'
+  ChatHistory: 'ChatHistory',
+  PlatformCredential: 'PlatformCredential'
 };
 
 /**

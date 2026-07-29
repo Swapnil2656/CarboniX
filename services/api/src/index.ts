@@ -12,7 +12,7 @@ import adminRoutes from './modules/admin/admin.routes';
 import connectRoutes from './modules/connect/connect.routes';
 import aiRoutes from './modules/ai/ai.routes';
 
-import { runCollector } from '@carbonix/agents';
+import { runCollector, enactRegionSwitch } from '@carbonix/agents';
 import { runAnalyst } from '@carbonix/agents';
 import { runReporter } from '@carbonix/agents';
 import { prisma } from './lib/prisma';
@@ -22,7 +22,7 @@ dotenv.config();
 const app = express();
 const port = Number(process.env.PORT) || 4000;
 
-const USE_MOCK = process.env.USE_MOCK_AGENTS !== 'false';
+const USE_MOCK = process.env.USE_MOCK_AGENTS === 'true';
 const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY || '';
 
 app.use(cors());
@@ -63,6 +63,10 @@ app.post('/api/v1/public/accept-invite', async (req, res) => {
 
 // Run Collector + Analyst every hour
 cron.schedule('0 * * * *', async () => {
+  if (!USE_MOCK) {
+    console.log('[CRON] Skipping hourly collector (mock mode disabled, waiting for live ingest)...');
+    return;
+  }
   console.log('[CRON] Running Collector + Analyst agents...');
   try {
     const startTime = Date.now();
@@ -136,6 +140,31 @@ cron.schedule('0 * * * *', async () => {
     });
 
     console.log(`[CRON] Analyst done: ${analystResult.summary}`);
+
+    // 3. Enact Real Agentic Actions for Agentic Projects
+    const agenticProjects = await prisma.project.findMany({
+      where: { agenticMode: true },
+      include: { platformCredentials: true }
+    });
+
+    for (const project of agenticProjects) {
+      // Find a region migration recommendation to enact
+      const migrationRec = analystResult.recommendations.find(r => r.recommendedAction === 'MIGRATE_REGION');
+      if (migrationRec) {
+        console.log(`[CRON] Agentic Action: Enacting region switch for project ${project.name} (${project.id})...`);
+        try {
+          const result = await enactRegionSwitch(
+            project.id,
+            project.name,
+            migrationRec,
+            project.platformCredentials.map(c => ({ provider: c.provider, token: c.token }))
+          );
+          console.log(`[CRON] Platform action result:`, result.message);
+        } catch (e) {
+          console.error(`[CRON] Failed to enact platform action for ${project.name}:`, e);
+        }
+      }
+    }
   } catch (error) {
     console.error('[CRON] Agent pipeline failed:', (error as Error).message);
   }

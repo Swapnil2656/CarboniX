@@ -25,6 +25,7 @@ const authenticate = (req, res, next) => {
         next();
     }
     catch (error) {
+        console.error('[AUTH ERROR] Token verification failed:', error.message, 'Token:', token.substring(0, 20) + '...');
         return res.status(401).json({ success: false, error: 'Unauthorized: Invalid token' });
     }
 };

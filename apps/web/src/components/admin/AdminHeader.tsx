@@ -191,7 +191,7 @@ export const AdminHeader = () => {
 
   return (
     <>
-    <header className="h-16 border-b border-outline-variant bg-surface-dim/90 backdrop-blur sticky top-0 z-40 flex items-center justify-between px-6 lg:px-8 gap-4">
+    <header className="h-16 border-b border-outline-variant bg-surface-dim/90 backdrop-blur sticky top-0 z-50 flex items-center justify-between px-6 lg:px-8 gap-4">
       {/* Left side: Logo & Navigation */}
       <div className="flex items-center gap-8">
         <Link href="/admin/dashboard" className="flex items-center gap-3 shrink-0">
@@ -201,26 +201,27 @@ export const AdminHeader = () => {
           </span>
         </Link>
         
-        <nav className="hidden md:flex items-center gap-1">
-          {navItems.map((item) => {
-            const isActive = pathname === item.path || pathname.startsWith(`${item.path}/`);
-            return (
-              <Link 
-                key={item.path} 
-                href={item.path}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors font-medium text-sm ${
-                  isActive 
-                    ? 'bg-[rgba(245,197,24,0.1)] text-primary' 
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[18px]">{item.icon}</span>
-                <span className="whitespace-nowrap">{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
       </div>
+
+      <nav className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2 pr-32 lg:pr-48">
+        {navItems.map((item) => {
+          const isActive = pathname === item.path || pathname.startsWith(`${item.path}/`);
+          return (
+            <Link 
+              key={item.path} 
+              href={item.path}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors font-medium text-sm ${
+                isActive 
+                  ? 'bg-[rgba(245,197,24,0.1)] text-primary' 
+                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">{item.icon}</span>
+              <span className="whitespace-nowrap">{item.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
 
       {/* Right side: Search & Profile */}
       <div className="flex items-center gap-4 flex-1 justify-end max-w-3xl">
@@ -264,140 +265,47 @@ export const AdminHeader = () => {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-4">
-          <div className="relative" ref={dropdownRef}>
+
+        <div className="relative" ref={dropdownRef}>
           <button 
-            onClick={toggleNotifications}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors relative"
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="flex items-center gap-2 p-1 pl-2 pr-1 rounded-full hover:bg-surface-container transition-colors border border-outline-variant/30 ml-2"
           >
-            <span className="material-symbols-outlined text-[20px]">notifications</span>
-            {hasUnreadNotifications && (
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#50FA7B] ring-2 ring-surface"></span>
+            {avatarUrl ? (
+              <Image src={avatarUrl} alt={userName} width={32} height={32} className="w-8 h-8 rounded-full bg-surface-container-high object-cover" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
+                {userInitial}
+              </div>
             )}
+            <span className="material-symbols-outlined text-outline text-[18px] ml-1">expand_more</span>
           </button>
 
-          {isNotificationsOpen && (
-            <div className="absolute right-0 mt-2 w-80 rounded-lg bg-surface border border-outline-variant shadow-lg py-1 z-50 overflow-hidden flex flex-col max-h-[400px]">
-              <div className="px-4 py-3 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
-                <h3 className="font-semibold text-on-surface text-sm">Notifications</h3>
-                {hasUnreadNotifications && (
-                  <button 
-                    onClick={() => {
-                      setHasUnreadNotifications(false);
-                      if (notifications.length > 0) localStorage.setItem('lastSeenNotificationId', notifications[0].id);
-                    }}
-                    className="text-xs text-primary hover:text-primary-hover font-medium transition-colors"
-                  >
-                    Mark all as read
-                  </button>
-                )}
+          {isDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-56 rounded-lg bg-surface border border-outline-variant shadow-lg py-1 z-50">
+              <div className="px-4 py-3 border-b border-outline-variant/50">
+                <p className="text-sm font-medium text-on-surface truncate">{userName}</p>
+                <p className="text-xs text-outline truncate">{userEmail}</p>
               </div>
-              <div className="overflow-y-auto flex-1 custom-scrollbar" data-lenis-prevent="true" style={{ overscrollBehavior: 'contain' }}>
-                {notifications.length > 0 ? (
-                  <ul className="divide-y divide-outline-variant/50">
-                    {notifications.map((notification) => (
-                      <li key={notification.id} className={`p-4 hover:bg-surface-container transition-colors cursor-pointer ${!notification.isRead ? 'bg-primary-container/5' : ''}`}>
-                        <div className="flex gap-3">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                            notification.type === 'warning' ? 'bg-orange-500/10 text-orange-500' :
-                            notification.type === 'success' ? 'bg-green-500/10 text-green-500' :
-                            'bg-blue-500/10 text-blue-500'
-                          }`}>
-                            <span className="material-symbols-outlined text-[16px]">{notification.icon}</span>
-                          </div>
-                          <div>
-                            <p className={`text-sm ${!notification.isRead ? 'font-semibold text-on-surface' : 'font-medium text-on-surface-variant'}`}>
-                              {notification.title}
-                            </p>
-                            <p className="text-xs text-on-surface-variant mt-0.5 leading-relaxed">{notification.description}</p>
-                            <p className="text-[10px] font-medium text-outline mt-1.5">{notification.time}</p>
-                          </div>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <div className="p-8 text-center flex flex-col items-center justify-center">
-                    <span className="material-symbols-outlined text-outline text-[40px] mb-2 opacity-50">notifications_off</span>
-                    <p className="text-sm text-on-surface-variant">No notifications yet</p>
-                  </div>
-                )}
-              </div>
-              <div className="p-2 border-t border-outline-variant bg-surface-container-lowest">
+              <div className="py-1">
                 <button 
-                  onClick={() => {
-                    setIsNotificationsOpen(false);
-                    alert("Notifications page is coming soon!");
-                  }}
-                  className="w-full py-1.5 text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors text-center"
+                  onClick={() => signOut({ callbackUrl: '/' })}
+                  className="w-full text-left px-4 py-2 text-sm text-error hover:bg-surface-container transition-colors flex items-center gap-2"
                 >
-                  View all notifications
+                  <span className="material-symbols-outlined text-[18px]">logout</span>
+                  Sign out
                 </button>
               </div>
             </div>
           )}
         </div>
 
-        <div className="relative" ref={historyRef}>
-          <button 
-            onClick={toggleHistory}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors relative"
-          >
-            <span className="material-symbols-outlined text-[20px]">history</span>
-            {hasUnreadHistory && (
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#50FA7B] ring-2 ring-surface"></span>
-            )}
-          </button>
-
-          {isHistoryOpen && (
-            <div className="absolute right-0 mt-2 w-80 rounded-lg bg-surface border border-outline-variant shadow-lg py-1 z-50 overflow-hidden flex flex-col max-h-[400px]">
-              <div className="px-4 py-3 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
-                <h3 className="font-semibold text-on-surface text-sm">Recent Activity</h3>
-              </div>
-              <div className="overflow-y-auto flex-1 custom-scrollbar" data-lenis-prevent="true" style={{ overscrollBehavior: 'contain' }}>
-                {historyLogs.length > 0 ? (
-                  <ul className="divide-y divide-outline-variant/50">
-                    {historyLogs.map((log) => (
-                      <li key={log.id} className="p-4 hover:bg-surface-container transition-colors cursor-pointer">
-                        <div className="flex gap-3 items-center">
-                          <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-surface-container-high text-on-surface-variant">
-                            <span className="material-symbols-outlined text-[16px]">{log.icon}</span>
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-on-surface">{log.action}</p>
-                            <p className="text-[10px] font-medium text-outline mt-0.5">{log.time}</p>
-                          </div>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <div className="p-8 text-center flex flex-col items-center justify-center">
-                    <span className="material-symbols-outlined text-outline text-[40px] mb-2 opacity-50">history</span>
-                    <p className="text-sm text-on-surface-variant">No recent activity</p>
-                  </div>
-                )}
-              </div>
-              <div className="p-2 border-t border-outline-variant bg-surface-container-lowest">
-                <button 
-                  onClick={() => {
-                    setIsHistoryOpen(false);
-                    router.push('/admin/history');
-                  }}
-                  className="w-full py-1.5 text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors text-center"
-                >
-                  View full audit log
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-        
         </div>
       </div>
     </header>
 
     {/* Floating Actions (Top Right) */}
-      <div className="fixed top-20 right-6 z-50 flex flex-col items-center gap-2 bg-surface border border-outline-variant rounded-full shadow-lg p-1.5 backdrop-blur/90">
+      <div className="fixed top-20 right-6 z-40 flex flex-col items-center gap-2 bg-surface border border-outline-variant rounded-full shadow-lg p-1.5 backdrop-blur/90">
         <div className="relative" ref={notificationsRef}>
           <button 
             onClick={toggleNotifications}

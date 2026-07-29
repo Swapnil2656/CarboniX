@@ -1,15 +1,11 @@
 import { Response } from 'express';
 import { AuthRequest } from '../../middleware/auth.middleware';
 import { prisma } from '../../lib/prisma';
+import { resolveTenantContext } from '../admin/admin.controller';
+import { ChatMessage, Role, callNvidiaApi } from '@carbonix/core';
+import { Expo } from 'expo-server-sdk';
 
-export type Role = 'user' | 'model' | 'function';
-
-export interface ChatMessage {
-  role: Role;
-  content: string;
-  name?: string;
-  toolCallId?: string;
-}
+const expo = new Expo();
 
 const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY;
 
@@ -95,105 +91,13 @@ const tools = [
   },
 ];
 
-async function callNvidiaApi(history: ChatMessage[]) {
-  if (!NVIDIA_API_KEY) {
-    return {
-      choices: [{
-        message: {
-          role: 'assistant',
-          content: "AI features are currently disabled. Please configure NVIDIA_API_KEY on the server to enable CarboniX Assistant."
-        }
-      }]
-    };
-  }
-
-  const messages = [
-    { role: 'system', content: SYSTEM_PROMPT },
-    ...history.map((msg) => {
-      if (msg.role === 'function') {
-        return {
-          role: 'tool',
-          tool_call_id: msg.toolCallId,
-          name: msg.name,
-          content: msg.content
-        };
-      }
-      
-      if (msg.role === 'model' && msg.name) {
-        return {
-          role: 'assistant',
-          tool_calls: [{
-            id: msg.toolCallId,
-            type: 'function',
-            function: {
-              name: msg.name,
-              arguments: msg.content
-            }
-          }]
-        };
-      }
-
-      return {
-        role: msg.role === 'user' ? 'user' : 'assistant',
-        content: msg.content || "",
-      };
-    })
-  ];
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
-
-  let response;
-  try {
-    response = await fetch(
-      `https://integrate.api.nvidia.com/v1/chat/completions`,
-      {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${NVIDIA_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'mistralai/mistral-nemotron',
-          messages,
-          tools,
-          temperature: 0.2,
-        }),
-        signal: controller.signal
-      }
-    );
-  } catch (err: any) {
-    clearTimeout(timeoutId);
-    if (err.name === 'AbortError') {
-      throw new Error('Nvidia NIM API Error: Request timed out after 60 seconds.');
-    }
-    throw err;
-  }
-  clearTimeout(timeoutId);
-
-  if (!response.ok) {
-    const errText = await response.text();
-    console.error('Nvidia NIM API Error details:', errText);
-    
-    let detailedMsg = 'Failed to generate response from Nvidia NIM. See console.';
-    try {
-      const errJson = JSON.parse(errText);
-      if (errJson.error && errJson.error.message) {
-        detailedMsg = errJson.error.message;
-      }
-    } catch(e) {}
-    
-    throw new Error(`Nvidia NIM API Error: ${detailedMsg}`);
-  }
-
-  return response.json();
-}
-
-async function executeTool(name: string, args: any, adminUserId: string) {
+// The callNvidiaApi function has been moved to @carbonix/core
+async function executeTool(name: string, args: any, adminUserId: string, adminUserEmail: string) {
   switch (name) {
     case 'listProjects': {
+      const { projectIds } = await resolveTenantContext(adminUserId, adminUserEmail);
       const projects = await prisma.project.findMany({
-        where: { userId: adminUserId },
+        where: { id: { in: projectIds } },
         select: { id: true, name: true, region: true, isDeployed: true }
       });
       if (projects.length === 0) return 'No projects found.';
@@ -202,6 +106,11 @@ async function executeTool(name: string, args: any, adminUserId: string) {
     case 'switchProjectRegion': {
       const { projectId, region } = args;
       
+      const { projectIds, teamUserIds } = await resolveTenantContext(adminUserId, adminUserEmail);
+      if (!projectIds.includes(projectId)) {
+        throw new Error('Project not found or you do not have permission to modify it.');
+      }
+
       const oldProject = await prisma.project.findUnique({ where: { id: projectId } });
       if (!oldProject) throw new Error('Project not found');
 
@@ -229,9 +138,10 @@ async function executeTool(name: string, args: any, adminUserId: string) {
         data: {
           title: 'Project Region Changed',
           body: `Project '${project.name}' was switched from ${oldProject.region || 'unknown'} to ${region} to optimize carbon emissions.`,
-          type: 'BROADCAST',
+          type: 'TARGETED',
           status: 'SENT',
-          targetAudience: 'ALL',
+          targetAudience: 'CUSTOM',
+          targetUserIds: teamUserIds,
           createdBy: adminUserId,
         }
       });
@@ -241,19 +151,42 @@ async function executeTool(name: string, args: any, adminUserId: string) {
     }
     case 'pushMobileNotification': {
       const { userId, title, body } = args;
+      
+      const userProfile = await prisma.profile.findUnique({ where: { userId } });
+      
+      let pushSuccess = false;
+      if (userProfile?.expoPushToken && Expo.isExpoPushToken(userProfile.expoPushToken)) {
+        const messages = [{
+          to: userProfile.expoPushToken,
+          sound: 'default' as const,
+          title,
+          body,
+          data: { type: 'agent_alert' },
+        }];
+        try {
+          const chunks = expo.chunkPushNotifications(messages);
+          for (const chunk of chunks) {
+            await expo.sendPushNotificationsAsync(chunk);
+          }
+          pushSuccess = true;
+        } catch (error) {
+          console.error('Expo push error:', error);
+        }
+      }
+
       await prisma.notification.create({
         data: {
           title,
           body,
           type: 'TARGETED',
-          status: 'SENDING',
+          status: pushSuccess ? 'SENT' : 'FAILED',
           targetAudience: 'CUSTOM',
           targetUserIds: [userId],
           createdBy: adminUserId,
           totalRecipients: 1,
         },
       });
-      return `Notification '${title}' sent successfully.`;
+      return pushSuccess ? `Notification '${title}' sent successfully.` : `Notification '${title}' logged but push delivery failed (no valid token).`;
     }
     case 'getProjectStatus': {
       const { projectId } = args;
@@ -311,6 +244,7 @@ export const clearHistory = async (req: AuthRequest, res: Response) => {
 export const chat = async (req: AuthRequest, res: Response) => {
   try {
     const adminUserId = req.user!.id;
+    const adminUserEmail = req.user!.email;
     const { message, history } = req.body;
     
     if (!message || !history) {
@@ -319,7 +253,12 @@ export const chat = async (req: AuthRequest, res: Response) => {
 
     const updatedHistory: ChatMessage[] = [...history, { role: 'user', content: message }];
     
-    let aiData = await callNvidiaApi(updatedHistory);
+    if (!NVIDIA_API_KEY) {
+      updatedHistory.push({ role: 'model', content: "AI features are currently disabled. Please configure NVIDIA_API_KEY on the server to enable CarboniX Assistant." });
+      return res.json({ success: true, text: "AI features are currently disabled. Please configure NVIDIA_API_KEY on the server to enable CarboniX Assistant.", updatedHistory });
+    }
+
+    let aiData = await callNvidiaApi(NVIDIA_API_KEY, 'mistralai/mistral-nemotron', SYSTEM_PROMPT, updatedHistory, tools);
     let aiMessage = aiData?.choices?.[0]?.message;
     
     if (!aiMessage) {
@@ -359,7 +298,7 @@ export const chat = async (req: AuthRequest, res: Response) => {
 
         let resultStr = '';
         try {
-          const result = await executeTool(functionName, JSON.parse(functionArgs), adminUserId);
+          const result = await executeTool(functionName, JSON.parse(functionArgs), adminUserId, adminUserEmail);
           resultStr = typeof result === 'string' ? result : JSON.stringify(result);
         } catch (err: any) {
           resultStr = `Error: ${err.message}`;
@@ -376,7 +315,7 @@ export const chat = async (req: AuthRequest, res: Response) => {
 
       // Fetch the next turn from AI
       try {
-        aiData = await callNvidiaApi(updatedHistory);
+        aiData = await callNvidiaApi(NVIDIA_API_KEY, 'mistralai/mistral-nemotron', SYSTEM_PROMPT, updatedHistory, tools);
         aiMessage = aiData?.choices?.[0]?.message;
         if (!aiMessage) break;
       } catch (aiError: any) {

@@ -251,6 +251,8 @@ model ApiKey {
   prefix      String   @db.VarChar(12) // First 8 chars for identification
   hashedKey   String   @unique
   createdBy   String // Admin user ID (from web DB)
+  projectId   String?
+  project     Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
   permissions String[] // ['calculate', 'compare', 'recommend', 'history']
 
   // Rate limits
@@ -581,6 +583,7 @@ model Project {
   isDeployed   Boolean   @default(false)
   deploymentUrl String?
   sdkConnected Boolean   @default(false)
+  agenticMode  Boolean   @default(false)
   connectedAt  DateTime?
   lastPingAt   DateTime?
   carbonBudgetKg Float?  @default(100) // Monthly CO₂ budget in kg
@@ -589,6 +592,8 @@ model Project {
   
   agentRuns       AgentRun[]
   emissionRecords EmissionRecord[]
+  apiKeys         ApiKey[]
+  platformCredentials PlatformCredential[]
   
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -609,6 +614,7 @@ model Profile {
   emailAlerts     Boolean @default(true)
   pushAlerts      Boolean @default(false)
   thresholdAlerts Boolean @default(true)
+  expoPushToken   String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -648,4 +654,18 @@ model ChatHistory {
   messages  Json     @default("[]")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// ─── Platform Credentials ───────────────────────────────────
+
+model PlatformCredential {
+  id           String        @id @default(cuid())
+  projectId    String
+  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  provider     CloudProvider // e.g. VERCEL, NETLIFY, AWS
+  token        String        // The API token or Installation ID
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@unique([projectId, provider])
 }

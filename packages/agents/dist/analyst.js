@@ -8,6 +8,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.runAnalyst = runAnalyst;
+const core_1 = require("@carbonix/core");
 // Downgrade mapping: what to recommend when an instance is oversized
 const DOWNGRADE_MAP = {
     'm5.2xlarge': 'm5.xlarge',
@@ -35,37 +36,11 @@ Each recommendation object must have exactly these fields:
 - projectedCarbonKg (number)
 - reductionPercent (number)
 - reasoning (string: one sentence)
-- priority (string: "HIGH", "MEDIUM", or "LOW")
-
-Infrastructure Data:
-${JSON.stringify(records.filter(r => r.isIdle || r.isOversized), null, 2)}
-
-Key context:
-- Instances with cpuUtilization < 0.05 are IDLE (waste)
-- Instances with cpuUtilization < 0.20 are OVERSIZED
-- ap-south-1 (India) has 750 gCO₂/kWh — one of the dirtiest grids
-- eu-north-1 (Stockholm) has 8 gCO₂/kWh — one of the cleanest grids
-- Migrating from ap-south-1 to eu-north-1 saves ~98% carbon
-
-Return ONLY the JSON array:`;
-        const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`,
-            },
-            body: JSON.stringify({
-                model: 'nvidia/llama-3.1-nemotron-70b-instruct',
-                messages: [{ role: 'user', content: prompt }],
-                temperature: 0.2,
-                max_tokens: 2048,
-            }),
-        });
-        if (!response.ok) {
-            console.warn(`[Analyst] Nvidia NIM returned ${response.status}, falling back to rules`);
-            return null;
-        }
-        const data = await response.json();
+- priority (string: "HIGH", "MEDIUM", or "LOW")`;
+        const history = [
+            { role: 'user', content: JSON.stringify(records.filter(r => r.isIdle || r.isOversized), null, 2) }
+        ];
+        const data = await (0, core_1.callNvidiaApi)(apiKey, 'mistralai/mistral-nemotron', prompt, history);
         const text = data.choices?.[0]?.message?.content;
         if (!text)
             return null;

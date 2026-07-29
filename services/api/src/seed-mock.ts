@@ -1,4 +1,5 @@
 import { prisma } from './lib/prisma';
+import { CloudProvider } from '@prisma/client';
 
 async function seed() {
   const users = await prisma.user.findMany();
@@ -32,7 +33,7 @@ async function seed() {
         timestamp: new Date(now - i * 3600 * 1000),
         instanceId: 'i-mock' + i + '-' + user.id.substring(0,4),
         instanceType: 't3.medium',
-        provider: 'AWS',
+        provider: 'AWS' as CloudProvider,
         region: 'us-east-1',
         cpuUtilization: Math.random() * 0.8 + 0.1,
         memoryUtilization: Math.random() * 0.6 + 0.2,

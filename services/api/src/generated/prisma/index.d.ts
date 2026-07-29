@@ -118,6 +118,11 @@ export type TeamMember = $Result.DefaultSelection<Prisma.$TeamMemberPayload>
  * 
  */
 export type ChatHistory = $Result.DefaultSelection<Prisma.$ChatHistoryPayload>
+/**
+ * Model PlatformCredential
+ * 
+ */
+export type PlatformCredential = $Result.DefaultSelection<Prisma.$PlatformCredentialPayload>
 
 /**
  * Enums
@@ -695,6 +700,16 @@ export class PrismaClient<
     * ```
     */
   get chatHistory(): Prisma.ChatHistoryDelegate<ExtArgs>;
+
+  /**
+   * `prisma.platformCredential`: Exposes CRUD operations for the **PlatformCredential** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PlatformCredentials
+    * const platformCredentials = await prisma.platformCredential.findMany()
+    * ```
+    */
+  get platformCredential(): Prisma.PlatformCredentialDelegate<ExtArgs>;
 }
 
 export namespace Prisma {
@@ -1156,7 +1171,8 @@ export namespace Prisma {
     Profile: 'Profile',
     VerificationToken: 'VerificationToken',
     TeamMember: 'TeamMember',
-    ChatHistory: 'ChatHistory'
+    ChatHistory: 'ChatHistory',
+    PlatformCredential: 'PlatformCredential'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1172,7 +1188,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "mobileUser" | "calculation" | "session" | "apiKey" | "featureFlag" | "remoteConfig" | "auditLog" | "notification" | "userNotification" | "pushToken" | "region" | "instanceType" | "provider" | "agentRun" | "emissionRecord" | "user" | "project" | "profile" | "verificationToken" | "teamMember" | "chatHistory"
+      modelProps: "mobileUser" | "calculation" | "session" | "apiKey" | "featureFlag" | "remoteConfig" | "auditLog" | "notification" | "userNotification" | "pushToken" | "region" | "instanceType" | "provider" | "agentRun" | "emissionRecord" | "user" | "project" | "profile" | "verificationToken" | "teamMember" | "chatHistory" | "platformCredential"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2646,6 +2662,76 @@ export namespace Prisma {
           }
         }
       }
+      PlatformCredential: {
+        payload: Prisma.$PlatformCredentialPayload<ExtArgs>
+        fields: Prisma.PlatformCredentialFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PlatformCredentialFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlatformCredentialPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PlatformCredentialFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlatformCredentialPayload>
+          }
+          findFirst: {
+            args: Prisma.PlatformCredentialFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlatformCredentialPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PlatformCredentialFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlatformCredentialPayload>
+          }
+          findMany: {
+            args: Prisma.PlatformCredentialFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlatformCredentialPayload>[]
+          }
+          create: {
+            args: Prisma.PlatformCredentialCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlatformCredentialPayload>
+          }
+          createMany: {
+            args: Prisma.PlatformCredentialCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PlatformCredentialCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlatformCredentialPayload>[]
+          }
+          delete: {
+            args: Prisma.PlatformCredentialDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlatformCredentialPayload>
+          }
+          update: {
+            args: Prisma.PlatformCredentialUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlatformCredentialPayload>
+          }
+          deleteMany: {
+            args: Prisma.PlatformCredentialDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PlatformCredentialUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.PlatformCredentialUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlatformCredentialPayload>
+          }
+          aggregate: {
+            args: Prisma.PlatformCredentialAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePlatformCredential>
+          }
+          groupBy: {
+            args: Prisma.PlatformCredentialGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PlatformCredentialGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PlatformCredentialCountArgs<ExtArgs>
+            result: $Utils.Optional<PlatformCredentialCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2893,11 +2979,15 @@ export namespace Prisma {
   export type ProjectCountOutputType = {
     agentRuns: number
     emissionRecords: number
+    apiKeys: number
+    platformCredentials: number
   }
 
   export type ProjectCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     agentRuns?: boolean | ProjectCountOutputTypeCountAgentRunsArgs
     emissionRecords?: boolean | ProjectCountOutputTypeCountEmissionRecordsArgs
+    apiKeys?: boolean | ProjectCountOutputTypeCountApiKeysArgs
+    platformCredentials?: boolean | ProjectCountOutputTypeCountPlatformCredentialsArgs
   }
 
   // Custom InputTypes
@@ -2923,6 +3013,20 @@ export namespace Prisma {
    */
   export type ProjectCountOutputTypeCountEmissionRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: EmissionRecordWhereInput
+  }
+
+  /**
+   * ProjectCountOutputType without action
+   */
+  export type ProjectCountOutputTypeCountApiKeysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ApiKeyWhereInput
+  }
+
+  /**
+   * ProjectCountOutputType without action
+   */
+  export type ProjectCountOutputTypeCountPlatformCredentialsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PlatformCredentialWhereInput
   }
 
 
@@ -6656,6 +6760,7 @@ export namespace Prisma {
     prefix: string | null
     hashedKey: string | null
     createdBy: string | null
+    projectId: string | null
     requestsPerMinute: number | null
     requestsPerDay: number | null
     totalRequests: number | null
@@ -6677,6 +6782,7 @@ export namespace Prisma {
     prefix: string | null
     hashedKey: string | null
     createdBy: string | null
+    projectId: string | null
     requestsPerMinute: number | null
     requestsPerDay: number | null
     totalRequests: number | null
@@ -6698,6 +6804,7 @@ export namespace Prisma {
     prefix: number
     hashedKey: number
     createdBy: number
+    projectId: number
     permissions: number
     requestsPerMinute: number
     requestsPerDay: number
@@ -6736,6 +6843,7 @@ export namespace Prisma {
     prefix?: true
     hashedKey?: true
     createdBy?: true
+    projectId?: true
     requestsPerMinute?: true
     requestsPerDay?: true
     totalRequests?: true
@@ -6757,6 +6865,7 @@ export namespace Prisma {
     prefix?: true
     hashedKey?: true
     createdBy?: true
+    projectId?: true
     requestsPerMinute?: true
     requestsPerDay?: true
     totalRequests?: true
@@ -6778,6 +6887,7 @@ export namespace Prisma {
     prefix?: true
     hashedKey?: true
     createdBy?: true
+    projectId?: true
     permissions?: true
     requestsPerMinute?: true
     requestsPerDay?: true
@@ -6887,6 +6997,7 @@ export namespace Prisma {
     prefix: string
     hashedKey: string
     createdBy: string
+    projectId: string | null
     permissions: string[]
     requestsPerMinute: number
     requestsPerDay: number
@@ -6928,6 +7039,7 @@ export namespace Prisma {
     prefix?: boolean
     hashedKey?: boolean
     createdBy?: boolean
+    projectId?: boolean
     permissions?: boolean
     requestsPerMinute?: boolean
     requestsPerDay?: boolean
@@ -6942,6 +7054,7 @@ export namespace Prisma {
     expiresAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    project?: boolean | ApiKey$projectArgs<ExtArgs>
   }, ExtArgs["result"]["apiKey"]>
 
   export type ApiKeySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -6950,6 +7063,7 @@ export namespace Prisma {
     prefix?: boolean
     hashedKey?: boolean
     createdBy?: boolean
+    projectId?: boolean
     permissions?: boolean
     requestsPerMinute?: boolean
     requestsPerDay?: boolean
@@ -6964,6 +7078,7 @@ export namespace Prisma {
     expiresAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    project?: boolean | ApiKey$projectArgs<ExtArgs>
   }, ExtArgs["result"]["apiKey"]>
 
   export type ApiKeySelectScalar = {
@@ -6972,6 +7087,7 @@ export namespace Prisma {
     prefix?: boolean
     hashedKey?: boolean
     createdBy?: boolean
+    projectId?: boolean
     permissions?: boolean
     requestsPerMinute?: boolean
     requestsPerDay?: boolean
@@ -6988,16 +7104,25 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
+  export type ApiKeyInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | ApiKey$projectArgs<ExtArgs>
+  }
+  export type ApiKeyIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | ApiKey$projectArgs<ExtArgs>
+  }
 
   export type $ApiKeyPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ApiKey"
-    objects: {}
+    objects: {
+      project: Prisma.$ProjectPayload<ExtArgs> | null
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       name: string
       prefix: string
       hashedKey: string
       createdBy: string
+      projectId: string | null
       permissions: string[]
       requestsPerMinute: number
       requestsPerDay: number
@@ -7376,6 +7501,7 @@ export namespace Prisma {
    */
   export interface Prisma__ApiKeyClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    project<T extends ApiKey$projectArgs<ExtArgs> = {}>(args?: Subset<T, ApiKey$projectArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7410,6 +7536,7 @@ export namespace Prisma {
     readonly prefix: FieldRef<"ApiKey", 'String'>
     readonly hashedKey: FieldRef<"ApiKey", 'String'>
     readonly createdBy: FieldRef<"ApiKey", 'String'>
+    readonly projectId: FieldRef<"ApiKey", 'String'>
     readonly permissions: FieldRef<"ApiKey", 'String[]'>
     readonly requestsPerMinute: FieldRef<"ApiKey", 'Int'>
     readonly requestsPerDay: FieldRef<"ApiKey", 'Int'>
@@ -7437,6 +7564,10 @@ export namespace Prisma {
      */
     select?: ApiKeySelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiKeyInclude<ExtArgs> | null
+    /**
      * Filter, which ApiKey to fetch.
      */
     where: ApiKeyWhereUniqueInput
@@ -7451,6 +7582,10 @@ export namespace Prisma {
      */
     select?: ApiKeySelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiKeyInclude<ExtArgs> | null
+    /**
      * Filter, which ApiKey to fetch.
      */
     where: ApiKeyWhereUniqueInput
@@ -7464,6 +7599,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the ApiKey
      */
     select?: ApiKeySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiKeyInclude<ExtArgs> | null
     /**
      * Filter, which ApiKey to fetch.
      */
@@ -7509,6 +7648,10 @@ export namespace Prisma {
      */
     select?: ApiKeySelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiKeyInclude<ExtArgs> | null
+    /**
      * Filter, which ApiKey to fetch.
      */
     where?: ApiKeyWhereInput
@@ -7553,6 +7696,10 @@ export namespace Prisma {
      */
     select?: ApiKeySelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiKeyInclude<ExtArgs> | null
+    /**
      * Filter, which ApiKeys to fetch.
      */
     where?: ApiKeyWhereInput
@@ -7592,6 +7739,10 @@ export namespace Prisma {
      */
     select?: ApiKeySelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiKeyInclude<ExtArgs> | null
+    /**
      * The data needed to create a ApiKey.
      */
     data: XOR<ApiKeyCreateInput, ApiKeyUncheckedCreateInput>
@@ -7621,6 +7772,10 @@ export namespace Prisma {
      */
     data: ApiKeyCreateManyInput | ApiKeyCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiKeyIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -7631,6 +7786,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the ApiKey
      */
     select?: ApiKeySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiKeyInclude<ExtArgs> | null
     /**
      * The data needed to update a ApiKey.
      */
@@ -7664,6 +7823,10 @@ export namespace Prisma {
      */
     select?: ApiKeySelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiKeyInclude<ExtArgs> | null
+    /**
      * The filter to search for the ApiKey to update in case it exists.
      */
     where: ApiKeyWhereUniqueInput
@@ -7686,6 +7849,10 @@ export namespace Prisma {
      */
     select?: ApiKeySelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiKeyInclude<ExtArgs> | null
+    /**
      * Filter which ApiKey to delete.
      */
     where: ApiKeyWhereUniqueInput
@@ -7702,6 +7869,21 @@ export namespace Prisma {
   }
 
   /**
+   * ApiKey.project
+   */
+  export type ApiKey$projectArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Project
+     */
+    select?: ProjectSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectInclude<ExtArgs> | null
+    where?: ProjectWhereInput
+  }
+
+  /**
    * ApiKey without action
    */
   export type ApiKeyDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7709,6 +7891,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the ApiKey
      */
     select?: ApiKeySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiKeyInclude<ExtArgs> | null
   }
 
 
@@ -19904,6 +20090,7 @@ export namespace Prisma {
     isDeployed: boolean | null
     deploymentUrl: string | null
     sdkConnected: boolean | null
+    agenticMode: boolean | null
     connectedAt: Date | null
     lastPingAt: Date | null
     carbonBudgetKg: number | null
@@ -19920,6 +20107,7 @@ export namespace Prisma {
     isDeployed: boolean | null
     deploymentUrl: string | null
     sdkConnected: boolean | null
+    agenticMode: boolean | null
     connectedAt: Date | null
     lastPingAt: Date | null
     carbonBudgetKg: number | null
@@ -19936,6 +20124,7 @@ export namespace Prisma {
     isDeployed: number
     deploymentUrl: number
     sdkConnected: number
+    agenticMode: number
     connectedAt: number
     lastPingAt: number
     carbonBudgetKg: number
@@ -19962,6 +20151,7 @@ export namespace Prisma {
     isDeployed?: true
     deploymentUrl?: true
     sdkConnected?: true
+    agenticMode?: true
     connectedAt?: true
     lastPingAt?: true
     carbonBudgetKg?: true
@@ -19978,6 +20168,7 @@ export namespace Prisma {
     isDeployed?: true
     deploymentUrl?: true
     sdkConnected?: true
+    agenticMode?: true
     connectedAt?: true
     lastPingAt?: true
     carbonBudgetKg?: true
@@ -19994,6 +20185,7 @@ export namespace Prisma {
     isDeployed?: true
     deploymentUrl?: true
     sdkConnected?: true
+    agenticMode?: true
     connectedAt?: true
     lastPingAt?: true
     carbonBudgetKg?: true
@@ -20097,6 +20289,7 @@ export namespace Prisma {
     isDeployed: boolean
     deploymentUrl: string | null
     sdkConnected: boolean
+    agenticMode: boolean
     connectedAt: Date | null
     lastPingAt: Date | null
     carbonBudgetKg: number | null
@@ -20132,6 +20325,7 @@ export namespace Prisma {
     isDeployed?: boolean
     deploymentUrl?: boolean
     sdkConnected?: boolean
+    agenticMode?: boolean
     connectedAt?: boolean
     lastPingAt?: boolean
     carbonBudgetKg?: boolean
@@ -20141,6 +20335,8 @@ export namespace Prisma {
     user?: boolean | UserDefaultArgs<ExtArgs>
     agentRuns?: boolean | Project$agentRunsArgs<ExtArgs>
     emissionRecords?: boolean | Project$emissionRecordsArgs<ExtArgs>
+    apiKeys?: boolean | Project$apiKeysArgs<ExtArgs>
+    platformCredentials?: boolean | Project$platformCredentialsArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["project"]>
 
@@ -20152,6 +20348,7 @@ export namespace Prisma {
     isDeployed?: boolean
     deploymentUrl?: boolean
     sdkConnected?: boolean
+    agenticMode?: boolean
     connectedAt?: boolean
     lastPingAt?: boolean
     carbonBudgetKg?: boolean
@@ -20169,6 +20366,7 @@ export namespace Prisma {
     isDeployed?: boolean
     deploymentUrl?: boolean
     sdkConnected?: boolean
+    agenticMode?: boolean
     connectedAt?: boolean
     lastPingAt?: boolean
     carbonBudgetKg?: boolean
@@ -20181,6 +20379,8 @@ export namespace Prisma {
     user?: boolean | UserDefaultArgs<ExtArgs>
     agentRuns?: boolean | Project$agentRunsArgs<ExtArgs>
     emissionRecords?: boolean | Project$emissionRecordsArgs<ExtArgs>
+    apiKeys?: boolean | Project$apiKeysArgs<ExtArgs>
+    platformCredentials?: boolean | Project$platformCredentialsArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ProjectIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -20193,6 +20393,8 @@ export namespace Prisma {
       user: Prisma.$UserPayload<ExtArgs>
       agentRuns: Prisma.$AgentRunPayload<ExtArgs>[]
       emissionRecords: Prisma.$EmissionRecordPayload<ExtArgs>[]
+      apiKeys: Prisma.$ApiKeyPayload<ExtArgs>[]
+      platformCredentials: Prisma.$PlatformCredentialPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -20202,6 +20404,7 @@ export namespace Prisma {
       isDeployed: boolean
       deploymentUrl: string | null
       sdkConnected: boolean
+      agenticMode: boolean
       connectedAt: Date | null
       lastPingAt: Date | null
       carbonBudgetKg: number | null
@@ -20575,6 +20778,8 @@ export namespace Prisma {
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     agentRuns<T extends Project$agentRunsArgs<ExtArgs> = {}>(args?: Subset<T, Project$agentRunsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentRunPayload<ExtArgs>, T, "findMany"> | Null>
     emissionRecords<T extends Project$emissionRecordsArgs<ExtArgs> = {}>(args?: Subset<T, Project$emissionRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmissionRecordPayload<ExtArgs>, T, "findMany"> | Null>
+    apiKeys<T extends Project$apiKeysArgs<ExtArgs> = {}>(args?: Subset<T, Project$apiKeysArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "findMany"> | Null>
+    platformCredentials<T extends Project$platformCredentialsArgs<ExtArgs> = {}>(args?: Subset<T, Project$platformCredentialsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlatformCredentialPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -20611,6 +20816,7 @@ export namespace Prisma {
     readonly isDeployed: FieldRef<"Project", 'Boolean'>
     readonly deploymentUrl: FieldRef<"Project", 'String'>
     readonly sdkConnected: FieldRef<"Project", 'Boolean'>
+    readonly agenticMode: FieldRef<"Project", 'Boolean'>
     readonly connectedAt: FieldRef<"Project", 'DateTime'>
     readonly lastPingAt: FieldRef<"Project", 'DateTime'>
     readonly carbonBudgetKg: FieldRef<"Project", 'Float'>
@@ -20975,6 +21181,46 @@ export namespace Prisma {
   }
 
   /**
+   * Project.apiKeys
+   */
+  export type Project$apiKeysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ApiKey
+     */
+    select?: ApiKeySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiKeyInclude<ExtArgs> | null
+    where?: ApiKeyWhereInput
+    orderBy?: ApiKeyOrderByWithRelationInput | ApiKeyOrderByWithRelationInput[]
+    cursor?: ApiKeyWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ApiKeyScalarFieldEnum | ApiKeyScalarFieldEnum[]
+  }
+
+  /**
+   * Project.platformCredentials
+   */
+  export type Project$platformCredentialsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformCredential
+     */
+    select?: PlatformCredentialSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformCredentialInclude<ExtArgs> | null
+    where?: PlatformCredentialWhereInput
+    orderBy?: PlatformCredentialOrderByWithRelationInput | PlatformCredentialOrderByWithRelationInput[]
+    cursor?: PlatformCredentialWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PlatformCredentialScalarFieldEnum | PlatformCredentialScalarFieldEnum[]
+  }
+
+  /**
    * Project without action
    */
   export type ProjectDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -21008,6 +21254,7 @@ export namespace Prisma {
     emailAlerts: boolean | null
     pushAlerts: boolean | null
     thresholdAlerts: boolean | null
+    expoPushToken: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -21021,6 +21268,7 @@ export namespace Prisma {
     emailAlerts: boolean | null
     pushAlerts: boolean | null
     thresholdAlerts: boolean | null
+    expoPushToken: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -21034,6 +21282,7 @@ export namespace Prisma {
     emailAlerts: number
     pushAlerts: number
     thresholdAlerts: number
+    expoPushToken: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -21049,6 +21298,7 @@ export namespace Prisma {
     emailAlerts?: true
     pushAlerts?: true
     thresholdAlerts?: true
+    expoPushToken?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -21062,6 +21312,7 @@ export namespace Prisma {
     emailAlerts?: true
     pushAlerts?: true
     thresholdAlerts?: true
+    expoPushToken?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -21075,6 +21326,7 @@ export namespace Prisma {
     emailAlerts?: true
     pushAlerts?: true
     thresholdAlerts?: true
+    expoPushToken?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -21161,6 +21413,7 @@ export namespace Prisma {
     emailAlerts: boolean
     pushAlerts: boolean
     thresholdAlerts: boolean
+    expoPushToken: string | null
     createdAt: Date
     updatedAt: Date
     _count: ProfileCountAggregateOutputType | null
@@ -21191,6 +21444,7 @@ export namespace Prisma {
     emailAlerts?: boolean
     pushAlerts?: boolean
     thresholdAlerts?: boolean
+    expoPushToken?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -21205,6 +21459,7 @@ export namespace Prisma {
     emailAlerts?: boolean
     pushAlerts?: boolean
     thresholdAlerts?: boolean
+    expoPushToken?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -21219,6 +21474,7 @@ export namespace Prisma {
     emailAlerts?: boolean
     pushAlerts?: boolean
     thresholdAlerts?: boolean
+    expoPushToken?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
@@ -21244,6 +21500,7 @@ export namespace Prisma {
       emailAlerts: boolean
       pushAlerts: boolean
       thresholdAlerts: boolean
+      expoPushToken: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["profile"]>
@@ -21648,6 +21905,7 @@ export namespace Prisma {
     readonly emailAlerts: FieldRef<"Profile", 'Boolean'>
     readonly pushAlerts: FieldRef<"Profile", 'Boolean'>
     readonly thresholdAlerts: FieldRef<"Profile", 'Boolean'>
+    readonly expoPushToken: FieldRef<"Profile", 'String'>
     readonly createdAt: FieldRef<"Profile", 'DateTime'>
     readonly updatedAt: FieldRef<"Profile", 'DateTime'>
   }
@@ -24829,6 +25087,951 @@ export namespace Prisma {
 
 
   /**
+   * Model PlatformCredential
+   */
+
+  export type AggregatePlatformCredential = {
+    _count: PlatformCredentialCountAggregateOutputType | null
+    _min: PlatformCredentialMinAggregateOutputType | null
+    _max: PlatformCredentialMaxAggregateOutputType | null
+  }
+
+  export type PlatformCredentialMinAggregateOutputType = {
+    id: string | null
+    projectId: string | null
+    provider: $Enums.CloudProvider | null
+    token: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PlatformCredentialMaxAggregateOutputType = {
+    id: string | null
+    projectId: string | null
+    provider: $Enums.CloudProvider | null
+    token: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PlatformCredentialCountAggregateOutputType = {
+    id: number
+    projectId: number
+    provider: number
+    token: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type PlatformCredentialMinAggregateInputType = {
+    id?: true
+    projectId?: true
+    provider?: true
+    token?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PlatformCredentialMaxAggregateInputType = {
+    id?: true
+    projectId?: true
+    provider?: true
+    token?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PlatformCredentialCountAggregateInputType = {
+    id?: true
+    projectId?: true
+    provider?: true
+    token?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type PlatformCredentialAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PlatformCredential to aggregate.
+     */
+    where?: PlatformCredentialWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlatformCredentials to fetch.
+     */
+    orderBy?: PlatformCredentialOrderByWithRelationInput | PlatformCredentialOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PlatformCredentialWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlatformCredentials from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlatformCredentials.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PlatformCredentials
+    **/
+    _count?: true | PlatformCredentialCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PlatformCredentialMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PlatformCredentialMaxAggregateInputType
+  }
+
+  export type GetPlatformCredentialAggregateType<T extends PlatformCredentialAggregateArgs> = {
+        [P in keyof T & keyof AggregatePlatformCredential]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePlatformCredential[P]>
+      : GetScalarType<T[P], AggregatePlatformCredential[P]>
+  }
+
+
+
+
+  export type PlatformCredentialGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PlatformCredentialWhereInput
+    orderBy?: PlatformCredentialOrderByWithAggregationInput | PlatformCredentialOrderByWithAggregationInput[]
+    by: PlatformCredentialScalarFieldEnum[] | PlatformCredentialScalarFieldEnum
+    having?: PlatformCredentialScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PlatformCredentialCountAggregateInputType | true
+    _min?: PlatformCredentialMinAggregateInputType
+    _max?: PlatformCredentialMaxAggregateInputType
+  }
+
+  export type PlatformCredentialGroupByOutputType = {
+    id: string
+    projectId: string
+    provider: $Enums.CloudProvider
+    token: string
+    createdAt: Date
+    updatedAt: Date
+    _count: PlatformCredentialCountAggregateOutputType | null
+    _min: PlatformCredentialMinAggregateOutputType | null
+    _max: PlatformCredentialMaxAggregateOutputType | null
+  }
+
+  type GetPlatformCredentialGroupByPayload<T extends PlatformCredentialGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PlatformCredentialGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PlatformCredentialGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PlatformCredentialGroupByOutputType[P]>
+            : GetScalarType<T[P], PlatformCredentialGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PlatformCredentialSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    projectId?: boolean
+    provider?: boolean
+    token?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["platformCredential"]>
+
+  export type PlatformCredentialSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    projectId?: boolean
+    provider?: boolean
+    token?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["platformCredential"]>
+
+  export type PlatformCredentialSelectScalar = {
+    id?: boolean
+    projectId?: boolean
+    provider?: boolean
+    token?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type PlatformCredentialInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }
+  export type PlatformCredentialIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }
+
+  export type $PlatformCredentialPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PlatformCredential"
+    objects: {
+      project: Prisma.$ProjectPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      projectId: string
+      provider: $Enums.CloudProvider
+      token: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["platformCredential"]>
+    composites: {}
+  }
+
+  type PlatformCredentialGetPayload<S extends boolean | null | undefined | PlatformCredentialDefaultArgs> = $Result.GetResult<Prisma.$PlatformCredentialPayload, S>
+
+  type PlatformCredentialCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<PlatformCredentialFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: PlatformCredentialCountAggregateInputType | true
+    }
+
+  export interface PlatformCredentialDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PlatformCredential'], meta: { name: 'PlatformCredential' } }
+    /**
+     * Find zero or one PlatformCredential that matches the filter.
+     * @param {PlatformCredentialFindUniqueArgs} args - Arguments to find a PlatformCredential
+     * @example
+     * // Get one PlatformCredential
+     * const platformCredential = await prisma.platformCredential.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PlatformCredentialFindUniqueArgs>(args: SelectSubset<T, PlatformCredentialFindUniqueArgs<ExtArgs>>): Prisma__PlatformCredentialClient<$Result.GetResult<Prisma.$PlatformCredentialPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one PlatformCredential that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {PlatformCredentialFindUniqueOrThrowArgs} args - Arguments to find a PlatformCredential
+     * @example
+     * // Get one PlatformCredential
+     * const platformCredential = await prisma.platformCredential.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PlatformCredentialFindUniqueOrThrowArgs>(args: SelectSubset<T, PlatformCredentialFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PlatformCredentialClient<$Result.GetResult<Prisma.$PlatformCredentialPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first PlatformCredential that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlatformCredentialFindFirstArgs} args - Arguments to find a PlatformCredential
+     * @example
+     * // Get one PlatformCredential
+     * const platformCredential = await prisma.platformCredential.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PlatformCredentialFindFirstArgs>(args?: SelectSubset<T, PlatformCredentialFindFirstArgs<ExtArgs>>): Prisma__PlatformCredentialClient<$Result.GetResult<Prisma.$PlatformCredentialPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first PlatformCredential that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlatformCredentialFindFirstOrThrowArgs} args - Arguments to find a PlatformCredential
+     * @example
+     * // Get one PlatformCredential
+     * const platformCredential = await prisma.platformCredential.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PlatformCredentialFindFirstOrThrowArgs>(args?: SelectSubset<T, PlatformCredentialFindFirstOrThrowArgs<ExtArgs>>): Prisma__PlatformCredentialClient<$Result.GetResult<Prisma.$PlatformCredentialPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more PlatformCredentials that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlatformCredentialFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PlatformCredentials
+     * const platformCredentials = await prisma.platformCredential.findMany()
+     * 
+     * // Get first 10 PlatformCredentials
+     * const platformCredentials = await prisma.platformCredential.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const platformCredentialWithIdOnly = await prisma.platformCredential.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PlatformCredentialFindManyArgs>(args?: SelectSubset<T, PlatformCredentialFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlatformCredentialPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a PlatformCredential.
+     * @param {PlatformCredentialCreateArgs} args - Arguments to create a PlatformCredential.
+     * @example
+     * // Create one PlatformCredential
+     * const PlatformCredential = await prisma.platformCredential.create({
+     *   data: {
+     *     // ... data to create a PlatformCredential
+     *   }
+     * })
+     * 
+     */
+    create<T extends PlatformCredentialCreateArgs>(args: SelectSubset<T, PlatformCredentialCreateArgs<ExtArgs>>): Prisma__PlatformCredentialClient<$Result.GetResult<Prisma.$PlatformCredentialPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many PlatformCredentials.
+     * @param {PlatformCredentialCreateManyArgs} args - Arguments to create many PlatformCredentials.
+     * @example
+     * // Create many PlatformCredentials
+     * const platformCredential = await prisma.platformCredential.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PlatformCredentialCreateManyArgs>(args?: SelectSubset<T, PlatformCredentialCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PlatformCredentials and returns the data saved in the database.
+     * @param {PlatformCredentialCreateManyAndReturnArgs} args - Arguments to create many PlatformCredentials.
+     * @example
+     * // Create many PlatformCredentials
+     * const platformCredential = await prisma.platformCredential.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PlatformCredentials and only return the `id`
+     * const platformCredentialWithIdOnly = await prisma.platformCredential.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PlatformCredentialCreateManyAndReturnArgs>(args?: SelectSubset<T, PlatformCredentialCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlatformCredentialPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a PlatformCredential.
+     * @param {PlatformCredentialDeleteArgs} args - Arguments to delete one PlatformCredential.
+     * @example
+     * // Delete one PlatformCredential
+     * const PlatformCredential = await prisma.platformCredential.delete({
+     *   where: {
+     *     // ... filter to delete one PlatformCredential
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PlatformCredentialDeleteArgs>(args: SelectSubset<T, PlatformCredentialDeleteArgs<ExtArgs>>): Prisma__PlatformCredentialClient<$Result.GetResult<Prisma.$PlatformCredentialPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one PlatformCredential.
+     * @param {PlatformCredentialUpdateArgs} args - Arguments to update one PlatformCredential.
+     * @example
+     * // Update one PlatformCredential
+     * const platformCredential = await prisma.platformCredential.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PlatformCredentialUpdateArgs>(args: SelectSubset<T, PlatformCredentialUpdateArgs<ExtArgs>>): Prisma__PlatformCredentialClient<$Result.GetResult<Prisma.$PlatformCredentialPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more PlatformCredentials.
+     * @param {PlatformCredentialDeleteManyArgs} args - Arguments to filter PlatformCredentials to delete.
+     * @example
+     * // Delete a few PlatformCredentials
+     * const { count } = await prisma.platformCredential.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PlatformCredentialDeleteManyArgs>(args?: SelectSubset<T, PlatformCredentialDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PlatformCredentials.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlatformCredentialUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PlatformCredentials
+     * const platformCredential = await prisma.platformCredential.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PlatformCredentialUpdateManyArgs>(args: SelectSubset<T, PlatformCredentialUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one PlatformCredential.
+     * @param {PlatformCredentialUpsertArgs} args - Arguments to update or create a PlatformCredential.
+     * @example
+     * // Update or create a PlatformCredential
+     * const platformCredential = await prisma.platformCredential.upsert({
+     *   create: {
+     *     // ... data to create a PlatformCredential
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PlatformCredential we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PlatformCredentialUpsertArgs>(args: SelectSubset<T, PlatformCredentialUpsertArgs<ExtArgs>>): Prisma__PlatformCredentialClient<$Result.GetResult<Prisma.$PlatformCredentialPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of PlatformCredentials.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlatformCredentialCountArgs} args - Arguments to filter PlatformCredentials to count.
+     * @example
+     * // Count the number of PlatformCredentials
+     * const count = await prisma.platformCredential.count({
+     *   where: {
+     *     // ... the filter for the PlatformCredentials we want to count
+     *   }
+     * })
+    **/
+    count<T extends PlatformCredentialCountArgs>(
+      args?: Subset<T, PlatformCredentialCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PlatformCredentialCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PlatformCredential.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlatformCredentialAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PlatformCredentialAggregateArgs>(args: Subset<T, PlatformCredentialAggregateArgs>): Prisma.PrismaPromise<GetPlatformCredentialAggregateType<T>>
+
+    /**
+     * Group by PlatformCredential.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlatformCredentialGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PlatformCredentialGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PlatformCredentialGroupByArgs['orderBy'] }
+        : { orderBy?: PlatformCredentialGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PlatformCredentialGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPlatformCredentialGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PlatformCredential model
+   */
+  readonly fields: PlatformCredentialFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PlatformCredential.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PlatformCredentialClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    project<T extends ProjectDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProjectDefaultArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PlatformCredential model
+   */ 
+  interface PlatformCredentialFieldRefs {
+    readonly id: FieldRef<"PlatformCredential", 'String'>
+    readonly projectId: FieldRef<"PlatformCredential", 'String'>
+    readonly provider: FieldRef<"PlatformCredential", 'CloudProvider'>
+    readonly token: FieldRef<"PlatformCredential", 'String'>
+    readonly createdAt: FieldRef<"PlatformCredential", 'DateTime'>
+    readonly updatedAt: FieldRef<"PlatformCredential", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PlatformCredential findUnique
+   */
+  export type PlatformCredentialFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformCredential
+     */
+    select?: PlatformCredentialSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformCredentialInclude<ExtArgs> | null
+    /**
+     * Filter, which PlatformCredential to fetch.
+     */
+    where: PlatformCredentialWhereUniqueInput
+  }
+
+  /**
+   * PlatformCredential findUniqueOrThrow
+   */
+  export type PlatformCredentialFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformCredential
+     */
+    select?: PlatformCredentialSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformCredentialInclude<ExtArgs> | null
+    /**
+     * Filter, which PlatformCredential to fetch.
+     */
+    where: PlatformCredentialWhereUniqueInput
+  }
+
+  /**
+   * PlatformCredential findFirst
+   */
+  export type PlatformCredentialFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformCredential
+     */
+    select?: PlatformCredentialSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformCredentialInclude<ExtArgs> | null
+    /**
+     * Filter, which PlatformCredential to fetch.
+     */
+    where?: PlatformCredentialWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlatformCredentials to fetch.
+     */
+    orderBy?: PlatformCredentialOrderByWithRelationInput | PlatformCredentialOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PlatformCredentials.
+     */
+    cursor?: PlatformCredentialWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlatformCredentials from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlatformCredentials.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PlatformCredentials.
+     */
+    distinct?: PlatformCredentialScalarFieldEnum | PlatformCredentialScalarFieldEnum[]
+  }
+
+  /**
+   * PlatformCredential findFirstOrThrow
+   */
+  export type PlatformCredentialFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformCredential
+     */
+    select?: PlatformCredentialSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformCredentialInclude<ExtArgs> | null
+    /**
+     * Filter, which PlatformCredential to fetch.
+     */
+    where?: PlatformCredentialWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlatformCredentials to fetch.
+     */
+    orderBy?: PlatformCredentialOrderByWithRelationInput | PlatformCredentialOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PlatformCredentials.
+     */
+    cursor?: PlatformCredentialWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlatformCredentials from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlatformCredentials.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PlatformCredentials.
+     */
+    distinct?: PlatformCredentialScalarFieldEnum | PlatformCredentialScalarFieldEnum[]
+  }
+
+  /**
+   * PlatformCredential findMany
+   */
+  export type PlatformCredentialFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformCredential
+     */
+    select?: PlatformCredentialSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformCredentialInclude<ExtArgs> | null
+    /**
+     * Filter, which PlatformCredentials to fetch.
+     */
+    where?: PlatformCredentialWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlatformCredentials to fetch.
+     */
+    orderBy?: PlatformCredentialOrderByWithRelationInput | PlatformCredentialOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PlatformCredentials.
+     */
+    cursor?: PlatformCredentialWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlatformCredentials from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlatformCredentials.
+     */
+    skip?: number
+    distinct?: PlatformCredentialScalarFieldEnum | PlatformCredentialScalarFieldEnum[]
+  }
+
+  /**
+   * PlatformCredential create
+   */
+  export type PlatformCredentialCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformCredential
+     */
+    select?: PlatformCredentialSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformCredentialInclude<ExtArgs> | null
+    /**
+     * The data needed to create a PlatformCredential.
+     */
+    data: XOR<PlatformCredentialCreateInput, PlatformCredentialUncheckedCreateInput>
+  }
+
+  /**
+   * PlatformCredential createMany
+   */
+  export type PlatformCredentialCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PlatformCredentials.
+     */
+    data: PlatformCredentialCreateManyInput | PlatformCredentialCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PlatformCredential createManyAndReturn
+   */
+  export type PlatformCredentialCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformCredential
+     */
+    select?: PlatformCredentialSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many PlatformCredentials.
+     */
+    data: PlatformCredentialCreateManyInput | PlatformCredentialCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformCredentialIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PlatformCredential update
+   */
+  export type PlatformCredentialUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformCredential
+     */
+    select?: PlatformCredentialSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformCredentialInclude<ExtArgs> | null
+    /**
+     * The data needed to update a PlatformCredential.
+     */
+    data: XOR<PlatformCredentialUpdateInput, PlatformCredentialUncheckedUpdateInput>
+    /**
+     * Choose, which PlatformCredential to update.
+     */
+    where: PlatformCredentialWhereUniqueInput
+  }
+
+  /**
+   * PlatformCredential updateMany
+   */
+  export type PlatformCredentialUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PlatformCredentials.
+     */
+    data: XOR<PlatformCredentialUpdateManyMutationInput, PlatformCredentialUncheckedUpdateManyInput>
+    /**
+     * Filter which PlatformCredentials to update
+     */
+    where?: PlatformCredentialWhereInput
+  }
+
+  /**
+   * PlatformCredential upsert
+   */
+  export type PlatformCredentialUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformCredential
+     */
+    select?: PlatformCredentialSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformCredentialInclude<ExtArgs> | null
+    /**
+     * The filter to search for the PlatformCredential to update in case it exists.
+     */
+    where: PlatformCredentialWhereUniqueInput
+    /**
+     * In case the PlatformCredential found by the `where` argument doesn't exist, create a new PlatformCredential with this data.
+     */
+    create: XOR<PlatformCredentialCreateInput, PlatformCredentialUncheckedCreateInput>
+    /**
+     * In case the PlatformCredential was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PlatformCredentialUpdateInput, PlatformCredentialUncheckedUpdateInput>
+  }
+
+  /**
+   * PlatformCredential delete
+   */
+  export type PlatformCredentialDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformCredential
+     */
+    select?: PlatformCredentialSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformCredentialInclude<ExtArgs> | null
+    /**
+     * Filter which PlatformCredential to delete.
+     */
+    where: PlatformCredentialWhereUniqueInput
+  }
+
+  /**
+   * PlatformCredential deleteMany
+   */
+  export type PlatformCredentialDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PlatformCredentials to delete
+     */
+    where?: PlatformCredentialWhereInput
+  }
+
+  /**
+   * PlatformCredential without action
+   */
+  export type PlatformCredentialDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformCredential
+     */
+    select?: PlatformCredentialSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformCredentialInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -24940,6 +26143,7 @@ export namespace Prisma {
     prefix: 'prefix',
     hashedKey: 'hashedKey',
     createdBy: 'createdBy',
+    projectId: 'projectId',
     permissions: 'permissions',
     requestsPerMinute: 'requestsPerMinute',
     requestsPerDay: 'requestsPerDay',
@@ -25187,6 +26391,7 @@ export namespace Prisma {
     isDeployed: 'isDeployed',
     deploymentUrl: 'deploymentUrl',
     sdkConnected: 'sdkConnected',
+    agenticMode: 'agenticMode',
     connectedAt: 'connectedAt',
     lastPingAt: 'lastPingAt',
     carbonBudgetKg: 'carbonBudgetKg',
@@ -25207,6 +26412,7 @@ export namespace Prisma {
     emailAlerts: 'emailAlerts',
     pushAlerts: 'pushAlerts',
     thresholdAlerts: 'thresholdAlerts',
+    expoPushToken: 'expoPushToken',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -25251,6 +26457,18 @@ export namespace Prisma {
   };
 
   export type ChatHistoryScalarFieldEnum = (typeof ChatHistoryScalarFieldEnum)[keyof typeof ChatHistoryScalarFieldEnum]
+
+
+  export const PlatformCredentialScalarFieldEnum: {
+    id: 'id',
+    projectId: 'projectId',
+    provider: 'provider',
+    token: 'token',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type PlatformCredentialScalarFieldEnum = (typeof PlatformCredentialScalarFieldEnum)[keyof typeof PlatformCredentialScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -26093,6 +27311,7 @@ export namespace Prisma {
     prefix?: StringFilter<"ApiKey"> | string
     hashedKey?: StringFilter<"ApiKey"> | string
     createdBy?: StringFilter<"ApiKey"> | string
+    projectId?: StringNullableFilter<"ApiKey"> | string | null
     permissions?: StringNullableListFilter<"ApiKey">
     requestsPerMinute?: IntFilter<"ApiKey"> | number
     requestsPerDay?: IntFilter<"ApiKey"> | number
@@ -26107,6 +27326,7 @@ export namespace Prisma {
     expiresAt?: DateTimeNullableFilter<"ApiKey"> | Date | string | null
     createdAt?: DateTimeFilter<"ApiKey"> | Date | string
     updatedAt?: DateTimeFilter<"ApiKey"> | Date | string
+    project?: XOR<ProjectNullableRelationFilter, ProjectWhereInput> | null
   }
 
   export type ApiKeyOrderByWithRelationInput = {
@@ -26115,6 +27335,7 @@ export namespace Prisma {
     prefix?: SortOrder
     hashedKey?: SortOrder
     createdBy?: SortOrder
+    projectId?: SortOrderInput | SortOrder
     permissions?: SortOrder
     requestsPerMinute?: SortOrder
     requestsPerDay?: SortOrder
@@ -26129,6 +27350,7 @@ export namespace Prisma {
     expiresAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    project?: ProjectOrderByWithRelationInput
   }
 
   export type ApiKeyWhereUniqueInput = Prisma.AtLeast<{
@@ -26140,6 +27362,7 @@ export namespace Prisma {
     name?: StringFilter<"ApiKey"> | string
     prefix?: StringFilter<"ApiKey"> | string
     createdBy?: StringFilter<"ApiKey"> | string
+    projectId?: StringNullableFilter<"ApiKey"> | string | null
     permissions?: StringNullableListFilter<"ApiKey">
     requestsPerMinute?: IntFilter<"ApiKey"> | number
     requestsPerDay?: IntFilter<"ApiKey"> | number
@@ -26154,6 +27377,7 @@ export namespace Prisma {
     expiresAt?: DateTimeNullableFilter<"ApiKey"> | Date | string | null
     createdAt?: DateTimeFilter<"ApiKey"> | Date | string
     updatedAt?: DateTimeFilter<"ApiKey"> | Date | string
+    project?: XOR<ProjectNullableRelationFilter, ProjectWhereInput> | null
   }, "id" | "hashedKey">
 
   export type ApiKeyOrderByWithAggregationInput = {
@@ -26162,6 +27386,7 @@ export namespace Prisma {
     prefix?: SortOrder
     hashedKey?: SortOrder
     createdBy?: SortOrder
+    projectId?: SortOrderInput | SortOrder
     permissions?: SortOrder
     requestsPerMinute?: SortOrder
     requestsPerDay?: SortOrder
@@ -26192,6 +27417,7 @@ export namespace Prisma {
     prefix?: StringWithAggregatesFilter<"ApiKey"> | string
     hashedKey?: StringWithAggregatesFilter<"ApiKey"> | string
     createdBy?: StringWithAggregatesFilter<"ApiKey"> | string
+    projectId?: StringNullableWithAggregatesFilter<"ApiKey"> | string | null
     permissions?: StringNullableListFilter<"ApiKey">
     requestsPerMinute?: IntWithAggregatesFilter<"ApiKey"> | number
     requestsPerDay?: IntWithAggregatesFilter<"ApiKey"> | number
@@ -27319,6 +28545,7 @@ export namespace Prisma {
     isDeployed?: BoolFilter<"Project"> | boolean
     deploymentUrl?: StringNullableFilter<"Project"> | string | null
     sdkConnected?: BoolFilter<"Project"> | boolean
+    agenticMode?: BoolFilter<"Project"> | boolean
     connectedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     lastPingAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     carbonBudgetKg?: FloatNullableFilter<"Project"> | number | null
@@ -27328,6 +28555,8 @@ export namespace Prisma {
     user?: XOR<UserRelationFilter, UserWhereInput>
     agentRuns?: AgentRunListRelationFilter
     emissionRecords?: EmissionRecordListRelationFilter
+    apiKeys?: ApiKeyListRelationFilter
+    platformCredentials?: PlatformCredentialListRelationFilter
   }
 
   export type ProjectOrderByWithRelationInput = {
@@ -27338,6 +28567,7 @@ export namespace Prisma {
     isDeployed?: SortOrder
     deploymentUrl?: SortOrderInput | SortOrder
     sdkConnected?: SortOrder
+    agenticMode?: SortOrder
     connectedAt?: SortOrderInput | SortOrder
     lastPingAt?: SortOrderInput | SortOrder
     carbonBudgetKg?: SortOrderInput | SortOrder
@@ -27347,6 +28577,8 @@ export namespace Prisma {
     user?: UserOrderByWithRelationInput
     agentRuns?: AgentRunOrderByRelationAggregateInput
     emissionRecords?: EmissionRecordOrderByRelationAggregateInput
+    apiKeys?: ApiKeyOrderByRelationAggregateInput
+    platformCredentials?: PlatformCredentialOrderByRelationAggregateInput
   }
 
   export type ProjectWhereUniqueInput = Prisma.AtLeast<{
@@ -27360,6 +28592,7 @@ export namespace Prisma {
     isDeployed?: BoolFilter<"Project"> | boolean
     deploymentUrl?: StringNullableFilter<"Project"> | string | null
     sdkConnected?: BoolFilter<"Project"> | boolean
+    agenticMode?: BoolFilter<"Project"> | boolean
     connectedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     lastPingAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     carbonBudgetKg?: FloatNullableFilter<"Project"> | number | null
@@ -27369,6 +28602,8 @@ export namespace Prisma {
     user?: XOR<UserRelationFilter, UserWhereInput>
     agentRuns?: AgentRunListRelationFilter
     emissionRecords?: EmissionRecordListRelationFilter
+    apiKeys?: ApiKeyListRelationFilter
+    platformCredentials?: PlatformCredentialListRelationFilter
   }, "id">
 
   export type ProjectOrderByWithAggregationInput = {
@@ -27379,6 +28614,7 @@ export namespace Prisma {
     isDeployed?: SortOrder
     deploymentUrl?: SortOrderInput | SortOrder
     sdkConnected?: SortOrder
+    agenticMode?: SortOrder
     connectedAt?: SortOrderInput | SortOrder
     lastPingAt?: SortOrderInput | SortOrder
     carbonBudgetKg?: SortOrderInput | SortOrder
@@ -27403,6 +28639,7 @@ export namespace Prisma {
     isDeployed?: BoolWithAggregatesFilter<"Project"> | boolean
     deploymentUrl?: StringNullableWithAggregatesFilter<"Project"> | string | null
     sdkConnected?: BoolWithAggregatesFilter<"Project"> | boolean
+    agenticMode?: BoolWithAggregatesFilter<"Project"> | boolean
     connectedAt?: DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
     lastPingAt?: DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
     carbonBudgetKg?: FloatNullableWithAggregatesFilter<"Project"> | number | null
@@ -27423,6 +28660,7 @@ export namespace Prisma {
     emailAlerts?: BoolFilter<"Profile"> | boolean
     pushAlerts?: BoolFilter<"Profile"> | boolean
     thresholdAlerts?: BoolFilter<"Profile"> | boolean
+    expoPushToken?: StringNullableFilter<"Profile"> | string | null
     createdAt?: DateTimeFilter<"Profile"> | Date | string
     updatedAt?: DateTimeFilter<"Profile"> | Date | string
     user?: XOR<UserRelationFilter, UserWhereInput>
@@ -27437,6 +28675,7 @@ export namespace Prisma {
     emailAlerts?: SortOrder
     pushAlerts?: SortOrder
     thresholdAlerts?: SortOrder
+    expoPushToken?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -27454,6 +28693,7 @@ export namespace Prisma {
     emailAlerts?: BoolFilter<"Profile"> | boolean
     pushAlerts?: BoolFilter<"Profile"> | boolean
     thresholdAlerts?: BoolFilter<"Profile"> | boolean
+    expoPushToken?: StringNullableFilter<"Profile"> | string | null
     createdAt?: DateTimeFilter<"Profile"> | Date | string
     updatedAt?: DateTimeFilter<"Profile"> | Date | string
     user?: XOR<UserRelationFilter, UserWhereInput>
@@ -27468,6 +28708,7 @@ export namespace Prisma {
     emailAlerts?: SortOrder
     pushAlerts?: SortOrder
     thresholdAlerts?: SortOrder
+    expoPushToken?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ProfileCountOrderByAggregateInput
@@ -27487,6 +28728,7 @@ export namespace Prisma {
     emailAlerts?: BoolWithAggregatesFilter<"Profile"> | boolean
     pushAlerts?: BoolWithAggregatesFilter<"Profile"> | boolean
     thresholdAlerts?: BoolWithAggregatesFilter<"Profile"> | boolean
+    expoPushToken?: StringNullableWithAggregatesFilter<"Profile"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Profile"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Profile"> | Date | string
   }
@@ -27683,6 +28925,67 @@ export namespace Prisma {
     messages?: JsonWithAggregatesFilter<"ChatHistory">
     createdAt?: DateTimeWithAggregatesFilter<"ChatHistory"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"ChatHistory"> | Date | string
+  }
+
+  export type PlatformCredentialWhereInput = {
+    AND?: PlatformCredentialWhereInput | PlatformCredentialWhereInput[]
+    OR?: PlatformCredentialWhereInput[]
+    NOT?: PlatformCredentialWhereInput | PlatformCredentialWhereInput[]
+    id?: StringFilter<"PlatformCredential"> | string
+    projectId?: StringFilter<"PlatformCredential"> | string
+    provider?: EnumCloudProviderFilter<"PlatformCredential"> | $Enums.CloudProvider
+    token?: StringFilter<"PlatformCredential"> | string
+    createdAt?: DateTimeFilter<"PlatformCredential"> | Date | string
+    updatedAt?: DateTimeFilter<"PlatformCredential"> | Date | string
+    project?: XOR<ProjectRelationFilter, ProjectWhereInput>
+  }
+
+  export type PlatformCredentialOrderByWithRelationInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    provider?: SortOrder
+    token?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    project?: ProjectOrderByWithRelationInput
+  }
+
+  export type PlatformCredentialWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    projectId_provider?: PlatformCredentialProjectIdProviderCompoundUniqueInput
+    AND?: PlatformCredentialWhereInput | PlatformCredentialWhereInput[]
+    OR?: PlatformCredentialWhereInput[]
+    NOT?: PlatformCredentialWhereInput | PlatformCredentialWhereInput[]
+    projectId?: StringFilter<"PlatformCredential"> | string
+    provider?: EnumCloudProviderFilter<"PlatformCredential"> | $Enums.CloudProvider
+    token?: StringFilter<"PlatformCredential"> | string
+    createdAt?: DateTimeFilter<"PlatformCredential"> | Date | string
+    updatedAt?: DateTimeFilter<"PlatformCredential"> | Date | string
+    project?: XOR<ProjectRelationFilter, ProjectWhereInput>
+  }, "id" | "projectId_provider">
+
+  export type PlatformCredentialOrderByWithAggregationInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    provider?: SortOrder
+    token?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: PlatformCredentialCountOrderByAggregateInput
+    _max?: PlatformCredentialMaxOrderByAggregateInput
+    _min?: PlatformCredentialMinOrderByAggregateInput
+  }
+
+  export type PlatformCredentialScalarWhereWithAggregatesInput = {
+    AND?: PlatformCredentialScalarWhereWithAggregatesInput | PlatformCredentialScalarWhereWithAggregatesInput[]
+    OR?: PlatformCredentialScalarWhereWithAggregatesInput[]
+    NOT?: PlatformCredentialScalarWhereWithAggregatesInput | PlatformCredentialScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"PlatformCredential"> | string
+    projectId?: StringWithAggregatesFilter<"PlatformCredential"> | string
+    provider?: EnumCloudProviderWithAggregatesFilter<"PlatformCredential"> | $Enums.CloudProvider
+    token?: StringWithAggregatesFilter<"PlatformCredential"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"PlatformCredential"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"PlatformCredential"> | Date | string
   }
 
   export type MobileUserCreateInput = {
@@ -28292,6 +29595,7 @@ export namespace Prisma {
     expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    project?: ProjectCreateNestedOneWithoutApiKeysInput
   }
 
   export type ApiKeyUncheckedCreateInput = {
@@ -28300,6 +29604,7 @@ export namespace Prisma {
     prefix: string
     hashedKey: string
     createdBy: string
+    projectId?: string | null
     permissions?: ApiKeyCreatepermissionsInput | string[]
     requestsPerMinute?: number
     requestsPerDay?: number
@@ -28336,6 +29641,7 @@ export namespace Prisma {
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneWithoutApiKeysNestedInput
   }
 
   export type ApiKeyUncheckedUpdateInput = {
@@ -28344,6 +29650,7 @@ export namespace Prisma {
     prefix?: StringFieldUpdateOperationsInput | string
     hashedKey?: StringFieldUpdateOperationsInput | string
     createdBy?: StringFieldUpdateOperationsInput | string
+    projectId?: NullableStringFieldUpdateOperationsInput | string | null
     permissions?: ApiKeyUpdatepermissionsInput | string[]
     requestsPerMinute?: IntFieldUpdateOperationsInput | number
     requestsPerDay?: IntFieldUpdateOperationsInput | number
@@ -28366,6 +29673,7 @@ export namespace Prisma {
     prefix: string
     hashedKey: string
     createdBy: string
+    projectId?: string | null
     permissions?: ApiKeyCreatepermissionsInput | string[]
     requestsPerMinute?: number
     requestsPerDay?: number
@@ -28410,6 +29718,7 @@ export namespace Prisma {
     prefix?: StringFieldUpdateOperationsInput | string
     hashedKey?: StringFieldUpdateOperationsInput | string
     createdBy?: StringFieldUpdateOperationsInput | string
+    projectId?: NullableStringFieldUpdateOperationsInput | string | null
     permissions?: ApiKeyUpdatepermissionsInput | string[]
     requestsPerMinute?: IntFieldUpdateOperationsInput | number
     requestsPerDay?: IntFieldUpdateOperationsInput | number
@@ -29736,6 +31045,7 @@ export namespace Prisma {
     isDeployed?: boolean
     deploymentUrl?: string | null
     sdkConnected?: boolean
+    agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
@@ -29744,6 +31054,8 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutProjectsInput
     agentRuns?: AgentRunCreateNestedManyWithoutProjectInput
     emissionRecords?: EmissionRecordCreateNestedManyWithoutProjectInput
+    apiKeys?: ApiKeyCreateNestedManyWithoutProjectInput
+    platformCredentials?: PlatformCredentialCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateInput = {
@@ -29754,6 +31066,7 @@ export namespace Prisma {
     isDeployed?: boolean
     deploymentUrl?: string | null
     sdkConnected?: boolean
+    agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
@@ -29762,6 +31075,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     agentRuns?: AgentRunUncheckedCreateNestedManyWithoutProjectInput
     emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutProjectInput
+    apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutProjectInput
+    platformCredentials?: PlatformCredentialUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUpdateInput = {
@@ -29772,6 +31087,7 @@ export namespace Prisma {
     isDeployed?: BoolFieldUpdateOperationsInput | boolean
     deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
     sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -29780,6 +31096,8 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutProjectsNestedInput
     agentRuns?: AgentRunUpdateManyWithoutProjectNestedInput
     emissionRecords?: EmissionRecordUpdateManyWithoutProjectNestedInput
+    apiKeys?: ApiKeyUpdateManyWithoutProjectNestedInput
+    platformCredentials?: PlatformCredentialUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateInput = {
@@ -29790,6 +31108,7 @@ export namespace Prisma {
     isDeployed?: BoolFieldUpdateOperationsInput | boolean
     deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
     sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -29798,6 +31117,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agentRuns?: AgentRunUncheckedUpdateManyWithoutProjectNestedInput
     emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutProjectNestedInput
+    apiKeys?: ApiKeyUncheckedUpdateManyWithoutProjectNestedInput
+    platformCredentials?: PlatformCredentialUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateManyInput = {
@@ -29808,6 +31129,7 @@ export namespace Prisma {
     isDeployed?: boolean
     deploymentUrl?: string | null
     sdkConnected?: boolean
+    agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
@@ -29824,6 +31146,7 @@ export namespace Prisma {
     isDeployed?: BoolFieldUpdateOperationsInput | boolean
     deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
     sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -29839,6 +31162,7 @@ export namespace Prisma {
     isDeployed?: BoolFieldUpdateOperationsInput | boolean
     deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
     sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -29855,6 +31179,7 @@ export namespace Prisma {
     emailAlerts?: boolean
     pushAlerts?: boolean
     thresholdAlerts?: boolean
+    expoPushToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProfileInput
@@ -29869,6 +31194,7 @@ export namespace Prisma {
     emailAlerts?: boolean
     pushAlerts?: boolean
     thresholdAlerts?: boolean
+    expoPushToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -29881,6 +31207,7 @@ export namespace Prisma {
     emailAlerts?: BoolFieldUpdateOperationsInput | boolean
     pushAlerts?: BoolFieldUpdateOperationsInput | boolean
     thresholdAlerts?: BoolFieldUpdateOperationsInput | boolean
+    expoPushToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProfileNestedInput
@@ -29895,6 +31222,7 @@ export namespace Prisma {
     emailAlerts?: BoolFieldUpdateOperationsInput | boolean
     pushAlerts?: BoolFieldUpdateOperationsInput | boolean
     thresholdAlerts?: BoolFieldUpdateOperationsInput | boolean
+    expoPushToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29908,6 +31236,7 @@ export namespace Prisma {
     emailAlerts?: boolean
     pushAlerts?: boolean
     thresholdAlerts?: boolean
+    expoPushToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -29920,6 +31249,7 @@ export namespace Prisma {
     emailAlerts?: BoolFieldUpdateOperationsInput | boolean
     pushAlerts?: BoolFieldUpdateOperationsInput | boolean
     thresholdAlerts?: BoolFieldUpdateOperationsInput | boolean
+    expoPushToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29933,6 +31263,7 @@ export namespace Prisma {
     emailAlerts?: BoolFieldUpdateOperationsInput | boolean
     pushAlerts?: BoolFieldUpdateOperationsInput | boolean
     thresholdAlerts?: BoolFieldUpdateOperationsInput | boolean
+    expoPushToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30141,6 +31472,68 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     messages?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlatformCredentialCreateInput = {
+    id?: string
+    provider: $Enums.CloudProvider
+    token: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    project: ProjectCreateNestedOneWithoutPlatformCredentialsInput
+  }
+
+  export type PlatformCredentialUncheckedCreateInput = {
+    id?: string
+    projectId: string
+    provider: $Enums.CloudProvider
+    token: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PlatformCredentialUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
+    token?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneRequiredWithoutPlatformCredentialsNestedInput
+  }
+
+  export type PlatformCredentialUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
+    token?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlatformCredentialCreateManyInput = {
+    id?: string
+    projectId: string
+    provider: $Enums.CloudProvider
+    token: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PlatformCredentialUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
+    token?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlatformCredentialUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
+    token?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30807,12 +32200,18 @@ export namespace Prisma {
     not?: NestedEnumApiKeyStatusFilter<$PrismaModel> | $Enums.ApiKeyStatus
   }
 
+  export type ProjectNullableRelationFilter = {
+    is?: ProjectWhereInput | null
+    isNot?: ProjectWhereInput | null
+  }
+
   export type ApiKeyCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
     prefix?: SortOrder
     hashedKey?: SortOrder
     createdBy?: SortOrder
+    projectId?: SortOrder
     permissions?: SortOrder
     requestsPerMinute?: SortOrder
     requestsPerDay?: SortOrder
@@ -30842,6 +32241,7 @@ export namespace Prisma {
     prefix?: SortOrder
     hashedKey?: SortOrder
     createdBy?: SortOrder
+    projectId?: SortOrder
     requestsPerMinute?: SortOrder
     requestsPerDay?: SortOrder
     totalRequests?: SortOrder
@@ -30863,6 +32263,7 @@ export namespace Prisma {
     prefix?: SortOrder
     hashedKey?: SortOrder
     createdBy?: SortOrder
+    projectId?: SortOrder
     requestsPerMinute?: SortOrder
     requestsPerDay?: SortOrder
     totalRequests?: SortOrder
@@ -31612,11 +33013,6 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
-  export type ProjectNullableRelationFilter = {
-    is?: ProjectWhereInput | null
-    isNot?: ProjectWhereInput | null
-  }
-
   export type AgentRunCountOrderByAggregateInput = {
     id?: SortOrder
     projectId?: SortOrder
@@ -31895,11 +33291,31 @@ export namespace Prisma {
     none?: EmissionRecordWhereInput
   }
 
+  export type ApiKeyListRelationFilter = {
+    every?: ApiKeyWhereInput
+    some?: ApiKeyWhereInput
+    none?: ApiKeyWhereInput
+  }
+
+  export type PlatformCredentialListRelationFilter = {
+    every?: PlatformCredentialWhereInput
+    some?: PlatformCredentialWhereInput
+    none?: PlatformCredentialWhereInput
+  }
+
   export type AgentRunOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type EmissionRecordOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ApiKeyOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type PlatformCredentialOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -31911,6 +33327,7 @@ export namespace Prisma {
     isDeployed?: SortOrder
     deploymentUrl?: SortOrder
     sdkConnected?: SortOrder
+    agenticMode?: SortOrder
     connectedAt?: SortOrder
     lastPingAt?: SortOrder
     carbonBudgetKg?: SortOrder
@@ -31931,6 +33348,7 @@ export namespace Prisma {
     isDeployed?: SortOrder
     deploymentUrl?: SortOrder
     sdkConnected?: SortOrder
+    agenticMode?: SortOrder
     connectedAt?: SortOrder
     lastPingAt?: SortOrder
     carbonBudgetKg?: SortOrder
@@ -31947,6 +33365,7 @@ export namespace Prisma {
     isDeployed?: SortOrder
     deploymentUrl?: SortOrder
     sdkConnected?: SortOrder
+    agenticMode?: SortOrder
     connectedAt?: SortOrder
     lastPingAt?: SortOrder
     carbonBudgetKg?: SortOrder
@@ -31968,6 +33387,7 @@ export namespace Prisma {
     emailAlerts?: SortOrder
     pushAlerts?: SortOrder
     thresholdAlerts?: SortOrder
+    expoPushToken?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -31981,6 +33401,7 @@ export namespace Prisma {
     emailAlerts?: SortOrder
     pushAlerts?: SortOrder
     thresholdAlerts?: SortOrder
+    expoPushToken?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -31994,6 +33415,7 @@ export namespace Prisma {
     emailAlerts?: SortOrder
     pushAlerts?: SortOrder
     thresholdAlerts?: SortOrder
+    expoPushToken?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -32090,6 +33512,43 @@ export namespace Prisma {
   export type ChatHistoryMinOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProjectRelationFilter = {
+    is?: ProjectWhereInput
+    isNot?: ProjectWhereInput
+  }
+
+  export type PlatformCredentialProjectIdProviderCompoundUniqueInput = {
+    projectId: string
+    provider: $Enums.CloudProvider
+  }
+
+  export type PlatformCredentialCountOrderByAggregateInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    provider?: SortOrder
+    token?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PlatformCredentialMaxOrderByAggregateInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    provider?: SortOrder
+    token?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PlatformCredentialMinOrderByAggregateInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    provider?: SortOrder
+    token?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -32278,6 +33737,12 @@ export namespace Prisma {
     set: string[]
   }
 
+  export type ProjectCreateNestedOneWithoutApiKeysInput = {
+    create?: XOR<ProjectCreateWithoutApiKeysInput, ProjectUncheckedCreateWithoutApiKeysInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutApiKeysInput
+    connect?: ProjectWhereUniqueInput
+  }
+
   export type ApiKeyUpdatepermissionsInput = {
     set?: string[]
     push?: string | string[]
@@ -32285,6 +33750,16 @@ export namespace Prisma {
 
   export type EnumApiKeyStatusFieldUpdateOperationsInput = {
     set?: $Enums.ApiKeyStatus
+  }
+
+  export type ProjectUpdateOneWithoutApiKeysNestedInput = {
+    create?: XOR<ProjectCreateWithoutApiKeysInput, ProjectUncheckedCreateWithoutApiKeysInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutApiKeysInput
+    upsert?: ProjectUpsertWithoutApiKeysInput
+    disconnect?: ProjectWhereInput | boolean
+    delete?: ProjectWhereInput | boolean
+    connect?: ProjectWhereUniqueInput
+    update?: XOR<XOR<ProjectUpdateToOneWithWhereWithoutApiKeysInput, ProjectUpdateWithoutApiKeysInput>, ProjectUncheckedUpdateWithoutApiKeysInput>
   }
 
   export type EnumFlagCategoryFieldUpdateOperationsInput = {
@@ -32557,6 +34032,20 @@ export namespace Prisma {
     connect?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
   }
 
+  export type ApiKeyCreateNestedManyWithoutProjectInput = {
+    create?: XOR<ApiKeyCreateWithoutProjectInput, ApiKeyUncheckedCreateWithoutProjectInput> | ApiKeyCreateWithoutProjectInput[] | ApiKeyUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: ApiKeyCreateOrConnectWithoutProjectInput | ApiKeyCreateOrConnectWithoutProjectInput[]
+    createMany?: ApiKeyCreateManyProjectInputEnvelope
+    connect?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
+  }
+
+  export type PlatformCredentialCreateNestedManyWithoutProjectInput = {
+    create?: XOR<PlatformCredentialCreateWithoutProjectInput, PlatformCredentialUncheckedCreateWithoutProjectInput> | PlatformCredentialCreateWithoutProjectInput[] | PlatformCredentialUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: PlatformCredentialCreateOrConnectWithoutProjectInput | PlatformCredentialCreateOrConnectWithoutProjectInput[]
+    createMany?: PlatformCredentialCreateManyProjectInputEnvelope
+    connect?: PlatformCredentialWhereUniqueInput | PlatformCredentialWhereUniqueInput[]
+  }
+
   export type AgentRunUncheckedCreateNestedManyWithoutProjectInput = {
     create?: XOR<AgentRunCreateWithoutProjectInput, AgentRunUncheckedCreateWithoutProjectInput> | AgentRunCreateWithoutProjectInput[] | AgentRunUncheckedCreateWithoutProjectInput[]
     connectOrCreate?: AgentRunCreateOrConnectWithoutProjectInput | AgentRunCreateOrConnectWithoutProjectInput[]
@@ -32569,6 +34058,20 @@ export namespace Prisma {
     connectOrCreate?: EmissionRecordCreateOrConnectWithoutProjectInput | EmissionRecordCreateOrConnectWithoutProjectInput[]
     createMany?: EmissionRecordCreateManyProjectInputEnvelope
     connect?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+  }
+
+  export type ApiKeyUncheckedCreateNestedManyWithoutProjectInput = {
+    create?: XOR<ApiKeyCreateWithoutProjectInput, ApiKeyUncheckedCreateWithoutProjectInput> | ApiKeyCreateWithoutProjectInput[] | ApiKeyUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: ApiKeyCreateOrConnectWithoutProjectInput | ApiKeyCreateOrConnectWithoutProjectInput[]
+    createMany?: ApiKeyCreateManyProjectInputEnvelope
+    connect?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
+  }
+
+  export type PlatformCredentialUncheckedCreateNestedManyWithoutProjectInput = {
+    create?: XOR<PlatformCredentialCreateWithoutProjectInput, PlatformCredentialUncheckedCreateWithoutProjectInput> | PlatformCredentialCreateWithoutProjectInput[] | PlatformCredentialUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: PlatformCredentialCreateOrConnectWithoutProjectInput | PlatformCredentialCreateOrConnectWithoutProjectInput[]
+    createMany?: PlatformCredentialCreateManyProjectInputEnvelope
+    connect?: PlatformCredentialWhereUniqueInput | PlatformCredentialWhereUniqueInput[]
   }
 
   export type UserUpdateOneRequiredWithoutProjectsNestedInput = {
@@ -32607,6 +34110,34 @@ export namespace Prisma {
     deleteMany?: EmissionRecordScalarWhereInput | EmissionRecordScalarWhereInput[]
   }
 
+  export type ApiKeyUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<ApiKeyCreateWithoutProjectInput, ApiKeyUncheckedCreateWithoutProjectInput> | ApiKeyCreateWithoutProjectInput[] | ApiKeyUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: ApiKeyCreateOrConnectWithoutProjectInput | ApiKeyCreateOrConnectWithoutProjectInput[]
+    upsert?: ApiKeyUpsertWithWhereUniqueWithoutProjectInput | ApiKeyUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: ApiKeyCreateManyProjectInputEnvelope
+    set?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
+    disconnect?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
+    delete?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
+    connect?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
+    update?: ApiKeyUpdateWithWhereUniqueWithoutProjectInput | ApiKeyUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: ApiKeyUpdateManyWithWhereWithoutProjectInput | ApiKeyUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: ApiKeyScalarWhereInput | ApiKeyScalarWhereInput[]
+  }
+
+  export type PlatformCredentialUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<PlatformCredentialCreateWithoutProjectInput, PlatformCredentialUncheckedCreateWithoutProjectInput> | PlatformCredentialCreateWithoutProjectInput[] | PlatformCredentialUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: PlatformCredentialCreateOrConnectWithoutProjectInput | PlatformCredentialCreateOrConnectWithoutProjectInput[]
+    upsert?: PlatformCredentialUpsertWithWhereUniqueWithoutProjectInput | PlatformCredentialUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: PlatformCredentialCreateManyProjectInputEnvelope
+    set?: PlatformCredentialWhereUniqueInput | PlatformCredentialWhereUniqueInput[]
+    disconnect?: PlatformCredentialWhereUniqueInput | PlatformCredentialWhereUniqueInput[]
+    delete?: PlatformCredentialWhereUniqueInput | PlatformCredentialWhereUniqueInput[]
+    connect?: PlatformCredentialWhereUniqueInput | PlatformCredentialWhereUniqueInput[]
+    update?: PlatformCredentialUpdateWithWhereUniqueWithoutProjectInput | PlatformCredentialUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: PlatformCredentialUpdateManyWithWhereWithoutProjectInput | PlatformCredentialUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: PlatformCredentialScalarWhereInput | PlatformCredentialScalarWhereInput[]
+  }
+
   export type AgentRunUncheckedUpdateManyWithoutProjectNestedInput = {
     create?: XOR<AgentRunCreateWithoutProjectInput, AgentRunUncheckedCreateWithoutProjectInput> | AgentRunCreateWithoutProjectInput[] | AgentRunUncheckedCreateWithoutProjectInput[]
     connectOrCreate?: AgentRunCreateOrConnectWithoutProjectInput | AgentRunCreateOrConnectWithoutProjectInput[]
@@ -32633,6 +34164,34 @@ export namespace Prisma {
     update?: EmissionRecordUpdateWithWhereUniqueWithoutProjectInput | EmissionRecordUpdateWithWhereUniqueWithoutProjectInput[]
     updateMany?: EmissionRecordUpdateManyWithWhereWithoutProjectInput | EmissionRecordUpdateManyWithWhereWithoutProjectInput[]
     deleteMany?: EmissionRecordScalarWhereInput | EmissionRecordScalarWhereInput[]
+  }
+
+  export type ApiKeyUncheckedUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<ApiKeyCreateWithoutProjectInput, ApiKeyUncheckedCreateWithoutProjectInput> | ApiKeyCreateWithoutProjectInput[] | ApiKeyUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: ApiKeyCreateOrConnectWithoutProjectInput | ApiKeyCreateOrConnectWithoutProjectInput[]
+    upsert?: ApiKeyUpsertWithWhereUniqueWithoutProjectInput | ApiKeyUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: ApiKeyCreateManyProjectInputEnvelope
+    set?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
+    disconnect?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
+    delete?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
+    connect?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
+    update?: ApiKeyUpdateWithWhereUniqueWithoutProjectInput | ApiKeyUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: ApiKeyUpdateManyWithWhereWithoutProjectInput | ApiKeyUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: ApiKeyScalarWhereInput | ApiKeyScalarWhereInput[]
+  }
+
+  export type PlatformCredentialUncheckedUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<PlatformCredentialCreateWithoutProjectInput, PlatformCredentialUncheckedCreateWithoutProjectInput> | PlatformCredentialCreateWithoutProjectInput[] | PlatformCredentialUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: PlatformCredentialCreateOrConnectWithoutProjectInput | PlatformCredentialCreateOrConnectWithoutProjectInput[]
+    upsert?: PlatformCredentialUpsertWithWhereUniqueWithoutProjectInput | PlatformCredentialUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: PlatformCredentialCreateManyProjectInputEnvelope
+    set?: PlatformCredentialWhereUniqueInput | PlatformCredentialWhereUniqueInput[]
+    disconnect?: PlatformCredentialWhereUniqueInput | PlatformCredentialWhereUniqueInput[]
+    delete?: PlatformCredentialWhereUniqueInput | PlatformCredentialWhereUniqueInput[]
+    connect?: PlatformCredentialWhereUniqueInput | PlatformCredentialWhereUniqueInput[]
+    update?: PlatformCredentialUpdateWithWhereUniqueWithoutProjectInput | PlatformCredentialUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: PlatformCredentialUpdateManyWithWhereWithoutProjectInput | PlatformCredentialUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: PlatformCredentialScalarWhereInput | PlatformCredentialScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutProfileInput = {
@@ -32675,6 +34234,20 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutChatHistoryInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutChatHistoryInput, UserUpdateWithoutChatHistoryInput>, UserUncheckedUpdateWithoutChatHistoryInput>
+  }
+
+  export type ProjectCreateNestedOneWithoutPlatformCredentialsInput = {
+    create?: XOR<ProjectCreateWithoutPlatformCredentialsInput, ProjectUncheckedCreateWithoutPlatformCredentialsInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutPlatformCredentialsInput
+    connect?: ProjectWhereUniqueInput
+  }
+
+  export type ProjectUpdateOneRequiredWithoutPlatformCredentialsNestedInput = {
+    create?: XOR<ProjectCreateWithoutPlatformCredentialsInput, ProjectUncheckedCreateWithoutPlatformCredentialsInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutPlatformCredentialsInput
+    upsert?: ProjectUpsertWithoutPlatformCredentialsInput
+    connect?: ProjectWhereUniqueInput
+    update?: XOR<XOR<ProjectUpdateToOneWithWhereWithoutPlatformCredentialsInput, ProjectUpdateWithoutPlatformCredentialsInput>, ProjectUncheckedUpdateWithoutPlatformCredentialsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -33758,6 +35331,102 @@ export namespace Prisma {
     calculations?: CalculationUncheckedUpdateManyWithoutUserNestedInput
   }
 
+  export type ProjectCreateWithoutApiKeysInput = {
+    id?: string
+    name: string
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    sdkConnected?: boolean
+    agenticMode?: boolean
+    connectedAt?: Date | string | null
+    lastPingAt?: Date | string | null
+    carbonBudgetKg?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutProjectsInput
+    agentRuns?: AgentRunCreateNestedManyWithoutProjectInput
+    emissionRecords?: EmissionRecordCreateNestedManyWithoutProjectInput
+    platformCredentials?: PlatformCredentialCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectUncheckedCreateWithoutApiKeysInput = {
+    id?: string
+    name: string
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    sdkConnected?: boolean
+    agenticMode?: boolean
+    connectedAt?: Date | string | null
+    lastPingAt?: Date | string | null
+    carbonBudgetKg?: number | null
+    userId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    agentRuns?: AgentRunUncheckedCreateNestedManyWithoutProjectInput
+    emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutProjectInput
+    platformCredentials?: PlatformCredentialUncheckedCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectCreateOrConnectWithoutApiKeysInput = {
+    where: ProjectWhereUniqueInput
+    create: XOR<ProjectCreateWithoutApiKeysInput, ProjectUncheckedCreateWithoutApiKeysInput>
+  }
+
+  export type ProjectUpsertWithoutApiKeysInput = {
+    update: XOR<ProjectUpdateWithoutApiKeysInput, ProjectUncheckedUpdateWithoutApiKeysInput>
+    create: XOR<ProjectCreateWithoutApiKeysInput, ProjectUncheckedCreateWithoutApiKeysInput>
+    where?: ProjectWhereInput
+  }
+
+  export type ProjectUpdateToOneWithWhereWithoutApiKeysInput = {
+    where?: ProjectWhereInput
+    data: XOR<ProjectUpdateWithoutApiKeysInput, ProjectUncheckedUpdateWithoutApiKeysInput>
+  }
+
+  export type ProjectUpdateWithoutApiKeysInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    agenticMode?: BoolFieldUpdateOperationsInput | boolean
+    connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutProjectsNestedInput
+    agentRuns?: AgentRunUpdateManyWithoutProjectNestedInput
+    emissionRecords?: EmissionRecordUpdateManyWithoutProjectNestedInput
+    platformCredentials?: PlatformCredentialUpdateManyWithoutProjectNestedInput
+  }
+
+  export type ProjectUncheckedUpdateWithoutApiKeysInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    agenticMode?: BoolFieldUpdateOperationsInput | boolean
+    connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    userId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agentRuns?: AgentRunUncheckedUpdateManyWithoutProjectNestedInput
+    emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutProjectNestedInput
+    platformCredentials?: PlatformCredentialUncheckedUpdateManyWithoutProjectNestedInput
+  }
+
   export type ProjectCreateWithoutAgentRunsInput = {
     id?: string
     name: string
@@ -33766,6 +35435,7 @@ export namespace Prisma {
     isDeployed?: boolean
     deploymentUrl?: string | null
     sdkConnected?: boolean
+    agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
@@ -33773,6 +35443,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProjectsInput
     emissionRecords?: EmissionRecordCreateNestedManyWithoutProjectInput
+    apiKeys?: ApiKeyCreateNestedManyWithoutProjectInput
+    platformCredentials?: PlatformCredentialCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutAgentRunsInput = {
@@ -33783,6 +35455,7 @@ export namespace Prisma {
     isDeployed?: boolean
     deploymentUrl?: string | null
     sdkConnected?: boolean
+    agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
@@ -33790,6 +35463,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutProjectInput
+    apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutProjectInput
+    platformCredentials?: PlatformCredentialUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutAgentRunsInput = {
@@ -33816,6 +35491,7 @@ export namespace Prisma {
     isDeployed?: BoolFieldUpdateOperationsInput | boolean
     deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
     sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -33823,6 +35499,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProjectsNestedInput
     emissionRecords?: EmissionRecordUpdateManyWithoutProjectNestedInput
+    apiKeys?: ApiKeyUpdateManyWithoutProjectNestedInput
+    platformCredentials?: PlatformCredentialUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutAgentRunsInput = {
@@ -33833,6 +35511,7 @@ export namespace Prisma {
     isDeployed?: BoolFieldUpdateOperationsInput | boolean
     deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
     sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -33840,6 +35519,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutProjectNestedInput
+    apiKeys?: ApiKeyUncheckedUpdateManyWithoutProjectNestedInput
+    platformCredentials?: PlatformCredentialUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateWithoutEmissionRecordsInput = {
@@ -33850,6 +35531,7 @@ export namespace Prisma {
     isDeployed?: boolean
     deploymentUrl?: string | null
     sdkConnected?: boolean
+    agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
@@ -33857,6 +35539,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProjectsInput
     agentRuns?: AgentRunCreateNestedManyWithoutProjectInput
+    apiKeys?: ApiKeyCreateNestedManyWithoutProjectInput
+    platformCredentials?: PlatformCredentialCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutEmissionRecordsInput = {
@@ -33867,6 +35551,7 @@ export namespace Prisma {
     isDeployed?: boolean
     deploymentUrl?: string | null
     sdkConnected?: boolean
+    agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
@@ -33874,6 +35559,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     agentRuns?: AgentRunUncheckedCreateNestedManyWithoutProjectInput
+    apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutProjectInput
+    platformCredentials?: PlatformCredentialUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutEmissionRecordsInput = {
@@ -33900,6 +35587,7 @@ export namespace Prisma {
     isDeployed?: BoolFieldUpdateOperationsInput | boolean
     deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
     sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -33907,6 +35595,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProjectsNestedInput
     agentRuns?: AgentRunUpdateManyWithoutProjectNestedInput
+    apiKeys?: ApiKeyUpdateManyWithoutProjectNestedInput
+    platformCredentials?: PlatformCredentialUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutEmissionRecordsInput = {
@@ -33917,6 +35607,7 @@ export namespace Prisma {
     isDeployed?: BoolFieldUpdateOperationsInput | boolean
     deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
     sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -33924,6 +35615,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agentRuns?: AgentRunUncheckedUpdateManyWithoutProjectNestedInput
+    apiKeys?: ApiKeyUncheckedUpdateManyWithoutProjectNestedInput
+    platformCredentials?: PlatformCredentialUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProfileCreateWithoutUserInput = {
@@ -33934,6 +35627,7 @@ export namespace Prisma {
     emailAlerts?: boolean
     pushAlerts?: boolean
     thresholdAlerts?: boolean
+    expoPushToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -33946,6 +35640,7 @@ export namespace Prisma {
     emailAlerts?: boolean
     pushAlerts?: boolean
     thresholdAlerts?: boolean
+    expoPushToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -33963,6 +35658,7 @@ export namespace Prisma {
     isDeployed?: boolean
     deploymentUrl?: string | null
     sdkConnected?: boolean
+    agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
@@ -33970,6 +35666,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     agentRuns?: AgentRunCreateNestedManyWithoutProjectInput
     emissionRecords?: EmissionRecordCreateNestedManyWithoutProjectInput
+    apiKeys?: ApiKeyCreateNestedManyWithoutProjectInput
+    platformCredentials?: PlatformCredentialCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutUserInput = {
@@ -33980,6 +35678,7 @@ export namespace Prisma {
     isDeployed?: boolean
     deploymentUrl?: string | null
     sdkConnected?: boolean
+    agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
@@ -33987,6 +35686,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     agentRuns?: AgentRunUncheckedCreateNestedManyWithoutProjectInput
     emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutProjectInput
+    apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutProjectInput
+    platformCredentials?: PlatformCredentialUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutUserInput = {
@@ -34059,6 +35760,7 @@ export namespace Prisma {
     emailAlerts?: BoolFieldUpdateOperationsInput | boolean
     pushAlerts?: BoolFieldUpdateOperationsInput | boolean
     thresholdAlerts?: BoolFieldUpdateOperationsInput | boolean
+    expoPushToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -34071,6 +35773,7 @@ export namespace Prisma {
     emailAlerts?: BoolFieldUpdateOperationsInput | boolean
     pushAlerts?: BoolFieldUpdateOperationsInput | boolean
     thresholdAlerts?: BoolFieldUpdateOperationsInput | boolean
+    expoPushToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -34102,6 +35805,7 @@ export namespace Prisma {
     isDeployed?: BoolFilter<"Project"> | boolean
     deploymentUrl?: StringNullableFilter<"Project"> | string | null
     sdkConnected?: BoolFilter<"Project"> | boolean
+    agenticMode?: BoolFilter<"Project"> | boolean
     connectedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     lastPingAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     carbonBudgetKg?: FloatNullableFilter<"Project"> | number | null
@@ -34288,6 +35992,86 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ApiKeyCreateWithoutProjectInput = {
+    id?: string
+    name: string
+    prefix: string
+    hashedKey: string
+    createdBy: string
+    permissions?: ApiKeyCreatepermissionsInput | string[]
+    requestsPerMinute?: number
+    requestsPerDay?: number
+    totalRequests?: number
+    lastUsedAt?: Date | string | null
+    todayRequests?: number
+    todayResetAt?: Date | string
+    status?: $Enums.ApiKeyStatus
+    revokedAt?: Date | string | null
+    revokedBy?: string | null
+    revokeReason?: string | null
+    expiresAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ApiKeyUncheckedCreateWithoutProjectInput = {
+    id?: string
+    name: string
+    prefix: string
+    hashedKey: string
+    createdBy: string
+    permissions?: ApiKeyCreatepermissionsInput | string[]
+    requestsPerMinute?: number
+    requestsPerDay?: number
+    totalRequests?: number
+    lastUsedAt?: Date | string | null
+    todayRequests?: number
+    todayResetAt?: Date | string
+    status?: $Enums.ApiKeyStatus
+    revokedAt?: Date | string | null
+    revokedBy?: string | null
+    revokeReason?: string | null
+    expiresAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ApiKeyCreateOrConnectWithoutProjectInput = {
+    where: ApiKeyWhereUniqueInput
+    create: XOR<ApiKeyCreateWithoutProjectInput, ApiKeyUncheckedCreateWithoutProjectInput>
+  }
+
+  export type ApiKeyCreateManyProjectInputEnvelope = {
+    data: ApiKeyCreateManyProjectInput | ApiKeyCreateManyProjectInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type PlatformCredentialCreateWithoutProjectInput = {
+    id?: string
+    provider: $Enums.CloudProvider
+    token: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PlatformCredentialUncheckedCreateWithoutProjectInput = {
+    id?: string
+    provider: $Enums.CloudProvider
+    token: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PlatformCredentialCreateOrConnectWithoutProjectInput = {
+    where: PlatformCredentialWhereUniqueInput
+    create: XOR<PlatformCredentialCreateWithoutProjectInput, PlatformCredentialUncheckedCreateWithoutProjectInput>
+  }
+
+  export type PlatformCredentialCreateManyProjectInputEnvelope = {
+    data: PlatformCredentialCreateManyProjectInput | PlatformCredentialCreateManyProjectInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutProjectsInput = {
     update: XOR<UserUpdateWithoutProjectsInput, UserUncheckedUpdateWithoutProjectsInput>
     create: XOR<UserCreateWithoutProjectsInput, UserUncheckedCreateWithoutProjectsInput>
@@ -34403,6 +36187,76 @@ export namespace Prisma {
     isOversized?: BoolFilter<"EmissionRecord"> | boolean
     recommendation?: StringNullableFilter<"EmissionRecord"> | string | null
     timestamp?: DateTimeFilter<"EmissionRecord"> | Date | string
+  }
+
+  export type ApiKeyUpsertWithWhereUniqueWithoutProjectInput = {
+    where: ApiKeyWhereUniqueInput
+    update: XOR<ApiKeyUpdateWithoutProjectInput, ApiKeyUncheckedUpdateWithoutProjectInput>
+    create: XOR<ApiKeyCreateWithoutProjectInput, ApiKeyUncheckedCreateWithoutProjectInput>
+  }
+
+  export type ApiKeyUpdateWithWhereUniqueWithoutProjectInput = {
+    where: ApiKeyWhereUniqueInput
+    data: XOR<ApiKeyUpdateWithoutProjectInput, ApiKeyUncheckedUpdateWithoutProjectInput>
+  }
+
+  export type ApiKeyUpdateManyWithWhereWithoutProjectInput = {
+    where: ApiKeyScalarWhereInput
+    data: XOR<ApiKeyUpdateManyMutationInput, ApiKeyUncheckedUpdateManyWithoutProjectInput>
+  }
+
+  export type ApiKeyScalarWhereInput = {
+    AND?: ApiKeyScalarWhereInput | ApiKeyScalarWhereInput[]
+    OR?: ApiKeyScalarWhereInput[]
+    NOT?: ApiKeyScalarWhereInput | ApiKeyScalarWhereInput[]
+    id?: StringFilter<"ApiKey"> | string
+    name?: StringFilter<"ApiKey"> | string
+    prefix?: StringFilter<"ApiKey"> | string
+    hashedKey?: StringFilter<"ApiKey"> | string
+    createdBy?: StringFilter<"ApiKey"> | string
+    projectId?: StringNullableFilter<"ApiKey"> | string | null
+    permissions?: StringNullableListFilter<"ApiKey">
+    requestsPerMinute?: IntFilter<"ApiKey"> | number
+    requestsPerDay?: IntFilter<"ApiKey"> | number
+    totalRequests?: IntFilter<"ApiKey"> | number
+    lastUsedAt?: DateTimeNullableFilter<"ApiKey"> | Date | string | null
+    todayRequests?: IntFilter<"ApiKey"> | number
+    todayResetAt?: DateTimeFilter<"ApiKey"> | Date | string
+    status?: EnumApiKeyStatusFilter<"ApiKey"> | $Enums.ApiKeyStatus
+    revokedAt?: DateTimeNullableFilter<"ApiKey"> | Date | string | null
+    revokedBy?: StringNullableFilter<"ApiKey"> | string | null
+    revokeReason?: StringNullableFilter<"ApiKey"> | string | null
+    expiresAt?: DateTimeNullableFilter<"ApiKey"> | Date | string | null
+    createdAt?: DateTimeFilter<"ApiKey"> | Date | string
+    updatedAt?: DateTimeFilter<"ApiKey"> | Date | string
+  }
+
+  export type PlatformCredentialUpsertWithWhereUniqueWithoutProjectInput = {
+    where: PlatformCredentialWhereUniqueInput
+    update: XOR<PlatformCredentialUpdateWithoutProjectInput, PlatformCredentialUncheckedUpdateWithoutProjectInput>
+    create: XOR<PlatformCredentialCreateWithoutProjectInput, PlatformCredentialUncheckedCreateWithoutProjectInput>
+  }
+
+  export type PlatformCredentialUpdateWithWhereUniqueWithoutProjectInput = {
+    where: PlatformCredentialWhereUniqueInput
+    data: XOR<PlatformCredentialUpdateWithoutProjectInput, PlatformCredentialUncheckedUpdateWithoutProjectInput>
+  }
+
+  export type PlatformCredentialUpdateManyWithWhereWithoutProjectInput = {
+    where: PlatformCredentialScalarWhereInput
+    data: XOR<PlatformCredentialUpdateManyMutationInput, PlatformCredentialUncheckedUpdateManyWithoutProjectInput>
+  }
+
+  export type PlatformCredentialScalarWhereInput = {
+    AND?: PlatformCredentialScalarWhereInput | PlatformCredentialScalarWhereInput[]
+    OR?: PlatformCredentialScalarWhereInput[]
+    NOT?: PlatformCredentialScalarWhereInput | PlatformCredentialScalarWhereInput[]
+    id?: StringFilter<"PlatformCredential"> | string
+    projectId?: StringFilter<"PlatformCredential"> | string
+    provider?: EnumCloudProviderFilter<"PlatformCredential"> | $Enums.CloudProvider
+    token?: StringFilter<"PlatformCredential"> | string
+    createdAt?: DateTimeFilter<"PlatformCredential"> | Date | string
+    updatedAt?: DateTimeFilter<"PlatformCredential"> | Date | string
   }
 
   export type UserCreateWithoutProfileInput = {
@@ -34633,6 +36487,102 @@ export namespace Prisma {
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   }
 
+  export type ProjectCreateWithoutPlatformCredentialsInput = {
+    id?: string
+    name: string
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    sdkConnected?: boolean
+    agenticMode?: boolean
+    connectedAt?: Date | string | null
+    lastPingAt?: Date | string | null
+    carbonBudgetKg?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutProjectsInput
+    agentRuns?: AgentRunCreateNestedManyWithoutProjectInput
+    emissionRecords?: EmissionRecordCreateNestedManyWithoutProjectInput
+    apiKeys?: ApiKeyCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectUncheckedCreateWithoutPlatformCredentialsInput = {
+    id?: string
+    name: string
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    sdkConnected?: boolean
+    agenticMode?: boolean
+    connectedAt?: Date | string | null
+    lastPingAt?: Date | string | null
+    carbonBudgetKg?: number | null
+    userId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    agentRuns?: AgentRunUncheckedCreateNestedManyWithoutProjectInput
+    emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutProjectInput
+    apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectCreateOrConnectWithoutPlatformCredentialsInput = {
+    where: ProjectWhereUniqueInput
+    create: XOR<ProjectCreateWithoutPlatformCredentialsInput, ProjectUncheckedCreateWithoutPlatformCredentialsInput>
+  }
+
+  export type ProjectUpsertWithoutPlatformCredentialsInput = {
+    update: XOR<ProjectUpdateWithoutPlatformCredentialsInput, ProjectUncheckedUpdateWithoutPlatformCredentialsInput>
+    create: XOR<ProjectCreateWithoutPlatformCredentialsInput, ProjectUncheckedCreateWithoutPlatformCredentialsInput>
+    where?: ProjectWhereInput
+  }
+
+  export type ProjectUpdateToOneWithWhereWithoutPlatformCredentialsInput = {
+    where?: ProjectWhereInput
+    data: XOR<ProjectUpdateWithoutPlatformCredentialsInput, ProjectUncheckedUpdateWithoutPlatformCredentialsInput>
+  }
+
+  export type ProjectUpdateWithoutPlatformCredentialsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    agenticMode?: BoolFieldUpdateOperationsInput | boolean
+    connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutProjectsNestedInput
+    agentRuns?: AgentRunUpdateManyWithoutProjectNestedInput
+    emissionRecords?: EmissionRecordUpdateManyWithoutProjectNestedInput
+    apiKeys?: ApiKeyUpdateManyWithoutProjectNestedInput
+  }
+
+  export type ProjectUncheckedUpdateWithoutPlatformCredentialsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    agenticMode?: BoolFieldUpdateOperationsInput | boolean
+    connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    userId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agentRuns?: AgentRunUncheckedUpdateManyWithoutProjectNestedInput
+    emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutProjectNestedInput
+    apiKeys?: ApiKeyUncheckedUpdateManyWithoutProjectNestedInput
+  }
+
   export type CalculationCreateManyUserInput = {
     id?: string
     provider: $Enums.CloudProvider
@@ -34841,6 +36791,7 @@ export namespace Prisma {
     isDeployed?: boolean
     deploymentUrl?: string | null
     sdkConnected?: boolean
+    agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
@@ -34862,6 +36813,7 @@ export namespace Prisma {
     isDeployed?: BoolFieldUpdateOperationsInput | boolean
     deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
     sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -34869,6 +36821,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agentRuns?: AgentRunUpdateManyWithoutProjectNestedInput
     emissionRecords?: EmissionRecordUpdateManyWithoutProjectNestedInput
+    apiKeys?: ApiKeyUpdateManyWithoutProjectNestedInput
+    platformCredentials?: PlatformCredentialUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutUserInput = {
@@ -34879,6 +36833,7 @@ export namespace Prisma {
     isDeployed?: BoolFieldUpdateOperationsInput | boolean
     deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
     sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -34886,6 +36841,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agentRuns?: AgentRunUncheckedUpdateManyWithoutProjectNestedInput
     emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutProjectNestedInput
+    apiKeys?: ApiKeyUncheckedUpdateManyWithoutProjectNestedInput
+    platformCredentials?: PlatformCredentialUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateManyWithoutUserInput = {
@@ -34896,6 +36853,7 @@ export namespace Prisma {
     isDeployed?: BoolFieldUpdateOperationsInput | boolean
     deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
     sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -34955,6 +36913,36 @@ export namespace Prisma {
     isOversized?: boolean
     recommendation?: string | null
     timestamp?: Date | string
+  }
+
+  export type ApiKeyCreateManyProjectInput = {
+    id?: string
+    name: string
+    prefix: string
+    hashedKey: string
+    createdBy: string
+    permissions?: ApiKeyCreatepermissionsInput | string[]
+    requestsPerMinute?: number
+    requestsPerDay?: number
+    totalRequests?: number
+    lastUsedAt?: Date | string | null
+    todayRequests?: number
+    todayResetAt?: Date | string
+    status?: $Enums.ApiKeyStatus
+    revokedAt?: Date | string | null
+    revokedBy?: string | null
+    revokeReason?: string | null
+    expiresAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PlatformCredentialCreateManyProjectInput = {
+    id?: string
+    provider: $Enums.CloudProvider
+    token: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type AgentRunUpdateWithoutProjectInput = {
@@ -35065,6 +37053,96 @@ export namespace Prisma {
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ApiKeyUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    prefix?: StringFieldUpdateOperationsInput | string
+    hashedKey?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    permissions?: ApiKeyUpdatepermissionsInput | string[]
+    requestsPerMinute?: IntFieldUpdateOperationsInput | number
+    requestsPerDay?: IntFieldUpdateOperationsInput | number
+    totalRequests?: IntFieldUpdateOperationsInput | number
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    todayRequests?: IntFieldUpdateOperationsInput | number
+    todayResetAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumApiKeyStatusFieldUpdateOperationsInput | $Enums.ApiKeyStatus
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    revokeReason?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ApiKeyUncheckedUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    prefix?: StringFieldUpdateOperationsInput | string
+    hashedKey?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    permissions?: ApiKeyUpdatepermissionsInput | string[]
+    requestsPerMinute?: IntFieldUpdateOperationsInput | number
+    requestsPerDay?: IntFieldUpdateOperationsInput | number
+    totalRequests?: IntFieldUpdateOperationsInput | number
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    todayRequests?: IntFieldUpdateOperationsInput | number
+    todayResetAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumApiKeyStatusFieldUpdateOperationsInput | $Enums.ApiKeyStatus
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    revokeReason?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ApiKeyUncheckedUpdateManyWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    prefix?: StringFieldUpdateOperationsInput | string
+    hashedKey?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    permissions?: ApiKeyUpdatepermissionsInput | string[]
+    requestsPerMinute?: IntFieldUpdateOperationsInput | number
+    requestsPerDay?: IntFieldUpdateOperationsInput | number
+    totalRequests?: IntFieldUpdateOperationsInput | number
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    todayRequests?: IntFieldUpdateOperationsInput | number
+    todayResetAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumApiKeyStatusFieldUpdateOperationsInput | $Enums.ApiKeyStatus
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    revokeReason?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlatformCredentialUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
+    token?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlatformCredentialUncheckedUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
+    token?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlatformCredentialUncheckedUpdateManyWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
+    token?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
 
 
   /**
@@ -35166,6 +37244,10 @@ export namespace Prisma {
      * @deprecated Use ChatHistoryDefaultArgs instead
      */
     export type ChatHistoryArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ChatHistoryDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use PlatformCredentialDefaultArgs instead
+     */
+    export type PlatformCredentialArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = PlatformCredentialDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany

@@ -6,7 +6,7 @@ import { redis } from '../../lib/redis';
 import { sendEmail } from '../../utils/email';
 
 // Helper to resolve the IDs of all users/projects in the current user's team/tenant
-async function resolveTenantContext(userId: string, userEmail: string) {
+export async function resolveTenantContext(userId: string, userEmail: string) {
   const ownedProjects = await prisma.project.findMany({ select: { id: true }, where: { userId } });
   const memberRecords = await prisma.teamMember.findMany({ select: { projectId: true }, where: { email: userEmail } });
   
@@ -244,8 +244,7 @@ export const getUsers = async (req: AuthRequest, res: Response) => {
 
     const allEnriched = allUsers.map(user => {
       const isConnected = connectedProjectNames.has(user.projectName);
-      // Give them a mock emission if it's 0, so insights display something in the demo
-      const co2 = user.co2Emissions > 0 ? user.co2Emissions : (Math.floor(Math.random() * 100) + 50);
+      const co2 = user.co2Emissions;
       
       totalEmissions += co2;
       connectedCount++;
@@ -814,7 +813,6 @@ export const getEmissions = async (req: AuthRequest, res: Response) => {
     });
   } catch (error: any) {
     console.error('[getEmissions] Internal server error:', error);
-    require('fs').writeFileSync('emissions-error.log', error.stack || error.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -997,6 +995,21 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
     });
     const costMap = new Map(instanceTypes.map(t => [t.name, t.onDemandHourlyUsd || 0]));
 
+    // Pre-calculate intervals for all emissions based on actual ingestion time
+    const instanceLastSeen = new Map<string, Date>();
+    const emissionIntervals = new Map<string, number>();
+    
+    for (const r of emissions) {
+      const lastSeen = instanceLastSeen.get(r.instanceId);
+      let intervalHours = 1; // Default to 1 hour
+      if (lastSeen) {
+        const diffMs = r.timestamp.getTime() - lastSeen.getTime();
+        intervalHours = Math.min(diffMs / (1000 * 60 * 60), 24); // Cap at 24h
+      }
+      emissionIntervals.set(r.id, intervalHours);
+      instanceLastSeen.set(r.instanceId, r.timestamp);
+    }
+
     const history30d = Array.from({ length: 30 }).map((_, i) => {
       const d = new Date();
       d.setDate(d.getDate() - (29 - i));
@@ -1004,7 +1017,8 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
       const dayRecords = emissions.filter(e => e.timestamp.toISOString().split('T')[0] === dayStr);
       let dayCost = 0;
       for (const r of dayRecords) {
-        dayCost += (costMap.get(r.instanceType) || 0);
+        const intervalHours = emissionIntervals.get(r.id) || 1;
+        dayCost += (costMap.get(r.instanceType) || 0) * intervalHours;
       }
       return {
         date: dayStr,
@@ -1046,7 +1060,7 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
 
     // API Keys
     const apiKeys = await prisma.apiKey.findMany({
-       where: { createdBy: req.user!.id, name: { contains: project.name, mode: 'insensitive' } }
+       where: { projectId: project.id }
     });
 
     // Greener Region

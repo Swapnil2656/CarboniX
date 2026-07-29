@@ -3,7 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProjectStats = exports.disconnectProject = exports.deleteProject = exports.getAuditLogs = exports.getNotifications = exports.migrateEmission = exports.getEmissions = exports.removeTeamMember = exports.inviteUser = exports.syncTeamMembers = exports.getTeamMembers = exports.deleteApiKey = exports.revokeApiKey = exports.createApiKey = exports.getApiKeys = exports.toggleFeatureFlag = exports.getFeatureFlags = exports.getUsers = exports.getDashboard = void 0;
+exports.getProjectStats = exports.disconnectProject = exports.deleteProject = exports.deleteAuditLog = exports.deleteNotification = exports.getAuditLogs = exports.getNotifications = exports.migrateEmission = exports.getEmissions = exports.removeTeamMember = exports.inviteUser = exports.syncTeamMembers = exports.getTeamMembers = exports.deleteApiKey = exports.revokeApiKey = exports.createApiKey = exports.getApiKeys = exports.toggleFeatureFlag = exports.getFeatureFlags = exports.getUsers = exports.getDashboard = void 0;
+exports.resolveTenantContext = resolveTenantContext;
 const prisma_1 = require("../../lib/prisma");
 const crypto_1 = __importDefault(require("crypto"));
 const redis_1 = require("../../lib/redis");
@@ -180,6 +181,13 @@ const getUsers = async (req, res) => {
             where: { email: { in: emailsToFetch } },
             include: { profile: true }
         });
+        // Only get projects for the current user
+        const projects = await prisma_1.prisma.project.findMany({
+            where: { id: { in: projectIds } },
+            select: { name: true, sdkConnected: true }
+        });
+        const connectedProjectNames = new Set(projects.filter(p => p.sdkConnected).map(p => p.name));
+        const defaultProjectName = projects.length > 0 ? projects[0].name : 'CarboniX Core';
         const mergedMap = new Map();
         rawTeamMembers.forEach(tm => mergedMap.set(tm.email, tm));
         rawUsers.forEach(u => {
@@ -189,7 +197,7 @@ const getUsers = async (req, res) => {
                     name: u.profile?.fullName || u.userName || u.email.split('@')[0],
                     email: u.email,
                     role: u.type,
-                    projectName: 'CarboniX Core',
+                    projectName: defaultProjectName,
                     projectId: projectIds[0] || 'core', // Default to their first project
                     location: 'Global',
                     co2Emissions: 0,
@@ -208,35 +216,61 @@ const getUsers = async (req, res) => {
         });
         let allUsers = Array.from(mergedMap.values());
         allUsers.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-        const users = allUsers.slice((page - 1) * pageSize, page * pageSize);
         const total = allUsers.length;
-        // Only get projects for the current user
-        const projects = await prisma_1.prisma.project.findMany({
-            where: { id: { in: projectIds } },
-            select: { name: true, sdkConnected: true }
-        });
-        const connectedProjectNames = new Set(projects.filter(p => p.sdkConnected).map(p => p.name));
+        // Calculate enriched users for ALL users to get accurate insights
         let totalEmissions = 0;
         let connectedCount = 0;
-        const enrichedUsers = users.map(user => {
+        const allEnriched = allUsers.map(user => {
             const isConnected = connectedProjectNames.has(user.projectName);
-            const co2 = isConnected ? user.co2Emissions : 0;
-            if (isConnected) {
-                totalEmissions += co2;
-                connectedCount++;
-            }
+            const co2 = user.co2Emissions;
+            totalEmissions += co2;
+            connectedCount++;
             return {
                 ...user,
                 co2Emissions: co2
             };
         });
         const fleetAvg = connectedCount > 0 ? Math.round(totalEmissions / connectedCount) : 0;
+        // Insights Logic
+        const projMap = new Map();
+        allEnriched.forEach(u => {
+            if (u.co2Emissions > 0) {
+                projMap.set(u.projectName, (projMap.get(u.projectName) || 0) + u.co2Emissions);
+            }
+        });
+        const sortedProjs = Array.from(projMap.entries())
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 2);
+        const projectEmissions = sortedProjs.map((p, idx) => ({
+            name: p[0],
+            percent: Math.round((p[1] / totalEmissions) * 100) || 0,
+            color: idx === 0 ? 'bg-[#50FA7B]' : 'bg-primary'
+        }));
+        let highEmitter = null;
+        const highest = [...allEnriched].sort((a, b) => b.co2Emissions - a.co2Emissions)[0];
+        if (highest && highest.co2Emissions > 0 && fleetAvg > 0) {
+            const diff = highest.co2Emissions - fleetAvg;
+            const percentAbove = Math.round((diff / fleetAvg) * 100);
+            if (percentAbove > 10) {
+                highEmitter = { name: highest.name, percentAbove };
+            }
+        }
+        const uniqueProjectsCount = new Set(allEnriched.map(u => u.projectName)).size;
+        const devCount = allEnriched.length;
+        const insights = {
+            projectEmissions,
+            highEmitter,
+            devCount,
+            projCount: uniqueProjectsCount
+        };
+        const users = allEnriched.slice((page - 1) * pageSize, page * pageSize);
         res.json({
-            users: enrichedUsers,
+            users,
             total,
             page,
             pageSize,
-            fleetAvg
+            fleetAvg,
+            insights
         });
     }
     catch (error) {
@@ -714,7 +748,6 @@ const getEmissions = async (req, res) => {
     }
     catch (error) {
         console.error('[getEmissions] Internal server error:', error);
-        require('fs').writeFileSync('emissions-error.log', error.stack || error.message);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
@@ -813,6 +846,32 @@ const getAuditLogs = async (req, res) => {
     }
 };
 exports.getAuditLogs = getAuditLogs;
+const deleteNotification = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await prisma_1.prisma.notification.delete({
+            where: { id }
+        });
+        res.json({ success: true });
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+exports.deleteNotification = deleteNotification;
+const deleteAuditLog = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await prisma_1.prisma.auditLog.delete({
+            where: { id }
+        });
+        res.json({ success: true });
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+exports.deleteAuditLog = deleteAuditLog;
 const deleteProject = async (req, res) => {
     try {
         const { id } = req.params;
@@ -866,6 +925,19 @@ const getProjectStats = async (req, res) => {
             where: { name: { in: uniqueTypes } }
         });
         const costMap = new Map(instanceTypes.map(t => [t.name, t.onDemandHourlyUsd || 0]));
+        // Pre-calculate intervals for all emissions based on actual ingestion time
+        const instanceLastSeen = new Map();
+        const emissionIntervals = new Map();
+        for (const r of emissions) {
+            const lastSeen = instanceLastSeen.get(r.instanceId);
+            let intervalHours = 1; // Default to 1 hour
+            if (lastSeen) {
+                const diffMs = r.timestamp.getTime() - lastSeen.getTime();
+                intervalHours = Math.min(diffMs / (1000 * 60 * 60), 24); // Cap at 24h
+            }
+            emissionIntervals.set(r.id, intervalHours);
+            instanceLastSeen.set(r.instanceId, r.timestamp);
+        }
         const history30d = Array.from({ length: 30 }).map((_, i) => {
             const d = new Date();
             d.setDate(d.getDate() - (29 - i));
@@ -873,7 +945,8 @@ const getProjectStats = async (req, res) => {
             const dayRecords = emissions.filter(e => e.timestamp.toISOString().split('T')[0] === dayStr);
             let dayCost = 0;
             for (const r of dayRecords) {
-                dayCost += (costMap.get(r.instanceType) || 0);
+                const intervalHours = emissionIntervals.get(r.id) || 1;
+                dayCost += (costMap.get(r.instanceType) || 0) * intervalHours;
             }
             return {
                 date: dayStr,
@@ -912,7 +985,7 @@ const getProjectStats = async (req, res) => {
         }
         // API Keys
         const apiKeys = await prisma_1.prisma.apiKey.findMany({
-            where: { createdBy: req.user.id, name: { contains: project.name, mode: 'insensitive' } }
+            where: { projectId: project.id }
         });
         // Greener Region
         let greenerRegion = null;
