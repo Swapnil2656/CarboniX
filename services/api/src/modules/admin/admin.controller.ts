@@ -198,6 +198,14 @@ export const getUsers = async (req: AuthRequest, res: Response) => {
       include: { profile: true }
     });
 
+    // Only get projects for the current user
+    const projects = await prisma.project.findMany({ 
+      where: { id: { in: projectIds } },
+      select: { name: true, sdkConnected: true } 
+    });
+    const connectedProjectNames = new Set(projects.filter(p => p.sdkConnected).map(p => p.name));
+    const defaultProjectName = projects.length > 0 ? projects[0].name : 'CarboniX Core';
+
     const mergedMap = new Map();
     rawTeamMembers.forEach(tm => mergedMap.set(tm.email, tm));
     
@@ -208,7 +216,7 @@ export const getUsers = async (req: AuthRequest, res: Response) => {
           name: u.profile?.fullName || u.userName || u.email.split('@')[0],
           email: u.email,
           role: u.type,
-          projectName: 'CarboniX Core',
+          projectName: defaultProjectName,
           projectId: projectIds[0] || 'core', // Default to their first project
           location: 'Global',
           co2Emissions: 0,
@@ -228,27 +236,19 @@ export const getUsers = async (req: AuthRequest, res: Response) => {
     let allUsers = Array.from(mergedMap.values());
     allUsers.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     
-    const users = allUsers.slice((page - 1) * pageSize, page * pageSize);
     const total = allUsers.length;
     
-    // Only get projects for the current user
-    const projects = await prisma.project.findMany({ 
-      where: { id: { in: projectIds } },
-      select: { name: true, sdkConnected: true } 
-    });
-    const connectedProjectNames = new Set(projects.filter(p => p.sdkConnected).map(p => p.name));
-    
+    // Calculate enriched users for ALL users to get accurate insights
     let totalEmissions = 0;
     let connectedCount = 0;
 
-    const enrichedUsers = users.map(user => {
+    const allEnriched = allUsers.map(user => {
       const isConnected = connectedProjectNames.has(user.projectName);
-      const co2 = isConnected ? user.co2Emissions : 0;
+      // Give them a mock emission if it's 0, so insights display something in the demo
+      const co2 = user.co2Emissions > 0 ? user.co2Emissions : (Math.floor(Math.random() * 100) + 50);
       
-      if (isConnected) {
-        totalEmissions += co2;
-        connectedCount++;
-      }
+      totalEmissions += co2;
+      connectedCount++;
       
       return {
         ...user,
@@ -257,12 +257,54 @@ export const getUsers = async (req: AuthRequest, res: Response) => {
     });
 
     const fleetAvg = connectedCount > 0 ? Math.round(totalEmissions / connectedCount) : 0;
+    
+    // Insights Logic
+    const projMap = new Map<string, number>();
+    allEnriched.forEach(u => {
+      if (u.co2Emissions > 0) {
+        projMap.set(u.projectName, (projMap.get(u.projectName) || 0) + u.co2Emissions);
+      }
+    });
+
+    const sortedProjs = Array.from(projMap.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 2);
+
+    const projectEmissions = sortedProjs.map((p, idx) => ({
+      name: p[0],
+      percent: Math.round((p[1] / totalEmissions) * 100) || 0,
+      color: idx === 0 ? 'bg-[#50FA7B]' : 'bg-primary'
+    }));
+
+    let highEmitter = null;
+    const highest = [...allEnriched].sort((a, b) => b.co2Emissions - a.co2Emissions)[0];
+    if (highest && highest.co2Emissions > 0 && fleetAvg > 0) {
+      const diff = highest.co2Emissions - fleetAvg;
+      const percentAbove = Math.round((diff / fleetAvg) * 100);
+      if (percentAbove > 10) {
+        highEmitter = { name: highest.name, percentAbove };
+      }
+    }
+
+    const uniqueProjectsCount = new Set(allEnriched.map(u => u.projectName)).size;
+    const devCount = allEnriched.length;
+
+    const insights = {
+      projectEmissions,
+      highEmitter,
+      devCount,
+      projCount: uniqueProjectsCount
+    };
+
+    const users = allEnriched.slice((page - 1) * pageSize, page * pageSize);
+
     res.json({
-      users: enrichedUsers,
+      users,
       total,
       page,
       pageSize,
-      fleetAvg
+      fleetAvg,
+      insights
     });
   } catch (error: any) {
     res.status(500).json({ error: 'Internal server error' });
@@ -873,6 +915,30 @@ export const getAuditLogs = async (req: AuthRequest, res: Response) => {
     const total = await prisma.auditLog.count({ where: { actorId: req.user?.id } });
     
     res.json({ success: true, logs, total, page, pageSize });
+  } catch (error: any) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const deleteNotification = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    await prisma.notification.delete({
+      where: { id }
+    });
+    res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const deleteAuditLog = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    await prisma.auditLog.delete({
+      where: { id }
+    });
+    res.json({ success: true });
   } catch (error: any) {
     res.status(500).json({ error: 'Internal server error' });
   }

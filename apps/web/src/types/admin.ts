@@ -58,6 +58,13 @@ export interface UsersResponse {
   total: number;
   page: number;
   pageSize: number;
+  fleetAvg?: number;
+  insights?: {
+    projectEmissions: { name: string; percent: number; color: string }[];
+    highEmitter: { name: string; percentAbove: number } | null;
+    devCount: number;
+    projCount: number;
+  };
 }
 
 // ─── Feature Flags ──────────────────────────────────────────────────────────

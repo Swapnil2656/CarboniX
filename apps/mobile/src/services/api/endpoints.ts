@@ -45,6 +45,10 @@ export const agentsApi = {
   getLatestBRSR: async () => {
     const response = await apiClient.get('/agents/report/brsr');
     return response.data;
+  },
+  triggerReporter: async (projectId: string) => {
+    const response = await apiClient.post(`/agents/trigger/reporter?projectId=${projectId}`);
+    return response.data;
   }
 };
 

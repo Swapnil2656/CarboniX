@@ -336,13 +336,14 @@ const ingestTelemetry = async (req, res) => {
         };
         const result = await (0, carbon_engine_1.calculateCarbon)(input);
         // Update the project's sdkConnected status
+        let resolvedProjectId = null;
         if (req.apiKey) {
-            const projectId = await resolveProjectForApiKey(req.apiKey, projectName);
-            if (projectId) {
+            resolvedProjectId = await resolveProjectForApiKey(req.apiKey, projectName);
+            if (resolvedProjectId) {
                 const now = new Date();
-                const existingProject = await prisma_1.prisma.project.findUnique({ where: { id: projectId } });
+                const existingProject = await prisma_1.prisma.project.findUnique({ where: { id: resolvedProjectId } });
                 await prisma_1.prisma.project.update({
-                    where: { id: projectId },
+                    where: { id: resolvedProjectId },
                     data: {
                         sdkConnected: true,
                         lastPingAt: now,
@@ -359,6 +360,7 @@ const ingestTelemetry = async (req, res) => {
                 provider: input.provider.toUpperCase(),
                 region: input.region,
                 instanceName: projectName,
+                projectId: resolvedProjectId, // Set the real tenant link
                 cpuUtilization: input.cpuUtilization,
                 energyKwh: result.totalFinalEnergyKwh,
                 gridIntensity: result.gridIntensity,

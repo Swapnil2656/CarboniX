@@ -5,16 +5,27 @@ import { useRouter } from 'next/navigation';
 import { StatCard } from '@/components/ui/StatCard';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { adminApi, carbonApi } from '@/services/api/endpoints';
+import { adminApi, carbonApi, agentsApi } from '@/services/api/endpoints';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
+import { jsPDF } from 'jspdf';
 import { Badge } from '@/components/ui/Badge';
+import { SdkConnectionBanner } from '@/components/admin/SdkConnectionBanner';
 
 export default function ProjectDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [chartDays, setChartDays] = useState<'7d' | '30d'>('7d');
+  const [chartDays, setChartDays] = useState<'7d' | '30d'>('30d');
+  const [dismissedBanner, setDismissedBanner] = useState(false);
+
+  // AI & Pagination states
+  const [localInstances, setLocalInstances] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const [analyzingId, setAnalyzingId] = useState<string | null>(null);
+  const [migratingId, setMigratingId] = useState<string | null>(null);
+  const [manualMigrateModal, setManualMigrateModal] = useState<{ open: boolean; record: any | null; targetRegion: string }>({ open: false, record: null, targetRegion: '' });
 
   // Danger zone states
   const [confirmNameDisconnect, setConfirmNameDisconnect] = useState('');
@@ -32,6 +43,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
         const res = await adminApi.getProjectStats(params.id);
         if (res.success) {
           setData(res.data);
+          setLocalInstances(res.data.instances || []);
         } else {
           setError(res.error || 'Failed to fetch project stats');
         }
@@ -43,6 +55,71 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     };
     fetchStats();
   }, [params.id]);
+
+  const handleAnalyze = async (record: any) => {
+    setAnalyzingId(record.id);
+    try {
+      const payload = {
+        projectName: record.instanceName || 'CarboniX',
+        instanceType: record.instanceType,
+        provider: record.provider,
+        region: record.region,
+        cpuUtilization: record.cpuUtilization,
+        storageGb: 20
+      };
+      const res = await carbonApi.recommend(payload);
+      
+      setLocalInstances((prev) => 
+        prev.map((r) => {
+          if (r.id === record.id) {
+            const recObj = res.data?.recommended;
+            const recMessage = recObj 
+              ? `AI: ${recObj.message || `Move to ${recObj.region}`}` 
+              : 'Already in an optimal region.';
+            return {
+              ...r,
+              recommendation: recMessage,
+              _recommendedRegion: recObj?.region,
+              _recommendedCarbonKg: recObj?.projectedCarbonKg
+            };
+          }
+          return r;
+        })
+      );
+    } catch (err) {
+      console.error(err);
+      alert('Failed to analyze: ' + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      setAnalyzingId(null);
+    }
+  };
+
+  const handleAutoMigrate = async (recordId: string, targetRegion: string) => {
+    setMigratingId(recordId);
+    try {
+      await adminApi.migrateEmission(recordId, targetRegion);
+      setLocalInstances((prev) => 
+        prev.map((r) => {
+          if (r.id === recordId) {
+            return {
+              ...r,
+              region: targetRegion,
+              carbonKg: r._recommendedCarbonKg || (r.carbonKg * 0.7),
+              isOptimized: true,
+              recommendation: 'Optimized via Auto Migrate',
+              _recommendedRegion: undefined
+            };
+          }
+          return r;
+        })
+      );
+    } catch (err) {
+      console.error(err);
+      alert('Migration failed: ' + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      setMigratingId(null);
+    }
+  };
 
   const handleDelete = async () => {
     if (confirmNameDelete !== data?.project?.name) {
@@ -77,18 +154,65 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
   const handleExport = async () => {
     try {
       setIsExporting(true);
-      // We assume there's a triggerReporter endpoint, we pass projectId as query
-      const res = await fetch(`/api/v1/agents/trigger/reporter?projectId=${params.id}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+      const res = await agentsApi.triggerReporter(params.id);
+      if (res.success && res.data) {
+        const doc = new jsPDF();
+        
+        doc.setFontSize(22);
+        doc.text(`CarboniX Report - ${data?.project?.name || params.id}`, 14, 20);
+        
+        doc.setFontSize(12);
+        
+        let reportContent = '';
+        if (typeof res.data.report === 'string') {
+          reportContent = res.data.report;
+        } else {
+          const r = res.data.report;
+          reportContent += `Report Period: ${r.reportPeriod?.label || 'N/A'}\n`;
+          reportContent += `Generated At: ${new Date(r.generatedAt || Date.now()).toLocaleString()}\n\n`;
+          
+          reportContent += `--- TOTAL EMISSIONS ---\n`;
+          reportContent += `Total Scope 2 Emissions: ${r.scope2Emissions?.totalKg?.toFixed(2) || 0} kg CO2e (${r.scope2Emissions?.totalTonnes?.toFixed(2) || 0} tonnes)\n\n`;
+          
+          reportContent += `--- INSIGHTS & SAVINGS ---\n`;
+          reportContent += `Top Emitting Region: ${r.insights?.topEmittingRegion || 'N/A'}\n`;
+          reportContent += `Top Emitting Instance: ${r.insights?.topEmittingInstance || 'N/A'}\n`;
+          reportContent += `Idle Resources Waste: ${r.insights?.idleWasteKg?.toFixed(2) || 0} kg CO2e\n`;
+          reportContent += `Oversized Resources Waste: ${r.insights?.oversizedWasteKg?.toFixed(2) || 0} kg CO2e\n`;
+          reportContent += `Potential Carbon Savings: ${r.insights?.potentialSavingsKg?.toFixed(2) || 0} kg CO2e\n\n`;
+          
+          if (r.breakdown?.byRegion && Array.isArray(r.breakdown.byRegion)) {
+            reportContent += `--- REGIONAL BREAKDOWN ---\n`;
+            r.breakdown.byRegion.forEach((reg: any) => {
+              reportContent += `• ${reg.region}: ${reg.carbonKg?.toFixed(2) || 0} kg CO2e (${reg.percentage || 0}%) - ${reg.instanceCount || 0} instances\n`;
+            });
+            reportContent += `\n`;
+          }
+          
+          if (r.breakdown?.byProvider && Array.isArray(r.breakdown.byProvider)) {
+            reportContent += `--- PROVIDER BREAKDOWN ---\n`;
+            r.breakdown.byProvider.forEach((prov: any) => {
+              reportContent += `• ${prov.provider}: ${prov.carbonKg?.toFixed(2) || 0} kg CO2e (${prov.percentage || 0}%) - ${prov.instanceCount || 0} instances\n`;
+            });
+            reportContent += `\n`;
+          }
         }
-      });
-      const json = await res.json();
-      if (json.success) {
-        alert('Export started successfully. It will be available in the Reports section soon.');
+        
+        const lines = doc.splitTextToSize(reportContent, 180);
+        
+        let y = 30;
+        for (let i = 0; i < lines.length; i++) {
+          if (y > 280) {
+            doc.addPage();
+            y = 20;
+          }
+          doc.text(lines[i], 14, y);
+          y += 7;
+        }
+        
+        doc.save(`CarboniX_Report_${params.id}.pdf`);
       } else {
-        alert('Export failed: ' + json.error);
+        alert('Export failed: ' + (res.error || 'Unknown error'));
       }
     } catch (e: any) {
       alert('Export failed: ' + e.message);
@@ -137,6 +261,9 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     };
   };
 
+  const paginatedInstances = localInstances.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil(localInstances.length / itemsPerPage);
+
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-12 relative min-h-screen animate-fade-in">
       <div className="flex items-center justify-between mb-4">
@@ -158,15 +285,25 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
             </p>
           </div>
         </div>
-        <button
-          onClick={handleExport}
-          disabled={isExporting}
-          className="bg-surface-container-high hover:bg-surface-bright text-on-surface px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
-        >
-          <span className="material-symbols-outlined text-[18px]">download</span>
-          {isExporting ? 'Exporting...' : 'Export Report'}
-        </button>
+        {project.isDeployed && project.sdkConnected && (
+          <button
+            onClick={handleExport}
+            disabled={isExporting}
+            className="bg-surface-container-high hover:bg-surface-bright text-on-surface px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-50"
+          >
+            <span className="material-symbols-outlined text-[18px]">download</span>
+            {isExporting ? 'Exporting...' : 'Export Report'}
+          </button>
+        )}
       </div>
+
+      {!project.sdkConnected && !dismissedBanner && (
+        <SdkConnectionBanner
+          projectName={project.name}
+          projectId={project.id}
+          onDismiss={() => setDismissedBanner(true)}
+        />
+      )}
 
       {/* Universal Budget Bar */}
       <div className="bg-surface-container border border-outline-variant rounded-xl p-5">
@@ -357,45 +494,126 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                     <th className="py-3 px-4 text-right">CPU Util</th>
                     <th className="py-3 px-4 text-right">Carbon (kg)</th>
                     <th className="py-3 px-4 text-center">Status</th>
+                    <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="text-sm divide-y divide-outline-variant">
-                  {instances?.length > 0 ? instances.map((record: any) => (
-                    <tr key={record.id} className="hover:bg-surface-container/50 transition-colors">
-                      <td className="py-4 px-4">
-                        <div className="font-medium text-on-surface">{record.instanceName || record.instanceId}</div>
-                        <div className="text-xs text-on-surface-variant font-mono mt-0.5">{record.instanceType}</div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-on-surface">{record.provider}</span>
-                        </div>
-                        <div className="text-xs text-on-surface-variant mt-0.5">{record.region}</div>
-                      </td>
-                      <td className="py-4 px-4 text-right font-mono text-on-surface">
-                        {Math.round(record.cpuUtilization * 100)}%
-                      </td>
-                      <td className="py-4 px-4 text-right">
-                        <span className="font-mono font-medium text-on-surface">{record.carbonKg.toFixed(2)}</span>
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        {record.isIdle ? (
-                          <Badge variant="error" className="uppercase text-[10px]">IDLE</Badge>
-                        ) : record.isOversized ? (
-                          <Badge variant="warning" className="uppercase text-[10px]">OVERSIZED</Badge>
-                        ) : (
-                          <Badge variant="success" className="uppercase text-[10px]">OPTIMAL</Badge>
-                        )}
-                      </td>
-                    </tr>
+                  {paginatedInstances?.length > 0 ? paginatedInstances.map((record: any) => (
+                    <React.Fragment key={record.id}>
+                      <tr className="hover:bg-surface-container/50 transition-colors">
+                        <td className="py-4 px-4">
+                          <div className="font-medium text-on-surface">{record.instanceName || record.instanceId}</div>
+                          <div className="text-xs text-on-surface-variant font-mono mt-0.5">{record.instanceType}</div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-on-surface">{record.provider}</span>
+                          </div>
+                          <div className="text-xs text-on-surface-variant mt-0.5">{record.region}</div>
+                        </td>
+                        <td className="py-4 px-4 text-right font-mono text-on-surface">
+                          {Math.round(record.cpuUtilization * 100)}%
+                        </td>
+                        <td className="py-4 px-4 text-right">
+                          <span className="font-mono font-medium text-on-surface">{record.carbonKg.toFixed(2)}</span>
+                        </td>
+                        <td className="py-4 px-4 text-center">
+                          {record.isOptimized ? (
+                            <Badge variant="success" className="uppercase text-[10px]">OPTIMIZED</Badge>
+                          ) : record.isIdle ? (
+                            <Badge variant="error" className="uppercase text-[10px]">IDLE</Badge>
+                          ) : record.isOversized ? (
+                            <Badge variant="warning" className="uppercase text-[10px]">OVERSIZED</Badge>
+                          ) : (
+                            <Badge variant="success" className="uppercase text-[10px]">OPTIMAL</Badge>
+                          )}
+                        </td>
+                        <td className="py-4 px-4 text-right">
+                          <button
+                            onClick={() => handleAnalyze(record)}
+                            disabled={analyzingId === record.id || record.isOptimized}
+                            className="bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 flex items-center gap-1 ml-auto"
+                          >
+                            {analyzingId === record.id ? (
+                              <span className="material-symbols-outlined text-sm animate-spin">refresh</span>
+                            ) : (
+                              <span className="material-symbols-outlined text-sm">auto_awesome</span>
+                            )}
+                            Analyze
+                          </button>
+                        </td>
+                      </tr>
+                      {record.recommendation && (
+                        <tr className="bg-primary/5 border-t-0">
+                          <td colSpan={6} className="py-3 px-4">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                              <div className="flex items-start gap-2">
+                                <span className="material-symbols-outlined text-primary text-sm mt-0.5">tips_and_updates</span>
+                                <div className="text-sm text-primary-light">
+                                  {record.recommendation}
+                                </div>
+                              </div>
+                              {record._recommendedRegion && !record.isOptimized && (
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => handleAutoMigrate(record.id, record._recommendedRegion)}
+                                    disabled={migratingId === record.id}
+                                    className="bg-primary hover:bg-primary-dark text-on-primary px-3 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 flex items-center gap-1"
+                                  >
+                                    {migratingId === record.id ? (
+                                      <span className="material-symbols-outlined text-sm animate-spin">refresh</span>
+                                    ) : (
+                                      <span className="material-symbols-outlined text-sm">flight_takeoff</span>
+                                    )}
+                                    Auto Migrate
+                                  </button>
+                                  <button
+                                    onClick={() => setManualMigrateModal({ open: true, record, targetRegion: record._recommendedRegion })}
+                                    className="bg-surface-container-high hover:bg-surface-bright border border-outline-variant text-on-surface px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                                  >
+                                    <span className="material-symbols-outlined text-sm">settings</span>
+                                    Manual
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   )) : (
                     <tr>
-                      <td colSpan={5} className="py-8 text-center text-on-surface-variant">No instances tracked yet.</td>
+                      <td colSpan={6} className="py-8 text-center text-on-surface-variant">No instances tracked yet.</td>
                     </tr>
                   )}
                 </tbody>
               </table>
             </div>
+            
+            {totalPages > 1 && (
+              <div className="px-5 py-4 border-t border-outline-variant bg-surface-container-low flex items-center justify-between">
+                <div className="text-xs text-on-surface-variant">
+                  Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, localInstances.length)} of {localInstances.length} instances
+                </div>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="p-1.5 rounded-md hover:bg-surface-container-high disabled:opacity-30 transition-colors text-on-surface-variant flex items-center justify-center"
+                  >
+                    <span className="material-symbols-outlined text-sm">chevron_left</span>
+                  </button>
+                  <div className="text-xs font-medium text-on-surface">Page {currentPage} of {totalPages}</div>
+                  <button 
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="p-1.5 rounded-md hover:bg-surface-container-high disabled:opacity-30 transition-colors text-on-surface-variant flex items-center justify-center"
+                  >
+                    <span className="material-symbols-outlined text-sm">chevron_right</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -484,6 +702,34 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
           </div>
         </div>
       </div>
+      {/* Manual Migrate Modal */}
+      {manualMigrateModal.open && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-surface border border-outline-variant rounded-xl p-6 max-w-md w-full shadow-2xl">
+            <h3 className="text-lg font-semibold text-on-surface mb-2">Manual Migration Required</h3>
+            <p className="text-sm text-on-surface-variant mb-6">
+              CarboniX cannot automatically migrate this specific resource type. To achieve the projected carbon savings, please log in to your provider console and manually move <span className="font-mono text-on-surface bg-surface-container px-1 py-0.5 rounded">{manualMigrateModal.record?.instanceName}</span> to <span className="font-mono text-on-surface bg-surface-container px-1 py-0.5 rounded">{manualMigrateModal.targetRegion}</span>.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button 
+                onClick={() => setManualMigrateModal({ open: false, record: null, targetRegion: '' })}
+                className="px-4 py-2 text-sm font-medium text-on-surface hover:bg-surface-container-high rounded-lg transition-colors"
+              >
+                Close
+              </button>
+              <button 
+                onClick={() => {
+                  window.open('https://console.aws.amazon.com', '_blank');
+                  setManualMigrateModal({ open: false, record: null, targetRegion: '' });
+                }}
+                className="bg-primary hover:bg-primary-dark text-on-primary px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+              >
+                Open Cloud Console <span className="material-symbols-outlined text-sm">open_in_new</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

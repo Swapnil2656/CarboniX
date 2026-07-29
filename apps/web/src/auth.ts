@@ -69,11 +69,12 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
         token.type = user.type;
         token.isOnboarded = user.isOnboarded;
         
-        // Generate a standard JWT compatible with the Express API middleware
+        const secretUsed = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || "fallback_secret_do_not_use_in_prod";
+        console.log('[AUTH DEBUG] JWT Secret used:', secretUsed.substring(0, 5) + '...');
         token.accessToken = jwt.sign(
           { id: user.id, email: user.email }, 
-          process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || "fallback_secret_do_not_use_in_prod",
-          { expiresIn: '1d' }
+          secretUsed,
+          { expiresIn: '30d' }
         );
       }
 

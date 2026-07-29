@@ -30,7 +30,8 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     const decoded = jwt.verify(token, JWT_SECRET) as { id: string; email: string };
     req.user = decoded;
     next();
-  } catch (error) {
+  } catch (error: any) {
+    console.error('[AUTH ERROR] Token verification failed:', error.message, 'Token:', token.substring(0, 20) + '...');
     return res.status(401).json({ success: false, error: 'Unauthorized: Invalid token' });
   }
 };

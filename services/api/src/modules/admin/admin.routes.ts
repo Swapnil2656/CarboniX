@@ -16,7 +16,9 @@ import {
   getEmissions,
   migrateEmission,
   getNotifications,
+  deleteNotification,
   getAuditLogs,
+  deleteAuditLog,
   deleteProject,
   disconnectProject,
   getProjectStats
@@ -30,7 +32,9 @@ router.get('/dashboard', getDashboard);
 router.get('/emissions', getEmissions);
 router.post('/emissions/:id/migrate', migrateEmission);
 router.get('/notifications', getNotifications);
+router.delete('/notifications/:id', deleteNotification);
 router.get('/audit-logs', getAuditLogs);
+router.delete('/audit-logs/:id', deleteAuditLog);
 router.get('/users', getUsers);
 router.delete('/projects/:id', deleteProject);
 router.post('/projects/:id/disconnect', disconnectProject);

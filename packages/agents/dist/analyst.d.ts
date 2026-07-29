@@ -29,4 +29,4 @@ export interface AnalystResult {
 /**
  * Run the Analyst Agent
  */
-export declare function runAnalyst(records: EmissionRecordData[], geminiApiKey?: string): Promise<AnalystResult>;
+export declare function runAnalyst(records: EmissionRecordData[], nvidiaApiKey?: string): Promise<AnalystResult>;

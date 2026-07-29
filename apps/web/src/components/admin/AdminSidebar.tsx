@@ -15,7 +15,6 @@ export const AdminSidebar = ({ isCollapsed, onToggle }: AdminSidebarProps) => {
 
   const navItems = [
     { label: 'Dashboard', path: '/admin/dashboard', icon: 'dashboard' },
-    { label: 'Emissions', path: '/admin/emissions', icon: 'co2' },
     { label: 'Team Emissions', path: '/admin/users', icon: 'group' },
     { label: 'API Keys', path: '/admin/api-keys', icon: 'key' },
     { label: 'Settings', path: '/admin/settings', icon: 'settings' },

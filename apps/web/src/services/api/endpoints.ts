@@ -81,10 +81,18 @@ export const adminApi = {
     });
   },
 
+  deleteNotification: async (id: string): Promise<any> => {
+    return fetchClient(`/admin/notifications/${id}`, { method: 'DELETE' });
+  },
+
   getAuditLogs: async (page = 1, pageSize = 20): Promise<any> => {
     return fetchClient(`/admin/audit-logs?page=${page}&pageSize=${pageSize}`, {
       method: 'GET',
     });
+  },
+
+  deleteAuditLog: async (id: string): Promise<any> => {
+    return fetchClient(`/admin/audit-logs/${id}`, { method: 'DELETE' });
   },
 
   getDashboard: async (projectId?: string, projectName?: string): Promise<DashboardData> => {
@@ -152,6 +160,15 @@ export const adminApi = {
   removeUser: async (id: string): Promise<{ success: boolean; message: string }> => {
     return fetchClient(`/admin/users/${id}`, {
       method: 'DELETE',
+    });
+  },
+};
+
+// ─── Agents Endpoints ────────────────────────────────────────────────────────
+export const agentsApi = {
+  triggerReporter: async (projectId: string): Promise<any> => {
+    return fetchClient(`/agents/trigger/reporter?projectId=${projectId}`, {
+      method: 'POST',
     });
   },
 };

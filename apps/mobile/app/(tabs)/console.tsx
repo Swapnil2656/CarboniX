@@ -462,7 +462,7 @@ const styles = StyleSheet.create({
   emptyText: { fontFamily: 'Inter', color: colors.textMuted, textAlign: 'center', paddingVertical: 20 },
 
   // Analysis Modal
-  configFooter: { borderTopWidth: 1, borderTopColor: '#333', marginTop: 12, paddingTop: 12, alignItems: 'flex-end' },
+  configFooter: { borderTopWidth: 1, borderTopColor: '#333', marginTop: 12, paddingTop: 12, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' },
   insightBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255, 229, 160, 0.1)', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 },
   insightBtnText: { fontFamily: 'Inter-SemiBold', fontSize: 13, color: colors.primary },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 20 },

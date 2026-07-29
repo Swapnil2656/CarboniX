@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { getHistoryLogs } from '@/app/actions/history-actions';
+import { adminApi } from '@/services/api/endpoints';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Badge } from '@/components/ui/Badge';
@@ -91,6 +92,7 @@ export default function HistoryPage() {
                 <th className="py-3 px-4">Action</th>
                 <th className="py-3 px-4">Resource</th>
                 <th className="py-3 px-4">Details</th>
+                <th className="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="text-sm divide-y divide-outline-variant">
@@ -102,6 +104,7 @@ export default function HistoryPage() {
                     <td className="py-4 px-4"><Skeleton className="h-5 w-32" /></td>
                     <td className="py-4 px-4"><Skeleton className="h-5 w-24" /></td>
                     <td className="py-4 px-4"><Skeleton className="h-5 w-16" /></td>
+                    <td className="py-4 px-4"></td>
                   </tr>
                 ))
               ) : logs.length > 0 ? (
@@ -125,6 +128,20 @@ export default function HistoryPage() {
                       <div className="flex flex-col gap-1 text-xs">
                         <span className="text-on-surface-variant font-mono truncate max-w-[200px]" title={log.ip}>IP: {log.ip}</span>
                       </div>
+                    </td>
+                    <td className="py-4 px-4 text-right">
+                      <button
+                        onClick={async () => {
+                          if (confirm('Are you sure you want to delete this log?')) {
+                            await adminApi.deleteAuditLog(log.id);
+                            fetchLogs();
+                          }
+                        }}
+                        className="p-2 text-outline hover:text-error hover:bg-error/10 rounded-full transition-colors"
+                        title="Delete log"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
                     </td>
                   </tr>
                 ))

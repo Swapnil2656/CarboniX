@@ -14,7 +14,7 @@ import { runReporter } from '@carbonix/agents';
 import { runOrchestrator, Recommendation } from '@carbonix/agents';
 
 const USE_MOCK = process.env.USE_MOCK_AGENTS === 'true';
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY || '';
 const CARBON_BUDGET = parseFloat(process.env.CARBON_BUDGET_KG_DAY || '10');
 
 /**
@@ -197,7 +197,7 @@ export const triggerAnalyst = async (req: Request, res: Response) => {
         isIdle: r.isIdle,
         isOversized: r.isOversized,
       })),
-      GEMINI_API_KEY
+      NVIDIA_API_KEY
     );
 
     // Update recommendations on the emission records

@@ -128,62 +128,115 @@ export default function UsersPage() {
   const uniqueProjects = Array.from(new Set(data?.users?.map(u => u.projectName) || [])).filter(Boolean);
   if (uniqueProjects.length === 0) uniqueProjects.push('CarboniX Core');
 
-  // Computed Insights
-  let projectEmissions: { name: string; percent: number; color: string }[] = [];
-  let highEmitter: { name: string; percentAbove: number } | null = null;
-  let devCount = 0;
-  let projCount = 0;
-  
-  if (data?.users) {
-    const totalEmissions = data.users.reduce((sum, u) => sum + u.co2Emissions, 0);
-    
-    // Emissions by Project
-    const projMap = new Map<string, number>();
-    data.users.forEach(u => {
-      if (u.co2Emissions > 0) {
-        projMap.set(u.projectName, (projMap.get(u.projectName) || 0) + u.co2Emissions);
-      }
-    });
-    
-    const sortedProjs = Array.from(projMap.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 2); // Take top 2
-      
-    const colors = ['bg-primary', 'bg-tertiary'];
-    projectEmissions = sortedProjs.map(([name, co2], i) => ({
-      name,
-      percent: totalEmissions > 0 ? Math.round((co2 / totalEmissions) * 100) : 0,
-      color: colors[i] || 'bg-secondary'
-    }));
+  const projectEmissions = data?.insights?.projectEmissions || [];
+  const highEmitter = data?.insights?.highEmitter || null;
+  const devCount = data?.insights?.devCount || 0;
+  const projCount = data?.insights?.projCount || 0;
 
-    // High Emitter Detected
-    const dataAny = data as any;
-    if (data.users.length > 0 && dataAny.fleetAvg > 0) {
-      const topEmitter = [...data.users].sort((a, b) => b.co2Emissions - a.co2Emissions)[0];
-      if (topEmitter.co2Emissions > dataAny.fleetAvg * 1.1) {
-        highEmitter = {
-          name: topEmitter.name,
-          percentAbove: Math.round(((topEmitter.co2Emissions - dataAny.fleetAvg) / dataAny.fleetAvg) * 100)
-        };
-      }
+  const currentUserList = filteredUsers.filter(u => u.role === 'USER' || u.role === 'ADMIN');
+  const teamList = filteredUsers.filter(u => u.role !== 'USER' && u.role !== 'ADMIN');
+
+  const renderTableRows = (usersList: typeof filteredUsers) => {
+    if (loading) {
+      return Array(3).fill(0).map((_, i) => (
+        <tr key={i}>
+          <td className="px-6 py-4"><Skeleton className="h-8 w-32" /></td>
+          <td className="px-6 py-4"><Skeleton className="h-6 w-24" /></td>
+          <td className="px-6 py-4"><Skeleton className="h-6 w-20" /></td>
+          <td className="px-6 py-4"><Skeleton className="h-6 w-16" /></td>
+          <td className="px-6 py-4"><Skeleton className="h-6 w-16" /></td>
+          <td className="px-6 py-4"><Skeleton className="h-6 w-20" /></td>
+        </tr>
+      ));
     }
 
-    // Team Collaboration
-    devCount = data.users.length;
-    projCount = new Set(data.users.map(u => u.projectName)).size;
-  }
+    if (usersList.length === 0) {
+      return (
+        <tr>
+          <td colSpan={6} className="px-6 py-8 text-center text-on-surface-variant">
+            No records found.
+          </td>
+        </tr>
+      );
+    }
+
+    return usersList.map((user) => (
+      <tr key={user.id} className="hover:bg-surface-container-low transition-colors group">
+        <td className="px-6 py-4">
+          <div className="flex flex-col">
+            <span className="font-semibold text-sm text-on-surface">{user.name}</span>
+            <span className="text-xs text-on-surface-variant">{user.role}</span>
+          </div>
+        </td>
+        <td className="px-6 py-4">
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-on-surface">{user.projectName}</span>
+            <span className="text-xs text-outline font-code">{user.projectId}</span>
+          </div>
+        </td>
+        <td className="px-6 py-4">
+          <span className="text-sm text-on-surface">{user.location}</span>
+        </td>
+        <td className="px-6 py-4">
+          <Badge variant={getRatingVariant(user.co2Emissions)}>
+            {user.co2Emissions} kg
+          </Badge>
+        </td>
+        <td className="px-6 py-4">
+          <Badge variant={user.status === 'ACTIVE' ? 'success' : (user.status as any) === 'PENDING' ? 'info' : 'error'}>
+            {user.status}
+          </Badge>
+        </td>
+        <td className="px-6 py-4 text-right relative action-menu-container">
+          <button 
+            onClick={() => setOpenMenuId(openMenuId === user.id ? null : user.id)}
+            className="text-on-surface-variant hover:text-on-surface p-1 rounded-full hover:bg-surface-container transition-colors"
+            title="More actions"
+          >
+            <span className="material-symbols-outlined text-[20px]">more_vert</span>
+          </button>
+
+          {openMenuId === user.id && (
+            <div className="absolute right-12 top-10 bg-surface border border-outline-variant rounded-lg shadow-xl py-1 z-20 w-48 text-left">
+              <button 
+                onClick={() => { handleNotify(user.name); setOpenMenuId(null); }}
+                className="w-full px-4 py-2 text-sm text-on-surface hover:bg-surface-container flex items-center gap-3 transition-colors"
+              >
+                <span className="material-symbols-outlined text-[18px] text-primary">notifications_active</span>
+                Notify Teammate
+              </button>
+              <button 
+                onClick={() => { openAiSuggestion(user.name, user.aiSuggestion); setOpenMenuId(null); }}
+                className="w-full px-4 py-2 text-sm text-on-surface hover:bg-surface-container flex items-center gap-3 transition-colors"
+              >
+                <span className="material-symbols-outlined text-[18px] text-[#50FA7B]">auto_awesome</span>
+                AI Suggestion
+              </button>
+              <div className="h-px bg-outline-variant my-1" />
+              <button 
+                onClick={() => { handleRemoveUser(user.id, user.name); setOpenMenuId(null); }}
+                className="w-full px-4 py-2 text-sm text-[#f87171] hover:bg-surface-container flex items-center gap-3 transition-colors"
+              >
+                <span className="material-symbols-outlined text-[18px] text-[#f87171]">person_remove</span>
+                Remove Teammate
+              </button>
+            </div>
+          )}
+        </td>
+      </tr>
+    ));
+  };
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between mb-2">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-section-header text-on-surface">Team Emissions</h1>
-          <p className="text-on-surface-variant mt-1">Track carbon emissions produced by each teammate across shared projects.</p>
+          <h1 className="text-2xl font-display font-semibold text-on-surface mb-1">Team Emissions</h1>
+          <p className="text-sm text-on-surface-variant">Track carbon emissions produced by each teammate across shared projects.</p>
         </div>
-        <button 
-          onClick={() => setInviteModalOpen(true)}
-          className="bg-primary text-on-primary hover:bg-primary-container px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-        >
+        <button onClick={() => setInviteModalOpen(true)} className="bg-primary text-on-primary hover:bg-primary-container px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+          <span className="material-symbols-outlined text-[18px]">person_add</span>
           Invite User
         </button>
       </div>
@@ -201,8 +254,9 @@ export default function UsersPage() {
               className="bg-surface-container border border-outline-variant rounded-lg px-3 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary"
             >
               <option>All</option>
-              <option>CarboniX Core</option>
-              <option>Mobile Analytics</option>
+              {uniqueProjects.map(p => (
+                <option key={p} value={p}>{p}</option>
+              ))}
             </select>
           </div>
           <div className="flex items-center gap-2">
@@ -246,7 +300,8 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {/* Data Table */}
+      {/* My Footprint Section */}
+      <h2 className="text-lg font-display font-medium text-on-surface mt-2 mb-[-12px]">My Footprint</h2>
       <div className="glass-card rounded-xl border border-outline-variant relative">
         <div className="w-full">
           <table className="w-full text-left border-collapse">
@@ -261,90 +316,29 @@ export default function UsersPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant">
-              {loading ? (
-                Array(5).fill(0).map((_, i) => (
-                  <tr key={i}>
-                    <td className="px-6 py-4"><Skeleton className="h-8 w-32" /></td>
-                    <td className="px-6 py-4"><Skeleton className="h-6 w-24" /></td>
-                    <td className="px-6 py-4"><Skeleton className="h-6 w-20" /></td>
-                    <td className="px-6 py-4"><Skeleton className="h-6 w-16" /></td>
-                    <td className="px-6 py-4"><Skeleton className="h-6 w-16" /></td>
-                    <td className="px-6 py-4"><Skeleton className="h-6 w-20" /></td>
-                  </tr>
-                ))
-              ) : filteredUsers.length > 0 ? (
-                filteredUsers.map((user) => (
-                  <tr key={user.id} className="hover:bg-surface-container-low transition-colors group">
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-sm text-on-surface">{user.name}</span>
-                        <span className="text-xs text-on-surface-variant">{user.role}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-on-surface">{user.projectName}</span>
-                        <span className="text-xs text-outline font-code">{user.projectId}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-on-surface">{user.location}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <Badge variant={getRatingVariant(user.co2Emissions)}>
-                        {user.co2Emissions} kg
-                      </Badge>
-                    </td>
-                    <td className="px-6 py-4">
-                      <Badge variant={user.status === 'ACTIVE' ? 'success' : (user.status as any) === 'PENDING' ? 'info' : 'error'}>
-                        {user.status}
-                      </Badge>
-                    </td>
-                    <td className="px-6 py-4 text-right relative action-menu-container">
-                      <button 
-                        onClick={() => setOpenMenuId(openMenuId === user.id ? null : user.id)}
-                        className="text-on-surface-variant hover:text-on-surface p-1 rounded-full hover:bg-surface-container transition-colors"
-                        title="More actions"
-                      >
-                        <span className="material-symbols-outlined text-[20px]">more_vert</span>
-                      </button>
+              {renderTableRows(currentUserList)}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-                      {openMenuId === user.id && (
-                        <div className="absolute right-12 top-10 bg-surface border border-outline-variant rounded-lg shadow-xl py-1 z-20 w-48 text-left">
-                          <button 
-                            onClick={() => { handleNotify(user.name); setOpenMenuId(null); }}
-                            className="w-full px-4 py-2 text-sm text-on-surface hover:bg-surface-container flex items-center gap-3 transition-colors"
-                          >
-                            <span className="material-symbols-outlined text-[18px] text-primary">notifications_active</span>
-                            Notify Teammate
-                          </button>
-                          <button 
-                            onClick={() => { openAiSuggestion(user.name, user.aiSuggestion); setOpenMenuId(null); }}
-                            className="w-full px-4 py-2 text-sm text-on-surface hover:bg-surface-container flex items-center gap-3 transition-colors"
-                          >
-                            <span className="material-symbols-outlined text-[18px] text-[#50FA7B]">auto_awesome</span>
-                            AI Suggestion
-                          </button>
-                          <div className="h-px bg-outline-variant my-1" />
-                          <button 
-                            onClick={() => { handleRemoveUser(user.id, user.name); setOpenMenuId(null); }}
-                            className="w-full px-4 py-2 text-sm text-[#f87171] hover:bg-surface-container flex items-center gap-3 transition-colors"
-                          >
-                            <span className="material-symbols-outlined text-[18px] text-[#f87171]">person_remove</span>
-                            Remove Teammate
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-on-surface-variant">
-                    No users or assets found.
-                  </td>
-                </tr>
-              )}
+      {/* Team Data Table */}
+      <h2 className="text-lg font-display font-medium text-on-surface mt-2 mb-[-12px]">Team Developers</h2>
+      <div className="glass-card rounded-xl border border-outline-variant relative">
+        <div className="w-full">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-surface-container-low border-b border-outline-variant">
+                <th className="px-6 py-4 text-xs font-label-caps text-on-surface-variant">Teammate / Role</th>
+                <th className="px-6 py-4 text-xs font-label-caps text-on-surface-variant">Project</th>
+                <th className="px-6 py-4 text-xs font-label-caps text-on-surface-variant">Location</th>
+                <th className="px-6 py-4 text-xs font-label-caps text-on-surface-variant">Avg CO₂</th>
+                <th className="px-6 py-4 text-xs font-label-caps text-on-surface-variant">Status</th>
+                <th className="px-6 py-4 text-xs font-label-caps text-on-surface-variant text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-outline-variant">
+              {renderTableRows(teamList)}
             </tbody>
           </table>
         </div>

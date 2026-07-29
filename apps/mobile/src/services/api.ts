@@ -25,10 +25,10 @@ api.interceptors.request.use(
   async (config) => {
     try {
       const customUrl = await SecureStore.getItemAsync('custom_api_url');
-      if (customUrl) {
-        config.baseURL = customUrl;
-        api.defaults.baseURL = customUrl;
-      }
+      // if (customUrl) {
+      //   config.baseURL = customUrl;
+      //   api.defaults.baseURL = customUrl;
+      // }
       const token = await SecureStore.getItemAsync('auth_token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;

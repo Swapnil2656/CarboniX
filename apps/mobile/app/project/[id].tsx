@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { colors } from '../../src/theme/colors';
-import { adminApi } from '../../src/services/api/endpoints';
+import { adminApi, agentsApi } from '../../src/services/api/endpoints';
 import { LineChart } from 'react-native-chart-kit';
 
 export default function ProjectDetailScreen() {
@@ -73,6 +73,22 @@ export default function ProjectDetailScreen() {
     }
   };
 
+  const handleExport = async () => {
+    try {
+      setIsExporting(true);
+      const res = await agentsApi.triggerReporter(id as string);
+      if (res.success) {
+        Alert.alert('Success', 'Export started successfully. It will be available in the Reports section soon.');
+      } else {
+        Alert.alert('Error', 'Export failed: ' + (res.error || 'Unknown error'));
+      }
+    } catch (e: any) {
+      Alert.alert('Error', 'Export failed: ' + e.message);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   if (loading) {
     return (
       <View style={[styles.container, { paddingTop: insets.top, justifyContent: 'center', alignItems: 'center' }]}>
@@ -133,6 +149,17 @@ export default function ProjectDetailScreen() {
             )}
           </View>
           <Text style={styles.subtitle}>Created: {new Date(project.createdAt).toLocaleDateString()}</Text>
+          
+          {project.isDeployed && !isStale && (
+            <TouchableOpacity 
+              style={[styles.exportBtn, isExporting && styles.disabledBtn]} 
+              onPress={handleExport}
+              disabled={isExporting}
+            >
+              <MaterialIcons name="file-download" size={20} color={colors.background} />
+              <Text style={styles.exportBtnText}>{isExporting ? 'Exporting...' : 'Export Report'}</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         <View style={styles.panel}>
@@ -382,5 +409,7 @@ const styles = StyleSheet.create({
   dangerBtn: { backgroundColor: colors.error, padding: 12, borderRadius: 8, alignItems: 'center' },
   dangerBtnText: { color: '#fff', fontWeight: 'bold' },
   disabledBtn: { opacity: 0.5 },
-  divider: { height: 1, backgroundColor: 'rgba(248, 113, 113, 0.1)', marginVertical: 20 }
+  divider: { height: 1, backgroundColor: 'rgba(248, 113, 113, 0.1)', marginVertical: 20 },
+  exportBtn: { backgroundColor: colors.primary, padding: 10, borderRadius: 8, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', marginTop: 12, gap: 8 },
+  exportBtnText: { color: colors.background, fontWeight: 'bold' }
 });

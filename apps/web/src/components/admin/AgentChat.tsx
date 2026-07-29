@@ -112,7 +112,6 @@ export default function AgentChat() {
           </div>
           <div>
             <h3 className="text-white font-medium text-sm">CarboniX Agent</h3>
-            <p className="text-xs text-gray-400">Powered by Gemini AI</p>
           </div>
         </div>
         <div className="flex items-center gap-2">

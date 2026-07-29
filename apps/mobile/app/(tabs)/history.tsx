@@ -89,11 +89,11 @@ export default function HistoryScreen() {
 
                 <View style={styles.cardBody}>
                   <View style={{ flex: 1, gap: 4 }}>
-                    <Text style={styles.cardTitle}>{item.actorEmail}</Text>
+                    <Text style={styles.cardTitle}>{item.resource} {item.resourceId ? `(${item.resourceId.substring(0, 8)})` : ''}</Text>
                     <View style={styles.providerInfo}>
-                      <Text style={styles.providerText}>{item.actorRole}</Text>
+                      <Text style={styles.providerText}>{item.actorEmail}</Text>
                       <Text style={styles.dotSeparator}>•</Text>
-                      <Text style={styles.regionText}>{item.resource} {item.resourceId ? `(${item.resourceId.substring(0, 8)})` : ''}</Text>
+                      <Text style={styles.regionText}>{item.actorRole}</Text>
                     </View>
                   </View>
                   

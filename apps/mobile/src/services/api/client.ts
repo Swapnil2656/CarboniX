@@ -30,10 +30,10 @@ export async function setApiBaseUrl(newUrl: string) {
 apiClient.interceptors.request.use(async (config) => {
   try {
     const customUrl = await SecureStore.getItemAsync('custom_api_url');
-    if (customUrl) {
-      config.baseURL = customUrl;
-      apiClient.defaults.baseURL = customUrl;
-    }
+    // if (customUrl) {
+    //   config.baseURL = customUrl;
+    //   apiClient.defaults.baseURL = customUrl;
+    // }
     const token = await SecureStore.getItemAsync('auth_token');
     if (config.headers) {
       config.headers.Authorization = `Bearer ${token || 'mock-token-for-dev'}`;

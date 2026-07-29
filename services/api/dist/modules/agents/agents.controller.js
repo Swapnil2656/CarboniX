@@ -13,8 +13,8 @@ const agents_2 = require("@carbonix/agents");
 const agents_3 = require("@carbonix/agents");
 const agents_4 = require("@carbonix/agents");
 const agents_5 = require("@carbonix/agents");
-const USE_MOCK = process.env.USE_MOCK_AGENTS !== 'false';
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+const USE_MOCK = process.env.USE_MOCK_AGENTS === 'true';
+const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY || '';
 const CARBON_BUDGET = parseFloat(process.env.CARBON_BUDGET_KG_DAY || '10');
 /**
  * GET /api/v1/agents/runs — List recent agent runs (feed)
@@ -66,6 +66,7 @@ exports.getAgentRun = getAgentRun;
  */
 const triggerCollector = async (req, res) => {
     try {
+        const { projectId } = req.body;
         const startTime = Date.now();
         // Create the AgentRun record
         const agentRun = await prisma_1.prisma.agentRun.create({
@@ -73,6 +74,7 @@ const triggerCollector = async (req, res) => {
                 agentType: 'COLLECTOR',
                 status: 'RUNNING',
                 triggeredBy: 'manual',
+                projectId: projectId || null,
             },
         });
         // Run the collector
@@ -81,6 +83,7 @@ const triggerCollector = async (req, res) => {
         const createdRecords = await prisma_1.prisma.emissionRecord.createMany({
             data: result.records.map(r => ({
                 agentRunId: agentRun.id,
+                projectId: projectId || null,
                 instanceId: r.instanceId,
                 instanceType: r.instanceType,
                 provider: r.provider,
@@ -178,7 +181,7 @@ const triggerAnalyst = async (req, res) => {
             carbonKg: r.carbonKg,
             isIdle: r.isIdle,
             isOversized: r.isOversized,
-        })), GEMINI_API_KEY);
+        })), NVIDIA_API_KEY);
         // Update recommendations on the emission records
         for (const rec of result.recommendations) {
             await prisma_1.prisma.emissionRecord.updateMany({
@@ -281,8 +284,10 @@ exports.runGate = runGate;
 const triggerReporter = async (req, res) => {
     try {
         const startTime = Date.now();
+        const projectId = req.query.projectId;
         // Get all emission records (from latest collector run or all recent)
         const records = await prisma_1.prisma.emissionRecord.findMany({
+            where: projectId ? { projectId } : undefined,
             orderBy: { timestamp: 'desc' },
             take: 100,
         });
@@ -294,6 +299,7 @@ const triggerReporter = async (req, res) => {
         }
         const agentRun = await prisma_1.prisma.agentRun.create({
             data: {
+                projectId,
                 agentType: 'REPORTER',
                 status: 'RUNNING',
                 triggeredBy: 'manual',

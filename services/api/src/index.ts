@@ -23,7 +23,7 @@ const app = express();
 const port = Number(process.env.PORT) || 4000;
 
 const USE_MOCK = process.env.USE_MOCK_AGENTS !== 'false';
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY || '';
 
 app.use(cors());
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
@@ -118,7 +118,7 @@ cron.schedule('0 * * * *', async () => {
       data: { agentType: 'ANALYST', status: 'RUNNING', triggeredBy: 'cron' },
     });
 
-    const analystResult = await runAnalyst(collectorResult.records, GEMINI_API_KEY);
+    const analystResult = await runAnalyst(collectorResult.records, NVIDIA_API_KEY);
 
     await prisma.agentRun.update({
       where: { id: analystRun.id },

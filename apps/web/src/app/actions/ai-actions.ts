@@ -8,141 +8,186 @@ export interface ChatMessage {
   role: Role;
   content: string;
   name?: string; // used for function call name
+  toolCallId?: string;
 }
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY;
 
 // System instructions for the CarboniX agent
 const SYSTEM_PROMPT = `
-You are CarboniX AI, an agentic AI assistant integrated into the CarboniX dashboard.
-You help users track their codebase deployments, manage cloud regions, and send notifications.
+You are CarboniX AI, a helpful and expert assistant for the CarboniX platform.
+CarboniX is an industrial-grade cloud infrastructure optimization platform. It helps users quantify, monitor, and reduce the carbon footprint and cost of their cloud deployments (like AWS, GCP, Azure).
 
-You have access to the following tools:
-1. switchProjectRegion: Switch the cloud region for a deployed project to optimize carbon emissions.
-2. pushMobileNotification: Send a push notification to a user's mobile app.
-3. getProjectStatus: Retrieve real-time data about a project's current deployment.
+You MUST ALWAYS use a tool to respond.
+1. If the user asks about their projects, use listProjects, switchProjectRegion, etc. Use the data from the tools to give detailed answers about their infrastructure.
+2. If the user asks a general question (like "what is CarboniX?", "hi", "who are you?"), use the "respondToUser" tool to answer them accurately based on your knowledge of CarboniX.
 
-When a user asks you to perform an action, use the tools provided.
-Be concise and helpful. Use a professional but friendly tone.
+NEVER answer without using a tool.
 `;
 
 const tools = [
   {
-    name: 'switchProjectRegion',
-    description: 'Switch the region of a deployed project to a new cloud region.',
-    parameters: {
-      type: 'OBJECT',
-      properties: {
-        projectId: { type: 'STRING', description: 'The ID of the project to update.' },
-        region: { type: 'STRING', description: 'The new region code (e.g., us-east-1, eu-west-1).' },
-      },
-      required: ['projectId', 'region'],
-    },
+    type: 'function',
+    function: {
+      name: 'respondToUser',
+      description: 'Use this to respond to the user for general queries, greetings, and chat.',
+      parameters: {
+        type: 'object',
+        properties: { response: { type: 'string', description: 'The text to reply to the user with.' } },
+        required: ['response']
+      }
+    }
   },
   {
-    name: 'pushMobileNotification',
-    description: 'Send a push notification to the user on their mobile device.',
-    parameters: {
-      type: 'OBJECT',
-      properties: {
-        userId: { type: 'STRING', description: 'The ID of the user to notify.' },
-        title: { type: 'STRING', description: 'The title of the notification.' },
-        body: { type: 'STRING', description: 'The main content of the notification.' },
-      },
-      required: ['userId', 'title', 'body'],
-    },
+    type: 'function',
+    function: {
+      name: 'listProjects',
+      description: 'List all available projects and their IDs.',
+      parameters: {
+        type: 'object',
+        properties: {},
+      }
+    }
   },
   {
-    name: 'getProjectStatus',
-    description: 'Get the current status, region, and emission metrics of a project.',
-    parameters: {
-      type: 'OBJECT',
-      properties: {
-        projectId: { type: 'STRING', description: 'The ID of the project.' },
-      },
-      required: ['projectId'],
-    },
+    type: 'function',
+    function: {
+      name: 'switchProjectRegion',
+      description: 'Switch the region of a deployed project to a new cloud region.',
+      parameters: {
+        type: 'object',
+        properties: {
+          projectId: { type: 'string', description: 'The ID of the project to update.' },
+          region: { type: 'string', description: 'The new region code (e.g., us-east-1, eu-west-1).' },
+        },
+        required: ['projectId', 'region'],
+      }
+    }
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'pushMobileNotification',
+      description: 'Send a push notification to the user on their mobile device.',
+      parameters: {
+        type: 'object',
+        properties: {
+          userId: { type: 'string', description: 'The ID of the user to notify.' },
+          title: { type: 'string', description: 'The title of the notification.' },
+          body: { type: 'string', description: 'The main content of the notification.' },
+        },
+        required: ['userId', 'title', 'body'],
+      }
+    }
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'getProjectStatus',
+      description: 'Get the current status, region, and emission metrics of a project.',
+      parameters: {
+        type: 'object',
+        properties: {
+          projectId: { type: 'string', description: 'The ID of the project.' },
+        },
+        required: ['projectId'],
+      }
+    }
   },
 ];
 
-async function callGeminiApi(history: ChatMessage[]) {
-  if (!GEMINI_API_KEY) {
+async function callNvidiaApi(history: ChatMessage[]) {
+  if (!NVIDIA_API_KEY) {
     return {
-      candidates: [{
-        content: {
-          parts: [{ text: "AI features are currently disabled. Please configure GEMINI_API_KEY on the server to enable CarboniX Assistant." }]
+      choices: [{
+        message: {
+          role: 'assistant',
+          content: "AI features are currently disabled. Please configure NVIDIA_API_KEY on the server to enable CarboniX Assistant."
         }
       }]
     };
   }
 
-  // Format history for Gemini
-  const contents = history.map((msg) => {
-    if (msg.role === 'function') {
+  const messages = [
+    { role: 'system', content: SYSTEM_PROMPT },
+    ...history.map((msg) => {
+      if (msg.role === 'function') {
+        return {
+          role: 'tool',
+          tool_call_id: msg.toolCallId,
+          name: msg.name,
+          content: msg.content
+        };
+      }
+      
+      if (msg.role === 'model' && msg.name) {
+        return {
+          role: 'assistant',
+          tool_calls: [{
+            id: msg.toolCallId,
+            type: 'function',
+            function: {
+              name: msg.name,
+              arguments: msg.content
+            }
+          }]
+        };
+      }
+
       return {
-        role: 'function',
-        parts: [{
-          functionResponse: {
-            name: msg.name,
-            response: { result: msg.content }
-          }
-        }]
+        role: msg.role === 'user' ? 'user' : 'assistant',
+        content: msg.content || "",
       };
-    }
-    
-    // For assistant tool calls
-    if (msg.role === 'model' && msg.name) {
-      return {
-        role: 'model',
-        parts: [{
-          functionCall: {
-            name: msg.name,
-            args: JSON.parse(msg.content)
-          }
-        }]
-      };
-    }
+    })
+  ];
 
-    return {
-      role: msg.role === 'user' ? 'user' : 'model',
-      parts: [{ text: msg.content }],
-    };
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
 
-  const body = {
-    systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-    contents,
-    tools: [{ functionDeclarations: tools }],
-  };
-
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+  let response;
+  try {
+    response = await fetch(
+      `https://integrate.api.nvidia.com/v1/chat/completions`,
+      {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${NVIDIA_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'mistralai/mistral-nemotron',
+          messages,
+          tools,
+          temperature: 0.2,
+        }),
+        signal: controller.signal
+      }
+    );
+  } catch (err: any) {
+    clearTimeout(timeoutId);
+    if (err.name === 'AbortError') {
+      throw new Error('Nvidia NIM API Error: Request timed out after 60 seconds.');
     }
-  );
+    throw err;
+  }
+  clearTimeout(timeoutId);
 
   if (!response.ok) {
     const errText = await response.text();
-    console.error('Gemini API Error details:', errText);
+    console.error('Nvidia NIM API Error details:', errText);
     
-    let detailedMsg = 'Failed to generate response from Gemini. See console.';
+    let detailedMsg = 'Failed to generate response from Nvidia NIM. See console.';
     try {
       const errJson = JSON.parse(errText);
       if (errJson.error && errJson.error.message) {
         detailedMsg = errJson.error.message;
       }
-    } catch(e) {
-      // Ignore JSON parse errors
-    }
+    } catch(e) {}
     
-    throw new Error(`Gemini API Error: ${detailedMsg}`);
+    throw new Error(`Nvidia NIM API Error: ${detailedMsg}`);
   }
 
-  const data = await response.json();
-  return data;
+  return response.json();
 }
 
 // Tool implementations
@@ -150,6 +195,14 @@ import { redis } from '@/lib/redis';
 
 async function executeTool(name: string, args: any, adminUserId: string) {
   switch (name) {
+    case 'listProjects': {
+      const projects = await prisma.project.findMany({
+        where: { userId: adminUserId },
+        select: { id: true, name: true, region: true, sdkConnected: true }
+      });
+      if (projects.length === 0) return 'No projects found.';
+      return JSON.stringify(projects);
+    }
     case 'switchProjectRegion': {
       const { projectId, region } = args;
       
@@ -273,62 +326,79 @@ export async function chatWithAgent(message: string, history: ChatMessage[], adm
   try {
     const updatedHistory: ChatMessage[] = [...history, { role: 'user', content: message }];
     
-    let aiData = await callGeminiApi(updatedHistory);
-    let candidate = aiData?.candidates?.[0];
+    let aiData = await callNvidiaApi(updatedHistory);
+    let aiMessage = aiData?.choices?.[0]?.message;
     
-    if (!candidate) {
+    if (!aiMessage) {
       return { success: false, error: 'No response from AI.' };
     }
 
-    const newMessages: ChatMessage[] = [];
-
-    // Loop to handle tool calls automatically on the server
-    while (candidate.content?.parts?.[0]?.functionCall) {
-      const call = candidate.content.parts[0].functionCall;
-      const functionName = call.name;
-      const functionArgs = call.args;
-
-      // Add model's tool call to history
-      updatedHistory.push({
-        role: 'model',
-        name: functionName,
-        content: JSON.stringify(functionArgs),
-      });
-
-      // Execute tool
-      let resultStr = '';
-      try {
-        resultStr = await executeTool(functionName, functionArgs, adminUserId);
-      } catch (e: any) {
-        resultStr = `Error executing ${functionName}: ${e.message}`;
+    // Process tool calls if requested
+    let iterations = 0;
+    while (aiMessage.tool_calls && aiMessage.tool_calls.length > 0 && iterations < 5) {
+      iterations++;
+      const toolCalls = aiMessage.tool_calls;
+      
+      // Check if the AI used the respondToUser bypass
+      if (toolCalls.length === 1 && toolCalls[0].function.name === 'respondToUser') {
+        try {
+          const parsedArgs = JSON.parse(toolCalls[0].function.arguments);
+          aiMessage.content = parsedArgs.response || "Hello!";
+          break; // Exit tool loop, answer generated
+        } catch (e) {
+          // Fallback if parsing fails
+        }
       }
+      for (const call of toolCalls) {
+        const functionName = call.function.name;
+        const functionArgs = call.function.arguments; // JSON string
+        const toolCallId = call.id;
 
-      // Add tool response to history
-      updatedHistory.push({
-        role: 'function',
-        name: functionName,
-        content: resultStr,
-      });
-
-      // Call Gemini again with the tool result
-      try {
-        aiData = await callGeminiApi(updatedHistory);
-        candidate = aiData?.candidates?.[0];
-        
-        if (!candidate) break;
-      } catch (geminiError: any) {
-        console.error('Gemini API Error after tool execution:', geminiError);
+        // Add the model's call to history
         updatedHistory.push({
           role: 'model',
-          content: `I executed the action successfully, but encountered an API error generating my response: ${geminiError.message}`
+          name: functionName,
+          content: functionArgs,
+          toolCallId: toolCallId
         });
-        return { success: true, updatedHistory };
+
+        console.log(`Executing ${functionName}...`);
+
+        let resultStr = '';
+        try {
+          const result = await executeTool(functionName, JSON.parse(functionArgs), adminUserId);
+          resultStr = typeof result === 'string' ? result : JSON.stringify(result);
+        } catch (err: any) {
+          resultStr = `Error: ${err.message}`;
+        }
+
+        // Add tool response to history
+        updatedHistory.push({
+          role: 'function',
+          name: functionName,
+          content: resultStr,
+          toolCallId: toolCallId
+        });
+      }
+
+      // Fetch the next turn from AI
+      try {
+        aiData = await callNvidiaApi(updatedHistory);
+        aiMessage = aiData?.choices?.[0]?.message;
+        if (!aiMessage) break;
+      } catch (aiError: any) {
+        console.error('Nvidia NIM API Error after tool execution:', aiError);
+        updatedHistory.push({
+          role: 'model',
+          content: `I executed the action successfully, but encountered an API error generating my response: ${aiError.message}`
+        });
+        break;
       }
     }
 
-    // Final text response
-    if (candidate?.content?.parts?.[0]?.text) {
-      const text = candidate.content.parts[0].text;
+    // Return the final text if any
+    if (aiMessage?.content) {
+      const text = aiMessage.content;
       updatedHistory.push({ role: 'model', content: text });
       
       // Save history to database

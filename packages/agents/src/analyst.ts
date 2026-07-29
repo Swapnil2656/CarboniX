@@ -41,9 +41,9 @@ export interface AnalystResult {
 }
 
 /**
- * Call Gemini Flash API for intelligent recommendations
+ * Call Nvidia NIM API for intelligent recommendations
  */
-async function callGeminiForRecommendations(
+async function callNvidiaForRecommendations(
   records: EmissionRecordData[],
   apiKey: string
 ): Promise<Recommendation[] | null> {
@@ -76,40 +76,39 @@ Key context:
 Return ONLY the JSON array:`;
 
     const response = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
+      'https://integrate.api.nvidia.com/v1/chat/completions',
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-goog-api-key': apiKey,
+          'Authorization': `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.2,
-            maxOutputTokens: 2048,
-          },
+          model: 'meta/llama-3.1-70b-instruct',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.2,
+          max_tokens: 2048,
         }),
       }
     );
 
     if (!response.ok) {
-      console.warn(`[Analyst] Gemini returned ${response.status}, falling back to rules`);
+      console.warn(`[Analyst] Nvidia NIM returned ${response.status}, falling back to rules`);
       return null;
     }
 
     const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const text = data.choices?.[0]?.message?.content;
     
     if (!text) return null;
 
-    // Extract JSON from response (Gemini sometimes wraps in ```json blocks)
+    // Extract JSON from response (Nvidia sometimes wraps in ```json blocks)
     const jsonMatch = text.match(/\[[\s\S]*\]/);
     if (!jsonMatch) return null;
 
     return JSON.parse(jsonMatch[0]) as Recommendation[];
   } catch (error) {
-    console.warn(`[Analyst] Gemini call failed: ${(error as Error).message}, falling back to rules`);
+    console.warn(`[Analyst] Nvidia NIM call failed: ${(error as Error).message}, falling back to rules`);
     return null;
   }
 }
@@ -175,7 +174,7 @@ function generateFallbackRecommendations(records: EmissionRecordData[]): Recomme
  */
 export async function runAnalyst(
   records: EmissionRecordData[],
-  geminiApiKey?: string
+  nvidiaApiKey?: string
 ): Promise<AnalystResult> {
   const idleInstances = records.filter(r => r.isIdle);
   const oversizedInstances = records.filter(r => r.isOversized);
@@ -183,10 +182,10 @@ export async function runAnalyst(
 
   let recommendations: Recommendation[];
 
-  // Try Gemini first, fall back to rules
-  if (geminiApiKey && flaggedRecords.length > 0) {
-    const geminiRecs = await callGeminiForRecommendations(records, geminiApiKey);
-    recommendations = geminiRecs || generateFallbackRecommendations(flaggedRecords);
+  // Try Nvidia first, fall back to rules
+  if (nvidiaApiKey && flaggedRecords.length > 0) {
+    const aiRecs = await callNvidiaForRecommendations(records, nvidiaApiKey);
+    recommendations = aiRecs || generateFallbackRecommendations(flaggedRecords);
   } else {
     recommendations = generateFallbackRecommendations(flaggedRecords);
   }
