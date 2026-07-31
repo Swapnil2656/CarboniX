@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { StatCard } from '@/components/ui/StatCard';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -240,6 +241,8 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
 
   const { project, idleInstances, oversizedInstances, carbonTrend, history7d, history30d, totalMonthKg, apiKeys, greenerRegion, isStale, instances } = data;
   const chartData = chartDays === '7d' ? history7d : history30d;
+  const dataSource: 'NO_CREDS' | 'MOCK_DEMO' | 'LIVE' = project.dataSource || 'NO_CREDS';
+
 
   // Real-world equivalents logic (copied from core)
   const getEquivalent = (kg: number) => {
@@ -266,23 +269,52 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-12 relative min-h-screen animate-fade-in">
+      {/* Floating Project Settings Button (below global admin header) */}
+      <Link
+        href={`/admin/project/${params.id}/settings`}
+        className="fixed top-[260px] right-6 z-40 w-10 h-10 rounded-full flex items-center justify-center bg-surface border border-outline-variant shadow-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
+        title="Project Settings"
+      >
+        <span className="material-symbols-outlined text-[20px]">tune</span>
+      </Link>
+
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-4">
           <button onClick={() => router.back()} className="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-2 rounded-full hover:bg-surface-container-high">
             <span className="material-symbols-outlined">arrow_back</span>
           </button>
           <div>
-            <h1 className="text-section-header text-on-surface flex items-center gap-2">
+            <h1 className="text-section-header text-on-surface flex items-center gap-2 flex-wrap">
               {project.name}
               {project.isDeployed ? (
                 <span className="bg-green-500/20 text-green-400 text-xs px-2 py-0.5 rounded border border-green-500/30">Deployed</span>
               ) : (
                 <span className="bg-amber-500/20 text-amber-400 text-xs px-2 py-0.5 rounded border border-amber-500/30">Not Deployed</span>
               )}
+              {/* Data Source Badge — always visible, never hidden */}
+              {dataSource === 'LIVE' && (
+                <span className="inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-400 text-xs px-2 py-0.5 rounded-full border border-emerald-500/30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Live Data
+                </span>
+              )}
+              {dataSource === 'MOCK_DEMO' && (
+                <span className="inline-flex items-center gap-1 bg-orange-500/15 text-orange-400 text-xs px-2 py-0.5 rounded-full border border-orange-500/30 animate-pulse">
+                  <span className="w-1.5 h-1.5 rounded-full bg-orange-400" />
+                  Demo Data
+                </span>
+              )}
+              {dataSource === 'NO_CREDS' && (
+                <span className="inline-flex items-center gap-1 bg-amber-500/10 text-amber-500 text-xs px-2 py-0.5 rounded-full border border-amber-500/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                  No Account Connected
+                </span>
+              )}
             </h1>
             <p className="text-on-surface-variant text-sm mt-1">
               Created: {new Date(project.createdAt).toLocaleDateString()}
             </p>
+
           </div>
         </div>
         {project.isDeployed && project.sdkConnected && (
@@ -397,8 +429,50 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
              </div>
           </div>
         </div>
+      ) : dataSource === 'NO_CREDS' ? (
+        /* NO_CREDS: No platform connected — show empty state, hide all data panels */
+        <div className="flex flex-col items-center justify-center py-20 space-y-6">
+          <div className="w-20 h-20 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+            <span className="material-symbols-outlined text-amber-500 text-4xl">link_off</span>
+          </div>
+          <div className="text-center space-y-2">
+            <h2 className="text-xl font-semibold text-on-surface">No Platform Account Connected</h2>
+            <p className="text-on-surface-variant text-sm max-w-md">
+              Connect a Vercel, Netlify, Railway, or Render account to start collecting
+              real carbon emission data for this project.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {(['Vercel', 'Netlify', 'Railway', 'Render'] as const).map((p) => (
+              <button
+                key={p}
+                className="flex flex-col items-center gap-2 p-4 rounded-xl bg-surface-container border border-outline-variant hover:border-primary/40 hover:bg-surface-container-high transition-all group"
+                onClick={() => window.location.href = `/admin/project/${params.id}/settings`}
+              >
+                <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">cloud</span>
+                <span className="text-xs font-medium text-on-surface-variant group-hover:text-on-surface transition-colors">{p}</span>
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-on-surface-variant">
+            Go to <span className="text-primary cursor-pointer underline underline-offset-2" onClick={() => window.location.href = `/admin/project/${params.id}/settings`}>Project Settings</span> to add a platform token.
+          </p>
+        </div>
       ) : (
         <div className="space-y-6">
+          {/* MOCK_DEMO: Persistent banner across ALL data panels */}
+          {dataSource === 'MOCK_DEMO' && (
+            <div className="flex items-center gap-3 bg-orange-500/10 border border-orange-500/30 rounded-xl px-4 py-3">
+              <span className="material-symbols-outlined text-orange-400 text-[20px]">science</span>
+              <div className="flex-1">
+                <span className="font-medium text-orange-400 text-sm">Demo Data Mode</span>
+                <p className="text-xs text-orange-400/80 mt-0.5">
+                  All numbers below are simulated. Connect a real platform account in Project Settings to see live data.
+                </p>
+              </div>
+            </div>
+          )}
+
           {greenerRegion && (
             <div className="bg-primary/10 border border-primary/30 rounded-xl p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">

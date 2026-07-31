@@ -8,6 +8,8 @@
 
 import { EmissionRecordData } from './collector';
 import { callNvidiaApi, ChatMessage } from '@carbonix/core';
+import { z } from 'zod';
+
 
 // Downgrade mapping: what to recommend when an instance is oversized
 const DOWNGRADE_MAP: Record<string, string> = {
@@ -18,6 +20,23 @@ const DOWNGRADE_MAP: Record<string, string> = {
   't3.medium': 't3.micro',
   'c5.xlarge': 'c5.large',
 };
+
+// ─── Zod schema for Nemotron output validation ────────────────────────────────
+
+const RecommendationSchema = z.object({
+  instanceId:        z.string(),
+  instanceName:      z.string(),
+  currentType:       z.string(),
+  recommendedAction: z.enum(['TERMINATE', 'DOWNGRADE', 'MIGRATE_REGION', 'SCHEDULE_SHUTDOWN']),
+  currentCarbonKg:   z.number(),
+  projectedCarbonKg: z.number(),
+  reductionPercent:  z.number(),
+  reasoning:         z.string(),
+  priority:          z.enum(['HIGH', 'MEDIUM', 'LOW']),
+});
+
+const RecommendationArraySchema = z.array(RecommendationSchema);
+
 
 export interface Recommendation {
   instanceId: string;
@@ -48,8 +67,7 @@ async function callNvidiaForRecommendations(
   records: EmissionRecordData[],
   apiKey: string
 ): Promise<Recommendation[] | null> {
-  try {
-    const prompt = `You are CarboniX Analyst Agent — an AI carbon optimization advisor for cloud infrastructure.
+  const SYSTEM_PROMPT = `You are CarboniX Analyst Agent — an AI carbon optimization advisor for cloud infrastructure.
 
 Analyze these cloud infrastructure emission records and return ONLY a valid JSON array of optimization recommendations. No markdown, no explanation, ONLY the JSON array.
 
@@ -64,30 +82,81 @@ Each recommendation object must have exactly these fields:
 - reasoning (string: one sentence)
 - priority (string: "HIGH", "MEDIUM", or "LOW")`;
 
-    const history: ChatMessage[] = [
-      { role: 'user', content: JSON.stringify(records.filter(r => r.isIdle || r.isOversized), null, 2) }
-    ];
+  const history: ChatMessage[] = [
+    { role: 'user', content: JSON.stringify(records.filter(r => r.isIdle || r.isOversized), null, 2) }
+  ];
 
-    const data = await callNvidiaApi(
-      apiKey,
-      'mistralai/mistral-nemotron',
-      prompt,
-      history
-    );
-    const text = data.choices?.[0]?.message?.content;
-    
-    if (!text) return null;
+  /** One call attempt: returns parsed validated array or null on any failure */
+  async function attempt(extraInstruction?: string): Promise<Recommendation[] | null> {
+    try {
+      // 15-second hard timeout on the Nvidia API call
+      const timeoutController = new AbortController();
+      const timeoutTimer = setTimeout(() => timeoutController.abort(), 15_000);
 
-    // Extract JSON from response (Nvidia sometimes wraps in ```json blocks)
-    const jsonMatch = text.match(/\[[\s\S]*\]/);
-    if (!jsonMatch) return null;
+      let data: any;
+      try {
+        const prompt = extraInstruction ? `${SYSTEM_PROMPT}\n\n${extraInstruction}` : SYSTEM_PROMPT;
+        data = await callNvidiaApi(
+          apiKey,
+          'mistralai/mistral-nemotron',
+          prompt,
+          history
+        );
+      } finally {
+        clearTimeout(timeoutTimer);
+      }
 
-    return JSON.parse(jsonMatch[0]) as Recommendation[];
-  } catch (error) {
-    console.warn(`[Analyst] Nvidia NIM call failed: ${(error as Error).message}, falling back to rules`);
-    return null;
+      const text = data?.choices?.[0]?.message?.content;
+      if (!text) return null;
+
+      // Extract JSON array from response (Nvidia sometimes wraps in ```json blocks)
+      const jsonMatch = text.match(/\[[\s\S]*\]/);
+      if (!jsonMatch) {
+        console.warn('[Analyst] Nemotron response did not contain a JSON array.');
+        return null;
+      }
+
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(jsonMatch[0]);
+      } catch {
+        console.warn('[Analyst] Nemotron response JSON.parse failed.');
+        return null;
+      }
+
+      // Validate with zod
+      const result = RecommendationArraySchema.safeParse(parsed);
+      if (!result.success) {
+        console.warn('[Analyst] Nemotron output failed zod validation:', result.error.format());
+        return null;
+      }
+
+      return result.data as Recommendation[];
+    } catch (error: any) {
+      if (error?.name === 'AbortError') {
+        console.warn('[Analyst] Nvidia NIM call timed out after 15 s, falling back to rules.');
+      } else {
+        console.warn(`[Analyst] Nvidia NIM call failed: ${error.message}`);
+      }
+      return null;
+    }
   }
+
+  // First attempt
+  const first = await attempt();
+  if (first !== null) return first;
+
+  // Retry once with an explicit "JSON only" reinforcement
+  console.warn('[Analyst] Retrying Nvidia NIM with explicit JSON instruction...');
+  const second = await attempt(
+    'CRITICAL: Your previous response was invalid. Return ONLY a raw JSON array with no markdown, no code fences, no explanation. Start your response with "[" and end with "]".',
+  );
+  if (second !== null) return second;
+
+  console.warn('[Analyst] Both Nvidia NIM attempts failed — falling back to rule-based recommendations.');
+  return null;
 }
+
 
 /**
  * Rule-based fallback recommendations (when Gemini is unavailable)

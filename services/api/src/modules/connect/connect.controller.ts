@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
 import { createHash } from 'crypto';
 import { prisma } from '../../lib/prisma';
+import { AuthRequest } from '../../middleware/auth.middleware';
+import { encryptToken, verifyPlatformToken } from '../../lib/platformTokenService';
+
 
 // ─── Error Codes ──────────────────────────────────────────────────────────────
 // These are structured so the CLI can print clean, actionable error messages
@@ -188,3 +191,168 @@ export async function handleConnect(req: Request, res: Response) {
     });
   }
 }
+
+// ─── Platform Token Connect ───────────────────────────────────────────────────────
+
+/**
+ * POST /api/v1/connect/platform-token
+ *
+ * Body: { projectId, platform: 'VERCEL'|'NETLIFY'|'RAILWAY'|'RENDER', token, projectSlug? }
+ *
+ * 1. Verifies the token is valid against the platform API (fast, read-only call)
+ * 2. If valid: encrypts and upserts into PlatformToken, sets dataSource = LIVE
+ * 3. If invalid: returns a specific error — never saves an invalid token
+ */
+export async function handleConnectPlatformToken(req: AuthRequest, res: Response) {
+  try {
+    const { projectId, platform, token, projectSlug } = req.body as {
+      projectId?: string;
+      platform?: string;
+      token?: string;
+      projectSlug?: string;
+    };
+
+    if (!projectId || !platform || !token) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: projectId, platform, token',
+      });
+    }
+
+    const allowedPlatforms = ['VERCEL', 'NETLIFY', 'RAILWAY', 'RENDER'];
+    if (!allowedPlatforms.includes(platform)) {
+      return res.status(400).json({
+        success: false,
+        error: `Unsupported platform "${platform}". Allowed: ${allowedPlatforms.join(', ')}`,
+      });
+    }
+
+    // Authorization: confirm the project belongs to the current user
+    const project = await prisma.project.findUnique({ where: { id: projectId } });
+    if (!project || project.userId !== req.user!.id) {
+      return res.status(403).json({ success: false, error: 'Forbidden: project not found or access denied.' });
+    }
+
+    // Verify the token against the real platform API before saving anything
+    console.log(`[CONNECT] Verifying ${platform} token for project ${projectId}...`);
+    const verifyResult = await verifyPlatformToken(
+      platform as 'VERCEL' | 'NETLIFY' | 'RAILWAY' | 'RENDER',
+      token,
+      projectSlug
+    );
+
+    if (!verifyResult.valid) {
+      return res.status(422).json({
+        success: false,
+        error: verifyResult.error || 'Token verification failed.',
+      });
+    }
+
+    // Encrypt the token before persisting
+    let encryptedToken: string;
+    try {
+      encryptedToken = encryptToken(token);
+    } catch (encErr: any) {
+      console.error('[CONNECT] Encryption key missing or invalid:', encErr.message);
+      return res.status(500).json({
+        success: false,
+        error: 'Server configuration error: TOKEN_ENCRYPTION_KEY is not set. Contact the administrator.',
+      });
+    }
+
+    // Upsert the platform token (one per project+platform combination)
+    await prisma.platformToken.upsert({
+      where: { projectId_platform: { projectId, platform: platform as any } },
+      create: {
+        projectId,
+        platform: platform as any,
+        encryptedToken,
+        projectSlug: projectSlug || null,
+        status: 'ACTIVE',
+        lastVerifiedAt: new Date(),
+        lastError: null,
+        failCount: 0,
+      },
+      update: {
+        encryptedToken,
+        projectSlug: projectSlug || null,
+        status: 'ACTIVE',
+        lastVerifiedAt: new Date(),
+        lastError: null,
+        failCount: 0,
+      },
+    });
+
+    // Set project dataSource to LIVE
+    await prisma.project.update({
+      where: { id: projectId },
+      data: { dataSource: 'LIVE' },
+    });
+
+    console.log(`[CONNECT] ✓ ${platform} token verified and saved for project "${project.name}" (${projectId}). dataSource = LIVE.`);
+
+    return res.json({
+      success: true,
+      platform,
+      accountName: verifyResult.meta?.accountName,
+      message: `${platform} account connected successfully. Real usage-based carbon data will be collected on the next hourly run.`,
+    });
+
+  } catch (error: any) {
+    console.error('[CONNECT] handleConnectPlatformToken error:', error.message);
+    return res.status(500).json({ success: false, error: 'Internal server error.' });
+  }
+}
+
+// ─── Platform Token Revoke ──────────────────────────────────────────────────────
+
+/**
+ * DELETE /api/v1/connect/platform-token/:platform
+ *
+ * Revokes/removes a platform token for the specified project (query param: projectId).
+ * If no active tokens remain, resets project.dataSource back to NO_CREDS.
+ */
+export async function handleRevokePlatformToken(req: AuthRequest, res: Response) {
+  try {
+    const { platform } = req.params;
+    const { projectId } = req.query as { projectId?: string };
+
+    if (!projectId || !platform) {
+      return res.status(400).json({ success: false, error: 'Missing projectId query param or platform route param.' });
+    }
+
+    const project = await prisma.project.findUnique({ where: { id: projectId } });
+    if (!project || project.userId !== req.user!.id) {
+      return res.status(403).json({ success: false, error: 'Forbidden.' });
+    }
+
+    // Delete the token
+    await prisma.platformToken.deleteMany({
+      where: { projectId, platform: platform as any },
+    });
+
+    // Check if any active tokens remain
+    const remaining = await prisma.platformToken.count({
+      where: { projectId, status: 'ACTIVE' },
+    });
+
+    // If no active tokens left, reset dataSource to NO_CREDS
+    if (remaining === 0) {
+      await prisma.project.update({
+        where: { id: projectId },
+        data: { dataSource: 'NO_CREDS' },
+      });
+      console.log(`[CONNECT] All platform tokens removed for project ${projectId}. dataSource = NO_CREDS.`);
+    }
+
+    return res.json({
+      success: true,
+      message: `${platform} token revoked.${remaining === 0 ? ' Project data source reset to NO_CREDS.' : ''}`,
+    });
+
+  } catch (error: any) {
+    console.error('[CONNECT] handleRevokePlatformToken error:', error.message);
+    return res.status(500).json({ success: false, error: 'Internal server error.' });
+  }
+}
+

@@ -123,6 +123,11 @@ export type ChatHistory = $Result.DefaultSelection<Prisma.$ChatHistoryPayload>
  * 
  */
 export type PlatformCredential = $Result.DefaultSelection<Prisma.$PlatformCredentialPayload>
+/**
+ * Model PlatformToken
+ * 
+ */
+export type PlatformToken = $Result.DefaultSelection<Prisma.$PlatformTokenPayload>
 
 /**
  * Enums
@@ -298,6 +303,35 @@ export const userType: {
 
 export type userType = (typeof userType)[keyof typeof userType]
 
+
+export const DataSource: {
+  NO_CREDS: 'NO_CREDS',
+  MOCK_DEMO: 'MOCK_DEMO',
+  LIVE: 'LIVE'
+};
+
+export type DataSource = (typeof DataSource)[keyof typeof DataSource]
+
+
+export const PlatformType: {
+  VERCEL: 'VERCEL',
+  NETLIFY: 'NETLIFY',
+  RAILWAY: 'RAILWAY',
+  RENDER: 'RENDER'
+};
+
+export type PlatformType = (typeof PlatformType)[keyof typeof PlatformType]
+
+
+export const PlatformTokenStatus: {
+  ACTIVE: 'ACTIVE',
+  INVALID: 'INVALID',
+  EXPIRED: 'EXPIRED',
+  REVOKED: 'REVOKED'
+};
+
+export type PlatformTokenStatus = (typeof PlatformTokenStatus)[keyof typeof PlatformTokenStatus]
+
 }
 
 export type CloudProvider = $Enums.CloudProvider
@@ -367,6 +401,18 @@ export const AgentRunStatus: typeof $Enums.AgentRunStatus
 export type userType = $Enums.userType
 
 export const userType: typeof $Enums.userType
+
+export type DataSource = $Enums.DataSource
+
+export const DataSource: typeof $Enums.DataSource
+
+export type PlatformType = $Enums.PlatformType
+
+export const PlatformType: typeof $Enums.PlatformType
+
+export type PlatformTokenStatus = $Enums.PlatformTokenStatus
+
+export const PlatformTokenStatus: typeof $Enums.PlatformTokenStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -710,6 +756,16 @@ export class PrismaClient<
     * ```
     */
   get platformCredential(): Prisma.PlatformCredentialDelegate<ExtArgs>;
+
+  /**
+   * `prisma.platformToken`: Exposes CRUD operations for the **PlatformToken** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PlatformTokens
+    * const platformTokens = await prisma.platformToken.findMany()
+    * ```
+    */
+  get platformToken(): Prisma.PlatformTokenDelegate<ExtArgs>;
 }
 
 export namespace Prisma {
@@ -1172,7 +1228,8 @@ export namespace Prisma {
     VerificationToken: 'VerificationToken',
     TeamMember: 'TeamMember',
     ChatHistory: 'ChatHistory',
-    PlatformCredential: 'PlatformCredential'
+    PlatformCredential: 'PlatformCredential',
+    PlatformToken: 'PlatformToken'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1188,7 +1245,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "mobileUser" | "calculation" | "session" | "apiKey" | "featureFlag" | "remoteConfig" | "auditLog" | "notification" | "userNotification" | "pushToken" | "region" | "instanceType" | "provider" | "agentRun" | "emissionRecord" | "user" | "project" | "profile" | "verificationToken" | "teamMember" | "chatHistory" | "platformCredential"
+      modelProps: "mobileUser" | "calculation" | "session" | "apiKey" | "featureFlag" | "remoteConfig" | "auditLog" | "notification" | "userNotification" | "pushToken" | "region" | "instanceType" | "provider" | "agentRun" | "emissionRecord" | "user" | "project" | "profile" | "verificationToken" | "teamMember" | "chatHistory" | "platformCredential" | "platformToken"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2732,6 +2789,76 @@ export namespace Prisma {
           }
         }
       }
+      PlatformToken: {
+        payload: Prisma.$PlatformTokenPayload<ExtArgs>
+        fields: Prisma.PlatformTokenFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PlatformTokenFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlatformTokenPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PlatformTokenFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlatformTokenPayload>
+          }
+          findFirst: {
+            args: Prisma.PlatformTokenFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlatformTokenPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PlatformTokenFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlatformTokenPayload>
+          }
+          findMany: {
+            args: Prisma.PlatformTokenFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlatformTokenPayload>[]
+          }
+          create: {
+            args: Prisma.PlatformTokenCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlatformTokenPayload>
+          }
+          createMany: {
+            args: Prisma.PlatformTokenCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PlatformTokenCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlatformTokenPayload>[]
+          }
+          delete: {
+            args: Prisma.PlatformTokenDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlatformTokenPayload>
+          }
+          update: {
+            args: Prisma.PlatformTokenUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlatformTokenPayload>
+          }
+          deleteMany: {
+            args: Prisma.PlatformTokenDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PlatformTokenUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.PlatformTokenUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlatformTokenPayload>
+          }
+          aggregate: {
+            args: Prisma.PlatformTokenAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePlatformToken>
+          }
+          groupBy: {
+            args: Prisma.PlatformTokenGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PlatformTokenGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PlatformTokenCountArgs<ExtArgs>
+            result: $Utils.Optional<PlatformTokenCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2981,6 +3108,7 @@ export namespace Prisma {
     emissionRecords: number
     apiKeys: number
     platformCredentials: number
+    platformTokens: number
   }
 
   export type ProjectCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2988,6 +3116,7 @@ export namespace Prisma {
     emissionRecords?: boolean | ProjectCountOutputTypeCountEmissionRecordsArgs
     apiKeys?: boolean | ProjectCountOutputTypeCountApiKeysArgs
     platformCredentials?: boolean | ProjectCountOutputTypeCountPlatformCredentialsArgs
+    platformTokens?: boolean | ProjectCountOutputTypeCountPlatformTokensArgs
   }
 
   // Custom InputTypes
@@ -3027,6 +3156,13 @@ export namespace Prisma {
    */
   export type ProjectCountOutputTypeCountPlatformCredentialsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PlatformCredentialWhereInput
+  }
+
+  /**
+   * ProjectCountOutputType without action
+   */
+  export type ProjectCountOutputTypeCountPlatformTokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PlatformTokenWhereInput
   }
 
 
@@ -20094,6 +20230,7 @@ export namespace Prisma {
     connectedAt: Date | null
     lastPingAt: Date | null
     carbonBudgetKg: number | null
+    dataSource: $Enums.DataSource | null
     userId: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -20111,6 +20248,7 @@ export namespace Prisma {
     connectedAt: Date | null
     lastPingAt: Date | null
     carbonBudgetKg: number | null
+    dataSource: $Enums.DataSource | null
     userId: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -20128,6 +20266,7 @@ export namespace Prisma {
     connectedAt: number
     lastPingAt: number
     carbonBudgetKg: number
+    dataSource: number
     userId: number
     createdAt: number
     updatedAt: number
@@ -20155,6 +20294,7 @@ export namespace Prisma {
     connectedAt?: true
     lastPingAt?: true
     carbonBudgetKg?: true
+    dataSource?: true
     userId?: true
     createdAt?: true
     updatedAt?: true
@@ -20172,6 +20312,7 @@ export namespace Prisma {
     connectedAt?: true
     lastPingAt?: true
     carbonBudgetKg?: true
+    dataSource?: true
     userId?: true
     createdAt?: true
     updatedAt?: true
@@ -20189,6 +20330,7 @@ export namespace Prisma {
     connectedAt?: true
     lastPingAt?: true
     carbonBudgetKg?: true
+    dataSource?: true
     userId?: true
     createdAt?: true
     updatedAt?: true
@@ -20293,6 +20435,7 @@ export namespace Prisma {
     connectedAt: Date | null
     lastPingAt: Date | null
     carbonBudgetKg: number | null
+    dataSource: $Enums.DataSource
     userId: string
     createdAt: Date
     updatedAt: Date
@@ -20329,6 +20472,7 @@ export namespace Prisma {
     connectedAt?: boolean
     lastPingAt?: boolean
     carbonBudgetKg?: boolean
+    dataSource?: boolean
     userId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -20337,6 +20481,7 @@ export namespace Prisma {
     emissionRecords?: boolean | Project$emissionRecordsArgs<ExtArgs>
     apiKeys?: boolean | Project$apiKeysArgs<ExtArgs>
     platformCredentials?: boolean | Project$platformCredentialsArgs<ExtArgs>
+    platformTokens?: boolean | Project$platformTokensArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["project"]>
 
@@ -20352,6 +20497,7 @@ export namespace Prisma {
     connectedAt?: boolean
     lastPingAt?: boolean
     carbonBudgetKg?: boolean
+    dataSource?: boolean
     userId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -20370,6 +20516,7 @@ export namespace Prisma {
     connectedAt?: boolean
     lastPingAt?: boolean
     carbonBudgetKg?: boolean
+    dataSource?: boolean
     userId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -20381,6 +20528,7 @@ export namespace Prisma {
     emissionRecords?: boolean | Project$emissionRecordsArgs<ExtArgs>
     apiKeys?: boolean | Project$apiKeysArgs<ExtArgs>
     platformCredentials?: boolean | Project$platformCredentialsArgs<ExtArgs>
+    platformTokens?: boolean | Project$platformTokensArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ProjectIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -20395,6 +20543,7 @@ export namespace Prisma {
       emissionRecords: Prisma.$EmissionRecordPayload<ExtArgs>[]
       apiKeys: Prisma.$ApiKeyPayload<ExtArgs>[]
       platformCredentials: Prisma.$PlatformCredentialPayload<ExtArgs>[]
+      platformTokens: Prisma.$PlatformTokenPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -20408,6 +20557,7 @@ export namespace Prisma {
       connectedAt: Date | null
       lastPingAt: Date | null
       carbonBudgetKg: number | null
+      dataSource: $Enums.DataSource
       userId: string
       createdAt: Date
       updatedAt: Date
@@ -20780,6 +20930,7 @@ export namespace Prisma {
     emissionRecords<T extends Project$emissionRecordsArgs<ExtArgs> = {}>(args?: Subset<T, Project$emissionRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmissionRecordPayload<ExtArgs>, T, "findMany"> | Null>
     apiKeys<T extends Project$apiKeysArgs<ExtArgs> = {}>(args?: Subset<T, Project$apiKeysArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "findMany"> | Null>
     platformCredentials<T extends Project$platformCredentialsArgs<ExtArgs> = {}>(args?: Subset<T, Project$platformCredentialsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlatformCredentialPayload<ExtArgs>, T, "findMany"> | Null>
+    platformTokens<T extends Project$platformTokensArgs<ExtArgs> = {}>(args?: Subset<T, Project$platformTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlatformTokenPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -20820,6 +20971,7 @@ export namespace Prisma {
     readonly connectedAt: FieldRef<"Project", 'DateTime'>
     readonly lastPingAt: FieldRef<"Project", 'DateTime'>
     readonly carbonBudgetKg: FieldRef<"Project", 'Float'>
+    readonly dataSource: FieldRef<"Project", 'DataSource'>
     readonly userId: FieldRef<"Project", 'String'>
     readonly createdAt: FieldRef<"Project", 'DateTime'>
     readonly updatedAt: FieldRef<"Project", 'DateTime'>
@@ -21218,6 +21370,26 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: PlatformCredentialScalarFieldEnum | PlatformCredentialScalarFieldEnum[]
+  }
+
+  /**
+   * Project.platformTokens
+   */
+  export type Project$platformTokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformToken
+     */
+    select?: PlatformTokenSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformTokenInclude<ExtArgs> | null
+    where?: PlatformTokenWhereInput
+    orderBy?: PlatformTokenOrderByWithRelationInput | PlatformTokenOrderByWithRelationInput[]
+    cursor?: PlatformTokenWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PlatformTokenScalarFieldEnum | PlatformTokenScalarFieldEnum[]
   }
 
   /**
@@ -26032,6 +26204,1045 @@ export namespace Prisma {
 
 
   /**
+   * Model PlatformToken
+   */
+
+  export type AggregatePlatformToken = {
+    _count: PlatformTokenCountAggregateOutputType | null
+    _avg: PlatformTokenAvgAggregateOutputType | null
+    _sum: PlatformTokenSumAggregateOutputType | null
+    _min: PlatformTokenMinAggregateOutputType | null
+    _max: PlatformTokenMaxAggregateOutputType | null
+  }
+
+  export type PlatformTokenAvgAggregateOutputType = {
+    failCount: number | null
+  }
+
+  export type PlatformTokenSumAggregateOutputType = {
+    failCount: number | null
+  }
+
+  export type PlatformTokenMinAggregateOutputType = {
+    id: string | null
+    projectId: string | null
+    platform: $Enums.PlatformType | null
+    encryptedToken: string | null
+    projectSlug: string | null
+    status: $Enums.PlatformTokenStatus | null
+    lastVerifiedAt: Date | null
+    lastError: string | null
+    failCount: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PlatformTokenMaxAggregateOutputType = {
+    id: string | null
+    projectId: string | null
+    platform: $Enums.PlatformType | null
+    encryptedToken: string | null
+    projectSlug: string | null
+    status: $Enums.PlatformTokenStatus | null
+    lastVerifiedAt: Date | null
+    lastError: string | null
+    failCount: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PlatformTokenCountAggregateOutputType = {
+    id: number
+    projectId: number
+    platform: number
+    encryptedToken: number
+    projectSlug: number
+    status: number
+    lastVerifiedAt: number
+    lastError: number
+    failCount: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type PlatformTokenAvgAggregateInputType = {
+    failCount?: true
+  }
+
+  export type PlatformTokenSumAggregateInputType = {
+    failCount?: true
+  }
+
+  export type PlatformTokenMinAggregateInputType = {
+    id?: true
+    projectId?: true
+    platform?: true
+    encryptedToken?: true
+    projectSlug?: true
+    status?: true
+    lastVerifiedAt?: true
+    lastError?: true
+    failCount?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PlatformTokenMaxAggregateInputType = {
+    id?: true
+    projectId?: true
+    platform?: true
+    encryptedToken?: true
+    projectSlug?: true
+    status?: true
+    lastVerifiedAt?: true
+    lastError?: true
+    failCount?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PlatformTokenCountAggregateInputType = {
+    id?: true
+    projectId?: true
+    platform?: true
+    encryptedToken?: true
+    projectSlug?: true
+    status?: true
+    lastVerifiedAt?: true
+    lastError?: true
+    failCount?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type PlatformTokenAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PlatformToken to aggregate.
+     */
+    where?: PlatformTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlatformTokens to fetch.
+     */
+    orderBy?: PlatformTokenOrderByWithRelationInput | PlatformTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PlatformTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlatformTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlatformTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PlatformTokens
+    **/
+    _count?: true | PlatformTokenCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: PlatformTokenAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PlatformTokenSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PlatformTokenMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PlatformTokenMaxAggregateInputType
+  }
+
+  export type GetPlatformTokenAggregateType<T extends PlatformTokenAggregateArgs> = {
+        [P in keyof T & keyof AggregatePlatformToken]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePlatformToken[P]>
+      : GetScalarType<T[P], AggregatePlatformToken[P]>
+  }
+
+
+
+
+  export type PlatformTokenGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PlatformTokenWhereInput
+    orderBy?: PlatformTokenOrderByWithAggregationInput | PlatformTokenOrderByWithAggregationInput[]
+    by: PlatformTokenScalarFieldEnum[] | PlatformTokenScalarFieldEnum
+    having?: PlatformTokenScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PlatformTokenCountAggregateInputType | true
+    _avg?: PlatformTokenAvgAggregateInputType
+    _sum?: PlatformTokenSumAggregateInputType
+    _min?: PlatformTokenMinAggregateInputType
+    _max?: PlatformTokenMaxAggregateInputType
+  }
+
+  export type PlatformTokenGroupByOutputType = {
+    id: string
+    projectId: string
+    platform: $Enums.PlatformType
+    encryptedToken: string
+    projectSlug: string | null
+    status: $Enums.PlatformTokenStatus
+    lastVerifiedAt: Date | null
+    lastError: string | null
+    failCount: number
+    createdAt: Date
+    updatedAt: Date
+    _count: PlatformTokenCountAggregateOutputType | null
+    _avg: PlatformTokenAvgAggregateOutputType | null
+    _sum: PlatformTokenSumAggregateOutputType | null
+    _min: PlatformTokenMinAggregateOutputType | null
+    _max: PlatformTokenMaxAggregateOutputType | null
+  }
+
+  type GetPlatformTokenGroupByPayload<T extends PlatformTokenGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PlatformTokenGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PlatformTokenGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PlatformTokenGroupByOutputType[P]>
+            : GetScalarType<T[P], PlatformTokenGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PlatformTokenSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    projectId?: boolean
+    platform?: boolean
+    encryptedToken?: boolean
+    projectSlug?: boolean
+    status?: boolean
+    lastVerifiedAt?: boolean
+    lastError?: boolean
+    failCount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["platformToken"]>
+
+  export type PlatformTokenSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    projectId?: boolean
+    platform?: boolean
+    encryptedToken?: boolean
+    projectSlug?: boolean
+    status?: boolean
+    lastVerifiedAt?: boolean
+    lastError?: boolean
+    failCount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["platformToken"]>
+
+  export type PlatformTokenSelectScalar = {
+    id?: boolean
+    projectId?: boolean
+    platform?: boolean
+    encryptedToken?: boolean
+    projectSlug?: boolean
+    status?: boolean
+    lastVerifiedAt?: boolean
+    lastError?: boolean
+    failCount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type PlatformTokenInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }
+  export type PlatformTokenIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }
+
+  export type $PlatformTokenPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PlatformToken"
+    objects: {
+      project: Prisma.$ProjectPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      projectId: string
+      platform: $Enums.PlatformType
+      encryptedToken: string
+      projectSlug: string | null
+      status: $Enums.PlatformTokenStatus
+      lastVerifiedAt: Date | null
+      lastError: string | null
+      failCount: number
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["platformToken"]>
+    composites: {}
+  }
+
+  type PlatformTokenGetPayload<S extends boolean | null | undefined | PlatformTokenDefaultArgs> = $Result.GetResult<Prisma.$PlatformTokenPayload, S>
+
+  type PlatformTokenCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<PlatformTokenFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: PlatformTokenCountAggregateInputType | true
+    }
+
+  export interface PlatformTokenDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PlatformToken'], meta: { name: 'PlatformToken' } }
+    /**
+     * Find zero or one PlatformToken that matches the filter.
+     * @param {PlatformTokenFindUniqueArgs} args - Arguments to find a PlatformToken
+     * @example
+     * // Get one PlatformToken
+     * const platformToken = await prisma.platformToken.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PlatformTokenFindUniqueArgs>(args: SelectSubset<T, PlatformTokenFindUniqueArgs<ExtArgs>>): Prisma__PlatformTokenClient<$Result.GetResult<Prisma.$PlatformTokenPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one PlatformToken that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {PlatformTokenFindUniqueOrThrowArgs} args - Arguments to find a PlatformToken
+     * @example
+     * // Get one PlatformToken
+     * const platformToken = await prisma.platformToken.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PlatformTokenFindUniqueOrThrowArgs>(args: SelectSubset<T, PlatformTokenFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PlatformTokenClient<$Result.GetResult<Prisma.$PlatformTokenPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first PlatformToken that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlatformTokenFindFirstArgs} args - Arguments to find a PlatformToken
+     * @example
+     * // Get one PlatformToken
+     * const platformToken = await prisma.platformToken.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PlatformTokenFindFirstArgs>(args?: SelectSubset<T, PlatformTokenFindFirstArgs<ExtArgs>>): Prisma__PlatformTokenClient<$Result.GetResult<Prisma.$PlatformTokenPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first PlatformToken that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlatformTokenFindFirstOrThrowArgs} args - Arguments to find a PlatformToken
+     * @example
+     * // Get one PlatformToken
+     * const platformToken = await prisma.platformToken.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PlatformTokenFindFirstOrThrowArgs>(args?: SelectSubset<T, PlatformTokenFindFirstOrThrowArgs<ExtArgs>>): Prisma__PlatformTokenClient<$Result.GetResult<Prisma.$PlatformTokenPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more PlatformTokens that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlatformTokenFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PlatformTokens
+     * const platformTokens = await prisma.platformToken.findMany()
+     * 
+     * // Get first 10 PlatformTokens
+     * const platformTokens = await prisma.platformToken.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const platformTokenWithIdOnly = await prisma.platformToken.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PlatformTokenFindManyArgs>(args?: SelectSubset<T, PlatformTokenFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlatformTokenPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a PlatformToken.
+     * @param {PlatformTokenCreateArgs} args - Arguments to create a PlatformToken.
+     * @example
+     * // Create one PlatformToken
+     * const PlatformToken = await prisma.platformToken.create({
+     *   data: {
+     *     // ... data to create a PlatformToken
+     *   }
+     * })
+     * 
+     */
+    create<T extends PlatformTokenCreateArgs>(args: SelectSubset<T, PlatformTokenCreateArgs<ExtArgs>>): Prisma__PlatformTokenClient<$Result.GetResult<Prisma.$PlatformTokenPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many PlatformTokens.
+     * @param {PlatformTokenCreateManyArgs} args - Arguments to create many PlatformTokens.
+     * @example
+     * // Create many PlatformTokens
+     * const platformToken = await prisma.platformToken.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PlatformTokenCreateManyArgs>(args?: SelectSubset<T, PlatformTokenCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PlatformTokens and returns the data saved in the database.
+     * @param {PlatformTokenCreateManyAndReturnArgs} args - Arguments to create many PlatformTokens.
+     * @example
+     * // Create many PlatformTokens
+     * const platformToken = await prisma.platformToken.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PlatformTokens and only return the `id`
+     * const platformTokenWithIdOnly = await prisma.platformToken.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PlatformTokenCreateManyAndReturnArgs>(args?: SelectSubset<T, PlatformTokenCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlatformTokenPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a PlatformToken.
+     * @param {PlatformTokenDeleteArgs} args - Arguments to delete one PlatformToken.
+     * @example
+     * // Delete one PlatformToken
+     * const PlatformToken = await prisma.platformToken.delete({
+     *   where: {
+     *     // ... filter to delete one PlatformToken
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PlatformTokenDeleteArgs>(args: SelectSubset<T, PlatformTokenDeleteArgs<ExtArgs>>): Prisma__PlatformTokenClient<$Result.GetResult<Prisma.$PlatformTokenPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one PlatformToken.
+     * @param {PlatformTokenUpdateArgs} args - Arguments to update one PlatformToken.
+     * @example
+     * // Update one PlatformToken
+     * const platformToken = await prisma.platformToken.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PlatformTokenUpdateArgs>(args: SelectSubset<T, PlatformTokenUpdateArgs<ExtArgs>>): Prisma__PlatformTokenClient<$Result.GetResult<Prisma.$PlatformTokenPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more PlatformTokens.
+     * @param {PlatformTokenDeleteManyArgs} args - Arguments to filter PlatformTokens to delete.
+     * @example
+     * // Delete a few PlatformTokens
+     * const { count } = await prisma.platformToken.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PlatformTokenDeleteManyArgs>(args?: SelectSubset<T, PlatformTokenDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PlatformTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlatformTokenUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PlatformTokens
+     * const platformToken = await prisma.platformToken.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PlatformTokenUpdateManyArgs>(args: SelectSubset<T, PlatformTokenUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one PlatformToken.
+     * @param {PlatformTokenUpsertArgs} args - Arguments to update or create a PlatformToken.
+     * @example
+     * // Update or create a PlatformToken
+     * const platformToken = await prisma.platformToken.upsert({
+     *   create: {
+     *     // ... data to create a PlatformToken
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PlatformToken we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PlatformTokenUpsertArgs>(args: SelectSubset<T, PlatformTokenUpsertArgs<ExtArgs>>): Prisma__PlatformTokenClient<$Result.GetResult<Prisma.$PlatformTokenPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of PlatformTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlatformTokenCountArgs} args - Arguments to filter PlatformTokens to count.
+     * @example
+     * // Count the number of PlatformTokens
+     * const count = await prisma.platformToken.count({
+     *   where: {
+     *     // ... the filter for the PlatformTokens we want to count
+     *   }
+     * })
+    **/
+    count<T extends PlatformTokenCountArgs>(
+      args?: Subset<T, PlatformTokenCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PlatformTokenCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PlatformToken.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlatformTokenAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PlatformTokenAggregateArgs>(args: Subset<T, PlatformTokenAggregateArgs>): Prisma.PrismaPromise<GetPlatformTokenAggregateType<T>>
+
+    /**
+     * Group by PlatformToken.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlatformTokenGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PlatformTokenGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PlatformTokenGroupByArgs['orderBy'] }
+        : { orderBy?: PlatformTokenGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PlatformTokenGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPlatformTokenGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PlatformToken model
+   */
+  readonly fields: PlatformTokenFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PlatformToken.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PlatformTokenClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    project<T extends ProjectDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProjectDefaultArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PlatformToken model
+   */ 
+  interface PlatformTokenFieldRefs {
+    readonly id: FieldRef<"PlatformToken", 'String'>
+    readonly projectId: FieldRef<"PlatformToken", 'String'>
+    readonly platform: FieldRef<"PlatformToken", 'PlatformType'>
+    readonly encryptedToken: FieldRef<"PlatformToken", 'String'>
+    readonly projectSlug: FieldRef<"PlatformToken", 'String'>
+    readonly status: FieldRef<"PlatformToken", 'PlatformTokenStatus'>
+    readonly lastVerifiedAt: FieldRef<"PlatformToken", 'DateTime'>
+    readonly lastError: FieldRef<"PlatformToken", 'String'>
+    readonly failCount: FieldRef<"PlatformToken", 'Int'>
+    readonly createdAt: FieldRef<"PlatformToken", 'DateTime'>
+    readonly updatedAt: FieldRef<"PlatformToken", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PlatformToken findUnique
+   */
+  export type PlatformTokenFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformToken
+     */
+    select?: PlatformTokenSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which PlatformToken to fetch.
+     */
+    where: PlatformTokenWhereUniqueInput
+  }
+
+  /**
+   * PlatformToken findUniqueOrThrow
+   */
+  export type PlatformTokenFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformToken
+     */
+    select?: PlatformTokenSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which PlatformToken to fetch.
+     */
+    where: PlatformTokenWhereUniqueInput
+  }
+
+  /**
+   * PlatformToken findFirst
+   */
+  export type PlatformTokenFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformToken
+     */
+    select?: PlatformTokenSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which PlatformToken to fetch.
+     */
+    where?: PlatformTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlatformTokens to fetch.
+     */
+    orderBy?: PlatformTokenOrderByWithRelationInput | PlatformTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PlatformTokens.
+     */
+    cursor?: PlatformTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlatformTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlatformTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PlatformTokens.
+     */
+    distinct?: PlatformTokenScalarFieldEnum | PlatformTokenScalarFieldEnum[]
+  }
+
+  /**
+   * PlatformToken findFirstOrThrow
+   */
+  export type PlatformTokenFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformToken
+     */
+    select?: PlatformTokenSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which PlatformToken to fetch.
+     */
+    where?: PlatformTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlatformTokens to fetch.
+     */
+    orderBy?: PlatformTokenOrderByWithRelationInput | PlatformTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PlatformTokens.
+     */
+    cursor?: PlatformTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlatformTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlatformTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PlatformTokens.
+     */
+    distinct?: PlatformTokenScalarFieldEnum | PlatformTokenScalarFieldEnum[]
+  }
+
+  /**
+   * PlatformToken findMany
+   */
+  export type PlatformTokenFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformToken
+     */
+    select?: PlatformTokenSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which PlatformTokens to fetch.
+     */
+    where?: PlatformTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlatformTokens to fetch.
+     */
+    orderBy?: PlatformTokenOrderByWithRelationInput | PlatformTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PlatformTokens.
+     */
+    cursor?: PlatformTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlatformTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlatformTokens.
+     */
+    skip?: number
+    distinct?: PlatformTokenScalarFieldEnum | PlatformTokenScalarFieldEnum[]
+  }
+
+  /**
+   * PlatformToken create
+   */
+  export type PlatformTokenCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformToken
+     */
+    select?: PlatformTokenSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformTokenInclude<ExtArgs> | null
+    /**
+     * The data needed to create a PlatformToken.
+     */
+    data: XOR<PlatformTokenCreateInput, PlatformTokenUncheckedCreateInput>
+  }
+
+  /**
+   * PlatformToken createMany
+   */
+  export type PlatformTokenCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PlatformTokens.
+     */
+    data: PlatformTokenCreateManyInput | PlatformTokenCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PlatformToken createManyAndReturn
+   */
+  export type PlatformTokenCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformToken
+     */
+    select?: PlatformTokenSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many PlatformTokens.
+     */
+    data: PlatformTokenCreateManyInput | PlatformTokenCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformTokenIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PlatformToken update
+   */
+  export type PlatformTokenUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformToken
+     */
+    select?: PlatformTokenSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformTokenInclude<ExtArgs> | null
+    /**
+     * The data needed to update a PlatformToken.
+     */
+    data: XOR<PlatformTokenUpdateInput, PlatformTokenUncheckedUpdateInput>
+    /**
+     * Choose, which PlatformToken to update.
+     */
+    where: PlatformTokenWhereUniqueInput
+  }
+
+  /**
+   * PlatformToken updateMany
+   */
+  export type PlatformTokenUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PlatformTokens.
+     */
+    data: XOR<PlatformTokenUpdateManyMutationInput, PlatformTokenUncheckedUpdateManyInput>
+    /**
+     * Filter which PlatformTokens to update
+     */
+    where?: PlatformTokenWhereInput
+  }
+
+  /**
+   * PlatformToken upsert
+   */
+  export type PlatformTokenUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformToken
+     */
+    select?: PlatformTokenSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformTokenInclude<ExtArgs> | null
+    /**
+     * The filter to search for the PlatformToken to update in case it exists.
+     */
+    where: PlatformTokenWhereUniqueInput
+    /**
+     * In case the PlatformToken found by the `where` argument doesn't exist, create a new PlatformToken with this data.
+     */
+    create: XOR<PlatformTokenCreateInput, PlatformTokenUncheckedCreateInput>
+    /**
+     * In case the PlatformToken was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PlatformTokenUpdateInput, PlatformTokenUncheckedUpdateInput>
+  }
+
+  /**
+   * PlatformToken delete
+   */
+  export type PlatformTokenDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformToken
+     */
+    select?: PlatformTokenSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformTokenInclude<ExtArgs> | null
+    /**
+     * Filter which PlatformToken to delete.
+     */
+    where: PlatformTokenWhereUniqueInput
+  }
+
+  /**
+   * PlatformToken deleteMany
+   */
+  export type PlatformTokenDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PlatformTokens to delete
+     */
+    where?: PlatformTokenWhereInput
+  }
+
+  /**
+   * PlatformToken without action
+   */
+  export type PlatformTokenDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformToken
+     */
+    select?: PlatformTokenSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformTokenInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -26395,6 +27606,7 @@ export namespace Prisma {
     connectedAt: 'connectedAt',
     lastPingAt: 'lastPingAt',
     carbonBudgetKg: 'carbonBudgetKg',
+    dataSource: 'dataSource',
     userId: 'userId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -26469,6 +27681,23 @@ export namespace Prisma {
   };
 
   export type PlatformCredentialScalarFieldEnum = (typeof PlatformCredentialScalarFieldEnum)[keyof typeof PlatformCredentialScalarFieldEnum]
+
+
+  export const PlatformTokenScalarFieldEnum: {
+    id: 'id',
+    projectId: 'projectId',
+    platform: 'platform',
+    encryptedToken: 'encryptedToken',
+    projectSlug: 'projectSlug',
+    status: 'status',
+    lastVerifiedAt: 'lastVerifiedAt',
+    lastError: 'lastError',
+    failCount: 'failCount',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type PlatformTokenScalarFieldEnum = (typeof PlatformTokenScalarFieldEnum)[keyof typeof PlatformTokenScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -26829,6 +28058,48 @@ export namespace Prisma {
    * Reference to a field of type 'userType[]'
    */
   export type ListEnumuserTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'userType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'DataSource'
+   */
+  export type EnumDataSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DataSource'>
+    
+
+
+  /**
+   * Reference to a field of type 'DataSource[]'
+   */
+  export type ListEnumDataSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DataSource[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'PlatformType'
+   */
+  export type EnumPlatformTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlatformType'>
+    
+
+
+  /**
+   * Reference to a field of type 'PlatformType[]'
+   */
+  export type ListEnumPlatformTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlatformType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'PlatformTokenStatus'
+   */
+  export type EnumPlatformTokenStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlatformTokenStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'PlatformTokenStatus[]'
+   */
+  export type ListEnumPlatformTokenStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlatformTokenStatus[]'>
     
   /**
    * Deep Input Types
@@ -28549,6 +29820,7 @@ export namespace Prisma {
     connectedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     lastPingAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     carbonBudgetKg?: FloatNullableFilter<"Project"> | number | null
+    dataSource?: EnumDataSourceFilter<"Project"> | $Enums.DataSource
     userId?: StringFilter<"Project"> | string
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
@@ -28557,6 +29829,7 @@ export namespace Prisma {
     emissionRecords?: EmissionRecordListRelationFilter
     apiKeys?: ApiKeyListRelationFilter
     platformCredentials?: PlatformCredentialListRelationFilter
+    platformTokens?: PlatformTokenListRelationFilter
   }
 
   export type ProjectOrderByWithRelationInput = {
@@ -28571,6 +29844,7 @@ export namespace Prisma {
     connectedAt?: SortOrderInput | SortOrder
     lastPingAt?: SortOrderInput | SortOrder
     carbonBudgetKg?: SortOrderInput | SortOrder
+    dataSource?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -28579,6 +29853,7 @@ export namespace Prisma {
     emissionRecords?: EmissionRecordOrderByRelationAggregateInput
     apiKeys?: ApiKeyOrderByRelationAggregateInput
     platformCredentials?: PlatformCredentialOrderByRelationAggregateInput
+    platformTokens?: PlatformTokenOrderByRelationAggregateInput
   }
 
   export type ProjectWhereUniqueInput = Prisma.AtLeast<{
@@ -28596,6 +29871,7 @@ export namespace Prisma {
     connectedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     lastPingAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     carbonBudgetKg?: FloatNullableFilter<"Project"> | number | null
+    dataSource?: EnumDataSourceFilter<"Project"> | $Enums.DataSource
     userId?: StringFilter<"Project"> | string
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
@@ -28604,6 +29880,7 @@ export namespace Prisma {
     emissionRecords?: EmissionRecordListRelationFilter
     apiKeys?: ApiKeyListRelationFilter
     platformCredentials?: PlatformCredentialListRelationFilter
+    platformTokens?: PlatformTokenListRelationFilter
   }, "id">
 
   export type ProjectOrderByWithAggregationInput = {
@@ -28618,6 +29895,7 @@ export namespace Prisma {
     connectedAt?: SortOrderInput | SortOrder
     lastPingAt?: SortOrderInput | SortOrder
     carbonBudgetKg?: SortOrderInput | SortOrder
+    dataSource?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -28643,6 +29921,7 @@ export namespace Prisma {
     connectedAt?: DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
     lastPingAt?: DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
     carbonBudgetKg?: FloatNullableWithAggregatesFilter<"Project"> | number | null
+    dataSource?: EnumDataSourceWithAggregatesFilter<"Project"> | $Enums.DataSource
     userId?: StringWithAggregatesFilter<"Project"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
@@ -28986,6 +30265,94 @@ export namespace Prisma {
     token?: StringWithAggregatesFilter<"PlatformCredential"> | string
     createdAt?: DateTimeWithAggregatesFilter<"PlatformCredential"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"PlatformCredential"> | Date | string
+  }
+
+  export type PlatformTokenWhereInput = {
+    AND?: PlatformTokenWhereInput | PlatformTokenWhereInput[]
+    OR?: PlatformTokenWhereInput[]
+    NOT?: PlatformTokenWhereInput | PlatformTokenWhereInput[]
+    id?: StringFilter<"PlatformToken"> | string
+    projectId?: StringFilter<"PlatformToken"> | string
+    platform?: EnumPlatformTypeFilter<"PlatformToken"> | $Enums.PlatformType
+    encryptedToken?: StringFilter<"PlatformToken"> | string
+    projectSlug?: StringNullableFilter<"PlatformToken"> | string | null
+    status?: EnumPlatformTokenStatusFilter<"PlatformToken"> | $Enums.PlatformTokenStatus
+    lastVerifiedAt?: DateTimeNullableFilter<"PlatformToken"> | Date | string | null
+    lastError?: StringNullableFilter<"PlatformToken"> | string | null
+    failCount?: IntFilter<"PlatformToken"> | number
+    createdAt?: DateTimeFilter<"PlatformToken"> | Date | string
+    updatedAt?: DateTimeFilter<"PlatformToken"> | Date | string
+    project?: XOR<ProjectRelationFilter, ProjectWhereInput>
+  }
+
+  export type PlatformTokenOrderByWithRelationInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    platform?: SortOrder
+    encryptedToken?: SortOrder
+    projectSlug?: SortOrderInput | SortOrder
+    status?: SortOrder
+    lastVerifiedAt?: SortOrderInput | SortOrder
+    lastError?: SortOrderInput | SortOrder
+    failCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    project?: ProjectOrderByWithRelationInput
+  }
+
+  export type PlatformTokenWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    projectId_platform?: PlatformTokenProjectIdPlatformCompoundUniqueInput
+    AND?: PlatformTokenWhereInput | PlatformTokenWhereInput[]
+    OR?: PlatformTokenWhereInput[]
+    NOT?: PlatformTokenWhereInput | PlatformTokenWhereInput[]
+    projectId?: StringFilter<"PlatformToken"> | string
+    platform?: EnumPlatformTypeFilter<"PlatformToken"> | $Enums.PlatformType
+    encryptedToken?: StringFilter<"PlatformToken"> | string
+    projectSlug?: StringNullableFilter<"PlatformToken"> | string | null
+    status?: EnumPlatformTokenStatusFilter<"PlatformToken"> | $Enums.PlatformTokenStatus
+    lastVerifiedAt?: DateTimeNullableFilter<"PlatformToken"> | Date | string | null
+    lastError?: StringNullableFilter<"PlatformToken"> | string | null
+    failCount?: IntFilter<"PlatformToken"> | number
+    createdAt?: DateTimeFilter<"PlatformToken"> | Date | string
+    updatedAt?: DateTimeFilter<"PlatformToken"> | Date | string
+    project?: XOR<ProjectRelationFilter, ProjectWhereInput>
+  }, "id" | "projectId_platform">
+
+  export type PlatformTokenOrderByWithAggregationInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    platform?: SortOrder
+    encryptedToken?: SortOrder
+    projectSlug?: SortOrderInput | SortOrder
+    status?: SortOrder
+    lastVerifiedAt?: SortOrderInput | SortOrder
+    lastError?: SortOrderInput | SortOrder
+    failCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: PlatformTokenCountOrderByAggregateInput
+    _avg?: PlatformTokenAvgOrderByAggregateInput
+    _max?: PlatformTokenMaxOrderByAggregateInput
+    _min?: PlatformTokenMinOrderByAggregateInput
+    _sum?: PlatformTokenSumOrderByAggregateInput
+  }
+
+  export type PlatformTokenScalarWhereWithAggregatesInput = {
+    AND?: PlatformTokenScalarWhereWithAggregatesInput | PlatformTokenScalarWhereWithAggregatesInput[]
+    OR?: PlatformTokenScalarWhereWithAggregatesInput[]
+    NOT?: PlatformTokenScalarWhereWithAggregatesInput | PlatformTokenScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"PlatformToken"> | string
+    projectId?: StringWithAggregatesFilter<"PlatformToken"> | string
+    platform?: EnumPlatformTypeWithAggregatesFilter<"PlatformToken"> | $Enums.PlatformType
+    encryptedToken?: StringWithAggregatesFilter<"PlatformToken"> | string
+    projectSlug?: StringNullableWithAggregatesFilter<"PlatformToken"> | string | null
+    status?: EnumPlatformTokenStatusWithAggregatesFilter<"PlatformToken"> | $Enums.PlatformTokenStatus
+    lastVerifiedAt?: DateTimeNullableWithAggregatesFilter<"PlatformToken"> | Date | string | null
+    lastError?: StringNullableWithAggregatesFilter<"PlatformToken"> | string | null
+    failCount?: IntWithAggregatesFilter<"PlatformToken"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"PlatformToken"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"PlatformToken"> | Date | string
   }
 
   export type MobileUserCreateInput = {
@@ -31049,6 +32416,7 @@ export namespace Prisma {
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
+    dataSource?: $Enums.DataSource
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProjectsInput
@@ -31056,6 +32424,7 @@ export namespace Prisma {
     emissionRecords?: EmissionRecordCreateNestedManyWithoutProjectInput
     apiKeys?: ApiKeyCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialCreateNestedManyWithoutProjectInput
+    platformTokens?: PlatformTokenCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateInput = {
@@ -31070,6 +32439,7 @@ export namespace Prisma {
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
+    dataSource?: $Enums.DataSource
     userId: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -31077,6 +32447,7 @@ export namespace Prisma {
     emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutProjectInput
     apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialUncheckedCreateNestedManyWithoutProjectInput
+    platformTokens?: PlatformTokenUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUpdateInput = {
@@ -31091,6 +32462,7 @@ export namespace Prisma {
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProjectsNestedInput
@@ -31098,6 +32470,7 @@ export namespace Prisma {
     emissionRecords?: EmissionRecordUpdateManyWithoutProjectNestedInput
     apiKeys?: ApiKeyUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUpdateManyWithoutProjectNestedInput
+    platformTokens?: PlatformTokenUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateInput = {
@@ -31112,6 +32485,7 @@ export namespace Prisma {
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     userId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31119,6 +32493,7 @@ export namespace Prisma {
     emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutProjectNestedInput
     apiKeys?: ApiKeyUncheckedUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUncheckedUpdateManyWithoutProjectNestedInput
+    platformTokens?: PlatformTokenUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateManyInput = {
@@ -31133,6 +32508,7 @@ export namespace Prisma {
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
+    dataSource?: $Enums.DataSource
     userId: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -31150,6 +32526,7 @@ export namespace Prisma {
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -31166,6 +32543,7 @@ export namespace Prisma {
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     userId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31534,6 +32912,103 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
     token?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlatformTokenCreateInput = {
+    id?: string
+    platform: $Enums.PlatformType
+    encryptedToken: string
+    projectSlug?: string | null
+    status?: $Enums.PlatformTokenStatus
+    lastVerifiedAt?: Date | string | null
+    lastError?: string | null
+    failCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    project: ProjectCreateNestedOneWithoutPlatformTokensInput
+  }
+
+  export type PlatformTokenUncheckedCreateInput = {
+    id?: string
+    projectId: string
+    platform: $Enums.PlatformType
+    encryptedToken: string
+    projectSlug?: string | null
+    status?: $Enums.PlatformTokenStatus
+    lastVerifiedAt?: Date | string | null
+    lastError?: string | null
+    failCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PlatformTokenUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    platform?: EnumPlatformTypeFieldUpdateOperationsInput | $Enums.PlatformType
+    encryptedToken?: StringFieldUpdateOperationsInput | string
+    projectSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPlatformTokenStatusFieldUpdateOperationsInput | $Enums.PlatformTokenStatus
+    lastVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    failCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneRequiredWithoutPlatformTokensNestedInput
+  }
+
+  export type PlatformTokenUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    platform?: EnumPlatformTypeFieldUpdateOperationsInput | $Enums.PlatformType
+    encryptedToken?: StringFieldUpdateOperationsInput | string
+    projectSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPlatformTokenStatusFieldUpdateOperationsInput | $Enums.PlatformTokenStatus
+    lastVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    failCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlatformTokenCreateManyInput = {
+    id?: string
+    projectId: string
+    platform: $Enums.PlatformType
+    encryptedToken: string
+    projectSlug?: string | null
+    status?: $Enums.PlatformTokenStatus
+    lastVerifiedAt?: Date | string | null
+    lastError?: string | null
+    failCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PlatformTokenUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    platform?: EnumPlatformTypeFieldUpdateOperationsInput | $Enums.PlatformType
+    encryptedToken?: StringFieldUpdateOperationsInput | string
+    projectSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPlatformTokenStatusFieldUpdateOperationsInput | $Enums.PlatformTokenStatus
+    lastVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    failCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlatformTokenUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    platform?: EnumPlatformTypeFieldUpdateOperationsInput | $Enums.PlatformType
+    encryptedToken?: StringFieldUpdateOperationsInput | string
+    projectSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPlatformTokenStatusFieldUpdateOperationsInput | $Enums.PlatformTokenStatus
+    lastVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    failCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -33274,6 +34749,13 @@ export namespace Prisma {
     _max?: NestedEnumuserTypeFilter<$PrismaModel>
   }
 
+  export type EnumDataSourceFilter<$PrismaModel = never> = {
+    equals?: $Enums.DataSource | EnumDataSourceFieldRefInput<$PrismaModel>
+    in?: $Enums.DataSource[] | ListEnumDataSourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DataSource[] | ListEnumDataSourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumDataSourceFilter<$PrismaModel> | $Enums.DataSource
+  }
+
   export type UserRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
@@ -33303,6 +34785,12 @@ export namespace Prisma {
     none?: PlatformCredentialWhereInput
   }
 
+  export type PlatformTokenListRelationFilter = {
+    every?: PlatformTokenWhereInput
+    some?: PlatformTokenWhereInput
+    none?: PlatformTokenWhereInput
+  }
+
   export type AgentRunOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -33319,6 +34807,10 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type PlatformTokenOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type ProjectCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -33331,6 +34823,7 @@ export namespace Prisma {
     connectedAt?: SortOrder
     lastPingAt?: SortOrder
     carbonBudgetKg?: SortOrder
+    dataSource?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -33352,6 +34845,7 @@ export namespace Prisma {
     connectedAt?: SortOrder
     lastPingAt?: SortOrder
     carbonBudgetKg?: SortOrder
+    dataSource?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -33369,6 +34863,7 @@ export namespace Prisma {
     connectedAt?: SortOrder
     lastPingAt?: SortOrder
     carbonBudgetKg?: SortOrder
+    dataSource?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -33376,6 +34871,16 @@ export namespace Prisma {
 
   export type ProjectSumOrderByAggregateInput = {
     carbonBudgetKg?: SortOrder
+  }
+
+  export type EnumDataSourceWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DataSource | EnumDataSourceFieldRefInput<$PrismaModel>
+    in?: $Enums.DataSource[] | ListEnumDataSourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DataSource[] | ListEnumDataSourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumDataSourceWithAggregatesFilter<$PrismaModel> | $Enums.DataSource
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDataSourceFilter<$PrismaModel>
+    _max?: NestedEnumDataSourceFilter<$PrismaModel>
   }
 
   export type ProfileCountOrderByAggregateInput = {
@@ -33551,6 +35056,95 @@ export namespace Prisma {
     token?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type EnumPlatformTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.PlatformType | EnumPlatformTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.PlatformType[] | ListEnumPlatformTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PlatformType[] | ListEnumPlatformTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumPlatformTypeFilter<$PrismaModel> | $Enums.PlatformType
+  }
+
+  export type EnumPlatformTokenStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.PlatformTokenStatus | EnumPlatformTokenStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PlatformTokenStatus[] | ListEnumPlatformTokenStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PlatformTokenStatus[] | ListEnumPlatformTokenStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumPlatformTokenStatusFilter<$PrismaModel> | $Enums.PlatformTokenStatus
+  }
+
+  export type PlatformTokenProjectIdPlatformCompoundUniqueInput = {
+    projectId: string
+    platform: $Enums.PlatformType
+  }
+
+  export type PlatformTokenCountOrderByAggregateInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    platform?: SortOrder
+    encryptedToken?: SortOrder
+    projectSlug?: SortOrder
+    status?: SortOrder
+    lastVerifiedAt?: SortOrder
+    lastError?: SortOrder
+    failCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PlatformTokenAvgOrderByAggregateInput = {
+    failCount?: SortOrder
+  }
+
+  export type PlatformTokenMaxOrderByAggregateInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    platform?: SortOrder
+    encryptedToken?: SortOrder
+    projectSlug?: SortOrder
+    status?: SortOrder
+    lastVerifiedAt?: SortOrder
+    lastError?: SortOrder
+    failCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PlatformTokenMinOrderByAggregateInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    platform?: SortOrder
+    encryptedToken?: SortOrder
+    projectSlug?: SortOrder
+    status?: SortOrder
+    lastVerifiedAt?: SortOrder
+    lastError?: SortOrder
+    failCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PlatformTokenSumOrderByAggregateInput = {
+    failCount?: SortOrder
+  }
+
+  export type EnumPlatformTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PlatformType | EnumPlatformTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.PlatformType[] | ListEnumPlatformTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PlatformType[] | ListEnumPlatformTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumPlatformTypeWithAggregatesFilter<$PrismaModel> | $Enums.PlatformType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPlatformTypeFilter<$PrismaModel>
+    _max?: NestedEnumPlatformTypeFilter<$PrismaModel>
+  }
+
+  export type EnumPlatformTokenStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PlatformTokenStatus | EnumPlatformTokenStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PlatformTokenStatus[] | ListEnumPlatformTokenStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PlatformTokenStatus[] | ListEnumPlatformTokenStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumPlatformTokenStatusWithAggregatesFilter<$PrismaModel> | $Enums.PlatformTokenStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPlatformTokenStatusFilter<$PrismaModel>
+    _max?: NestedEnumPlatformTokenStatusFilter<$PrismaModel>
   }
 
   export type CalculationCreateNestedManyWithoutUserInput = {
@@ -34046,6 +35640,13 @@ export namespace Prisma {
     connect?: PlatformCredentialWhereUniqueInput | PlatformCredentialWhereUniqueInput[]
   }
 
+  export type PlatformTokenCreateNestedManyWithoutProjectInput = {
+    create?: XOR<PlatformTokenCreateWithoutProjectInput, PlatformTokenUncheckedCreateWithoutProjectInput> | PlatformTokenCreateWithoutProjectInput[] | PlatformTokenUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: PlatformTokenCreateOrConnectWithoutProjectInput | PlatformTokenCreateOrConnectWithoutProjectInput[]
+    createMany?: PlatformTokenCreateManyProjectInputEnvelope
+    connect?: PlatformTokenWhereUniqueInput | PlatformTokenWhereUniqueInput[]
+  }
+
   export type AgentRunUncheckedCreateNestedManyWithoutProjectInput = {
     create?: XOR<AgentRunCreateWithoutProjectInput, AgentRunUncheckedCreateWithoutProjectInput> | AgentRunCreateWithoutProjectInput[] | AgentRunUncheckedCreateWithoutProjectInput[]
     connectOrCreate?: AgentRunCreateOrConnectWithoutProjectInput | AgentRunCreateOrConnectWithoutProjectInput[]
@@ -34072,6 +35673,17 @@ export namespace Prisma {
     connectOrCreate?: PlatformCredentialCreateOrConnectWithoutProjectInput | PlatformCredentialCreateOrConnectWithoutProjectInput[]
     createMany?: PlatformCredentialCreateManyProjectInputEnvelope
     connect?: PlatformCredentialWhereUniqueInput | PlatformCredentialWhereUniqueInput[]
+  }
+
+  export type PlatformTokenUncheckedCreateNestedManyWithoutProjectInput = {
+    create?: XOR<PlatformTokenCreateWithoutProjectInput, PlatformTokenUncheckedCreateWithoutProjectInput> | PlatformTokenCreateWithoutProjectInput[] | PlatformTokenUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: PlatformTokenCreateOrConnectWithoutProjectInput | PlatformTokenCreateOrConnectWithoutProjectInput[]
+    createMany?: PlatformTokenCreateManyProjectInputEnvelope
+    connect?: PlatformTokenWhereUniqueInput | PlatformTokenWhereUniqueInput[]
+  }
+
+  export type EnumDataSourceFieldUpdateOperationsInput = {
+    set?: $Enums.DataSource
   }
 
   export type UserUpdateOneRequiredWithoutProjectsNestedInput = {
@@ -34138,6 +35750,20 @@ export namespace Prisma {
     deleteMany?: PlatformCredentialScalarWhereInput | PlatformCredentialScalarWhereInput[]
   }
 
+  export type PlatformTokenUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<PlatformTokenCreateWithoutProjectInput, PlatformTokenUncheckedCreateWithoutProjectInput> | PlatformTokenCreateWithoutProjectInput[] | PlatformTokenUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: PlatformTokenCreateOrConnectWithoutProjectInput | PlatformTokenCreateOrConnectWithoutProjectInput[]
+    upsert?: PlatformTokenUpsertWithWhereUniqueWithoutProjectInput | PlatformTokenUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: PlatformTokenCreateManyProjectInputEnvelope
+    set?: PlatformTokenWhereUniqueInput | PlatformTokenWhereUniqueInput[]
+    disconnect?: PlatformTokenWhereUniqueInput | PlatformTokenWhereUniqueInput[]
+    delete?: PlatformTokenWhereUniqueInput | PlatformTokenWhereUniqueInput[]
+    connect?: PlatformTokenWhereUniqueInput | PlatformTokenWhereUniqueInput[]
+    update?: PlatformTokenUpdateWithWhereUniqueWithoutProjectInput | PlatformTokenUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: PlatformTokenUpdateManyWithWhereWithoutProjectInput | PlatformTokenUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: PlatformTokenScalarWhereInput | PlatformTokenScalarWhereInput[]
+  }
+
   export type AgentRunUncheckedUpdateManyWithoutProjectNestedInput = {
     create?: XOR<AgentRunCreateWithoutProjectInput, AgentRunUncheckedCreateWithoutProjectInput> | AgentRunCreateWithoutProjectInput[] | AgentRunUncheckedCreateWithoutProjectInput[]
     connectOrCreate?: AgentRunCreateOrConnectWithoutProjectInput | AgentRunCreateOrConnectWithoutProjectInput[]
@@ -34194,6 +35820,20 @@ export namespace Prisma {
     deleteMany?: PlatformCredentialScalarWhereInput | PlatformCredentialScalarWhereInput[]
   }
 
+  export type PlatformTokenUncheckedUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<PlatformTokenCreateWithoutProjectInput, PlatformTokenUncheckedCreateWithoutProjectInput> | PlatformTokenCreateWithoutProjectInput[] | PlatformTokenUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: PlatformTokenCreateOrConnectWithoutProjectInput | PlatformTokenCreateOrConnectWithoutProjectInput[]
+    upsert?: PlatformTokenUpsertWithWhereUniqueWithoutProjectInput | PlatformTokenUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: PlatformTokenCreateManyProjectInputEnvelope
+    set?: PlatformTokenWhereUniqueInput | PlatformTokenWhereUniqueInput[]
+    disconnect?: PlatformTokenWhereUniqueInput | PlatformTokenWhereUniqueInput[]
+    delete?: PlatformTokenWhereUniqueInput | PlatformTokenWhereUniqueInput[]
+    connect?: PlatformTokenWhereUniqueInput | PlatformTokenWhereUniqueInput[]
+    update?: PlatformTokenUpdateWithWhereUniqueWithoutProjectInput | PlatformTokenUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: PlatformTokenUpdateManyWithWhereWithoutProjectInput | PlatformTokenUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: PlatformTokenScalarWhereInput | PlatformTokenScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutProfileInput = {
     create?: XOR<UserCreateWithoutProfileInput, UserUncheckedCreateWithoutProfileInput>
     connectOrCreate?: UserCreateOrConnectWithoutProfileInput
@@ -34248,6 +35888,28 @@ export namespace Prisma {
     upsert?: ProjectUpsertWithoutPlatformCredentialsInput
     connect?: ProjectWhereUniqueInput
     update?: XOR<XOR<ProjectUpdateToOneWithWhereWithoutPlatformCredentialsInput, ProjectUpdateWithoutPlatformCredentialsInput>, ProjectUncheckedUpdateWithoutPlatformCredentialsInput>
+  }
+
+  export type ProjectCreateNestedOneWithoutPlatformTokensInput = {
+    create?: XOR<ProjectCreateWithoutPlatformTokensInput, ProjectUncheckedCreateWithoutPlatformTokensInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutPlatformTokensInput
+    connect?: ProjectWhereUniqueInput
+  }
+
+  export type EnumPlatformTypeFieldUpdateOperationsInput = {
+    set?: $Enums.PlatformType
+  }
+
+  export type EnumPlatformTokenStatusFieldUpdateOperationsInput = {
+    set?: $Enums.PlatformTokenStatus
+  }
+
+  export type ProjectUpdateOneRequiredWithoutPlatformTokensNestedInput = {
+    create?: XOR<ProjectCreateWithoutPlatformTokensInput, ProjectUncheckedCreateWithoutPlatformTokensInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutPlatformTokensInput
+    upsert?: ProjectUpsertWithoutPlatformTokensInput
+    connect?: ProjectWhereUniqueInput
+    update?: XOR<XOR<ProjectUpdateToOneWithWhereWithoutPlatformTokensInput, ProjectUpdateWithoutPlatformTokensInput>, ProjectUncheckedUpdateWithoutPlatformTokensInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -34833,6 +36495,57 @@ export namespace Prisma {
     _max?: NestedEnumuserTypeFilter<$PrismaModel>
   }
 
+  export type NestedEnumDataSourceFilter<$PrismaModel = never> = {
+    equals?: $Enums.DataSource | EnumDataSourceFieldRefInput<$PrismaModel>
+    in?: $Enums.DataSource[] | ListEnumDataSourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DataSource[] | ListEnumDataSourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumDataSourceFilter<$PrismaModel> | $Enums.DataSource
+  }
+
+  export type NestedEnumDataSourceWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DataSource | EnumDataSourceFieldRefInput<$PrismaModel>
+    in?: $Enums.DataSource[] | ListEnumDataSourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DataSource[] | ListEnumDataSourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumDataSourceWithAggregatesFilter<$PrismaModel> | $Enums.DataSource
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDataSourceFilter<$PrismaModel>
+    _max?: NestedEnumDataSourceFilter<$PrismaModel>
+  }
+
+  export type NestedEnumPlatformTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.PlatformType | EnumPlatformTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.PlatformType[] | ListEnumPlatformTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PlatformType[] | ListEnumPlatformTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumPlatformTypeFilter<$PrismaModel> | $Enums.PlatformType
+  }
+
+  export type NestedEnumPlatformTokenStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.PlatformTokenStatus | EnumPlatformTokenStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PlatformTokenStatus[] | ListEnumPlatformTokenStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PlatformTokenStatus[] | ListEnumPlatformTokenStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumPlatformTokenStatusFilter<$PrismaModel> | $Enums.PlatformTokenStatus
+  }
+
+  export type NestedEnumPlatformTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PlatformType | EnumPlatformTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.PlatformType[] | ListEnumPlatformTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PlatformType[] | ListEnumPlatformTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumPlatformTypeWithAggregatesFilter<$PrismaModel> | $Enums.PlatformType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPlatformTypeFilter<$PrismaModel>
+    _max?: NestedEnumPlatformTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumPlatformTokenStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PlatformTokenStatus | EnumPlatformTokenStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PlatformTokenStatus[] | ListEnumPlatformTokenStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PlatformTokenStatus[] | ListEnumPlatformTokenStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumPlatformTokenStatusWithAggregatesFilter<$PrismaModel> | $Enums.PlatformTokenStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPlatformTokenStatusFilter<$PrismaModel>
+    _max?: NestedEnumPlatformTokenStatusFilter<$PrismaModel>
+  }
+
   export type CalculationCreateWithoutUserInput = {
     id?: string
     provider: $Enums.CloudProvider
@@ -35343,12 +37056,14 @@ export namespace Prisma {
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
+    dataSource?: $Enums.DataSource
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProjectsInput
     agentRuns?: AgentRunCreateNestedManyWithoutProjectInput
     emissionRecords?: EmissionRecordCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialCreateNestedManyWithoutProjectInput
+    platformTokens?: PlatformTokenCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutApiKeysInput = {
@@ -35363,12 +37078,14 @@ export namespace Prisma {
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
+    dataSource?: $Enums.DataSource
     userId: string
     createdAt?: Date | string
     updatedAt?: Date | string
     agentRuns?: AgentRunUncheckedCreateNestedManyWithoutProjectInput
     emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialUncheckedCreateNestedManyWithoutProjectInput
+    platformTokens?: PlatformTokenUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutApiKeysInput = {
@@ -35399,12 +37116,14 @@ export namespace Prisma {
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProjectsNestedInput
     agentRuns?: AgentRunUpdateManyWithoutProjectNestedInput
     emissionRecords?: EmissionRecordUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUpdateManyWithoutProjectNestedInput
+    platformTokens?: PlatformTokenUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutApiKeysInput = {
@@ -35419,12 +37138,14 @@ export namespace Prisma {
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     userId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agentRuns?: AgentRunUncheckedUpdateManyWithoutProjectNestedInput
     emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUncheckedUpdateManyWithoutProjectNestedInput
+    platformTokens?: PlatformTokenUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateWithoutAgentRunsInput = {
@@ -35439,12 +37160,14 @@ export namespace Prisma {
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
+    dataSource?: $Enums.DataSource
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProjectsInput
     emissionRecords?: EmissionRecordCreateNestedManyWithoutProjectInput
     apiKeys?: ApiKeyCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialCreateNestedManyWithoutProjectInput
+    platformTokens?: PlatformTokenCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutAgentRunsInput = {
@@ -35459,12 +37182,14 @@ export namespace Prisma {
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
+    dataSource?: $Enums.DataSource
     userId: string
     createdAt?: Date | string
     updatedAt?: Date | string
     emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutProjectInput
     apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialUncheckedCreateNestedManyWithoutProjectInput
+    platformTokens?: PlatformTokenUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutAgentRunsInput = {
@@ -35495,12 +37220,14 @@ export namespace Prisma {
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProjectsNestedInput
     emissionRecords?: EmissionRecordUpdateManyWithoutProjectNestedInput
     apiKeys?: ApiKeyUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUpdateManyWithoutProjectNestedInput
+    platformTokens?: PlatformTokenUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutAgentRunsInput = {
@@ -35515,12 +37242,14 @@ export namespace Prisma {
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     userId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutProjectNestedInput
     apiKeys?: ApiKeyUncheckedUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUncheckedUpdateManyWithoutProjectNestedInput
+    platformTokens?: PlatformTokenUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateWithoutEmissionRecordsInput = {
@@ -35535,12 +37264,14 @@ export namespace Prisma {
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
+    dataSource?: $Enums.DataSource
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProjectsInput
     agentRuns?: AgentRunCreateNestedManyWithoutProjectInput
     apiKeys?: ApiKeyCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialCreateNestedManyWithoutProjectInput
+    platformTokens?: PlatformTokenCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutEmissionRecordsInput = {
@@ -35555,12 +37286,14 @@ export namespace Prisma {
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
+    dataSource?: $Enums.DataSource
     userId: string
     createdAt?: Date | string
     updatedAt?: Date | string
     agentRuns?: AgentRunUncheckedCreateNestedManyWithoutProjectInput
     apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialUncheckedCreateNestedManyWithoutProjectInput
+    platformTokens?: PlatformTokenUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutEmissionRecordsInput = {
@@ -35591,12 +37324,14 @@ export namespace Prisma {
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProjectsNestedInput
     agentRuns?: AgentRunUpdateManyWithoutProjectNestedInput
     apiKeys?: ApiKeyUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUpdateManyWithoutProjectNestedInput
+    platformTokens?: PlatformTokenUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutEmissionRecordsInput = {
@@ -35611,12 +37346,14 @@ export namespace Prisma {
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     userId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agentRuns?: AgentRunUncheckedUpdateManyWithoutProjectNestedInput
     apiKeys?: ApiKeyUncheckedUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUncheckedUpdateManyWithoutProjectNestedInput
+    platformTokens?: PlatformTokenUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProfileCreateWithoutUserInput = {
@@ -35662,12 +37399,14 @@ export namespace Prisma {
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
+    dataSource?: $Enums.DataSource
     createdAt?: Date | string
     updatedAt?: Date | string
     agentRuns?: AgentRunCreateNestedManyWithoutProjectInput
     emissionRecords?: EmissionRecordCreateNestedManyWithoutProjectInput
     apiKeys?: ApiKeyCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialCreateNestedManyWithoutProjectInput
+    platformTokens?: PlatformTokenCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutUserInput = {
@@ -35682,12 +37421,14 @@ export namespace Prisma {
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
+    dataSource?: $Enums.DataSource
     createdAt?: Date | string
     updatedAt?: Date | string
     agentRuns?: AgentRunUncheckedCreateNestedManyWithoutProjectInput
     emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutProjectInput
     apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialUncheckedCreateNestedManyWithoutProjectInput
+    platformTokens?: PlatformTokenUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutUserInput = {
@@ -35809,6 +37550,7 @@ export namespace Prisma {
     connectedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     lastPingAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     carbonBudgetKg?: FloatNullableFilter<"Project"> | number | null
+    dataSource?: EnumDataSourceFilter<"Project"> | $Enums.DataSource
     userId?: StringFilter<"Project"> | string
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
@@ -36072,6 +37814,42 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type PlatformTokenCreateWithoutProjectInput = {
+    id?: string
+    platform: $Enums.PlatformType
+    encryptedToken: string
+    projectSlug?: string | null
+    status?: $Enums.PlatformTokenStatus
+    lastVerifiedAt?: Date | string | null
+    lastError?: string | null
+    failCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PlatformTokenUncheckedCreateWithoutProjectInput = {
+    id?: string
+    platform: $Enums.PlatformType
+    encryptedToken: string
+    projectSlug?: string | null
+    status?: $Enums.PlatformTokenStatus
+    lastVerifiedAt?: Date | string | null
+    lastError?: string | null
+    failCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PlatformTokenCreateOrConnectWithoutProjectInput = {
+    where: PlatformTokenWhereUniqueInput
+    create: XOR<PlatformTokenCreateWithoutProjectInput, PlatformTokenUncheckedCreateWithoutProjectInput>
+  }
+
+  export type PlatformTokenCreateManyProjectInputEnvelope = {
+    data: PlatformTokenCreateManyProjectInput | PlatformTokenCreateManyProjectInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutProjectsInput = {
     update: XOR<UserUpdateWithoutProjectsInput, UserUncheckedUpdateWithoutProjectsInput>
     create: XOR<UserCreateWithoutProjectsInput, UserUncheckedCreateWithoutProjectsInput>
@@ -36257,6 +38035,39 @@ export namespace Prisma {
     token?: StringFilter<"PlatformCredential"> | string
     createdAt?: DateTimeFilter<"PlatformCredential"> | Date | string
     updatedAt?: DateTimeFilter<"PlatformCredential"> | Date | string
+  }
+
+  export type PlatformTokenUpsertWithWhereUniqueWithoutProjectInput = {
+    where: PlatformTokenWhereUniqueInput
+    update: XOR<PlatformTokenUpdateWithoutProjectInput, PlatformTokenUncheckedUpdateWithoutProjectInput>
+    create: XOR<PlatformTokenCreateWithoutProjectInput, PlatformTokenUncheckedCreateWithoutProjectInput>
+  }
+
+  export type PlatformTokenUpdateWithWhereUniqueWithoutProjectInput = {
+    where: PlatformTokenWhereUniqueInput
+    data: XOR<PlatformTokenUpdateWithoutProjectInput, PlatformTokenUncheckedUpdateWithoutProjectInput>
+  }
+
+  export type PlatformTokenUpdateManyWithWhereWithoutProjectInput = {
+    where: PlatformTokenScalarWhereInput
+    data: XOR<PlatformTokenUpdateManyMutationInput, PlatformTokenUncheckedUpdateManyWithoutProjectInput>
+  }
+
+  export type PlatformTokenScalarWhereInput = {
+    AND?: PlatformTokenScalarWhereInput | PlatformTokenScalarWhereInput[]
+    OR?: PlatformTokenScalarWhereInput[]
+    NOT?: PlatformTokenScalarWhereInput | PlatformTokenScalarWhereInput[]
+    id?: StringFilter<"PlatformToken"> | string
+    projectId?: StringFilter<"PlatformToken"> | string
+    platform?: EnumPlatformTypeFilter<"PlatformToken"> | $Enums.PlatformType
+    encryptedToken?: StringFilter<"PlatformToken"> | string
+    projectSlug?: StringNullableFilter<"PlatformToken"> | string | null
+    status?: EnumPlatformTokenStatusFilter<"PlatformToken"> | $Enums.PlatformTokenStatus
+    lastVerifiedAt?: DateTimeNullableFilter<"PlatformToken"> | Date | string | null
+    lastError?: StringNullableFilter<"PlatformToken"> | string | null
+    failCount?: IntFilter<"PlatformToken"> | number
+    createdAt?: DateTimeFilter<"PlatformToken"> | Date | string
+    updatedAt?: DateTimeFilter<"PlatformToken"> | Date | string
   }
 
   export type UserCreateWithoutProfileInput = {
@@ -36499,12 +38310,14 @@ export namespace Prisma {
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
+    dataSource?: $Enums.DataSource
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProjectsInput
     agentRuns?: AgentRunCreateNestedManyWithoutProjectInput
     emissionRecords?: EmissionRecordCreateNestedManyWithoutProjectInput
     apiKeys?: ApiKeyCreateNestedManyWithoutProjectInput
+    platformTokens?: PlatformTokenCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutPlatformCredentialsInput = {
@@ -36519,12 +38332,14 @@ export namespace Prisma {
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
+    dataSource?: $Enums.DataSource
     userId: string
     createdAt?: Date | string
     updatedAt?: Date | string
     agentRuns?: AgentRunUncheckedCreateNestedManyWithoutProjectInput
     emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutProjectInput
     apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutProjectInput
+    platformTokens?: PlatformTokenUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutPlatformCredentialsInput = {
@@ -36555,12 +38370,14 @@ export namespace Prisma {
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProjectsNestedInput
     agentRuns?: AgentRunUpdateManyWithoutProjectNestedInput
     emissionRecords?: EmissionRecordUpdateManyWithoutProjectNestedInput
     apiKeys?: ApiKeyUpdateManyWithoutProjectNestedInput
+    platformTokens?: PlatformTokenUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutPlatformCredentialsInput = {
@@ -36575,12 +38392,118 @@ export namespace Prisma {
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     userId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agentRuns?: AgentRunUncheckedUpdateManyWithoutProjectNestedInput
     emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutProjectNestedInput
     apiKeys?: ApiKeyUncheckedUpdateManyWithoutProjectNestedInput
+    platformTokens?: PlatformTokenUncheckedUpdateManyWithoutProjectNestedInput
+  }
+
+  export type ProjectCreateWithoutPlatformTokensInput = {
+    id?: string
+    name: string
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    sdkConnected?: boolean
+    agenticMode?: boolean
+    connectedAt?: Date | string | null
+    lastPingAt?: Date | string | null
+    carbonBudgetKg?: number | null
+    dataSource?: $Enums.DataSource
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutProjectsInput
+    agentRuns?: AgentRunCreateNestedManyWithoutProjectInput
+    emissionRecords?: EmissionRecordCreateNestedManyWithoutProjectInput
+    apiKeys?: ApiKeyCreateNestedManyWithoutProjectInput
+    platformCredentials?: PlatformCredentialCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectUncheckedCreateWithoutPlatformTokensInput = {
+    id?: string
+    name: string
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    sdkConnected?: boolean
+    agenticMode?: boolean
+    connectedAt?: Date | string | null
+    lastPingAt?: Date | string | null
+    carbonBudgetKg?: number | null
+    dataSource?: $Enums.DataSource
+    userId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    agentRuns?: AgentRunUncheckedCreateNestedManyWithoutProjectInput
+    emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutProjectInput
+    apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutProjectInput
+    platformCredentials?: PlatformCredentialUncheckedCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectCreateOrConnectWithoutPlatformTokensInput = {
+    where: ProjectWhereUniqueInput
+    create: XOR<ProjectCreateWithoutPlatformTokensInput, ProjectUncheckedCreateWithoutPlatformTokensInput>
+  }
+
+  export type ProjectUpsertWithoutPlatformTokensInput = {
+    update: XOR<ProjectUpdateWithoutPlatformTokensInput, ProjectUncheckedUpdateWithoutPlatformTokensInput>
+    create: XOR<ProjectCreateWithoutPlatformTokensInput, ProjectUncheckedCreateWithoutPlatformTokensInput>
+    where?: ProjectWhereInput
+  }
+
+  export type ProjectUpdateToOneWithWhereWithoutPlatformTokensInput = {
+    where?: ProjectWhereInput
+    data: XOR<ProjectUpdateWithoutPlatformTokensInput, ProjectUncheckedUpdateWithoutPlatformTokensInput>
+  }
+
+  export type ProjectUpdateWithoutPlatformTokensInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    agenticMode?: BoolFieldUpdateOperationsInput | boolean
+    connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutProjectsNestedInput
+    agentRuns?: AgentRunUpdateManyWithoutProjectNestedInput
+    emissionRecords?: EmissionRecordUpdateManyWithoutProjectNestedInput
+    apiKeys?: ApiKeyUpdateManyWithoutProjectNestedInput
+    platformCredentials?: PlatformCredentialUpdateManyWithoutProjectNestedInput
+  }
+
+  export type ProjectUncheckedUpdateWithoutPlatformTokensInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    agenticMode?: BoolFieldUpdateOperationsInput | boolean
+    connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
+    userId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agentRuns?: AgentRunUncheckedUpdateManyWithoutProjectNestedInput
+    emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutProjectNestedInput
+    apiKeys?: ApiKeyUncheckedUpdateManyWithoutProjectNestedInput
+    platformCredentials?: PlatformCredentialUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type CalculationCreateManyUserInput = {
@@ -36795,6 +38718,7 @@ export namespace Prisma {
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
     carbonBudgetKg?: number | null
+    dataSource?: $Enums.DataSource
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -36817,12 +38741,14 @@ export namespace Prisma {
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agentRuns?: AgentRunUpdateManyWithoutProjectNestedInput
     emissionRecords?: EmissionRecordUpdateManyWithoutProjectNestedInput
     apiKeys?: ApiKeyUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUpdateManyWithoutProjectNestedInput
+    platformTokens?: PlatformTokenUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutUserInput = {
@@ -36837,12 +38763,14 @@ export namespace Prisma {
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agentRuns?: AgentRunUncheckedUpdateManyWithoutProjectNestedInput
     emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutProjectNestedInput
     apiKeys?: ApiKeyUncheckedUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUncheckedUpdateManyWithoutProjectNestedInput
+    platformTokens?: PlatformTokenUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateManyWithoutUserInput = {
@@ -36857,6 +38785,7 @@ export namespace Prisma {
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -36941,6 +38870,19 @@ export namespace Prisma {
     id?: string
     provider: $Enums.CloudProvider
     token: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PlatformTokenCreateManyProjectInput = {
+    id?: string
+    platform: $Enums.PlatformType
+    encryptedToken: string
+    projectSlug?: string | null
+    status?: $Enums.PlatformTokenStatus
+    lastVerifiedAt?: Date | string | null
+    lastError?: string | null
+    failCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -37143,6 +39085,45 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type PlatformTokenUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    platform?: EnumPlatformTypeFieldUpdateOperationsInput | $Enums.PlatformType
+    encryptedToken?: StringFieldUpdateOperationsInput | string
+    projectSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPlatformTokenStatusFieldUpdateOperationsInput | $Enums.PlatformTokenStatus
+    lastVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    failCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlatformTokenUncheckedUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    platform?: EnumPlatformTypeFieldUpdateOperationsInput | $Enums.PlatformType
+    encryptedToken?: StringFieldUpdateOperationsInput | string
+    projectSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPlatformTokenStatusFieldUpdateOperationsInput | $Enums.PlatformTokenStatus
+    lastVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    failCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlatformTokenUncheckedUpdateManyWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    platform?: EnumPlatformTypeFieldUpdateOperationsInput | $Enums.PlatformType
+    encryptedToken?: StringFieldUpdateOperationsInput | string
+    projectSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPlatformTokenStatusFieldUpdateOperationsInput | $Enums.PlatformTokenStatus
+    lastVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    failCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
 
 
   /**
@@ -37248,6 +39229,10 @@ export namespace Prisma {
      * @deprecated Use PlatformCredentialDefaultArgs instead
      */
     export type PlatformCredentialArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = PlatformCredentialDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use PlatformTokenDefaultArgs instead
+     */
+    export type PlatformTokenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = PlatformTokenDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany

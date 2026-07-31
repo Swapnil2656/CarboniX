@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { handleConnect } from './connect.controller';
+import { handleConnect, handleConnectPlatformToken, handleRevokePlatformToken } from './connect.controller';
+import { authenticate } from '../../middleware/auth.middleware';
 
 const router = Router();
 
@@ -7,5 +8,14 @@ const router = Router();
 // Called by the CarboniX CLI after `npx @carbonix/cli init --key <key>`
 // Validates SDK is properly initialized in the user's project
 router.post('/ping', handleConnect);
+
+// POST /api/v1/connect/platform-token
+// Connect a real platform account (Vercel, Netlify, Railway, Render).
+// Verifies the token before saving. Sets project.dataSource = LIVE.
+router.post('/platform-token', authenticate, handleConnectPlatformToken);
+
+// DELETE /api/v1/connect/platform-token/:platform
+// Revoke/remove a connected platform token. Resets dataSource to NO_CREDS if no tokens remain.
+router.delete('/platform-token/:platform', authenticate, handleRevokePlatformToken);
 
 export default router;

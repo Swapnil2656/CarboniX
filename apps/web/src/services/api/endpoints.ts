@@ -172,3 +172,18 @@ export const agentsApi = {
     });
   },
 };
+
+// ─── Connect Endpoints ───────────────────────────────────────────────────────
+export const connectApi = {
+  connectPlatformToken: async (payload: { projectId: string; platform: string; token: string; projectSlug?: string }): Promise<any> => {
+    return fetchClient('/connect/platform-token', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+  revokePlatformToken: async (projectId: string, platform: string): Promise<any> => {
+    return fetchClient(`/connect/platform-token/${encodeURIComponent(platform)}?projectId=${encodeURIComponent(projectId)}`, {
+      method: 'DELETE',
+    });
+  },
+};

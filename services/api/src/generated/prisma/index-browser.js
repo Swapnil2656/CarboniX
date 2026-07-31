@@ -424,6 +424,7 @@ exports.Prisma.ProjectScalarFieldEnum = {
   connectedAt: 'connectedAt',
   lastPingAt: 'lastPingAt',
   carbonBudgetKg: 'carbonBudgetKg',
+  dataSource: 'dataSource',
   userId: 'userId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -478,6 +479,20 @@ exports.Prisma.PlatformCredentialScalarFieldEnum = {
   projectId: 'projectId',
   provider: 'provider',
   token: 'token',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PlatformTokenScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  platform: 'platform',
+  encryptedToken: 'encryptedToken',
+  projectSlug: 'projectSlug',
+  status: 'status',
+  lastVerifiedAt: 'lastVerifiedAt',
+  lastError: 'lastError',
+  failCount: 'failCount',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -631,6 +646,26 @@ exports.userType = exports.$Enums.userType = {
   USER: 'USER'
 };
 
+exports.DataSource = exports.$Enums.DataSource = {
+  NO_CREDS: 'NO_CREDS',
+  MOCK_DEMO: 'MOCK_DEMO',
+  LIVE: 'LIVE'
+};
+
+exports.PlatformType = exports.$Enums.PlatformType = {
+  VERCEL: 'VERCEL',
+  NETLIFY: 'NETLIFY',
+  RAILWAY: 'RAILWAY',
+  RENDER: 'RENDER'
+};
+
+exports.PlatformTokenStatus = exports.$Enums.PlatformTokenStatus = {
+  ACTIVE: 'ACTIVE',
+  INVALID: 'INVALID',
+  EXPIRED: 'EXPIRED',
+  REVOKED: 'REVOKED'
+};
+
 exports.Prisma.ModelName = {
   MobileUser: 'MobileUser',
   Calculation: 'Calculation',
@@ -653,7 +688,8 @@ exports.Prisma.ModelName = {
   VerificationToken: 'VerificationToken',
   TeamMember: 'TeamMember',
   ChatHistory: 'ChatHistory',
-  PlatformCredential: 'PlatformCredential'
+  PlatformCredential: 'PlatformCredential',
+  PlatformToken: 'PlatformToken'
 };
 
 /**

@@ -110,6 +110,26 @@ enum GridIntensitySource {
   CCF_DEFAULT
 }
 
+enum DataSource {
+  NO_CREDS // No platform token connected — never collect or show real data
+  MOCK_DEMO // Demo/mock data explicitly acknowledged — always badge as demo
+  LIVE // Verified platform token present — real usage-based collection
+}
+
+enum PlatformType {
+  VERCEL
+  NETLIFY
+  RAILWAY
+  RENDER
+}
+
+enum PlatformTokenStatus {
+  ACTIVE // Last verification passed
+  INVALID // 401/403 from platform API — user must reconnect
+  EXPIRED // Token has an expiry and it has passed
+  REVOKED // Manually revoked by user
+}
+
 // ─── Mobile Users ───────────────────────────────────────────
 
 model MobileUser {
@@ -587,18 +607,25 @@ model Project {
   connectedAt    DateTime?
   lastPingAt     DateTime?
   carbonBudgetKg Float?         @default(100) // Monthly CO₂ budget in kg
-  userId         String
-  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Data source state — never silently blend mock and real data
+  dataSource DataSource @default(NO_CREDS)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   agentRuns           AgentRun[]
   emissionRecords     EmissionRecord[]
   apiKeys             ApiKey[]
+  // TODO: drop PlatformCredential after all enactRegionSwitch call sites are migrated to PlatformToken
   platformCredentials PlatformCredential[]
+  platformTokens      PlatformToken[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+  @@index([dataSource])
 }
 
 // Created automatically on signup. Add app-specific profile fields here.
@@ -656,16 +683,42 @@ model ChatHistory {
   updatedAt DateTime @updatedAt
 }
 
-// ─── Platform Credentials ───────────────────────────────────
+// ─── Platform Credentials (LEGACY — kept for enactRegionSwitch backward-compat) ────
+// TODO: migrate enactRegionSwitch to read from PlatformToken, then drop this model
 
 model PlatformCredential {
   id        String        @id @default(cuid())
   projectId String
   project   Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
   provider  CloudProvider // e.g. VERCEL, NETLIFY, AWS
-  token     String // The API token or Installation ID
+  token     String // The API token or Installation ID (plaintext — legacy)
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
 
   @@unique([projectId, provider])
+}
+
+// ─── Platform Tokens (NEW — encrypted, with status tracking) ───────────────────
+
+model PlatformToken {
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  platform       PlatformType // VERCEL | NETLIFY | RAILWAY | RENDER
+  encryptedToken String // AES-256-GCM encrypted; key in TOKEN_ENCRYPTION_KEY env
+  projectSlug    String? // Platform project slug/ID for scoping API calls
+  status         PlatformTokenStatus @default(ACTIVE)
+
+  // Verification tracking
+  lastVerifiedAt DateTime?
+  lastError      String? // Last error message from platform API (for UI display)
+  failCount      Int       @default(0) // Consecutive auth failures before INVALID
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, platform])
+  @@index([projectId, status])
+  @@index([status])
 }
