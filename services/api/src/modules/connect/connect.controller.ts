@@ -2,7 +2,8 @@ import { Request, Response } from 'express';
 import { createHash } from 'crypto';
 import { prisma } from '../../lib/prisma';
 import { AuthRequest } from '../../middleware/auth.middleware';
-import { encryptToken, verifyPlatformToken } from '../../lib/platformTokenService';
+import { encryptToken } from '../../lib/platformTokenService';
+import { platformRegistry } from '@carbonix/agents';
 
 
 // ─── Error Codes ──────────────────────────────────────────────────────────────
@@ -219,11 +220,11 @@ export async function handleConnectPlatformToken(req: AuthRequest, res: Response
       });
     }
 
-    const allowedPlatforms = ['VERCEL', 'NETLIFY', 'RAILWAY', 'RENDER'];
-    if (!allowedPlatforms.includes(platform)) {
+    const adapter = platformRegistry.getAdapter(platform);
+    if (!adapter) {
       return res.status(400).json({
         success: false,
-        error: `Unsupported platform "${platform}". Allowed: ${allowedPlatforms.join(', ')}`,
+        error: `Unsupported platform "${platform}". Allowed: ${platformRegistry.getAllPlatforms().join(', ')}`,
       });
     }
 
@@ -235,11 +236,7 @@ export async function handleConnectPlatformToken(req: AuthRequest, res: Response
 
     // Verify the token against the real platform API before saving anything
     console.log(`[CONNECT] Verifying ${platform} token for project ${projectId}...`);
-    const verifyResult = await verifyPlatformToken(
-      platform as 'VERCEL' | 'NETLIFY' | 'RAILWAY' | 'RENDER',
-      token,
-      projectSlug
-    );
+    const verifyResult = await adapter.verifyToken(token, projectSlug);
 
     if (!verifyResult.valid) {
       return res.status(422).json({
@@ -356,3 +353,35 @@ export async function handleRevokePlatformToken(req: AuthRequest, res: Response)
   }
 }
 
+// ─── Platform Discovery ───────────────────────────────────────────────────────
+
+export async function handleGetPlatforms(req: AuthRequest, res: Response) {
+  try {
+    const platforms = platformRegistry.getAllPlatforms().map(p => {
+      let icon = 'cloud';
+      let description = `Connect via ${p} Access Token`;
+      let needsProjectSlug = true;
+      let docsUrl = '#';
+
+      if (p === 'VERCEL') { icon = 'change_history'; docsUrl = 'https://vercel.com/account/tokens'; }
+      if (p === 'NETLIFY') { icon = 'diamond'; docsUrl = 'https://app.netlify.com/user/applications#personal-access-tokens'; }
+      if (p === 'RAILWAY') { icon = 'train'; docsUrl = 'https://docs.railway.app/reference/public-api#project-tokens'; needsProjectSlug = false; }
+      if (p === 'RENDER') { icon = 'cloud'; docsUrl = 'https://dashboard.render.com/user/settings#api-keys'; needsProjectSlug = false; }
+      if (p === 'SUPABASE') { icon = 'database'; docsUrl = 'https://supabase.com/dashboard/account/tokens'; }
+
+      return {
+        id: p,
+        name: p.charAt(0) + p.slice(1).toLowerCase(),
+        icon,
+        description,
+        docsUrl,
+        needsProjectSlug
+      };
+    });
+
+    return res.status(200).json({ success: true, data: platforms });
+  } catch (error: any) {
+    console.error('[GET_PLATFORMS] Error:', error);
+    return res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+}

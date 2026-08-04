@@ -4,51 +4,14 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { adminApi, connectApi } from '@/services/api/endpoints';
 
-type Platform = 'VERCEL' | 'NETLIFY' | 'RAILWAY' | 'RENDER';
-
 interface PlatformConfig {
-  id: Platform;
+  id: string;
   name: string;
   icon: string;
   description: string;
   docsUrl: string;
   needsProjectSlug: boolean;
 }
-
-const PLATFORMS: PlatformConfig[] = [
-  {
-    id: 'VERCEL',
-    name: 'Vercel',
-    icon: 'change_history',
-    description: 'Connect via Vercel Access Token to read deployments and usage metrics.',
-    docsUrl: 'https://vercel.com/account/tokens',
-    needsProjectSlug: true,
-  },
-  {
-    id: 'NETLIFY',
-    name: 'Netlify',
-    icon: 'diamond',
-    description: 'Connect via Netlify Personal Access Token to read site analytics.',
-    docsUrl: 'https://app.netlify.com/user/applications#personal-access-tokens',
-    needsProjectSlug: true,
-  },
-  {
-    id: 'RAILWAY',
-    name: 'Railway',
-    icon: 'train',
-    description: 'Connect via Railway Project Token.',
-    docsUrl: 'https://docs.railway.app/reference/public-api#project-tokens',
-    needsProjectSlug: false,
-  },
-  {
-    id: 'RENDER',
-    name: 'Render',
-    icon: 'cloud',
-    description: 'Connect via Render API Key.',
-    docsUrl: 'https://dashboard.render.com/user/settings#api-keys',
-    needsProjectSlug: false,
-  }
-];
 
 export default function ProjectSettingsPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -57,16 +20,35 @@ export default function ProjectSettingsPage({ params }: { params: { id: string }
   const [error, setError] = useState<string | null>(null);
 
   // Form states
-  const [selectedPlatform, setSelectedPlatform] = useState<Platform | null>(null);
+  const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
   const [tokenValue, setTokenValue] = useState('');
   const [projectSlug, setProjectSlug] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectError, setConnectError] = useState<string | null>(null);
   const [connectSuccess, setConnectSuccess] = useState<string | null>(null);
 
+  // Platform Discovery
+  const [availablePlatforms, setAvailablePlatforms] = useState<PlatformConfig[]>([]);
+
+  // Agent State
+  const [isGeneratingAgent, setIsGeneratingAgent] = useState(false);
+  const [newAgentKey, setNewAgentKey] = useState<string | null>(null);
+
   useEffect(() => {
     fetchProject();
+    fetchPlatforms();
   }, [params.id]);
+
+  const fetchPlatforms = async () => {
+    try {
+      const res = await connectApi.getPlatforms();
+      if (res.success) {
+        setAvailablePlatforms(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch platforms', err);
+    }
+  };
 
   const fetchProject = async () => {
     try {
@@ -88,7 +70,7 @@ export default function ProjectSettingsPage({ params }: { params: { id: string }
     if (!project?.platformTokens) return [];
     return project.platformTokens
       .filter((pt: any) => pt.status === 'ACTIVE')
-      .map((pt: any) => pt.platform as Platform);
+      .map((pt: any) => pt.platform as string);
   }, [project]);
 
   const handleConnect = async (e: React.FormEvent) => {
@@ -123,7 +105,7 @@ export default function ProjectSettingsPage({ params }: { params: { id: string }
     }
   };
 
-  const handleRevoke = async (platform: Platform) => {
+  const handleRevoke = async (platform: string) => {
     if (!confirm(`Are you sure you want to revoke the ${platform} connection?`)) return;
     try {
       setConnectError(null);
@@ -192,12 +174,18 @@ export default function ProjectSettingsPage({ params }: { params: { id: string }
         </div>
 
         <div className="p-6 space-y-8">
-          {PLATFORMS.map((platform) => {
-            const isConnected = connectedPlatforms.includes(platform.id);
-            const isSelected = selectedPlatform === platform.id;
+          {availablePlatforms.length === 0 ? (
+            <div className="text-sm text-on-surface-variant flex items-center justify-center py-4">
+              <span className="material-symbols-outlined animate-spin mr-2">progress_activity</span>
+              Loading platforms...
+            </div>
+          ) : (
+            availablePlatforms.map((platform) => {
+              const isConnected = connectedPlatforms.includes(platform.id);
+              const isSelected = selectedPlatform === platform.id;
 
-            return (
-              <div key={platform.id} className={`border rounded-xl p-5 transition-all ${isSelected ? 'border-primary bg-primary/5' : 'border-outline-variant bg-surface-container'}`}>
+              return (
+                <div key={platform.id} className={`border rounded-xl p-5 transition-all ${isSelected ? 'border-primary bg-primary/5' : 'border-outline-variant bg-surface-container'}`}>
                 <div className="flex items-start justify-between">
                   <div className="flex gap-4">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${isConnected ? 'bg-emerald-500/10 text-emerald-500' : 'bg-surface border border-outline-variant text-on-surface-variant'}`}>
@@ -285,7 +273,74 @@ export default function ProjectSettingsPage({ params }: { params: { id: string }
                 )}
               </div>
             );
-          })}
+          }))}
+        </div>
+      </div>
+
+      {/* Self-Hosted Agent Section */}
+      <div className="bg-surface border border-outline-variant rounded-xl overflow-hidden mt-8">
+        <div className="px-6 py-5 border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
+          <div>
+            <h2 className="font-semibold text-on-surface text-lg">Self-Hosted Server Agent</h2>
+            <p className="text-sm text-on-surface-variant">Hosting your own servers? Run the CarboniX agent daemon to stream live power metrics directly to this project.</p>
+          </div>
+        </div>
+
+        <div className="p-6">
+          {!newAgentKey ? (
+            <div>
+              <p className="text-on-surface-variant text-sm mb-4">
+                Generate a secure API key to authenticate your server. You will use this key when starting the agent on your machine.
+              </p>
+              <button 
+                onClick={async () => {
+                  try {
+                    setIsGeneratingAgent(true);
+                    const res = await adminApi.createApiKey({
+                      name: `Agent Key for ${project?.name}`,
+                      permissions: ['agent_control'],
+                      expiration: 'never',
+                      projectId: params.id
+                    });
+                    setNewAgentKey(res.key);
+                    await fetchProject(); // Refresh api keys list if needed
+                  } catch (err: any) {
+                    setConnectError(err.message || 'Failed to generate agent key');
+                  } finally {
+                    setIsGeneratingAgent(false);
+                  }
+                }}
+                disabled={isGeneratingAgent}
+                className="bg-primary text-on-primary hover:bg-primary/90 px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                <span className="material-symbols-outlined text-[18px]">key</span>
+                {isGeneratingAgent ? 'Generating...' : 'Generate Agent Key'}
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4 animate-fade-in">
+              <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+                <h3 className="font-medium text-emerald-400 flex items-center gap-2 mb-2">
+                  <span className="material-symbols-outlined">check_circle</span>
+                  Agent Key Generated
+                </h3>
+                <p className="text-sm text-emerald-400/80 mb-4">
+                  Copy this key now. You won't be able to see it again!
+                </p>
+                <code className="block w-full bg-surface border border-outline-variant rounded-lg p-3 text-on-surface font-mono text-sm break-all">
+                  {newAgentKey}
+                </code>
+              </div>
+
+              <div className="mt-6">
+                <h4 className="font-medium text-on-surface mb-2">How to run the agent</h4>
+                <p className="text-sm text-on-surface-variant mb-3">Run this command on your server to start the background telemetry agent:</p>
+                <div className="bg-surface-container-high border border-outline-variant rounded-lg p-4 font-mono text-xs text-on-surface-variant relative">
+                  CARBONIX_API_KEY={newAgentKey} npx @carbonix/cli start
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

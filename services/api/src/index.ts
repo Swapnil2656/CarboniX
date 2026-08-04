@@ -11,6 +11,7 @@ import agentRoutes from './modules/agents/agents.routes';
 import adminRoutes from './modules/admin/admin.routes';
 import connectRoutes from './modules/connect/connect.routes';
 import aiRoutes from './modules/ai/ai.routes';
+import localAgentRoutes from './modules/agent/agent.routes';
 
 import { runCollector, runAnalyst, runReporter, enactRegionSwitch, collectFromPlatform, PlatformAuthError, PlatformTransientError } from '@carbonix/agents';
 import { prisma } from './lib/prisma';
@@ -40,6 +41,7 @@ app.use('/api/v1/agents', agentRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/connect', connectRoutes);
 app.use('/api/v1/ai', aiRoutes);
+app.use('/api/v1/agent', localAgentRoutes);
 
 app.post('/api/v1/public/accept-invite', async (req, res) => {
   try {

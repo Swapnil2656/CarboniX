@@ -15,6 +15,7 @@ const agents_routes_1 = __importDefault(require("./modules/agents/agents.routes"
 const admin_routes_1 = __importDefault(require("./modules/admin/admin.routes"));
 const connect_routes_1 = __importDefault(require("./modules/connect/connect.routes"));
 const ai_routes_1 = __importDefault(require("./modules/ai/ai.routes"));
+const agent_routes_1 = __importDefault(require("./modules/agent/agent.routes"));
 const agents_1 = require("@carbonix/agents");
 const prisma_1 = require("./lib/prisma");
 const platformTokenService_1 = require("./lib/platformTokenService");
@@ -36,6 +37,7 @@ app.use('/api/v1/agents', agents_routes_1.default);
 app.use('/api/v1/admin', admin_routes_1.default);
 app.use('/api/v1/connect', connect_routes_1.default);
 app.use('/api/v1/ai', ai_routes_1.default);
+app.use('/api/v1/agent', agent_routes_1.default);
 app.post('/api/v1/public/accept-invite', async (req, res) => {
     try {
         const { email } = req.body;

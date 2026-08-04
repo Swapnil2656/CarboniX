@@ -3,9 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.handleConnect = handleConnect;
 exports.handleConnectPlatformToken = handleConnectPlatformToken;
 exports.handleRevokePlatformToken = handleRevokePlatformToken;
+exports.handleGetPlatforms = handleGetPlatforms;
 const crypto_1 = require("crypto");
 const prisma_1 = require("../../lib/prisma");
 const platformTokenService_1 = require("../../lib/platformTokenService");
+const agents_1 = require("@carbonix/agents");
 // ─── Error Codes ──────────────────────────────────────────────────────────────
 // These are structured so the CLI can print clean, actionable error messages
 // in the user's terminal.
@@ -190,11 +192,11 @@ async function handleConnectPlatformToken(req, res) {
                 error: 'Missing required fields: projectId, platform, token',
             });
         }
-        const allowedPlatforms = ['VERCEL', 'NETLIFY', 'RAILWAY', 'RENDER'];
-        if (!allowedPlatforms.includes(platform)) {
+        const adapter = agents_1.platformRegistry.getAdapter(platform);
+        if (!adapter) {
             return res.status(400).json({
                 success: false,
-                error: `Unsupported platform "${platform}". Allowed: ${allowedPlatforms.join(', ')}`,
+                error: `Unsupported platform "${platform}". Allowed: ${agents_1.platformRegistry.getAllPlatforms().join(', ')}`,
             });
         }
         // Authorization: confirm the project belongs to the current user
@@ -204,7 +206,7 @@ async function handleConnectPlatformToken(req, res) {
         }
         // Verify the token against the real platform API before saving anything
         console.log(`[CONNECT] Verifying ${platform} token for project ${projectId}...`);
-        const verifyResult = await (0, platformTokenService_1.verifyPlatformToken)(platform, token, projectSlug);
+        const verifyResult = await adapter.verifyToken(token, projectSlug);
         if (!verifyResult.valid) {
             return res.status(422).json({
                 success: false,
@@ -305,5 +307,51 @@ async function handleRevokePlatformToken(req, res) {
     catch (error) {
         console.error('[CONNECT] handleRevokePlatformToken error:', error.message);
         return res.status(500).json({ success: false, error: 'Internal server error.' });
+    }
+}
+// ─── Platform Discovery ───────────────────────────────────────────────────────
+async function handleGetPlatforms(req, res) {
+    try {
+        const platforms = agents_1.platformRegistry.getAllPlatforms().map(p => {
+            let icon = 'cloud';
+            let description = `Connect via ${p} Access Token`;
+            let needsProjectSlug = true;
+            let docsUrl = '#';
+            if (p === 'VERCEL') {
+                icon = 'change_history';
+                docsUrl = 'https://vercel.com/account/tokens';
+            }
+            if (p === 'NETLIFY') {
+                icon = 'diamond';
+                docsUrl = 'https://app.netlify.com/user/applications#personal-access-tokens';
+            }
+            if (p === 'RAILWAY') {
+                icon = 'train';
+                docsUrl = 'https://docs.railway.app/reference/public-api#project-tokens';
+                needsProjectSlug = false;
+            }
+            if (p === 'RENDER') {
+                icon = 'cloud';
+                docsUrl = 'https://dashboard.render.com/user/settings#api-keys';
+                needsProjectSlug = false;
+            }
+            if (p === 'SUPABASE') {
+                icon = 'database';
+                docsUrl = 'https://supabase.com/dashboard/account/tokens';
+            }
+            return {
+                id: p,
+                name: p.charAt(0) + p.slice(1).toLowerCase(),
+                icon,
+                description,
+                docsUrl,
+                needsProjectSlug
+            };
+        });
+        return res.status(200).json({ success: true, data: platforms });
+    }
+    catch (error) {
+        console.error('[GET_PLATFORMS] Error:', error);
+        return res.status(500).json({ success: false, error: 'Internal server error' });
     }
 }

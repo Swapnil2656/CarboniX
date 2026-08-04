@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { handleConnect, handleConnectPlatformToken, handleRevokePlatformToken } from './connect.controller';
+import { handleConnect, handleConnectPlatformToken, handleRevokePlatformToken, handleGetPlatforms } from './connect.controller';
 import { authenticate } from '../../middleware/auth.middleware';
 
 const router = Router();
@@ -17,5 +17,9 @@ router.post('/platform-token', authenticate, handleConnectPlatformToken);
 // DELETE /api/v1/connect/platform-token/:platform
 // Revoke/remove a connected platform token. Resets dataSource to NO_CREDS if no tokens remain.
 router.delete('/platform-token/:platform', authenticate, handleRevokePlatformToken);
+
+// GET /api/v1/connect/platforms
+// Fetch the list of dynamically available platform integrations (Tier 1 & Tier 2)
+router.get('/platforms', authenticate, handleGetPlatforms);
 
 export default router;

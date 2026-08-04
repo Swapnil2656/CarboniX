@@ -4,6 +4,7 @@ import { prisma } from '../../lib/prisma';
 import { resolveTenantContext } from '../admin/admin.controller';
 import { ChatMessage, Role, callNvidiaApi } from '@carbonix/core';
 import { Expo } from 'expo-server-sdk';
+import * as crypto from 'crypto';
 
 const expo = new Expo();
 
@@ -15,7 +16,8 @@ CarboniX is an industrial-grade cloud infrastructure optimization platform. It h
 
 You MUST ALWAYS use a tool to respond.
 1. If the user asks about their projects, use listProjects, switchProjectRegion, etc. Use the data from the tools to give detailed answers about their infrastructure.
-2. If the user asks a general question (like "what is CarboniX?", "hi", "who are you?"), use the "respondToUser" tool to answer them accurately based on your knowledge of CarboniX.
+2. If the user asks to generate a self-hosted agent API key, use generateApiKey to generate a key for their project (use listProjects to find their project ID first).
+3. If the user asks a general question (like "what is CarboniX?", "hi", "who are you?"), use the "respondToUser" tool to answer them accurately based on your knowledge of CarboniX.
 
 NEVER answer without using a tool.
 `;
@@ -84,6 +86,20 @@ const tools = [
         type: 'object',
         properties: {
           projectId: { type: 'string', description: 'The ID of the project.' },
+        },
+        required: ['projectId'],
+      }
+    }
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'generateApiKey',
+      description: 'Generate a new CarboniX agent API key for self-hosted server deployment.',
+      parameters: {
+        type: 'object',
+        properties: {
+          projectId: { type: 'string', description: 'The ID of the project to generate the key for.' },
         },
         required: ['projectId'],
       }
@@ -195,6 +211,33 @@ async function executeTool(name: string, args: any, adminUserId: string, adminUs
       });
       if (!project) return 'Project not found.';
       return `Project '${project.name}' is currently deployed in region '${project.region}'. It is active and tracking carbon emissions.`;
+    }
+    case 'generateApiKey': {
+      const { projectId } = args;
+      
+      const { projectIds } = await resolveTenantContext(adminUserId, adminUserEmail);
+      if (!projectIds.includes(projectId)) {
+        return 'Project not found or you do not have permission to modify it.';
+      }
+
+      const project = await prisma.project.findUnique({ where: { id: projectId } });
+      
+      const rawKey = 'cx_' + crypto.randomBytes(32).toString('hex');
+      const prefix = rawKey.substring(0, 12);
+      const hashedKey = crypto.createHash('sha256').update(rawKey).digest('hex');
+      
+      await prisma.apiKey.create({
+        data: {
+          name: `Agent Key for ${project?.name} (AI Generated)`,
+          prefix,
+          hashedKey,
+          createdBy: adminUserId,
+          projectId: projectId,
+          permissions: ['agent_control'],
+        }
+      });
+      
+      return `Success! I have generated a self-hosted server agent API key for project '${project?.name}'. Your new API key is: ${rawKey} . Please copy it immediately as it will not be shown again.`;
     }
     default:
       return `Unknown tool: ${name}`;

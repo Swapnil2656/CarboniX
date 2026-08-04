@@ -1,70 +1,68 @@
 import { Recommendation } from './analyst';
+import { platformRegistry } from './platform-adapters/registry';
+import { ApplyRegionResult } from './platform-adapters/types';
 
 export interface PlatformCredentialData {
-  provider: string; // e.g. VERCEL, GITHUB
+  provider: string; // e.g. VERCEL, GITHUB, RENDER, RAILWAY, NETLIFY, etc.
   token: string;
 }
 
 export interface EnactResult {
   success: boolean;
-  actionTaken: 'API_UPDATE' | 'PR_OPENED' | 'FAILED';
+  actionTaken: 'API_UPDATE' | 'PR_OPENED' | 'FAILED' | 'MANUAL_REQUIRED';
   message: string;
   details?: any;
 }
 
 /**
- * Enacts a recommended region switch using Platform APIs (e.g., Vercel)
- * or falls back to opening a GitHub PR with declarative config changes.
+ * Enacts a recommended region switch using Platform APIs via the AdapterRegistry.
+ * Falls back to opening a GitHub PR or returning a manual instruction state
+ * depending on platform capabilities.
  */
 export async function enactRegionSwitch(
   projectId: string,
-  projectName: string,
+  projectName: string, // Often used as projectRef/slug
   recommendation: Recommendation,
   credentials: PlatformCredentialData[]
 ): Promise<EnactResult> {
-  const vercelCred = credentials.find(c => c.provider === 'VERCEL');
-  const githubCred = credentials.find(c => c.provider === 'GITHUB');
+  const targetRegion = recommendation.reasoning.match(/to ([a-z0-9-]+)/i)?.[1] || 'us-east-1'; // naive extraction if not explicitly passed
 
-  // Try Vercel API if credential exists
-  if (vercelCred) {
-    try {
-      const targetRegion = recommendation.reasoning.includes('eu-north-1') ? 'arn1' : 'iad1'; // simple mapping
-      
-      const res = await fetch(`https://api.vercel.com/v9/projects/${projectName}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${vercelCred.token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          serverlessFunctionRegion: targetRegion
-        })
-      });
+  // Try to find a connected credential that we have a platform adapter for
+  for (const cred of credentials) {
+    if (cred.provider === 'GITHUB') continue; // Handled separately if needed
 
-      if (res.ok) {
-        return {
-          success: true,
-          actionTaken: 'API_UPDATE',
-          message: `Successfully updated Vercel project region to ${targetRegion} via API.`
-        };
-      } else {
-        console.warn(`[PlatformAgent] Vercel API failed: ${res.statusText}. Falling back to GitHub PR.`);
+    const adapter = platformRegistry.getAdapter(cred.provider);
+    if (adapter) {
+      try {
+        const res: ApplyRegionResult = await adapter.applyRegion(cred.token, projectName, targetRegion);
+        
+        if (res.success) {
+          return {
+            success: true,
+            actionTaken: res.actionTaken || 'API_UPDATE',
+            message: res.message || `Successfully applied region change via ${cred.provider}`,
+            details: res.details
+          };
+        } else if (res.requiresRedeploy) {
+          return {
+            success: false, // Could not auto-apply
+            actionTaken: 'MANUAL_REQUIRED',
+            message: res.message || `${cred.provider} requires manual intervention or redeployment.`
+          };
+        } else {
+          console.warn(`[PlatformAgent] ${cred.provider} applyRegion failed: ${res.error}`);
+        }
+      } catch (e: any) {
+        console.warn(`[PlatformAgent] Exception during ${cred.provider} applyRegion: ${e.message}`);
       }
-    } catch (e) {
-      console.warn(`[PlatformAgent] Vercel API exception: ${(e as Error).message}. Falling back to GitHub PR.`);
     }
   }
 
-  // Try GitHub PR Fallback
+  // Fallback to GitHub PR if we have a GitHub token
+  const githubCred = credentials.find(c => c.provider === 'GITHUB');
   if (githubCred) {
     try {
-      // In a real implementation, we would use the GitHub API to:
-      // 1. Get default branch SHA
-      // 2. Create a new branch
-      // 3. Update vercel.json or netlify.toml
-      // 4. Create a Pull Request
-      
-      // Mocking the successful PR creation for the demo
+      // Mocking successful PR creation
       return {
         success: true,
         actionTaken: 'PR_OPENED',
@@ -83,6 +81,6 @@ export async function enactRegionSwitch(
   return {
     success: false,
     actionTaken: 'FAILED',
-    message: 'No suitable platform credentials found (need VERCEL or GITHUB).'
+    message: 'No suitable platform credentials or supported capabilities found.'
   };
 }

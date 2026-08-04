@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PlatformTransientError = exports.PlatformAuthError = exports.collectFromPlatform = exports.enactRegionSwitch = exports.generateMockInstances = exports.runOrchestrator = exports.runReporter = exports.runGateAgent = exports.runAnalyst = exports.runCollector = void 0;
+exports.platformRegistry = exports.PlatformTransientError = exports.PlatformAuthError = exports.collectFromPlatform = exports.enactRegionSwitch = exports.generateMockInstances = exports.runOrchestrator = exports.runReporter = exports.runGateAgent = exports.runAnalyst = exports.runCollector = void 0;
 var collector_1 = require("./collector");
 Object.defineProperty(exports, "runCollector", { enumerable: true, get: function () { return collector_1.runCollector; } });
 var analyst_1 = require("./analyst");
@@ -19,3 +19,5 @@ var platformCollector_1 = require("./platformCollector");
 Object.defineProperty(exports, "collectFromPlatform", { enumerable: true, get: function () { return platformCollector_1.collectFromPlatform; } });
 Object.defineProperty(exports, "PlatformAuthError", { enumerable: true, get: function () { return platformCollector_1.PlatformAuthError; } });
 Object.defineProperty(exports, "PlatformTransientError", { enumerable: true, get: function () { return platformCollector_1.PlatformTransientError; } });
+var platform_adapters_1 = require("./platform-adapters");
+Object.defineProperty(exports, "platformRegistry", { enumerable: true, get: function () { return platform_adapters_1.platformRegistry; } });

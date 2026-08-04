@@ -105,6 +105,7 @@ export interface CreateApiKeyPayload {
   name: string;
   permissions: string[];
   expiration: string;
+  projectId?: string;
 }
 
 // ─── Emissions ──────────────────────────────────────────────────────────────

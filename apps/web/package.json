@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npx rimraf .next && dotenv -e ../../.env -- next dev",
+    "dev": "npx rimraf .next && dotenv -e ../../.env -- next dev --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "echo No lint",

@@ -264,6 +264,40 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     };
   };
 
+  const renderCapabilityBadge = () => {
+    switch (project.capabilityTier) {
+      case 'AUTO_APPLY':
+        return (
+          <span className="inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-400 text-xs px-2 py-0.5 rounded-full border border-emerald-500/30">
+            <span className="material-symbols-outlined text-[14px]">bolt</span>
+            Auto-apply available
+          </span>
+        );
+      case 'MANUAL_APPLY':
+        return (
+          <span className="inline-flex items-center gap-1 bg-amber-500/15 text-amber-400 text-xs px-2 py-0.5 rounded-full border border-amber-500/30">
+            <span className="material-symbols-outlined text-[14px]">construction</span>
+            Manual apply required
+          </span>
+        );
+      case 'DATA_ONLY':
+        return (
+          <span className="inline-flex items-center gap-1 bg-blue-500/15 text-blue-400 text-xs px-2 py-0.5 rounded-full border border-blue-500/30">
+            <span className="material-symbols-outlined text-[14px]">bar_chart</span>
+            Data collection only
+          </span>
+        );
+      case 'NOT_CONNECTED':
+      default:
+        return (
+          <span className="inline-flex items-center gap-1 bg-surface-container-high text-on-surface-variant text-xs px-2 py-0.5 rounded-full border border-outline-variant">
+            <span className="material-symbols-outlined text-[14px]">link_off</span>
+            Not connected
+          </span>
+        );
+    }
+  };
+
   const paginatedInstances = localInstances.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const totalPages = Math.ceil(localInstances.length / itemsPerPage);
 
@@ -291,25 +325,8 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
               ) : (
                 <span className="bg-amber-500/20 text-amber-400 text-xs px-2 py-0.5 rounded border border-amber-500/30">Not Deployed</span>
               )}
-              {/* Data Source Badge — always visible, never hidden */}
-              {dataSource === 'LIVE' && (
-                <span className="inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-400 text-xs px-2 py-0.5 rounded-full border border-emerald-500/30">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Live Data
-                </span>
-              )}
-              {dataSource === 'MOCK_DEMO' && (
-                <span className="inline-flex items-center gap-1 bg-orange-500/15 text-orange-400 text-xs px-2 py-0.5 rounded-full border border-orange-500/30 animate-pulse">
-                  <span className="w-1.5 h-1.5 rounded-full bg-orange-400" />
-                  Demo Data
-                </span>
-              )}
-              {dataSource === 'NO_CREDS' && (
-                <span className="inline-flex items-center gap-1 bg-amber-500/10 text-amber-500 text-xs px-2 py-0.5 rounded-full border border-amber-500/20">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                  No Account Connected
-                </span>
-              )}
+              {/* Capability Tier Badge */}
+              {renderCapabilityBadge()}
             </h1>
             <p className="text-on-surface-variant text-sm mt-1">
               Created: {new Date(project.createdAt).toLocaleDateString()}
@@ -429,8 +446,8 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
              </div>
           </div>
         </div>
-      ) : dataSource === 'NO_CREDS' ? (
-        /* NO_CREDS: No platform connected — show empty state, hide all data panels */
+      ) : project.capabilityTier === 'NOT_CONNECTED' ? (
+        /* NOT_CONNECTED: No platform connected — show empty state, hide all data panels */
         <div className="flex flex-col items-center justify-center py-20 space-y-6">
           <div className="w-20 h-20 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
             <span className="material-symbols-outlined text-amber-500 text-4xl">link_off</span>
@@ -438,25 +455,16 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
           <div className="text-center space-y-2">
             <h2 className="text-xl font-semibold text-on-surface">No Platform Account Connected</h2>
             <p className="text-on-surface-variant text-sm max-w-md">
-              Connect a Vercel, Netlify, Railway, or Render account to start collecting
-              real carbon emission data for this project.
+              Connect your project to a cloud provider or setup a self-hosted agent to start collecting real carbon emission data.
             </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {(['Vercel', 'Netlify', 'Railway', 'Render'] as const).map((p) => (
-              <button
-                key={p}
-                className="flex flex-col items-center gap-2 p-4 rounded-xl bg-surface-container border border-outline-variant hover:border-primary/40 hover:bg-surface-container-high transition-all group"
-                onClick={() => window.location.href = `/admin/project/${params.id}/settings`}
-              >
-                <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">cloud</span>
-                <span className="text-xs font-medium text-on-surface-variant group-hover:text-on-surface transition-colors">{p}</span>
-              </button>
-            ))}
-          </div>
-          <p className="text-xs text-on-surface-variant">
-            Go to <span className="text-primary cursor-pointer underline underline-offset-2" onClick={() => window.location.href = `/admin/project/${params.id}/settings`}>Project Settings</span> to add a platform token.
-          </p>
+          <button
+            onClick={() => window.location.href = `/admin/project/${params.id}/settings`}
+            className="bg-primary text-on-primary hover:bg-primary/90 px-6 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2"
+          >
+            <span className="material-symbols-outlined text-[20px]">settings</span>
+            Go to Project Settings
+          </button>
         </div>
       ) : (
         <div className="space-y-6">

@@ -4,6 +4,7 @@ import { prisma } from '../../lib/prisma';
 import crypto from 'crypto';
 import { redis } from '../../lib/redis';
 import { sendEmail } from '../../utils/email';
+import { platformRegistry } from '@carbonix/agents';
 
 // Helper to resolve the IDs of all users/projects in the current user's team/tenant
 export async function resolveTenantContext(userId: string, userEmail: string) {
@@ -423,7 +424,7 @@ export const createApiKey = async (req: AuthRequest, res: Response) => {
     const userEmail = req.user?.email;
     if (!userId || !userEmail) return res.status(401).json({ error: 'Unauthorized' });
 
-    const { name, permissions, expiration } = req.body;
+    const { name, permissions, expiration, projectId } = req.body;
     
     // Generate a random key
     const rawKey = 'cx_' + crypto.randomBytes(32).toString('hex');
@@ -441,6 +442,7 @@ export const createApiKey = async (req: AuthRequest, res: Response) => {
         prefix,
         hashedKey,
         createdBy: userId,
+        projectId: projectId || null,
         permissions: permissions || ['calculate', 'compare', 'recommend', 'history'],
         expiresAt
       }
@@ -1086,8 +1088,33 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
       take: 50 // some records for the table
     });
 
+    // Capability Labeling Logic
+    let capabilityTier: 'AUTO_APPLY' | 'MANUAL_APPLY' | 'DATA_ONLY' | 'NOT_CONNECTED' = 'NOT_CONNECTED';
+    
+    if (project.dataSource !== 'NO_CREDS' && project.dataSource) {
+      if (['AWS', 'GCP', 'AZURE'].includes(project.dataSource)) {
+        // Raw cloud creds or Agent without local action path
+        capabilityTier = 'DATA_ONLY';
+      } else {
+        const adapter = platformRegistry.getAdapter(project.dataSource);
+        if (adapter) {
+          if (adapter.capabilities.canSetRegion) {
+            capabilityTier = 'AUTO_APPLY';
+          } else {
+            capabilityTier = 'MANUAL_APPLY';
+          }
+        } else {
+          // Connected to something we don't have a first-class adapter for yet
+          capabilityTier = 'MANUAL_APPLY';
+        }
+      }
+    }
+
     const stats = {
-      project,
+      project: {
+        ...project,
+        capabilityTier
+      },
       idleInstances: latestEmissions.filter(e => e.isIdle).length,
       oversizedInstances: latestEmissions.filter(e => e.isOversized).length,
       carbonTrend: { todayKg, trendPercent, isNew },

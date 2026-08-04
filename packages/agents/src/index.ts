@@ -6,3 +6,4 @@ export { runOrchestrator, OrchestratorResult, MigrationPlan, MigrationStep } fro
 export { generateMockInstances } from './mockData';
 export { enactRegionSwitch, EnactResult, PlatformCredentialData } from './platform-agents';
 export { collectFromPlatform, PlatformAuthError, PlatformTransientError } from './platformCollector';
+export { platformRegistry } from './platform-adapters';

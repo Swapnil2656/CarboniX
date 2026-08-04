@@ -15,4 +15,7 @@ router.post('/platform-token', auth_middleware_1.authenticate, connect_controlle
 // DELETE /api/v1/connect/platform-token/:platform
 // Revoke/remove a connected platform token. Resets dataSource to NO_CREDS if no tokens remain.
 router.delete('/platform-token/:platform', auth_middleware_1.authenticate, connect_controller_1.handleRevokePlatformToken);
+// GET /api/v1/connect/platforms
+// Fetch the list of dynamically available platform integrations (Tier 1 & Tier 2)
+router.get('/platforms', auth_middleware_1.authenticate, connect_controller_1.handleGetPlatforms);
 exports.default = router;

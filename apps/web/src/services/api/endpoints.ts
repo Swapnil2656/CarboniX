@@ -175,6 +175,9 @@ export const agentsApi = {
 
 // ─── Connect Endpoints ───────────────────────────────────────────────────────
 export const connectApi = {
+  getPlatforms: async (): Promise<any> => {
+    return fetchClient('/connect/platforms');
+  },
   connectPlatformToken: async (payload: { projectId: string; platform: string; token: string; projectSlug?: string }): Promise<any> => {
     return fetchClient('/connect/platform-token', {
       method: 'POST',
