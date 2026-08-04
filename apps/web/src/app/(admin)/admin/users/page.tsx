@@ -235,7 +235,7 @@ export default function UsersPage() {
           <h1 className="text-2xl font-display font-semibold text-on-surface mb-1">Team Emissions</h1>
           <p className="text-sm text-on-surface-variant">Track carbon emissions produced by each teammate across shared projects.</p>
         </div>
-        <button onClick={() => setInviteModalOpen(true)} className="bg-primary text-on-primary hover:bg-primary-container px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+        <button onClick={() => setInviteModalOpen(true)} className="flex items-center gap-2 bg-primary text-on-primary hover:bg-primary-container px-4 py-2 rounded-lg text-sm font-medium transition-colors">
           <span className="material-symbols-outlined text-[18px]">person_add</span>
           Invite User
         </button>

@@ -58,6 +58,10 @@ export default function DashboardPage() {
   const router = useRouter();
 
   const handleAnalyze = async (project: Project) => {
+    if (!project.region || project.region === 'Not detected yet') {
+      alert("Project is not fully deployed yet. Waiting for region detection.");
+      return;
+    }
     setAnalyzingProjectId(project.id);
     try {
       const emRes = await adminApi.getEmissions('All', 'All', project.id);
@@ -312,8 +316,9 @@ export default function DashboardPage() {
                       </button>
                       <button
                         onClick={() => handleAnalyze(p)}
-                        disabled={analyzingProjectId === p.id}
-                        className="bg-surface-container-high hover:bg-outline-variant text-on-surface px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border border-outline-variant disabled:opacity-50"
+                        disabled={analyzingProjectId === p.id || !p.region || p.region === 'Not detected yet'}
+                        title={!p.region || p.region === 'Not detected yet' ? "Waiting for deployment region" : "Analyze carbon impact"}
+                        className="bg-surface-container-high hover:bg-outline-variant text-on-surface px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border border-outline-variant disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {analyzingProjectId === p.id ? 'Analyzing...' : 'Analyze'}
                       </button>
