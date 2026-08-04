@@ -276,7 +276,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     return <ErrorBanner message="Project not found." />;
   }
 
-  const { project, idleInstances, oversizedInstances, carbonTrend, history7d, history30d, totalMonthKg, apiKeys, greenerRegion, isStale, instances } = data;
+  const { project, idleInstances, oversizedInstances, carbonTrend, history7d, history30d, totalMonthKg, apiKeys, greenerRegion, isStale, instances, checklist, estimateAssumptions, top3Regions } = data;
   const chartData = chartDays === '7d' ? history7d : history30d;
   const dataSource: 'NO_CREDS' | 'MOCK_DEMO' | 'LIVE' = project.dataSource || 'NO_CREDS';
 
@@ -412,34 +412,47 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-surface-container-low rounded-xl border border-outline-variant p-6">
               <h2 className="text-lg font-semibold text-on-surface mb-2">Estimate Assumptions</h2>
+              {estimateAssumptions?.reasoning && (
+                <div className="bg-primary/10 text-primary px-3 py-2 rounded-lg text-xs mb-4">
+                  <span className="font-semibold">AI Reasoning:</span> {estimateAssumptions.reasoning}
+                </div>
+              )}
               <p className="text-on-surface-variant text-sm mb-4">
                 This project has not been deployed yet. The carbon estimates are based on:
               </p>
               <ul className="space-y-2 text-sm text-on-surface">
-                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">memory</span> Instance Type: t3.medium</li>
-                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">speed</span> CPU Utilization: 15%</li>
-                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">schedule</span> Running Hours: 730 hrs/month</li>
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">memory</span> Instance Type: {estimateAssumptions?.instanceType || 't3.medium'}</li>
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">speed</span> CPU Utilization: {estimateAssumptions?.cpuUtilization || 15}%</li>
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">schedule</span> Running Hours: {estimateAssumptions?.runningHours || 730} hrs/month</li>
               </ul>
             </div>
             
             <div className="bg-surface-container-low rounded-xl border border-outline-variant p-6">
               <h2 className="text-lg font-semibold text-on-surface mb-2">Launch Checklist</h2>
               <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <span className="material-symbols-outlined text-green-400">check_circle</span>
+                <div className={`flex items-center gap-3 ${!checklist?.projectCreated ? 'opacity-50' : ''}`}>
+                  <span className={`material-symbols-outlined ${checklist?.projectCreated ? 'text-green-400' : ''}`}>
+                    {checklist?.projectCreated ? 'check_circle' : 'radio_button_unchecked'}
+                  </span>
                   <span className="text-sm text-on-surface">Project Created</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="material-symbols-outlined text-green-400">check_circle</span>
+                <div className={`flex items-center gap-3 ${!checklist?.apiKeyGenerated ? 'opacity-50' : ''}`}>
+                  <span className={`material-symbols-outlined ${checklist?.apiKeyGenerated ? 'text-green-400' : ''}`}>
+                    {checklist?.apiKeyGenerated ? 'check_circle' : 'radio_button_unchecked'}
+                  </span>
                   <span className="text-sm text-on-surface">API Key Generated</span>
                 </div>
-                <div className="flex items-center gap-3 opacity-50">
-                  <span className="material-symbols-outlined">radio_button_unchecked</span>
-                  <span className="text-sm text-on-surface">CarboniX SDK Installed (npm install @carbonix/sdk)</span>
-                </div>
-                <div className="flex items-center gap-3 opacity-50">
-                  <span className="material-symbols-outlined">radio_button_unchecked</span>
+                <div className={`flex items-center gap-3 ${!checklist?.configInitialized ? 'opacity-50' : ''}`}>
+                  <span className={`material-symbols-outlined ${checklist?.configInitialized ? 'text-green-400' : ''}`}>
+                    {checklist?.configInitialized ? 'check_circle' : 'radio_button_unchecked'}
+                  </span>
                   <span className="text-sm text-on-surface">Config Initialized (npx @carbonix/cli init)</span>
+                </div>
+                <div className={`flex items-center gap-3 ${!checklist?.sdkConnected ? 'opacity-50' : ''}`}>
+                  <span className={`material-symbols-outlined ${checklist?.sdkConnected ? 'text-green-400' : ''}`}>
+                    {checklist?.sdkConnected ? 'check_circle' : 'radio_button_unchecked'}
+                  </span>
+                  <span className="text-sm text-on-surface">Telemetry Flowing (Connected)</span>
                 </div>
               </div>
             </div>
@@ -448,38 +461,22 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
           <div className="bg-surface-container-low rounded-xl border border-outline-variant p-6">
              <h2 className="text-lg font-semibold text-on-surface mb-4">Top 3 Recommended Regions</h2>
              <div className="space-y-3">
-                {/* Mock data for the UI since we don't have a real calculation endpoint here, 
-                    but mimicking the actual regions format based on the prompt's request for "reasoning". */}
-                <div className="flex items-center justify-between p-3 rounded-lg bg-surface border border-outline-variant">
-                  <div>
-                    <div className="font-medium text-on-surface">europe-west6 (AWS)</div>
-                    <div className="text-xs text-on-surface-variant">Grid Intensity: 12 gCO2/kWh • Renewable: 89%</div>
+                {top3Regions && top3Regions.length > 0 ? top3Regions.map((reg: any, i: number) => (
+                  <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-surface border border-outline-variant">
+                    <div>
+                      <div className="font-medium text-on-surface">{reg.name} ({reg.provider})</div>
+                      <div className="text-xs text-on-surface-variant">Grid Intensity: {reg.gridIntensity} gCO2/kWh • Renewable: {reg.renewablePercentage}%</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-mono text-sm text-primary">~{reg.projectedCarbonKg?.toFixed(2)} kg CO2/mo</div>
+                      <div className="text-xs text-on-surface-variant">Est. ${reg.costEstimateUsd?.toFixed(2)}/mo</div>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <div className="font-mono text-sm text-primary">~0.4 kg CO2/mo</div>
-                    <div className="text-xs text-on-surface-variant">Est. $15.50/mo</div>
+                )) : (
+                  <div className="text-sm text-on-surface-variant p-3 bg-surface border border-outline-variant rounded-lg">
+                    Loading regions...
                   </div>
-                </div>
-                <div className="flex items-center justify-between p-3 rounded-lg bg-surface border border-outline-variant">
-                  <div>
-                    <div className="font-medium text-on-surface">eu-north-1 (GCP)</div>
-                    <div className="text-xs text-on-surface-variant">Grid Intensity: 15 gCO2/kWh • Renewable: 85%</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-mono text-sm text-primary">~0.5 kg CO2/mo</div>
-                    <div className="text-xs text-on-surface-variant">Est. $16.20/mo</div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between p-3 rounded-lg bg-surface border border-outline-variant">
-                  <div>
-                    <div className="font-medium text-on-surface">us-west-2 (AWS)</div>
-                    <div className="text-xs text-on-surface-variant">Grid Intensity: 22 gCO2/kWh • Renewable: 76%</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-mono text-sm text-primary">~0.8 kg CO2/mo</div>
-                    <div className="text-xs text-on-surface-variant">Est. $14.80/mo</div>
-                  </div>
-                </div>
+                )}
              </div>
           </div>
         </div>

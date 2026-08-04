@@ -24,6 +24,7 @@ const DOWNGRADE_MAP: Record<string, string> = {
 // ─── Zod schema for Nemotron output validation ────────────────────────────────
 
 const RecommendationSchema = z.object({
+  projectId:         z.string().optional(),
   instanceId:        z.string(),
   instanceName:      z.string(),
   currentType:       z.string(),
@@ -39,6 +40,7 @@ const RecommendationArraySchema = z.array(RecommendationSchema);
 
 
 export interface Recommendation {
+  projectId?: string;
   instanceId: string;
   instanceName: string;
   currentType: string;
@@ -167,6 +169,7 @@ function generateFallbackRecommendations(records: EmissionRecordData[]): Recomme
   for (const record of records) {
     if (record.isIdle) {
       recommendations.push({
+        projectId: record.projectId,
         instanceId: record.instanceId,
         instanceName: record.instanceName || record.instanceId,
         currentType: record.instanceType,
@@ -182,6 +185,7 @@ function generateFallbackRecommendations(records: EmissionRecordData[]): Recomme
       const estimatedSaving = record.carbonKg * 0.5; // ~50% saving from downgrade
       
       recommendations.push({
+        projectId: record.projectId,
         instanceId: record.instanceId,
         instanceName: record.instanceName || record.instanceId,
         currentType: record.instanceType,
@@ -198,6 +202,7 @@ function generateFallbackRecommendations(records: EmissionRecordData[]): Recomme
     if (record.region === 'ap-south-1' && !record.isIdle) {
       const projectedKg = record.carbonKg * (8 / 750); // eu-north-1 ratio
       recommendations.push({
+        projectId: record.projectId,
         instanceId: record.instanceId,
         instanceName: record.instanceName || record.instanceId,
         currentType: record.instanceType,

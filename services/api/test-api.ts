@@ -1,17 +1,30 @@
-
+import { PrismaClient } from '@prisma/client';
+import { getProjectStats } from './src/modules/admin/admin.controller';
 
 async function test() {
+  const prisma = new PrismaClient();
+  const project = await prisma.project.findFirst({ where: { id: 'cmrfc3vj60003dg0wp35upsrn' }});
+  
+  if (!project) { console.log("No project"); return; }
+  const user = await prisma.user.findUnique({ where: { id: project.userId }});
+  
+  const req = {
+    params: { id: project.id },
+    user: { id: user?.id, email: user?.email, role: user?.type },
+    query: {}
+  } as any;
+  
+  const res = {
+    status: (code: number) => ({
+      json: (data: any) => { console.log("STATUS", code, data); }
+    }),
+    json: (data: any) => { console.log("SUCCESS"); }
+  } as any;
+
   try {
-    // Attempt to hit a protected backend route with an invalid token to see if it responds
-    const res = await fetch('http://localhost:4000/api/v1/admin/dashboard/stats', {
-      headers: {
-        'Authorization': 'Bearer bad-token'
-      }
-    });
-    console.log('Status with bad token:', res.status);
-    console.log('Body with bad token:', await res.text());
-  } catch (err: any) {
-    console.error('Fetch error:', err.message);
+    await getProjectStats(req, res);
+  } catch (e: any) {
+    console.error("UNCAUGHT ERROR:", e);
   }
 }
 test();

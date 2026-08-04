@@ -205,6 +205,35 @@ function detectProvider(envVars) {
   if (process.env.ARM_REGION || envVars.ARM_REGION || process.env.AZURE_REGION || envVars.AZURE_REGION) return "azure";
   return "aws";
 }
+async function detectProjectProfile(cwd) {
+  const profile = { runtime: "unknown", workloadClass: "unknown" };
+  try {
+    const pkgPath = import_path.default.join(cwd, "package.json");
+    if (await fileExists(pkgPath)) {
+      profile.runtime = "node";
+      const pkg = JSON.parse(await import_promises.default.readFile(pkgPath, "utf8"));
+      const deps = { ...pkg.dependencies || {}, ...pkg.devDependencies || {} };
+      if (deps["next"] || deps["express"] || deps["react"]) {
+        profile.workloadClass = "web";
+      } else if (deps["@tensorflow/tfjs-node"] || deps["brain.js"]) {
+        profile.workloadClass = "ml";
+      }
+    } else {
+      const reqPath = import_path.default.join(cwd, "requirements.txt");
+      if (await fileExists(reqPath)) {
+        profile.runtime = "python";
+        const reqs = await import_promises.default.readFile(reqPath, "utf8");
+        if (reqs.includes("django") || reqs.includes("flask") || reqs.includes("fastapi")) {
+          profile.workloadClass = "web";
+        } else if (reqs.includes("torch") || reqs.includes("tensorflow") || reqs.includes("scikit")) {
+          profile.workloadClass = "ml";
+        }
+      }
+    }
+  } catch (e) {
+  }
+  return profile;
+}
 function buildInjectionSnippet(cfg) {
   return [
     "",
@@ -264,7 +293,15 @@ program.command("init").description("Initialize CarboniX in your project \u2014 
       return import_path.default.basename(cwd);
     }
   })();
-  console.log(import_picocolors.default.green(`\u2705 ${provider.toUpperCase()} / ${region}`));
+  const projectProfile = await detectProjectProfile(cwd);
+  console.log(import_picocolors.default.green(`\u2705 ${provider.toUpperCase()} / ${region} [${projectProfile.runtime}-${projectProfile.workloadClass}]`));
+  try {
+    await import_axios.default.post(`${baseUrl}/api/v1/carbon/init`, { projectName, projectProfile }, {
+      headers: { "Authorization": `Bearer ${apiKey}` },
+      timeout: 5e3
+    });
+  } catch (e) {
+  }
   const cfg = { instanceId, instanceType, provider, region, projectName };
   process.stdout.write(import_picocolors.default.gray("  [3/5] Writing .carbonixrc... "));
   const rcPath = import_path.default.join(cwd, ".carbonixrc");

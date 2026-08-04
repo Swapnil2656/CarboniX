@@ -20229,6 +20229,7 @@ export namespace Prisma {
     agenticMode: boolean | null
     connectedAt: Date | null
     lastPingAt: Date | null
+    configInitializedAt: Date | null
     carbonBudgetKg: number | null
     dataSource: $Enums.DataSource | null
     userId: string | null
@@ -20247,6 +20248,7 @@ export namespace Prisma {
     agenticMode: boolean | null
     connectedAt: Date | null
     lastPingAt: Date | null
+    configInitializedAt: Date | null
     carbonBudgetKg: number | null
     dataSource: $Enums.DataSource | null
     userId: string | null
@@ -20265,6 +20267,8 @@ export namespace Prisma {
     agenticMode: number
     connectedAt: number
     lastPingAt: number
+    configInitializedAt: number
+    projectProfile: number
     carbonBudgetKg: number
     dataSource: number
     userId: number
@@ -20293,6 +20297,7 @@ export namespace Prisma {
     agenticMode?: true
     connectedAt?: true
     lastPingAt?: true
+    configInitializedAt?: true
     carbonBudgetKg?: true
     dataSource?: true
     userId?: true
@@ -20311,6 +20316,7 @@ export namespace Prisma {
     agenticMode?: true
     connectedAt?: true
     lastPingAt?: true
+    configInitializedAt?: true
     carbonBudgetKg?: true
     dataSource?: true
     userId?: true
@@ -20329,6 +20335,8 @@ export namespace Prisma {
     agenticMode?: true
     connectedAt?: true
     lastPingAt?: true
+    configInitializedAt?: true
+    projectProfile?: true
     carbonBudgetKg?: true
     dataSource?: true
     userId?: true
@@ -20434,6 +20442,8 @@ export namespace Prisma {
     agenticMode: boolean
     connectedAt: Date | null
     lastPingAt: Date | null
+    configInitializedAt: Date | null
+    projectProfile: JsonValue | null
     carbonBudgetKg: number | null
     dataSource: $Enums.DataSource
     userId: string
@@ -20471,6 +20481,8 @@ export namespace Prisma {
     agenticMode?: boolean
     connectedAt?: boolean
     lastPingAt?: boolean
+    configInitializedAt?: boolean
+    projectProfile?: boolean
     carbonBudgetKg?: boolean
     dataSource?: boolean
     userId?: boolean
@@ -20496,6 +20508,8 @@ export namespace Prisma {
     agenticMode?: boolean
     connectedAt?: boolean
     lastPingAt?: boolean
+    configInitializedAt?: boolean
+    projectProfile?: boolean
     carbonBudgetKg?: boolean
     dataSource?: boolean
     userId?: boolean
@@ -20515,6 +20529,8 @@ export namespace Prisma {
     agenticMode?: boolean
     connectedAt?: boolean
     lastPingAt?: boolean
+    configInitializedAt?: boolean
+    projectProfile?: boolean
     carbonBudgetKg?: boolean
     dataSource?: boolean
     userId?: boolean
@@ -20556,6 +20572,8 @@ export namespace Prisma {
       agenticMode: boolean
       connectedAt: Date | null
       lastPingAt: Date | null
+      configInitializedAt: Date | null
+      projectProfile: Prisma.JsonValue | null
       carbonBudgetKg: number | null
       dataSource: $Enums.DataSource
       userId: string
@@ -20970,6 +20988,8 @@ export namespace Prisma {
     readonly agenticMode: FieldRef<"Project", 'Boolean'>
     readonly connectedAt: FieldRef<"Project", 'DateTime'>
     readonly lastPingAt: FieldRef<"Project", 'DateTime'>
+    readonly configInitializedAt: FieldRef<"Project", 'DateTime'>
+    readonly projectProfile: FieldRef<"Project", 'Json'>
     readonly carbonBudgetKg: FieldRef<"Project", 'Float'>
     readonly dataSource: FieldRef<"Project", 'DataSource'>
     readonly userId: FieldRef<"Project", 'String'>
@@ -27605,6 +27625,8 @@ export namespace Prisma {
     agenticMode: 'agenticMode',
     connectedAt: 'connectedAt',
     lastPingAt: 'lastPingAt',
+    configInitializedAt: 'configInitializedAt',
+    projectProfile: 'projectProfile',
     carbonBudgetKg: 'carbonBudgetKg',
     dataSource: 'dataSource',
     userId: 'userId',
@@ -29819,6 +29841,8 @@ export namespace Prisma {
     agenticMode?: BoolFilter<"Project"> | boolean
     connectedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     lastPingAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    configInitializedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    projectProfile?: JsonNullableFilter<"Project">
     carbonBudgetKg?: FloatNullableFilter<"Project"> | number | null
     dataSource?: EnumDataSourceFilter<"Project"> | $Enums.DataSource
     userId?: StringFilter<"Project"> | string
@@ -29843,6 +29867,8 @@ export namespace Prisma {
     agenticMode?: SortOrder
     connectedAt?: SortOrderInput | SortOrder
     lastPingAt?: SortOrderInput | SortOrder
+    configInitializedAt?: SortOrderInput | SortOrder
+    projectProfile?: SortOrderInput | SortOrder
     carbonBudgetKg?: SortOrderInput | SortOrder
     dataSource?: SortOrder
     userId?: SortOrder
@@ -29870,6 +29896,8 @@ export namespace Prisma {
     agenticMode?: BoolFilter<"Project"> | boolean
     connectedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     lastPingAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    configInitializedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    projectProfile?: JsonNullableFilter<"Project">
     carbonBudgetKg?: FloatNullableFilter<"Project"> | number | null
     dataSource?: EnumDataSourceFilter<"Project"> | $Enums.DataSource
     userId?: StringFilter<"Project"> | string
@@ -29894,6 +29922,8 @@ export namespace Prisma {
     agenticMode?: SortOrder
     connectedAt?: SortOrderInput | SortOrder
     lastPingAt?: SortOrderInput | SortOrder
+    configInitializedAt?: SortOrderInput | SortOrder
+    projectProfile?: SortOrderInput | SortOrder
     carbonBudgetKg?: SortOrderInput | SortOrder
     dataSource?: SortOrder
     userId?: SortOrder
@@ -29920,6 +29950,8 @@ export namespace Prisma {
     agenticMode?: BoolWithAggregatesFilter<"Project"> | boolean
     connectedAt?: DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
     lastPingAt?: DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
+    configInitializedAt?: DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
+    projectProfile?: JsonNullableWithAggregatesFilter<"Project">
     carbonBudgetKg?: FloatNullableWithAggregatesFilter<"Project"> | number | null
     dataSource?: EnumDataSourceWithAggregatesFilter<"Project"> | $Enums.DataSource
     userId?: StringWithAggregatesFilter<"Project"> | string
@@ -32415,6 +32447,8 @@ export namespace Prisma {
     agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    configInitializedAt?: Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: number | null
     dataSource?: $Enums.DataSource
     createdAt?: Date | string
@@ -32438,6 +32472,8 @@ export namespace Prisma {
     agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    configInitializedAt?: Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: number | null
     dataSource?: $Enums.DataSource
     userId: string
@@ -32461,6 +32497,8 @@ export namespace Prisma {
     agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    configInitializedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32484,6 +32522,8 @@ export namespace Prisma {
     agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    configInitializedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     userId?: StringFieldUpdateOperationsInput | string
@@ -32507,6 +32547,8 @@ export namespace Prisma {
     agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    configInitializedAt?: Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: number | null
     dataSource?: $Enums.DataSource
     userId: string
@@ -32525,6 +32567,8 @@ export namespace Prisma {
     agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    configInitializedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32542,6 +32586,8 @@ export namespace Prisma {
     agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    configInitializedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     userId?: StringFieldUpdateOperationsInput | string
@@ -34822,6 +34868,8 @@ export namespace Prisma {
     agenticMode?: SortOrder
     connectedAt?: SortOrder
     lastPingAt?: SortOrder
+    configInitializedAt?: SortOrder
+    projectProfile?: SortOrder
     carbonBudgetKg?: SortOrder
     dataSource?: SortOrder
     userId?: SortOrder
@@ -34844,6 +34892,7 @@ export namespace Prisma {
     agenticMode?: SortOrder
     connectedAt?: SortOrder
     lastPingAt?: SortOrder
+    configInitializedAt?: SortOrder
     carbonBudgetKg?: SortOrder
     dataSource?: SortOrder
     userId?: SortOrder
@@ -34862,6 +34911,7 @@ export namespace Prisma {
     agenticMode?: SortOrder
     connectedAt?: SortOrder
     lastPingAt?: SortOrder
+    configInitializedAt?: SortOrder
     carbonBudgetKg?: SortOrder
     dataSource?: SortOrder
     userId?: SortOrder
@@ -37055,6 +37105,8 @@ export namespace Prisma {
     agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    configInitializedAt?: Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: number | null
     dataSource?: $Enums.DataSource
     createdAt?: Date | string
@@ -37077,6 +37129,8 @@ export namespace Prisma {
     agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    configInitializedAt?: Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: number | null
     dataSource?: $Enums.DataSource
     userId: string
@@ -37115,6 +37169,8 @@ export namespace Prisma {
     agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    configInitializedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -37137,6 +37193,8 @@ export namespace Prisma {
     agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    configInitializedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     userId?: StringFieldUpdateOperationsInput | string
@@ -37159,6 +37217,8 @@ export namespace Prisma {
     agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    configInitializedAt?: Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: number | null
     dataSource?: $Enums.DataSource
     createdAt?: Date | string
@@ -37181,6 +37241,8 @@ export namespace Prisma {
     agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    configInitializedAt?: Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: number | null
     dataSource?: $Enums.DataSource
     userId: string
@@ -37219,6 +37281,8 @@ export namespace Prisma {
     agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    configInitializedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -37241,6 +37305,8 @@ export namespace Prisma {
     agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    configInitializedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     userId?: StringFieldUpdateOperationsInput | string
@@ -37263,6 +37329,8 @@ export namespace Prisma {
     agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    configInitializedAt?: Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: number | null
     dataSource?: $Enums.DataSource
     createdAt?: Date | string
@@ -37285,6 +37353,8 @@ export namespace Prisma {
     agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    configInitializedAt?: Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: number | null
     dataSource?: $Enums.DataSource
     userId: string
@@ -37323,6 +37393,8 @@ export namespace Prisma {
     agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    configInitializedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -37345,6 +37417,8 @@ export namespace Prisma {
     agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    configInitializedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     userId?: StringFieldUpdateOperationsInput | string
@@ -37398,6 +37472,8 @@ export namespace Prisma {
     agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    configInitializedAt?: Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: number | null
     dataSource?: $Enums.DataSource
     createdAt?: Date | string
@@ -37420,6 +37496,8 @@ export namespace Prisma {
     agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    configInitializedAt?: Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: number | null
     dataSource?: $Enums.DataSource
     createdAt?: Date | string
@@ -37549,6 +37627,8 @@ export namespace Prisma {
     agenticMode?: BoolFilter<"Project"> | boolean
     connectedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     lastPingAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    configInitializedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    projectProfile?: JsonNullableFilter<"Project">
     carbonBudgetKg?: FloatNullableFilter<"Project"> | number | null
     dataSource?: EnumDataSourceFilter<"Project"> | $Enums.DataSource
     userId?: StringFilter<"Project"> | string
@@ -38309,6 +38389,8 @@ export namespace Prisma {
     agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    configInitializedAt?: Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: number | null
     dataSource?: $Enums.DataSource
     createdAt?: Date | string
@@ -38331,6 +38413,8 @@ export namespace Prisma {
     agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    configInitializedAt?: Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: number | null
     dataSource?: $Enums.DataSource
     userId: string
@@ -38369,6 +38453,8 @@ export namespace Prisma {
     agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    configInitializedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -38391,6 +38477,8 @@ export namespace Prisma {
     agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    configInitializedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     userId?: StringFieldUpdateOperationsInput | string
@@ -38413,6 +38501,8 @@ export namespace Prisma {
     agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    configInitializedAt?: Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: number | null
     dataSource?: $Enums.DataSource
     createdAt?: Date | string
@@ -38435,6 +38525,8 @@ export namespace Prisma {
     agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    configInitializedAt?: Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: number | null
     dataSource?: $Enums.DataSource
     userId: string
@@ -38473,6 +38565,8 @@ export namespace Prisma {
     agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    configInitializedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -38495,6 +38589,8 @@ export namespace Prisma {
     agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    configInitializedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     userId?: StringFieldUpdateOperationsInput | string
@@ -38717,6 +38813,8 @@ export namespace Prisma {
     agenticMode?: boolean
     connectedAt?: Date | string | null
     lastPingAt?: Date | string | null
+    configInitializedAt?: Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: number | null
     dataSource?: $Enums.DataSource
     createdAt?: Date | string
@@ -38740,6 +38838,8 @@ export namespace Prisma {
     agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    configInitializedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -38762,6 +38862,8 @@ export namespace Prisma {
     agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    configInitializedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -38784,6 +38886,8 @@ export namespace Prisma {
     agenticMode?: BoolFieldUpdateOperationsInput | boolean
     connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    configInitializedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
     carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
     dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

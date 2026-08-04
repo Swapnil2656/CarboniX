@@ -223,7 +223,7 @@ cron.schedule('0 * * * *', async () => {
         },
       });
 
-      allRecords.push(...projectRecords);
+      allRecords.push(...projectRecords.map(r => ({ ...r, projectId: project.id })));
       console.log(`[CRON] Collected ${projectRecords.length} records for "${project.name}" [${project.dataSource}]`);
 
     } catch (projectErr) {
@@ -265,7 +265,9 @@ cron.schedule('0 * * * *', async () => {
     // ─── Agentic region switches — now reads from PlatformToken (new) first, falls back to legacy PlatformCredential ──
     const agenticProjects = projects.filter(p => p.agenticMode);
     for (const project of agenticProjects) {
-      const migrationRec = analystResult.recommendations.find(r => r.recommendedAction === 'MIGRATE_REGION');
+      const migrationRec = analystResult.recommendations
+        .filter(r => r.projectId === project.id)
+        .find(r => r.recommendedAction === 'MIGRATE_REGION');
       if (!migrationRec) continue;
       console.log(`[CRON] Agentic Action: Enacting region switch for project ${project.name}...`);
       try {

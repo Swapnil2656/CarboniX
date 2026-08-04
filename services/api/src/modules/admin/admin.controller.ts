@@ -5,6 +5,8 @@ import crypto from 'crypto';
 import { redis } from '../../lib/redis';
 import { sendEmail } from '../../utils/email';
 import { platformRegistry } from '@carbonix/agents';
+import { calculateCarbon } from '@carbonix/core';
+import axios from 'axios';
 
 // Helper to resolve the IDs of all users/projects in the current user's team/tenant
 export async function resolveTenantContext(userId: string, userEmail: string) {
@@ -1110,6 +1112,105 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
       }
     }
 
+    const checklist = {
+      projectCreated: true,
+      apiKeyGenerated: apiKeys.length > 0,
+      configInitialized: !!project.configInitializedAt,
+      sdkConnected: !!project.lastPingAt
+    };
+
+    const defaultProvider = project.provider?.toUpperCase() || 'AWS';
+    
+    // Pick default instance based on provider
+    let baseInstance = 't3.medium';
+    let mlInstance = 'm5.xlarge'; // Fallback to a big CPU instance since g4dn isn't currently in core's JSON
+    
+    if (defaultProvider === 'GCP') {
+      baseInstance = 'e2-medium';
+      mlInstance = 'e2-standard-8';
+    } else if (defaultProvider === 'AZURE') {
+      baseInstance = 'Standard_B2s';
+      mlInstance = 'Standard_D8s_v3';
+    } else {
+      // AWS
+      baseInstance = 't3.medium';
+      mlInstance = 'm5.xlarge'; 
+    }
+
+    let estimateAssumptions = {
+      instanceType: baseInstance,
+      cpuUtilization: 15,
+      runningHours: 730,
+      isGenericDefault: true,
+      reasoning: "No project profile detected — showing generic defaults. Run `npx @carbonix/cli init` for an estimate based on your actual project."
+    };
+
+    if (project.projectProfile) {
+      const profile = project.projectProfile as any;
+      if (profile.workloadClass === 'ml') {
+        estimateAssumptions.instanceType = mlInstance;
+        estimateAssumptions.cpuUtilization = 75;
+        estimateAssumptions.runningHours = 200;
+        estimateAssumptions.isGenericDefault = false;
+        estimateAssumptions.reasoning = `Detected an ML workload. Suggesting a larger instance (${mlInstance}) with high utilization (75%) but intermittent running hours (200 hrs/month) typical for training/inference.`;
+      } else if (profile.workloadClass === 'web') {
+        estimateAssumptions.instanceType = baseInstance;
+        estimateAssumptions.cpuUtilization = 25;
+        estimateAssumptions.runningHours = 730;
+        estimateAssumptions.isGenericDefault = false;
+        estimateAssumptions.reasoning = `Detected a web workload. Suggesting a general-purpose instance (${baseInstance}) running 24/7 (730 hrs/month) with moderate utilization (25%).`;
+      }
+
+      if (process.env.NVIDIA_API_KEY && !estimateAssumptions.isGenericDefault) {
+        try {
+          const nvRes = await axios.post('https://integrate.api.nvidia.com/v1/chat/completions', {
+            model: 'meta/llama-3.1-405b-instruct',
+            messages: [{
+              role: 'user', 
+              content: `Write a 1-sentence reasoning (max 150 chars) for why a ${profile.runtime} ${profile.workloadClass} workload should be estimated using a ${estimateAssumptions.instanceType} instance at ${estimateAssumptions.cpuUtilization}% utilization for ${estimateAssumptions.runningHours} hours/month.`
+            }],
+            max_tokens: 100
+          }, {
+            headers: { 'Authorization': `Bearer ${process.env.NVIDIA_API_KEY}` },
+            timeout: 3000
+          });
+          if (nvRes.data?.choices?.[0]?.message?.content) {
+            estimateAssumptions.reasoning = nvRes.data.choices[0].message.content.trim();
+          }
+        } catch(e) { /* ignore timeout */ }
+      }
+    }
+
+    const providerRegions = await prisma.region.findMany({
+      where: { provider: project.provider || 'AWS' }
+    });
+    
+    const instanceRow = await prisma.instanceType.findFirst({
+      where: { name: estimateAssumptions.instanceType }
+    });
+    const costPerHour = instanceRow?.onDemandHourlyUsd || 0.0416;
+
+    const projectedRegions = await Promise.all(providerRegions.map(async reg => {
+      const calcResult = await calculateCarbon({
+        provider: project.provider || 'AWS',
+        region: reg.name,
+        instanceType: estimateAssumptions.instanceType,
+        instanceCount: 1,
+        hoursPerMonth: estimateAssumptions.runningHours,
+        cpuUtilization: estimateAssumptions.cpuUtilization / 100,
+        storageGb: 50
+      });
+      return {
+        ...reg,
+        projectedCarbonKg: calcResult.co2KgMonth,
+        costEstimateUsd: costPerHour * estimateAssumptions.runningHours
+      };
+    }));
+    
+    const top3Regions = projectedRegions
+      .sort((a, b) => a.projectedCarbonKg - b.projectedCarbonKg)
+      .slice(0, 3);
+
     const stats = {
       project: {
         ...project,
@@ -1124,7 +1225,10 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
       apiKeys,
       greenerRegion,
       isStale,
-      instances: latestEmissions
+      instances: latestEmissions,
+      checklist,
+      estimateAssumptions,
+      top3Regions
     };
     res.json({ success: true, data: stats });
   } catch (error: any) {

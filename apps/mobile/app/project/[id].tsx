@@ -109,7 +109,7 @@ export default function ProjectDetailScreen() {
     );
   }
 
-  const { project, idleInstances, oversizedInstances, carbonTrend, history7d, history30d, totalMonthKg, apiKeys, greenerRegion, isStale, instances } = data;
+  const { project, idleInstances, oversizedInstances, carbonTrend, history7d, history30d, totalMonthKg, apiKeys, greenerRegion, isStale, instances, checklist, estimateAssumptions, top3Regions } = data;
   const chartData = chartDays === '7d' ? history7d : history30d;
 
   const getEquivalent = (kg: number) => {
@@ -182,44 +182,50 @@ export default function ProjectDetailScreen() {
           <View>
             <View style={styles.panel}>
               <Text style={styles.panelTitle}>Estimate Assumptions</Text>
+              {estimateAssumptions?.reasoning && (
+                <View style={{ backgroundColor: 'rgba(80, 250, 123, 0.1)', padding: 8, borderRadius: 8, marginBottom: 8 }}>
+                  <Text style={{ color: colors.primary, fontSize: 12 }}><Text style={{ fontWeight: 'bold' }}>AI Reasoning:</Text> {estimateAssumptions.reasoning}</Text>
+                </View>
+              )}
               <Text style={styles.panelText}>Based on:</Text>
-              <Text style={{ color: colors.textBody }}>• Instance Type: t3.medium</Text>
-              <Text style={{ color: colors.textBody }}>• CPU Utilization: 15%</Text>
-              <Text style={{ color: colors.textBody }}>• Running Hours: 730 hrs/month</Text>
+              <Text style={{ color: colors.textBody }}>• Instance Type: {estimateAssumptions?.instanceType || 't3.medium'}</Text>
+              <Text style={{ color: colors.textBody }}>• CPU Utilization: {estimateAssumptions?.cpuUtilization || 15}%</Text>
+              <Text style={{ color: colors.textBody }}>• Running Hours: {estimateAssumptions?.runningHours || 730} hrs/month</Text>
             </View>
 
             <View style={styles.panel}>
               <Text style={styles.panelTitle}>Launch Checklist</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 4 }}>
-                <MaterialIcons name="check-circle" size={18} color={colors.primary} />
+              <View style={[{ flexDirection: 'row', alignItems: 'center', marginVertical: 4 }, !checklist?.projectCreated && { opacity: 0.5 }]}>
+                <MaterialIcons name={checklist?.projectCreated ? "check-circle" : "radio-button-unchecked"} size={18} color={checklist?.projectCreated ? colors.primary : colors.textBody} />
                 <Text style={{ color: colors.textBody, marginLeft: 8 }}>Project Created</Text>
               </View>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 4 }}>
-                <MaterialIcons name="check-circle" size={18} color={colors.primary} />
+              <View style={[{ flexDirection: 'row', alignItems: 'center', marginVertical: 4 }, !checklist?.apiKeyGenerated && { opacity: 0.5 }]}>
+                <MaterialIcons name={checklist?.apiKeyGenerated ? "check-circle" : "radio-button-unchecked"} size={18} color={checklist?.apiKeyGenerated ? colors.primary : colors.textBody} />
                 <Text style={{ color: colors.textBody, marginLeft: 8 }}>API Key Generated</Text>
               </View>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 4, opacity: 0.5 }}>
-                <MaterialIcons name="radio-button-unchecked" size={18} color={colors.textBody} />
-                <Text style={{ color: colors.textBody, marginLeft: 8 }}>SDK Installed</Text>
-              </View>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 4, opacity: 0.5 }}>
-                <MaterialIcons name="radio-button-unchecked" size={18} color={colors.textBody} />
+              <View style={[{ flexDirection: 'row', alignItems: 'center', marginVertical: 4 }, !checklist?.configInitialized && { opacity: 0.5 }]}>
+                <MaterialIcons name={checklist?.configInitialized ? "check-circle" : "radio-button-unchecked"} size={18} color={checklist?.configInitialized ? colors.primary : colors.textBody} />
                 <Text style={{ color: colors.textBody, marginLeft: 8 }}>Config Initialized</Text>
+              </View>
+              <View style={[{ flexDirection: 'row', alignItems: 'center', marginVertical: 4 }, !checklist?.sdkConnected && { opacity: 0.5 }]}>
+                <MaterialIcons name={checklist?.sdkConnected ? "check-circle" : "radio-button-unchecked"} size={18} color={checklist?.sdkConnected ? colors.primary : colors.textBody} />
+                <Text style={{ color: colors.textBody, marginLeft: 8 }}>Telemetry Flowing</Text>
               </View>
             </View>
 
             <View style={styles.panel}>
               <Text style={styles.panelTitle}>Top Recommended Regions</Text>
-              <View style={{ backgroundColor: colors.surfaceContainer, padding: 10, borderRadius: 8, marginBottom: 8 }}>
-                <Text style={{ color: colors.textBody, fontWeight: 'bold' }}>europe-west6 (AWS)</Text>
-                <Text style={{ color: colors.textMuted, fontSize: 12 }}>Grid Intensity: 12 gCO2/kWh • Renewable: 89%</Text>
-                <Text style={{ color: colors.primary, marginTop: 4 }}>~0.4 kg CO2/mo ($15.50/mo)</Text>
-              </View>
-              <View style={{ backgroundColor: colors.surfaceContainer, padding: 10, borderRadius: 8 }}>
-                <Text style={{ color: colors.textBody, fontWeight: 'bold' }}>eu-north-1 (GCP)</Text>
-                <Text style={{ color: colors.textMuted, fontSize: 12 }}>Grid Intensity: 15 gCO2/kWh • Renewable: 85%</Text>
-                <Text style={{ color: colors.primary, marginTop: 4 }}>~0.5 kg CO2/mo ($16.20/mo)</Text>
-              </View>
+              {top3Regions && top3Regions.length > 0 ? top3Regions.map((reg: any, i: number) => (
+                <View key={i} style={{ backgroundColor: colors.surfaceContainer, padding: 10, borderRadius: 8, marginBottom: 8 }}>
+                  <Text style={{ color: colors.textBody, fontWeight: 'bold' }}>{reg.name} ({reg.provider})</Text>
+                  <Text style={{ color: colors.textMuted, fontSize: 12 }}>Grid Intensity: {reg.gridIntensity} gCO2/kWh • Renewable: {reg.renewablePercentage}%</Text>
+                  <Text style={{ color: colors.primary, marginTop: 4 }}>~{reg.projectedCarbonKg?.toFixed(2)} kg CO2/mo (${reg.costEstimateUsd?.toFixed(2)}/mo)</Text>
+                </View>
+              )) : (
+                <View style={{ backgroundColor: colors.surfaceContainer, padding: 10, borderRadius: 8 }}>
+                  <Text style={{ color: colors.textMuted }}>Loading regions...</Text>
+                </View>
+              )}
             </View>
           </View>
         ) : (

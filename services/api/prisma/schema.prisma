@@ -606,6 +606,8 @@ model Project {
   agenticMode  Boolean   @default(false)
   connectedAt  DateTime?
   lastPingAt   DateTime?
+  configInitializedAt DateTime?
+  projectProfile      Json?
   carbonBudgetKg Float?  @default(100) // Monthly CO₂ budget in kg
 
   // Data source state — never silently blend mock and real data

@@ -6,6 +6,7 @@
  * In live mode, uses AWS CloudWatch and GCP Monitoring.
  */
 export interface EmissionRecordData {
+    projectId?: string;
     instanceId: string;
     instanceType: string;
     instanceName: string;

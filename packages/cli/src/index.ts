@@ -166,6 +166,37 @@ function detectProvider(envVars: Record<string, string>): string {
   return 'aws';
 }
 
+async function detectProjectProfile(cwd: string): Promise<Record<string, string>> {
+  const profile: Record<string, string> = { runtime: 'unknown', workloadClass: 'unknown' };
+  try {
+    const pkgPath = path.join(cwd, 'package.json');
+    if (await fileExists(pkgPath)) {
+      profile.runtime = 'node';
+      const pkg = JSON.parse(await fs.readFile(pkgPath, 'utf8'));
+      const deps = { ...(pkg.dependencies || {}), ...(pkg.devDependencies || {}) };
+      if (deps['next'] || deps['express'] || deps['react']) {
+        profile.workloadClass = 'web';
+      } else if (deps['@tensorflow/tfjs-node'] || deps['brain.js']) {
+        profile.workloadClass = 'ml';
+      }
+    } else {
+      const reqPath = path.join(cwd, 'requirements.txt');
+      if (await fileExists(reqPath)) {
+        profile.runtime = 'python';
+        const reqs = await fs.readFile(reqPath, 'utf8');
+        if (reqs.includes('django') || reqs.includes('flask') || reqs.includes('fastapi')) {
+          profile.workloadClass = 'web';
+        } else if (reqs.includes('torch') || reqs.includes('tensorflow') || reqs.includes('scikit')) {
+          profile.workloadClass = 'ml';
+        }
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+  return profile;
+}
+
 function buildInjectionSnippet(cfg: Record<string, string>): string {
   return [
     '',
@@ -240,7 +271,17 @@ program
     const projectName = envVars.APP_NAME || (() => {
       try { return require(path.join(cwd, 'package.json')).name; } catch { return path.basename(cwd); }
     })();
-    console.log(pc.green(`✅ ${provider.toUpperCase()} / ${region}`));
+    const projectProfile = await detectProjectProfile(cwd);
+    console.log(pc.green(`✅ ${provider.toUpperCase()} / ${region} [${projectProfile.runtime}-${projectProfile.workloadClass}]`));
+
+    try {
+      await axios.post(`${baseUrl}/api/v1/carbon/init`, { projectName, projectProfile }, {
+        headers: { 'Authorization': `Bearer ${apiKey}` },
+        timeout: 5000,
+      });
+    } catch (e) {
+      // Non-fatal if backend endpoint fails
+    }
 
     const cfg = { instanceId, instanceType, provider, region, projectName };
 

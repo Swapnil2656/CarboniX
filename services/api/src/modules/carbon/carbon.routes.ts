@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { calculate, compare, recommend, calculateEmissions, verifyKey, ingestTelemetry } from './carbon.controller';
+import { calculate, compare, recommend, calculateEmissions, verifyKey, ingestTelemetry, initProject } from './carbon.controller';
 import { getHistory, deleteCalculation } from './history.controller';
 import { getDashboard } from './dashboard.controller';
 import { getNotifications, markNotificationRead } from './notifications.controller';
@@ -19,6 +19,7 @@ router.post('/calculate-emissions', calculateEmissions);
 
 // CLI Integration Endpoints
 router.post('/verify-key', authenticateApiKey, verifyKey as any);
+router.post('/init', authenticateApiKey, initProject as any);
 router.post('/telemetry/ingest', authenticateApiKey, ingestTelemetry as any);
 
 router.get('/history', authenticate, getHistory);

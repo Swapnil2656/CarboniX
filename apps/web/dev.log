@@ -1,0 +1,17 @@
+
+> web@0.1.0 dev
+> npx rimraf .next && dotenv -e ../../.env -- next dev --turbo
+
+ ⚠ Port 3000 is in use, trying 3001 instead.
+  ▲ Next.js 14.2.35 (turbo)
+  - Local:        http://localhost:3001
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Compiled in 110ms
+ ✓ Ready in 666ms
+ ○ Compiling / ...
+ ✓ Compiled / in 2.9s
+ GET / 200 in 3148ms
+ ✓ Compiled in 142ms
+ ✓ Compiled in 74ms

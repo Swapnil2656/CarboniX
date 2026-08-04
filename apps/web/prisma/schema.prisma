@@ -550,6 +550,8 @@ model Project {
   sdkConnected Boolean   @default(false)
   connectedAt  DateTime?
   lastPingAt   DateTime?
+  configInitializedAt DateTime?
+  projectProfile      Json?
   userId       String
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   apiKeys      ApiKey[]

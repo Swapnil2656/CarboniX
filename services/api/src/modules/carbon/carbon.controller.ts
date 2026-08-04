@@ -308,6 +308,27 @@ export const verifyKey = async (req: ApiKeyRequest, res: Response) => {
   }
 };
 
+export const initProject = async (req: ApiKeyRequest, res: Response) => {
+  try {
+    if (req.apiKey) {
+      const { projectName, projectProfile } = req.body || {};
+      const projectId = await resolveProjectForApiKey(req.apiKey, projectName);
+      if (projectId) {
+        await prisma.project.update({
+          where: { id: projectId },
+          data: {
+            configInitializedAt: new Date(),
+            projectProfile: projectProfile || {}
+          }
+        });
+      }
+    }
+    res.json({ success: true, message: 'Project initialized' });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+};
+
 export const ingestTelemetry = async (req: ApiKeyRequest, res: Response) => {
   try {
     const { instanceId, instanceType, provider, region, cpuUtilization, storageGb, projectName } = req.body;

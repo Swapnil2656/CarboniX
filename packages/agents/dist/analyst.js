@@ -21,6 +21,7 @@ const DOWNGRADE_MAP = {
 };
 // ─── Zod schema for Nemotron output validation ────────────────────────────────
 const RecommendationSchema = zod_1.z.object({
+    projectId: zod_1.z.string().optional(),
     instanceId: zod_1.z.string(),
     instanceName: zod_1.z.string(),
     currentType: zod_1.z.string(),
@@ -122,6 +123,7 @@ function generateFallbackRecommendations(records) {
     for (const record of records) {
         if (record.isIdle) {
             recommendations.push({
+                projectId: record.projectId,
                 instanceId: record.instanceId,
                 instanceName: record.instanceName || record.instanceId,
                 currentType: record.instanceType,
@@ -137,6 +139,7 @@ function generateFallbackRecommendations(records) {
             const downgrade = DOWNGRADE_MAP[record.instanceType] || record.instanceType;
             const estimatedSaving = record.carbonKg * 0.5; // ~50% saving from downgrade
             recommendations.push({
+                projectId: record.projectId,
                 instanceId: record.instanceId,
                 instanceName: record.instanceName || record.instanceId,
                 currentType: record.instanceType,
@@ -152,6 +155,7 @@ function generateFallbackRecommendations(records) {
         if (record.region === 'ap-south-1' && !record.isIdle) {
             const projectedKg = record.carbonKg * (8 / 750); // eu-north-1 ratio
             recommendations.push({
+                projectId: record.projectId,
                 instanceId: record.instanceId,
                 instanceName: record.instanceName || record.instanceId,
                 currentType: record.instanceType,

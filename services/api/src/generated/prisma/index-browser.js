@@ -423,6 +423,8 @@ exports.Prisma.ProjectScalarFieldEnum = {
   agenticMode: 'agenticMode',
   connectedAt: 'connectedAt',
   lastPingAt: 'lastPingAt',
+  configInitializedAt: 'configInitializedAt',
+  projectProfile: 'projectProfile',
   carbonBudgetKg: 'carbonBudgetKg',
   dataSource: 'dataSource',
   userId: 'userId',

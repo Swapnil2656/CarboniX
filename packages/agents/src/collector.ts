@@ -12,6 +12,7 @@ import { CloudWatchClient, GetMetricStatisticsCommand } from '@aws-sdk/client-cl
 import monitoring from '@google-cloud/monitoring';
 
 export interface EmissionRecordData {
+  projectId?: string;
   instanceId: string;
   instanceType: string;
   instanceName: string;
