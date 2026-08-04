@@ -213,12 +213,49 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
         
         doc.save(`CarboniX_Report_${params.id}.pdf`);
       } else {
-        alert('Export failed: ' + (res.error || 'Unknown error'));
+        alert('Failed to generate report');
       }
     } catch (e: any) {
       alert('Export failed: ' + e.message);
     } finally {
       setIsExporting(false);
+    }
+  };
+
+  const handleRevokeKey = async (keyId: string) => {
+    if (!confirm('Are you sure you want to revoke this API key?')) return;
+    try {
+      await adminApi.revokeApiKey(keyId);
+      window.location.reload();
+    } catch (e: any) {
+      alert('Revoke failed: ' + e.message);
+    }
+  };
+
+  const handleRotateKey = async (key: any) => {
+    if (!confirm('Are you sure you want to rotate this key? The old key will be revoked immediately.')) return;
+    try {
+      await adminApi.revokeApiKey(key.id);
+      const res = await adminApi.createApiKey({
+        name: key.name,
+        permissions: key.permissions || ['agent_control'],
+        expiration: 'never',
+        projectId: params.id
+      });
+      alert(`New Key Generated:\n\n${res.key}\n\nPlease copy this now. It won't be shown again.`);
+      window.location.reload();
+    } catch (e: any) {
+      alert('Rotate failed: ' + e.message);
+    }
+  };
+
+  const handleDeleteKey = async (keyId: string) => {
+    if (!confirm('Are you sure you want to permanently delete this API key? This action cannot be undone.')) return;
+    try {
+      await adminApi.deleteApiKey(keyId);
+      window.location.reload();
+    } catch (e: any) {
+      alert('Delete failed: ' + e.message);
     }
   };
 
@@ -715,8 +752,9 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                   <div className="text-xs text-on-surface-variant mt-1">Prefix: {key.prefix} • Last Used: {key.lastUsedAt ? new Date(key.lastUsedAt).toLocaleDateString() : 'Never'}</div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button className="bg-surface-container-highest hover:bg-surface-bright px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">Rotate</button>
-                  <button className="bg-error/10 text-error hover:bg-error/20 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">Revoke</button>
+                  <button onClick={() => handleRotateKey(key)} className="bg-surface-container-highest hover:bg-surface-bright px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">Rotate</button>
+                  <button onClick={() => handleRevokeKey(key.id)} disabled={key.status !== 'ACTIVE'} className="bg-error/10 text-error hover:bg-error/20 disabled:opacity-50 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">Revoke</button>
+                  <button onClick={() => handleDeleteKey(key.id)} className="bg-error/20 text-error hover:bg-error/30 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">Delete</button>
                 </div>
               </div>
             ))}

@@ -1,6 +1,7 @@
 'use server';
 
 import { prisma } from '@/lib/carbonix-auth/prisma';
+import * as crypto from 'crypto';
 
 export type Role = 'user' | 'model' | 'function';
 
@@ -20,7 +21,8 @@ CarboniX is an industrial-grade cloud infrastructure optimization platform. It h
 
 You MUST ALWAYS use a tool to respond.
 1. If the user asks about their projects, use listProjects, switchProjectRegion, etc. Use the data from the tools to give detailed answers about their infrastructure.
-2. If the user asks a general question (like "what is CarboniX?", "hi", "who are you?"), use the "respondToUser" tool to answer them accurately based on your knowledge of CarboniX.
+2. If the user asks to generate, create, or make an API key for a self-hosted agent or server, ALWAYS use the generateApiKey tool. Return the generated key back to the user clearly.
+3. If the user asks a general question (like "what is CarboniX?", "hi", "who are you?"), use the "respondToUser" tool to answer them accurately based on your knowledge of CarboniX.
 
 NEVER answer without using a tool.
 `;
@@ -94,6 +96,21 @@ const tools = [
       }
     }
   },
+  {
+    type: 'function',
+    function: {
+      name: 'generateApiKey',
+      description: 'Generates a new API key for the user to use with self-hosted agents or integrations.',
+      parameters: {
+        type: 'object',
+        properties: {
+          projectName: { type: 'string', description: 'The name of the project this key is for.' },
+          permissions: { type: 'array', items: { type: 'string' }, description: 'Permissions for the key (e.g. agent_control)' },
+        },
+        required: ['projectName'],
+      }
+    }
+  },
 ];
 
 async function callNvidiaApi(history: ChatMessage[]) {
@@ -155,7 +172,7 @@ async function callNvidiaApi(history: ChatMessage[]) {
           'Authorization': `Bearer ${NVIDIA_API_KEY}`
         },
         body: JSON.stringify({
-          model: 'mistralai/mistral-nemotron',
+          model: 'meta/llama-3.1-70b-instruct',
           messages,
           tools,
           temperature: 0.2,
@@ -276,6 +293,37 @@ async function executeTool(name: string, args: any, adminUserId: string) {
       // We can also fetch recent emissions if needed
       return `Project '${project.name}' is currently deployed in region '${project.region}'. It is active and tracking carbon emissions.`;
     }
+    case 'generateApiKey': {
+      const { projectName, permissions } = args;
+      const rawKey = crypto.randomBytes(24).toString('hex');
+      const prefix = 'cx_' + rawKey.substring(0, 8);
+      const hashedKey = crypto.createHash('sha256').update(rawKey).digest('hex');
+
+      let project = await prisma.project.findFirst({
+        where: { name: projectName, userId: adminUserId }
+      });
+
+      if (!project) {
+        project = await prisma.project.findFirst({
+          where: { userId: adminUserId }
+        });
+      }
+
+      if (!project) return "You don't have any projects to attach this key to.";
+
+      const keyRecord = await prisma.apiKey.create({
+        data: {
+          name: `Agent Key for ${project.name}`,
+          prefix,
+          hashedKey,
+          projectId: project.id,
+          permissions: permissions || ['agent_control'],
+          createdBy: adminUserId,
+        }
+      });
+
+      return `Success! I have generated a new API Key for project '${project.name}'. The key is: cx_${rawKey}  (Please copy this, it will not be shown again).`;
+    }
     default:
       return `Unknown tool: ${name}`;
   }
@@ -347,6 +395,19 @@ export async function chatWithAgent(message: string, history: ChatMessage[], adm
           break; // Exit tool loop, answer generated
         } catch (e) {
           // Fallback if parsing fails
+        }
+      }
+
+      // Check if the AI generated an API key (we want to output it exactly as is without a second LLM pass)
+      if (toolCalls.length === 1 && toolCalls[0].function.name === 'generateApiKey') {
+        try {
+          const parsedArgs = JSON.parse(toolCalls[0].function.arguments);
+          const resultStr = await executeTool('generateApiKey', parsedArgs, adminUserId);
+          aiMessage.content = typeof resultStr === 'string' ? resultStr : JSON.stringify(resultStr);
+          break; // Exit tool loop, return exactly what executeTool returned
+        } catch (err: any) {
+          aiMessage.content = `Error: ${err.message}`;
+          break;
         }
       }
       for (const call of toolCalls) {
