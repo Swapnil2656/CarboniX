@@ -5,6 +5,7 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import * as SecureStore from 'expo-secure-store';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { colors } from '../../src/theme/colors';
 import { useAuthStore } from '../../src/stores/auth.store';
@@ -73,6 +74,10 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
+      <LinearGradient
+        colors={[colors.primary + '25', 'transparent']}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 280 }}
+      />
       {/* TopBar */}
       <View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top }]}>
         <View style={styles.topBarLeft}>
@@ -193,9 +198,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.outlineVariant,
+    backgroundColor: 'transparent',
   },
   topBarLeft: {
     flexDirection: 'row',

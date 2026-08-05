@@ -4,6 +4,7 @@ import { Tabs, Redirect, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Constants from 'expo-constants';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { colors } from '../../src/theme/colors';
 import { useAuthStore } from '../../src/stores/auth.store';
@@ -84,6 +85,13 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
 
   return (
     <View style={[styles.tabBarContainer, { height: TAB_HEIGHT + Math.max(insets.bottom, 0), paddingBottom: Math.max(insets.bottom, 0) }]}>
+      {/* Bottom fade effect */}
+      <LinearGradient
+        colors={['transparent', '#000000']}
+        style={{ position: 'absolute', left: 0, right: 0, top: -80, bottom: 0 }}
+        pointerEvents="none"
+      />
+
       {/* Magic Indicator */}
       <Animated.View 
         style={[
@@ -226,17 +234,13 @@ const styles = StyleSheet.create({
   tabBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#000000',
+    backgroundColor: 'transparent',
     height: TAB_HEIGHT,
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
+    elevation: 0,
   },
   indicatorWrapper: {
     position: 'absolute',

@@ -5,6 +5,7 @@ import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
+import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../../src/theme/colors';
 import { carbonApi, adminApi } from '../../src/services/api/endpoints';
 
@@ -141,6 +142,12 @@ export default function DashboardScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Spotify-style top gradient fade */}
+      <LinearGradient
+        colors={[colors.primary + '25', 'transparent']}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 280 }}
+      />
+      
       {/* TopAppBar */}
       <View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top }]}>
         <View style={styles.topBarLeft}>
@@ -397,8 +404,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#141414' },
   topBar: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingHorizontal: 20, backgroundColor: colors.surface,
-    borderBottomWidth: 1, borderBottomColor: colors.outlineVariant,
+    paddingHorizontal: 20, backgroundColor: 'transparent',
   },
   topBarLeft: { flexDirection: 'row', alignItems: 'center' },
   logoImage: { width: 56, height: 56, resizeMode: 'contain' },

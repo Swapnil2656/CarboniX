@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image,
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import { colors } from '../../src/theme/colors';
@@ -61,6 +62,10 @@ export default function HistoryScreen() {
 
   return (
     <View style={styles.container}>
+      <LinearGradient
+        colors={[colors.primary + '25', 'transparent']}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 280 }}
+      />
       {/* TopAppBar */}
       <View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top }]}>
         <View style={styles.topBarLeft}>
@@ -156,8 +161,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#141414' },
   topBar: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingHorizontal: 20, backgroundColor: colors.surface,
-    borderBottomWidth: 1, borderBottomColor: colors.outlineVariant,
+    paddingHorizontal: 20, backgroundColor: 'transparent',
   },
   topBarLeft: { flexDirection: 'row', alignItems: 'center' },
   logoImage: { width: 56, height: 56, resizeMode: 'contain' },

@@ -6,6 +6,7 @@ import { Picker } from '@react-native-picker/picker';
 import Slider from '@react-native-community/slider';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { colors } from '../../src/theme/colors';
 import { carbonApi, referenceApi } from '../../src/services/api/endpoints';
@@ -278,7 +279,11 @@ export default function EstimateScreen() {
   if (showResults) {
     return (
       <View style={styles.container}>
-        <View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top }]}>
+        <LinearGradient
+          colors={[colors.primary + '25', 'transparent']}
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 280 }}
+        />
+        <View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top, borderBottomWidth: 0 }]}>
           <View style={styles.topBarLeft}>
             <Image source={require('../../assets/carbonix-logo.png')} style={styles.logoImage} />
             <Text style={styles.logo}>CarboniX</Text>
@@ -306,7 +311,11 @@ export default function EstimateScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top }]}>
+      <LinearGradient
+        colors={[colors.primary + '25', 'transparent']}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 280 }}
+      />
+      <View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top, borderBottomWidth: 0 }]}>
         <View style={styles.topBarLeft}>
           <Image source={require('../../assets/carbonix-logo.png')} style={styles.logoImage} />
           <Text style={styles.logo}>CarboniX</Text>
@@ -490,8 +499,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#141414' },
   topBar: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingHorizontal: 20, backgroundColor: colors.surface,
-    borderBottomWidth: 1, borderBottomColor: colors.outlineVariant,
+    paddingHorizontal: 20, backgroundColor: 'transparent',
   },
   topBarLeft: { flexDirection: 'row', alignItems: 'center' },
   logoImage: { width: 56, height: 56, resizeMode: 'contain' },
