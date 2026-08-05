@@ -16,6 +16,10 @@ export default function ProjectDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [chartDays, setChartDays] = useState<'7d' | '30d'>('7d');
   
+  const [confirmNameDisconnect, setConfirmNameDisconnect] = useState('');
+  const [confirmNameDelete, setConfirmNameDelete] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
@@ -39,6 +43,35 @@ export default function ProjectDetailScreen() {
     }
   }, [id]);
 
+  const handleDelete = async () => {
+    if (confirmNameDelete !== data?.project?.name) {
+      Alert.alert('Validation Error', 'Project name does not match.');
+      return;
+    }
+    try {
+      setIsDeleting(true);
+      await adminApi.deleteProject(id as string);
+      router.back();
+    } catch (e: any) {
+      Alert.alert('Delete failed', e.message);
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDisconnect = async () => {
+    if (confirmNameDisconnect !== data?.project?.name) {
+      Alert.alert('Validation Error', 'Project name does not match.');
+      return;
+    }
+    try {
+      setIsDisconnecting(true);
+      await adminApi.disconnectProject(id as string);
+      router.back();
+    } catch (e: any) {
+      Alert.alert('Disconnect failed', e.message);
+      setIsDisconnecting(false);
+    }
+  };
 
   const handleExport = async () => {
     try {
@@ -98,6 +131,9 @@ export default function ProjectDetailScreen() {
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
           <MaterialIcons name="arrow-back" size={24} color={colors.textBody} />
           <Text style={styles.backText}>Back</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.settingsBtn} onPress={() => router.push({ pathname: '/project-settings' as any, params: { id } })}>
+          <MaterialIcons name="settings" size={24} color={colors.textBody} />
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -281,6 +317,70 @@ export default function ProjectDetailScreen() {
           </View>
         )}
 
+        <View style={styles.panel}>
+          <Text style={styles.panelTitle}>Associated API Keys</Text>
+          {apiKeys?.length > 0 ? (
+            apiKeys.map((key: any) => (
+              <View key={key.id} style={{ backgroundColor: colors.surfaceContainer, padding: 12, borderRadius: 8, marginBottom: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <View>
+                  <Text style={{ color: colors.textBody, fontWeight: 'bold' }}>{key.name}</Text>
+                  <Text style={{ color: colors.textMuted, fontSize: 12 }}>Prefix: {key.prefix}</Text>
+                </View>
+                <TouchableOpacity style={{ backgroundColor: 'rgba(248,113,113,0.1)', padding: 6, borderRadius: 6 }}>
+                  <Text style={{ color: colors.error, fontSize: 12 }}>Revoke</Text>
+                </TouchableOpacity>
+              </View>
+            ))
+          ) : (
+            <Text style={{ color: colors.textMuted, fontSize: 14 }}>No associated API keys found.</Text>
+          )}
+        </View>
+
+        {/* Danger Zone */}
+        <View style={styles.dangerZone}>
+          <View style={styles.dangerHeader}>
+            <MaterialIcons name="warning" size={20} color={colors.error} />
+            <Text style={styles.dangerTitle}>Danger Zone</Text>
+          </View>
+
+          <View style={styles.dangerContent}>
+            <Text style={styles.dangerItemTitle}>Disconnect Project</Text>
+            <Text style={styles.dangerItemText}>Disconnecting will stop new telemetry but preserve historical data.</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Type project name to confirm"
+              placeholderTextColor={colors.textMuted}
+              value={confirmNameDisconnect}
+              onChangeText={setConfirmNameDisconnect}
+            />
+            <TouchableOpacity 
+              style={[styles.dangerBtn, { backgroundColor: '#f5c518' }, (isDisconnecting || confirmNameDisconnect !== project.name) && styles.disabledBtn]}
+              onPress={handleDisconnect}
+              disabled={isDisconnecting || confirmNameDisconnect !== project.name}
+            >
+              <Text style={styles.dangerBtnText}>{isDisconnecting ? 'Disconnecting...' : 'Disconnect'}</Text>
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+
+            <Text style={styles.dangerItemTitle}>Delete Project</Text>
+            <Text style={styles.dangerItemText}>Permanently delete this project and all of its telemetry history.</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Type project name to confirm"
+              placeholderTextColor={colors.textMuted}
+              value={confirmNameDelete}
+              onChangeText={setConfirmNameDelete}
+            />
+            <TouchableOpacity 
+              style={[styles.dangerBtn, (isDeleting || confirmNameDelete !== project.name) && styles.disabledBtn]}
+              onPress={handleDelete}
+              disabled={isDeleting || confirmNameDelete !== project.name}
+            >
+              <Text style={styles.dangerBtnText}>{isDeleting ? 'Deleting...' : 'Delete'}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </ScrollView>
     </View>
   );
@@ -309,5 +409,17 @@ const styles = StyleSheet.create({
   statHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   statTitle: { fontSize: 12, color: colors.textMuted, marginLeft: 6 },
   statValue: { fontSize: 20, fontWeight: 'bold', color: colors.textBody },
+  dangerZone: { marginTop: 24, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(248, 113, 113, 0.3)' },
+  dangerHeader: { backgroundColor: 'rgba(248, 113, 113, 0.1)', padding: 16, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: 'rgba(248, 113, 113, 0.2)' },
+  dangerTitle: { color: colors.error, fontWeight: 'bold', fontSize: 16, marginLeft: 8 },
+  dangerContent: { backgroundColor: 'rgba(248, 113, 113, 0.05)', padding: 16 },
+  dangerItemTitle: { color: colors.textBody, fontWeight: 'bold', marginBottom: 4 },
+  dangerItemText: { color: colors.textMuted, fontSize: 12, marginBottom: 12 },
+  input: { backgroundColor: colors.background, borderWidth: 1, borderColor: colors.surfaceContainer, borderRadius: 8, padding: 12, color: colors.textBody, marginBottom: 12 },
+  dangerBtn: { backgroundColor: colors.error, padding: 12, borderRadius: 8, alignItems: 'center' },
+  dangerBtnText: { color: '#fff', fontWeight: 'bold' },
+  disabledBtn: { opacity: 0.5 },
+  divider: { height: 1, backgroundColor: 'rgba(248, 113, 113, 0.1)', marginVertical: 20 },
+  exportBtn: { backgroundColor: colors.primary, padding: 10, borderRadius: 8, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', marginTop: 12, gap: 8 },
   exportBtnText: { color: colors.background, fontWeight: 'bold' }
 });
