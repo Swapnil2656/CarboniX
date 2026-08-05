@@ -141,7 +141,6 @@ export const AiBotModal: React.FC<AiBotModalProps> = ({ visible, onClose }) => {
               </View>
               <View>
                 <Text style={styles.headerTitle}>CarboniX Agent</Text>
-                <Text style={styles.headerSubtitle}>Powered by Gemini AI</Text>
               </View>
             </View>
             <View style={styles.headerRight}>

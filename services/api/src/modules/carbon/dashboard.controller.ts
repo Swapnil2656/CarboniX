@@ -88,26 +88,34 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
     }
 
     // 5. Get budget info and active web projects
-    const user = await prisma.mobileUser.findUnique({ where: { id: userId } });
-    const budgetLimitKg = user?.carbonBudgetKg || 100;
+    const mobileUser = await prisma.mobileUser.findUnique({ where: { id: userId } });
+    const budgetLimitKg = mobileUser?.carbonBudgetKg || 100;
     const percentUsed = Math.round((totalCo2ThisMonth / budgetLimitKg) * 100);
 
     let webProjects: any[] = [];
-    if (user?.email) {
-      const webUser = await prisma.user.findUnique({
-        where: { email: user.email },
+    
+    // Auth might be passing a User ID (from web) or MobileUser ID
+    let webUser = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { projects: true } // or filter active ones
+    });
+
+    if (!webUser && mobileUser?.email) {
+      webUser = await prisma.user.findUnique({
+        where: { email: mobileUser.email },
         include: { projects: true }
       });
-      if (webUser?.projects) {
-        webProjects = webUser.projects.map(p => ({
-          id: p.id,
-          name: p.name,
-          region: p.region,
-          sdkConnected: p.sdkConnected,
-          connectedAt: p.connectedAt,
-          lastPingAt: p.lastPingAt
-        }));
-      }
+    }
+
+    if (webUser?.projects) {
+      webProjects = webUser.projects.map(p => ({
+        id: p.id,
+        name: p.name,
+        region: p.region,
+        sdkConnected: p.sdkConnected,
+        connectedAt: p.connectedAt,
+        lastPingAt: p.lastPingAt
+      }));
     }
 
     // 7. Get recent alerts

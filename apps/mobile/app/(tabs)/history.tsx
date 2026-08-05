@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image,
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import { colors } from '../../src/theme/colors';
 import { adminApi } from '../../src/services/api/endpoints';
@@ -30,6 +31,26 @@ export default function HistoryScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDeleteLog = async (id: string) => {
+    try {
+      const res = await adminApi.deleteAuditLog(id);
+      if (res.success) {
+        setLogs(logs.filter(log => log.id !== id));
+      }
+    } catch (err: any) {
+      Alert.alert('Error', 'Failed to delete audit log.');
+    }
+  };
+
+  const renderRightActions = (item: any) => {
+    return (
+      <TouchableOpacity style={styles.deleteAction} onPress={() => handleDeleteLog(item.id)}>
+        <MaterialIcons name="delete-outline" size={20} color="#fff" />
+        <Text style={styles.actionText}>Delete</Text>
+      </TouchableOpacity>
+    );
   };
 
   const filteredData = logs.filter(item => 
@@ -79,30 +100,36 @@ export default function HistoryScreen() {
             <Text style={styles.emptyText}>No audit logs found.</Text>
           ) : (
             filteredData.map((item) => (
-              <View key={item.id} style={styles.card}>
-                <View style={styles.cardHeader}>
-                  <Text style={styles.timeText}>{new Date(item.createdAt).toLocaleDateString()} {new Date(item.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</Text>
-                  <View style={styles.badge}>
-                    <Text style={styles.badgeText}>{item.action.replace(/_/g, ' ')}</Text>
-                  </View>
-                </View>
-
-                <View style={styles.cardBody}>
-                  <View style={{ flex: 1, gap: 4 }}>
-                    <Text style={styles.cardTitle}>{item.resource} {item.resourceId ? `(${item.resourceId.substring(0, 8)})` : ''}</Text>
-                    <View style={styles.providerInfo}>
-                      <Text style={styles.providerText}>{item.actorEmail}</Text>
-                      <Text style={styles.dotSeparator}>•</Text>
-                      <Text style={styles.regionText}>{item.actorRole}</Text>
+              <Swipeable
+                key={item.id}
+                renderRightActions={() => renderRightActions(item)}
+                overshootRight={false}
+              >
+                <View style={styles.card}>
+                  <View style={styles.cardHeader}>
+                    <Text style={styles.timeText}>{new Date(item.createdAt).toLocaleDateString()} {new Date(item.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</Text>
+                    <View style={styles.badge}>
+                      <Text style={styles.badgeText}>{item.action.replace(/_/g, ' ')}</Text>
                     </View>
                   </View>
-                  
-                  <View style={{ alignItems: 'flex-end' }}>
-                    <Text style={styles.totalLabel}>IP ADDRESS</Text>
-                    <Text style={styles.totalValue}>{item.ip || '127.0.0.1'}</Text>
+
+                  <View style={styles.cardBody}>
+                    <View style={{ flex: 1, gap: 4 }}>
+                      <Text style={styles.cardTitle}>{item.resource} {item.resourceId ? `(${item.resourceId.substring(0, 8)})` : ''}</Text>
+                      <View style={styles.providerInfo}>
+                        <Text style={styles.providerText}>{item.actorEmail}</Text>
+                        <Text style={styles.dotSeparator}>•</Text>
+                        <Text style={styles.regionText}>{item.actorRole}</Text>
+                      </View>
+                    </View>
+                    
+                    <View style={{ alignItems: 'flex-end' }}>
+                      <Text style={styles.totalLabel}>IP ADDRESS</Text>
+                      <Text style={styles.totalValue}>{item.ip || '127.0.0.1'}</Text>
+                    </View>
                   </View>
                 </View>
-              </View>
+              </Swipeable>
             ))
           )}
         </View>
@@ -151,5 +178,7 @@ const styles = StyleSheet.create({
   badge: { borderWidth: 1, borderColor: '#4285F4', backgroundColor: 'rgba(66, 133, 244, 0.1)', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2 },
   badgeText: { fontFamily: 'JetBrainsMono-Bold', fontSize: 10, color: '#4285F4', letterSpacing: 1 },
 
+  deleteAction: { backgroundColor: '#ff5555', justifyContent: 'center', alignItems: 'center', width: 80, borderRadius: 12, marginVertical: 1, marginLeft: 8 },
+  actionText: { fontFamily: 'Inter-SemiBold', color: '#fff', fontSize: 12, marginTop: 4 },
   emptyText: { color: colors.textMuted, textAlign: 'center', marginTop: 32, fontFamily: 'Inter' },
 });

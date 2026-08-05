@@ -58,6 +58,10 @@ export const adminApi = {
     const response = await apiClient.get('/admin/audit-logs', { params });
     return response.data;
   },
+  deleteAuditLog: async (id: string) => {
+    const response = await apiClient.delete(`/admin/audit-logs/${id}`);
+    return response.data;
+  },
   getDashboardStats: async () => {
     const response = await apiClient.get('/admin/dashboard');
     return response.data;
@@ -100,6 +104,10 @@ export const adminApi = {
   },
   revokeApiKey: async (id: string) => {
     const response = await apiClient.delete(`/admin/api-keys/${id}`);
+    return response.data;
+  },
+  deleteApiKey: async (id: string) => {
+    const response = await apiClient.delete(`/admin/api-keys/${id}/hard`);
     return response.data;
   },
   removeUser: async (id: string) => {

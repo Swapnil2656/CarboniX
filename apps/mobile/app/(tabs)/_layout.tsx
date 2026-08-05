@@ -182,6 +182,18 @@ export default function TabLayout() {
         <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
       </Tabs>
 
+      {/* Floating Action Button for AI Bot */}
+      <TouchableOpacity 
+        style={[styles.fab, { bottom: TAB_HEIGHT + Math.max(insets.bottom, 0) + 16 }]}
+        onPress={() => setAiBotVisible(true)}
+      >
+        <FontAwesome5 name="robot" size={24} color="#131313" />
+      </TouchableOpacity>
+      
+      <AiBotModal 
+        visible={aiBotVisible} 
+        onClose={() => setAiBotVisible(false)} 
+      />
     </View>
   );
 }

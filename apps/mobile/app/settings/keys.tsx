@@ -38,6 +38,13 @@ export default function ApiKeysScreen() {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => adminApi.deleteApiKey(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminApiKeys'] });
+    },
+  });
+
   return (
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top }]}>
@@ -103,13 +110,21 @@ export default function ApiKeysScreen() {
                 <Text style={styles.detailLabel}>Created By:</Text>
                 <Text style={styles.detailValue}>{item.createdBy}</Text>
               </View>
-              {item.status === 'ACTIVE' && (
+              {item.status === 'ACTIVE' ? (
                 <TouchableOpacity 
                   style={styles.revokeBtn}
                   disabled={revokeMutation.isPending}
                   onPress={() => revokeMutation.mutate(item.id)}
                 >
                   <Text style={styles.revokeBtnText}>Revoke Key</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity 
+                  style={[styles.revokeBtn, { backgroundColor: '#ff5555' }]}
+                  disabled={deleteMutation.isPending}
+                  onPress={() => deleteMutation.mutate(item.id)}
+                >
+                  <Text style={[styles.revokeBtnText, { color: '#000' }]}>Delete Key</Text>
                 </TouchableOpacity>
               )}
             </View>
