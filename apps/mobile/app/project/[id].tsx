@@ -132,6 +132,9 @@ export default function ProjectDetailScreen() {
           <MaterialIcons name="arrow-back" size={24} color={colors.textBody} />
           <Text style={styles.backText}>Back</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.settingsBtn} onPress={() => router.push({ pathname: '/project-settings' as any, params: { id } })}>
+          <MaterialIcons name="settings" size={24} color={colors.textBody} />
+        </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         
@@ -385,8 +388,9 @@ export default function ProjectDetailScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  topBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: colors.surfaceContainer },
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: colors.surfaceContainer },
   backBtn: { flexDirection: 'row', alignItems: 'center' },
+  settingsBtn: { padding: 4 },
   backText: { color: colors.textBody, marginLeft: 4, fontSize: 16 },
   content: { padding: 20 },
   header: { marginBottom: 24 },

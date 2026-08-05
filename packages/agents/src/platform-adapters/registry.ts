@@ -1,8 +1,9 @@
-import { PlatformAdapter } from './types';
+import { PlatformAdapter, PlatformMetadata } from './types';
 import { VercelAdapter } from './vercel';
 import { RenderAdapter } from './render';
 import { NetlifyAdapter } from './netlify';
 import { RailwayAdapter } from './railway';
+import { DenoDeployAdapter } from './deno';
 import { GenericRestAdapter } from './generic';
 import { GENERIC_PLATFORMS } from './generic-config';
 
@@ -15,6 +16,7 @@ export class AdapterRegistry {
     this.register(new RenderAdapter());
     this.register(new NetlifyAdapter());
     this.register(new RailwayAdapter());
+    this.register(new DenoDeployAdapter());
 
     // Register Tier 2 Generic Adapters
     for (const config of Object.values(GENERIC_PLATFORMS)) {
@@ -38,6 +40,10 @@ export class AdapterRegistry {
 
   getAllPlatforms(): string[] {
     return Array.from(this.adapters.keys());
+  }
+
+  getMetadata(platform: string): PlatformMetadata | undefined {
+    return this.adapters.get(platform)?.metadata;
   }
 }
 

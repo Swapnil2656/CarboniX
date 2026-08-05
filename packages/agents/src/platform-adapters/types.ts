@@ -25,8 +25,17 @@ export interface PlatformCapabilities {
   canSetRegion: boolean;
 }
 
+export interface PlatformMetadata {
+  displayName: string;
+  icon: string;
+  docsUrl: string;
+  category: 'FRONTEND' | 'BACKEND' | 'SELF_HOSTED';
+  regionSwitchSupport: 'AUTO' | 'MANUAL_PR' | 'NOT_SUPPORTED';
+}
+
 export interface PlatformAdapter {
   platform: string;
+  metadata: PlatformMetadata;
   capabilities: PlatformCapabilities;
 
   /**

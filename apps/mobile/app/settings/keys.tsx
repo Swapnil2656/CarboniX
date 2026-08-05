@@ -21,7 +21,10 @@ export default function ApiKeysScreen() {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: (name: string) => adminApi.createApiKey(name),
+    mutationFn: async (name: string) => {
+      const res = await adminApi.createApiKey({ name });
+      return res;
+    },
     onSuccess: () => {
       setNewKeyName('');
       queryClient.invalidateQueries({ queryKey: ['adminApiKeys'] });

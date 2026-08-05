@@ -1,11 +1,18 @@
-import { PlatformAdapter, UsageMetrics, VerifyTokenResult, ApplyRegionResult, PlatformCapabilities } from './types';
+import { PlatformAdapter, UsageMetrics, VerifyTokenResult, ApplyRegionResult, PlatformCapabilities, PlatformMetadata } from './types';
 import { fetchT } from './utils';
 
 export class NetlifyAdapter implements PlatformAdapter {
   platform = 'NETLIFY';
   capabilities = {
     canFetchUsage: true,
-    canSetRegion: false, // Default to false until dynamically verified
+    canSetRegion: true, 
+  };
+  metadata: PlatformMetadata = {
+    displayName: 'Netlify',
+    icon: 'diamond',
+    docsUrl: 'https://app.netlify.com/user/applications#personal-access-tokens',
+    category: 'FRONTEND',
+    regionSwitchSupport: 'AUTO',
   };
 
   async checkDynamicCapabilities(token: string, projectRef?: string): Promise<PlatformCapabilities> {

@@ -94,8 +94,8 @@ export const adminApi = {
     const response = await apiClient.patch(`/admin/feature-flags/${id}`, { enabled });
     return response.data;
   },
-  createApiKey: async (name: string) => {
-    const response = await apiClient.post('/admin/api-keys', { name });
+  createApiKey: async (payload: { name: string; permissions?: string[]; expiration?: string; projectId?: string }) => {
+    const response = await apiClient.post('/admin/api-keys', payload);
     return response.data;
   },
   revokeApiKey: async (id: string) => {
@@ -164,6 +164,22 @@ export const aiApi = {
   },
   chat: async (message: string, history: any[]) => {
     const response = await apiClient.post('/ai/chat', { message, history });
+    return response.data;
+  }
+};
+
+// Connect API Endpoints
+export const connectApi = {
+  getPlatforms: async () => {
+    const response = await apiClient.get('/connect/platforms');
+    return response.data;
+  },
+  connectPlatform: async (payload: { projectId: string; platform: string; token: string; projectSlug?: string }) => {
+    const response = await apiClient.post('/connect/connect', payload);
+    return response.data;
+  },
+  revokePlatform: async (projectId: string, platform: string) => {
+    const response = await apiClient.post('/connect/revoke', { projectId, platform });
     return response.data;
   }
 };

@@ -358,24 +358,17 @@ export async function handleRevokePlatformToken(req: AuthRequest, res: Response)
 export async function handleGetPlatforms(req: AuthRequest, res: Response) {
   try {
     const platforms = platformRegistry.getAllPlatforms().map(p => {
-      let icon = 'cloud';
-      let description = `Connect via ${p} Access Token`;
-      let needsProjectSlug = true;
-      let docsUrl = '#';
-
-      if (p === 'VERCEL') { icon = 'change_history'; docsUrl = 'https://vercel.com/account/tokens'; }
-      if (p === 'NETLIFY') { icon = 'diamond'; docsUrl = 'https://app.netlify.com/user/applications#personal-access-tokens'; }
-      if (p === 'RAILWAY') { icon = 'train'; docsUrl = 'https://docs.railway.app/reference/public-api#project-tokens'; needsProjectSlug = false; }
-      if (p === 'RENDER') { icon = 'cloud'; docsUrl = 'https://dashboard.render.com/user/settings#api-keys'; needsProjectSlug = false; }
-      if (p === 'SUPABASE') { icon = 'database'; docsUrl = 'https://supabase.com/dashboard/account/tokens'; }
-
+      const metadata = platformRegistry.getMetadata(p);
+      
       return {
         id: p,
-        name: p.charAt(0) + p.slice(1).toLowerCase(),
-        icon,
-        description,
-        docsUrl,
-        needsProjectSlug
+        name: metadata?.displayName || (p.charAt(0) + p.slice(1).toLowerCase()),
+        icon: metadata?.icon || 'cloud',
+        description: `Connect via ${p} Access Token`,
+        docsUrl: metadata?.docsUrl || '#',
+        needsProjectSlug: p !== 'RAILWAY' && p !== 'RENDER', // Special casing this since it's not strictly metadata for the platform UI per se, or we could add it to metadata later
+        category: metadata?.category || 'BACKEND',
+        regionSwitchSupport: metadata?.regionSwitchSupport || 'NOT_SUPPORTED',
       };
     });
 

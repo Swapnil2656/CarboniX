@@ -1,4 +1,4 @@
-import { PlatformAdapter, UsageMetrics, VerifyTokenResult, ApplyRegionResult } from './types';
+import { PlatformAdapter, UsageMetrics, VerifyTokenResult, ApplyRegionResult, PlatformMetadata } from './types';
 import { fetchT } from './utils';
 
 export class RailwayAdapter implements PlatformAdapter {
@@ -6,6 +6,13 @@ export class RailwayAdapter implements PlatformAdapter {
   capabilities = {
     canFetchUsage: true,
     canSetRegion: true,
+  };
+  metadata: PlatformMetadata = {
+    displayName: 'Railway',
+    icon: 'train',
+    docsUrl: 'https://docs.railway.app/reference/public-api#project-tokens',
+    category: 'BACKEND',
+    regionSwitchSupport: 'AUTO',
   };
 
   async verifyToken(token: string, projectRef?: string): Promise<VerifyTokenResult> {

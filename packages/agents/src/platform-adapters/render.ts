@@ -1,4 +1,4 @@
-import { PlatformAdapter, UsageMetrics, VerifyTokenResult, ApplyRegionResult } from './types';
+import { PlatformAdapter, UsageMetrics, VerifyTokenResult, ApplyRegionResult, PlatformMetadata } from './types';
 import { fetchT } from './utils';
 
 export class RenderAdapter implements PlatformAdapter {
@@ -6,6 +6,13 @@ export class RenderAdapter implements PlatformAdapter {
   capabilities = {
     canFetchUsage: true,
     canSetRegion: false, // Render services are immutable w.r.t region after creation
+  };
+  metadata: PlatformMetadata = {
+    displayName: 'Render',
+    icon: 'cloud',
+    docsUrl: 'https://dashboard.render.com/user/settings#api-keys',
+    category: 'BACKEND',
+    regionSwitchSupport: 'NOT_SUPPORTED',
   };
 
   async verifyToken(token: string, projectRef?: string): Promise<VerifyTokenResult> {

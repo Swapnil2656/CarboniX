@@ -1,4 +1,4 @@
-import { PlatformAdapter, UsageMetrics, VerifyTokenResult, ApplyRegionResult } from './types';
+import { PlatformAdapter, UsageMetrics, VerifyTokenResult, ApplyRegionResult, PlatformMetadata } from './types';
 import { fetchT } from './utils';
 
 export class VercelAdapter implements PlatformAdapter {
@@ -6,6 +6,13 @@ export class VercelAdapter implements PlatformAdapter {
   capabilities = {
     canFetchUsage: true,
     canSetRegion: true,
+  };
+  metadata: PlatformMetadata = {
+    displayName: 'Vercel',
+    icon: 'change_history',
+    docsUrl: 'https://vercel.com/account/tokens',
+    category: 'FRONTEND',
+    regionSwitchSupport: 'AUTO',
   };
 
   async verifyToken(token: string, projectRef?: string): Promise<VerifyTokenResult> {

@@ -1,9 +1,10 @@
-import { PlatformAdapter, UsageMetrics, VerifyTokenResult, ApplyRegionResult, PlatformCapabilities } from './types';
+import { PlatformAdapter, UsageMetrics, VerifyTokenResult, ApplyRegionResult, PlatformCapabilities, PlatformMetadata } from './types';
 import { fetchT } from './utils';
 import { GenericPlatformConfig } from './generic-config';
 
 export class GenericRestAdapter implements PlatformAdapter {
   platform: string;
+  metadata: PlatformMetadata;
   capabilities: PlatformCapabilities;
   private config: GenericPlatformConfig;
 
@@ -11,6 +12,13 @@ export class GenericRestAdapter implements PlatformAdapter {
     this.config = config;
     this.platform = config.platform;
     this.capabilities = config.capabilities;
+    this.metadata = {
+      displayName: config.displayName,
+      icon: config.icon,
+      docsUrl: config.docsUrl,
+      category: config.category,
+      regionSwitchSupport: config.regionSwitchSupport,
+    };
   }
 
   private getAuthHeader(token: string): string {
