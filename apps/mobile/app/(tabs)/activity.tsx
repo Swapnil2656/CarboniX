@@ -99,38 +99,52 @@ export default function HistoryScreen() {
           ) : filteredData.length === 0 ? (
             <Text style={styles.emptyText}>No audit logs found.</Text>
           ) : (
-            filteredData.map((item) => (
-              <Swipeable
-                key={item.id}
-                renderRightActions={() => renderRightActions(item)}
-                overshootRight={false}
-              >
-                <View style={styles.card}>
-                  <View style={styles.cardHeader}>
-                    <Text style={styles.timeText}>{new Date(item.createdAt).toLocaleDateString()} {new Date(item.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</Text>
-                    <View style={styles.badge}>
-                      <Text style={styles.badgeText}>{item.action.replace(/_/g, ' ')}</Text>
-                    </View>
-                  </View>
+            filteredData.map((item) => {
+              const isProject = item.resource?.toLowerCase() === 'project' || item.resource?.toLowerCase() === 'projects';
+              const canDeepLink = isProject && item.resourceId;
 
-                  <View style={styles.cardBody}>
-                    <View style={{ flex: 1, gap: 4 }}>
-                      <Text style={styles.cardTitle}>{item.resource} {item.resourceId ? `(${item.resourceId.substring(0, 8)})` : ''}</Text>
-                      <View style={styles.providerInfo}>
-                        <Text style={styles.providerText}>{item.actorEmail}</Text>
-                        <Text style={styles.dotSeparator}>•</Text>
-                        <Text style={styles.regionText}>{item.actorRole}</Text>
+              const handlePress = () => {
+                if (canDeepLink) {
+                  router.push(`/project/${item.resourceId}`);
+                }
+              };
+
+              return (
+                <Swipeable
+                  key={item.id}
+                  renderRightActions={() => renderRightActions(item)}
+                  overshootRight={false}
+                >
+                  <TouchableOpacity activeOpacity={canDeepLink ? 0.7 : 1} onPress={handlePress}>
+                    <View style={styles.card}>
+                      <View style={styles.cardHeader}>
+                        <Text style={styles.timeText}>{new Date(item.createdAt).toLocaleDateString()} {new Date(item.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</Text>
+                        <View style={styles.badge}>
+                          <Text style={styles.badgeText}>{item.action.replace(/_/g, ' ')}</Text>
+                        </View>
+                      </View>
+
+                      <View style={styles.cardBody}>
+                        <View style={{ flex: 1, gap: 4 }}>
+                          <Text style={styles.cardTitle}>{item.resource} {item.resourceId ? `(${item.resourceId.substring(0, 8)})` : ''}</Text>
+                          <View style={styles.providerInfo}>
+                            <Text style={styles.providerText}>{item.actorEmail}</Text>
+                            <Text style={styles.dotSeparator}>•</Text>
+                            <Text style={styles.regionText}>{item.actorRole}</Text>
+                          </View>
+                        </View>
+                        
+                        <View style={{ alignItems: 'flex-end' }}>
+                          {canDeepLink && <MaterialIcons name="chevron-right" size={24} color={colors.primary} style={{ marginBottom: 4 }} />}
+                          <Text style={styles.totalLabel}>IP ADDRESS</Text>
+                          <Text style={styles.totalValue}>{item.ip || '127.0.0.1'}</Text>
+                        </View>
                       </View>
                     </View>
-                    
-                    <View style={{ alignItems: 'flex-end' }}>
-                      <Text style={styles.totalLabel}>IP ADDRESS</Text>
-                      <Text style={styles.totalValue}>{item.ip || '127.0.0.1'}</Text>
-                    </View>
-                  </View>
-                </View>
-              </Swipeable>
-            ))
+                  </TouchableOpacity>
+                </Swipeable>
+              );
+            })
           )}
         </View>
       </ScrollView>

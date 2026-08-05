@@ -8,7 +8,20 @@ const gridCache_1 = require("./gridCache");
 const instance_coefficients_json_1 = __importDefault(require("../data/instance-coefficients.json"));
 async function calculateCarbon(input) {
     const provider = input.provider.toUpperCase();
-    const instance = instance_coefficients_json_1.default.find((i) => i.name === input.instanceType && i.provider === provider);
+    const underlyingProviderMap = {
+        VERCEL: 'AWS',
+        NETLIFY: 'AWS',
+        RENDER: 'AWS',
+        HEROKU: 'AWS',
+        SUPABASE: 'AWS',
+        DIGITALOCEAN: 'AWS',
+        CLOUDFLARE_WORKERS: 'AWS',
+        CLOUDFLARE_PAGES: 'AWS',
+        DENO_DEPLOY: 'GCP',
+        RAILWAY: 'GCP'
+    };
+    const actualProvider = underlyingProviderMap[provider] || provider;
+    const instance = instance_coefficients_json_1.default.find((i) => i.name === input.instanceType && i.provider === actualProvider);
     if (!instance) {
         throw new Error(`Instance type ${input.instanceType} not found for provider ${provider}`);
     }
@@ -29,9 +42,9 @@ async function calculateCarbon(input) {
     const storageEnergyKwh = storage * 0.0000016 * hours * count;
     const totalItEnergyKwh = cpuEnergyKwh + memoryEnergyKwh + storageEnergyKwh;
     const region = input.region.toLowerCase();
-    const pue = (0, gridCache_1.getProviderPue)(provider, region);
-    const totalFinalEnergyKwh = totalItEnergyKwh * pue;
     const gridIntensity = await (0, gridCache_1.getGridIntensity)(region);
+    const pue = (0, gridCache_1.getProviderPue)(actualProvider, region);
+    const totalFinalEnergyKwh = totalItEnergyKwh * pue;
     const co2GramsMonth = totalFinalEnergyKwh * gridIntensity;
     const co2KgMonth = co2GramsMonth / 1000;
     const co2GramsHour = co2GramsMonth / hours;

@@ -30,8 +30,23 @@ export interface CalculationResult {
 
 export async function calculateCarbon(input: CalculationInput): Promise<CalculationResult> {
   const provider = input.provider.toUpperCase();
+  
+  const underlyingProviderMap: Record<string, string> = {
+    VERCEL: 'AWS',
+    NETLIFY: 'AWS',
+    RENDER: 'AWS',
+    HEROKU: 'AWS',
+    SUPABASE: 'AWS',
+    DIGITALOCEAN: 'AWS',
+    CLOUDFLARE_WORKERS: 'AWS',
+    CLOUDFLARE_PAGES: 'AWS',
+    DENO_DEPLOY: 'GCP',
+    RAILWAY: 'GCP'
+  };
+  const actualProvider = underlyingProviderMap[provider] || provider;
+
   const instance = instanceCoefficients.find(
-    (i) => i.name === input.instanceType && i.provider === provider
+    (i) => i.name === input.instanceType && i.provider === actualProvider
   );
 
   if (!instance) {
@@ -61,10 +76,9 @@ export async function calculateCarbon(input: CalculationInput): Promise<Calculat
   const totalItEnergyKwh = cpuEnergyKwh + memoryEnergyKwh + storageEnergyKwh;
   
   const region = input.region.toLowerCase();
-  const pue = getProviderPue(provider, region);
-  const totalFinalEnergyKwh = totalItEnergyKwh * pue;
-
   const gridIntensity = await getGridIntensity(region);
+  const pue = getProviderPue(actualProvider, region);
+  const totalFinalEnergyKwh = totalItEnergyKwh * pue;
   
   const co2GramsMonth = totalFinalEnergyKwh * gridIntensity;
   const co2KgMonth = co2GramsMonth / 1000;

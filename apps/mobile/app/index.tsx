@@ -18,7 +18,7 @@ export default function AnimatedSplashScreen() {
 
     const { isAuthenticated } = useAuthStore.getState();
     if (isAuthenticated) {
-      router.replace('/(tabs)/config');
+      router.replace('/(tabs)/console');
     } else {
       router.replace('/(auth)/login');
     }

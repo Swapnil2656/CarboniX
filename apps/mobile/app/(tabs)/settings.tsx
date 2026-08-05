@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity, Image, Alert, Linking, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity, Image, Alert, Linking, TextInput, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
@@ -151,7 +151,10 @@ export default function SettingsScreen() {
             <Text style={styles.panelTitle}>ABOUT</Text>
           </View>
 
-          <TouchableOpacity style={styles.linkRow} onPress={() => Linking.openURL('http://10.0.2.2:3000/docs')}>
+          <TouchableOpacity style={styles.linkRow} onPress={() => {
+            const webUrl = process.env.EXPO_PUBLIC_WEB_URL || (Platform.OS === 'android' ? 'http://10.0.2.2:3000' : 'http://localhost:3000');
+            Linking.openURL(`${webUrl}/docs`);
+          }}>
             <Text style={styles.linkText}>View Documentation</Text>
             <MaterialIcons name="open-in-new" size={16} color={colors.textMuted} />
           </TouchableOpacity>

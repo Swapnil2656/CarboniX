@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions } from 'react-native';
-import { Tabs, Redirect } from 'expo-router';
+import { Tabs, Redirect, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Constants from 'expo-constants';
 
 import { colors } from '../../src/theme/colors';
 import { useAuthStore } from '../../src/stores/auth.store';
@@ -10,7 +11,7 @@ import { AiBotModal } from '../../src/components/AiBotModal';
 import { FontAwesome5 } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
-const tabWidth = width / 5;
+const tabWidth = width / 4;
 const INDICATOR_SIZE = 48; 
 const TAB_HEIGHT = 50;
 
@@ -129,10 +130,9 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
         };
 
         let iconName = 'home';
-        if (route.name === 'config') iconName = 'calculate';
-        if (route.name === 'compare') iconName = 'compare-arrows';
+        if (route.name === 'estimate') iconName = 'calculate';
         if (route.name === 'console') iconName = 'dashboard';
-        if (route.name === 'history') iconName = 'history';
+        if (route.name === 'activity') iconName = 'history';
         if (route.name === 'settings') iconName = 'settings';
 
         return (
@@ -155,8 +155,33 @@ export default function TabLayout() {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const isLoading = useAuthStore(state => state.isLoading);
   const insets = useSafeAreaInsets();
+  const router = useRouter();
 
   const [aiBotVisible, setAiBotVisible] = useState(false);
+
+  useEffect(() => {
+    let subscription: any;
+    try {
+      if (Constants.appOwnership !== 'expo') {
+        const Notifications = require('expo-notifications');
+        subscription = Notifications.addNotificationResponseReceivedListener((response: any) => {
+          const data = response.notification.request.content.data;
+          if (data?.projectId) {
+            router.push(`/project/${data.projectId}`);
+          } else if (data?.type === 'activity' || data?.type === 'alert') {
+            router.push('/activity');
+          } else {
+            router.push('/console');
+          }
+        });
+      }
+    } catch (e) {
+      console.log('Push notifications not available in this environment:', e);
+    }
+    return () => {
+      if (subscription) subscription.remove();
+    };
+  }, [router]);
 
   // While loading token, don't redirect yet
   if (isLoading) return null;
@@ -175,10 +200,9 @@ export default function TabLayout() {
           headerShown: false,
         }}
       >
-        <Tabs.Screen name="config" options={{ title: 'Calculator' }} />
-        <Tabs.Screen name="compare" options={{ title: 'Compare' }} />
         <Tabs.Screen name="console" options={{ title: 'Dashboard' }} />
-        <Tabs.Screen name="history" options={{ title: 'History' }} />
+        <Tabs.Screen name="estimate" options={{ title: 'Estimate' }} />
+        <Tabs.Screen name="activity" options={{ title: 'Activity' }} />
         <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
       </Tabs>
 
