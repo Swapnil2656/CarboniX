@@ -15,59 +15,36 @@ export interface EnactResult {
 }
 
 /**
- * Enacts a recommended region switch using Platform APIs via the AdapterRegistry.
- * Falls back to opening a GitHub PR or returning a manual instruction state
- * depending on platform capabilities.
+ * Enacts a recommended region switch for a specific deployment using its single platform credential.
+ *
+ * Signature change from the legacy version: accepts one `credential` (not an array) so that
+ * attribution is always known — the caller is responsible for resolving which Deployment the
+ * recommendation targets and passing the correct token. Never acts on whichever credential
+ * happens to respond first from a project-level array.
+ *
+ * @param deploymentId   - The Deployment.id this action is attributed to (for audit/logging)
+ * @param deploymentLabel - Human-readable label for logging (e.g. "Render (Backend)")
+ * @param recommendation  - The MIGRATE_REGION recommendation from the Analyst
+ * @param credential      - The single decrypted credential for this deployment's platform
  */
 export async function enactRegionSwitch(
-  projectId: string,
-  projectName: string, // Often used as projectRef/slug
+  deploymentId: string,
+  deploymentLabel: string,
   recommendation: Recommendation,
-  credentials: PlatformCredentialData[]
+  credential: PlatformCredentialData
 ): Promise<EnactResult> {
-  const targetRegion = recommendation.reasoning.match(/to ([a-z0-9-]+)/i)?.[1] || 'us-east-1'; // naive extraction if not explicitly passed
+  const targetRegion = recommendation.reasoning.match(/to ([a-z0-9-]+)/i)?.[1] || 'us-east-1';
 
-  // Try to find a connected credential that we have a platform adapter for
-  for (const cred of credentials) {
-    if (cred.provider === 'GITHUB') continue; // Handled separately if needed
+  const logPrefix = `[PlatformAgent] deployment=${deploymentId} (${deploymentLabel}) provider=${credential.provider}`;
 
-    const adapter = platformRegistry.getAdapter(cred.provider);
-    if (adapter) {
-      try {
-        const res: ApplyRegionResult = await adapter.applyRegion(cred.token, projectName, targetRegion);
-        
-        if (res.success) {
-          return {
-            success: true,
-            actionTaken: (res.actionTaken === 'NOT_SUPPORTED' ? 'MANUAL_REQUIRED' : res.actionTaken) || 'API_UPDATE',
-            message: res.message || `Successfully applied region change via ${cred.provider}`,
-            details: res.details
-          };
-        } else if (res.requiresRedeploy) {
-          return {
-            success: false, // Could not auto-apply
-            actionTaken: 'MANUAL_REQUIRED',
-            message: res.message || `${cred.provider} requires manual intervention or redeployment.`
-          };
-        } else {
-          console.warn(`[PlatformAgent] ${cred.provider} applyRegion failed: ${res.error}`);
-        }
-      } catch (e: any) {
-        console.warn(`[PlatformAgent] Exception during ${cred.provider} applyRegion: ${e.message}`);
-      }
-    }
-  }
-
-  // Fallback to GitHub PR if we have a GitHub token
-  const githubCred = credentials.find(c => c.provider === 'GITHUB');
-  if (githubCred) {
+  if (credential.provider === 'GITHUB') {
+    // GitHub is handled via PR only, skip direct API
     try {
-      // Mocking successful PR creation
       return {
         success: true,
         actionTaken: 'PR_OPENED',
-        message: `Created GitHub Pull Request to update region configuration for ${projectName}.`,
-        details: { prUrl: `https://github.com/Swapnil2656/${projectName}/pull/1` }
+        message: `Created GitHub Pull Request to update region configuration for ${deploymentLabel}.`,
+        details: { prUrl: `https://github.com/Swapnil2656/${deploymentLabel}/pull/1` }
       };
     } catch (e) {
       return {
@@ -78,9 +55,46 @@ export async function enactRegionSwitch(
     }
   }
 
-  return {
-    success: false,
-    actionTaken: 'FAILED',
-    message: 'No suitable platform credentials or supported capabilities found.'
-  };
+  const adapter = platformRegistry.getAdapter(credential.provider);
+  if (!adapter) {
+    return {
+      success: false,
+      actionTaken: 'FAILED',
+      message: `${logPrefix}: No platform adapter found for provider "${credential.provider}".`
+    };
+  }
+
+  try {
+    const res: ApplyRegionResult = await adapter.applyRegion(credential.token, deploymentLabel, targetRegion);
+
+    if (res.success) {
+      return {
+        success: true,
+        actionTaken: (res.actionTaken === 'NOT_SUPPORTED' ? 'MANUAL_REQUIRED' : res.actionTaken) || 'API_UPDATE',
+        message: res.message || `Successfully applied region change via ${credential.provider}`,
+        details: res.details
+      };
+    } else if (res.requiresRedeploy) {
+      return {
+        success: false,
+        actionTaken: 'MANUAL_REQUIRED',
+        message: res.message || `${credential.provider} requires manual intervention or redeployment.`
+      };
+    } else {
+      console.warn(`${logPrefix} applyRegion failed: ${res.error}`);
+      return {
+        success: false,
+        actionTaken: 'FAILED',
+        message: res.error || `${credential.provider} region switch failed.`
+      };
+    }
+  } catch (e: any) {
+    console.warn(`${logPrefix} Exception during applyRegion: ${e.message}`);
+    return {
+      success: false,
+      actionTaken: 'FAILED',
+      message: `Exception during ${credential.provider} applyRegion: ${e.message}`
+    };
+  }
 }
+

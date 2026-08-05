@@ -8,6 +8,7 @@
 import { EmissionRecordData } from './collector';
 export interface Recommendation {
     projectId?: string;
+    deploymentId?: string;
     instanceId: string;
     instanceName: string;
     currentType: string;

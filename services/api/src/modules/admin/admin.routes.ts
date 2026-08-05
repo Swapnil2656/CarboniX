@@ -21,7 +21,9 @@ import {
   deleteAuditLog,
   deleteProject,
   disconnectProject,
-  getProjectStats
+  getProjectStats,
+  addDeployment,
+  deleteDeployment,
 } from './admin.controller';
 
 const router = Router();
@@ -39,6 +41,8 @@ router.get('/users', getUsers);
 router.delete('/projects/:id', deleteProject);
 router.post('/projects/:id/disconnect', disconnectProject);
 router.get('/projects/:id/stats', getProjectStats);
+router.post('/projects/:id/deployments', addDeployment);
+router.delete('/projects/:id/deployments/:deploymentId', deleteDeployment);
 router.delete('/users/:id', removeTeamMember);
 router.post('/users/sync', syncTeamMembers);
 router.post('/users/invite', inviteUser);

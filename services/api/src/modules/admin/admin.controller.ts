@@ -983,7 +983,15 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
     const { projectIds } = await resolveTenantContext(req.user!.id, req.user!.email);
     if (!projectIds.includes(id)) return res.status(403).json({ error: 'Forbidden' });
 
-    const project = await prisma.project.findUnique({ where: { id } });
+    const project = await prisma.project.findUnique({
+      where: { id },
+      include: {
+        deployments: {
+          include: { platformToken: true },
+          orderBy: { createdAt: 'asc' },
+        },
+      },
+    });
     if (!project) return res.status(404).json({ error: 'Project not found' });
 
     // Fetch emissions for the last 30 days
@@ -1101,8 +1109,18 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
     let tokenRecord = null;
     
     if (project.dataSource === 'LIVE') {
-      tokenRecord = await prisma.platformToken.findFirst({ where: { projectId: project.id } });
-      if (tokenRecord) currentPlatform = tokenRecord.platform;
+      // Deployment-scoped: find the token from whichever deployment has one.
+      // Return the first active one for backward-compat capability-tier logic.
+      // In a multi-deployment project, each deployment has its own token — this
+      // is only used for the single-platform capability tier check (which is per-project
+      // in the legacy UI; per-deployment tier is returned in the deployments array).
+      const activeDeploymentWithToken = project.deployments.find(
+        d => d.platformToken && d.platformToken.status === 'ACTIVE'
+      );
+      if (activeDeploymentWithToken) {
+        tokenRecord = activeDeploymentWithToken.platformToken;
+        currentPlatform = activeDeploymentWithToken.platformToken!.platform;
+      }
     } else if (project.dataSource === 'MOCK_DEMO') {
       currentPlatform = project.provider || 'AWS'; // Fallback for mock demos
     }
@@ -1261,11 +1279,44 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
       .sort((a, b) => a.projectedCarbonKg - b.projectedCarbonKg)
       .slice(0, 3);
 
+    // ─── Per-deployment emission rollup (for multi-deployment card list) ───────
+    const deploymentStats = await Promise.all(
+      project.deployments.map(async (d) => {
+        const depMtdRecords = mtdRecords.filter(e => e.deploymentId === d.id);
+        const depTotalKg = depMtdRecords.reduce((sum, e) => sum + e.carbonKg, 0);
+        const depHistory = history30d.map(day => ({
+          ...day,
+          // per-deployment carbon for this day (from full emissions)
+          carbonKg: emissions
+            .filter(e => e.deploymentId === d.id && e.timestamp.toISOString().split('T')[0] === day.date)
+            .reduce((sum, e) => sum + e.carbonKg, 0),
+        }));
+        return {
+          id: d.id,
+          role: d.role,
+          label: d.label,
+          region: d.region,
+          provider: d.provider,
+          isDeployed: d.isDeployed,
+          deploymentUrl: d.deploymentUrl,
+          platformToken: d.platformToken
+            ? { platform: d.platformToken.platform, status: d.platformToken.status, projectSlug: d.platformToken.projectSlug }
+            : null,
+          totalMonthKg: depTotalKg,
+          history30d: depHistory,
+          idleCount: latestEmissions.filter(e => e.deploymentId === d.id && e.isIdle).length,
+          oversizedCount: latestEmissions.filter(e => e.deploymentId === d.id && e.isOversized).length,
+          createdAt: d.createdAt,
+        };
+      })
+    );
+
     const stats = {
       project: {
         ...project,
         capabilityTier
       },
+      deployments: deploymentStats,
       idleInstances: latestEmissions.filter(e => e.isIdle).length,
       oversizedInstances: latestEmissions.filter(e => e.isOversized).length,
       carbonTrend: { todayKg, trendPercent, isNew },
@@ -1285,5 +1336,76 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
   } catch (error: any) {
     console.error('[getProjectStats] Internal server error:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// ─── Deployment CRUD ──────────────────────────────────────────────────────────
+
+/**
+ * POST /admin/projects/:id/deployments
+ * Create a new Deployment for a project (label, role, optional platform connection).
+ */
+export const addDeployment = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id: projectId } = req.params;
+    const { projectIds } = await resolveTenantContext(req.user!.id, req.user!.email);
+    if (!projectIds.includes(projectId)) return res.status(403).json({ error: 'Forbidden' });
+
+    const { role, label } = req.body as { role?: string; label?: string };
+
+    const deployment = await prisma.deployment.create({
+      data: {
+        projectId,
+        role: (role as any) ?? 'OTHER',
+        label: label ?? null,
+      },
+    });
+
+    return res.status(201).json({ success: true, data: deployment });
+  } catch (error: any) {
+    console.error('[addDeployment]', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+/**
+ * DELETE /admin/projects/:id/deployments/:deploymentId
+ * Disconnect (and optionally delete) a single deployment without affecting others.
+ */
+export const deleteDeployment = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id: projectId, deploymentId } = req.params;
+    const { projectIds } = await resolveTenantContext(req.user!.id, req.user!.email);
+    if (!projectIds.includes(projectId)) return res.status(403).json({ error: 'Forbidden' });
+
+    const deployment = await prisma.deployment.findFirst({
+      where: { id: deploymentId, projectId },
+      include: { platformToken: true },
+    });
+    if (!deployment) return res.status(404).json({ error: 'Deployment not found' });
+
+    // Delete associated platform token first (FK constraint)
+    if (deployment.platformToken) {
+      await prisma.platformToken.delete({ where: { id: deployment.platformToken.id } });
+    }
+
+    // Null-out deploymentId on emission records (preserve history, remove attribution)
+    await prisma.emissionRecord.updateMany({
+      where: { deploymentId },
+      data: { deploymentId: null },
+    });
+
+    await prisma.deployment.delete({ where: { id: deploymentId } });
+
+    // If no active tokens remain, reset dataSource
+    const remaining = await prisma.platformToken.count({ where: { projectId, status: 'ACTIVE' } });
+    if (remaining === 0) {
+      await prisma.project.update({ where: { id: projectId }, data: { dataSource: 'NO_CREDS' } });
+    }
+
+    return res.json({ success: true, message: 'Deployment deleted. Historical emission data preserved at project level.' });
+  } catch (error: any) {
+    console.error('[deleteDeployment]', error);
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };

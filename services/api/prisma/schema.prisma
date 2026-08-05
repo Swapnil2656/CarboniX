@@ -130,6 +130,13 @@ enum PlatformTokenStatus {
   REVOKED  // Manually revoked by user
 }
 
+enum DeploymentRole {
+  FRONTEND
+  BACKEND
+  FULLSTACK
+  OTHER
+}
+
 // ─── Mobile Users ───────────────────────────────────────────
 
 model MobileUser {
@@ -534,7 +541,12 @@ model EmissionRecord {
   id         String  @id @default(cuid())
   agentRunId String? // Links to the AgentRun that created this
   projectId  String?
-  project    Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project    Project?    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // Deployment attribution — source of truth for per-deployment breakdown
+  // Kept alongside projectId (denormalized) for simple project-level rollup queries
+  deploymentId String?
+  deployment   Deployment? @relation(fields: [deploymentId], references: [id], onDelete: SetNull)
 
   // Instance identification
   instanceId   String // e.g., "i-0abc123def" or mock ID
@@ -562,6 +574,7 @@ model EmissionRecord {
   timestamp DateTime @default(now())
 
   @@index([region, timestamp(sort: Desc)])
+  @@index([deploymentId, timestamp(sort: Desc)])
   @@index([isIdle])
   @@index([isOversized])
   @@index([agentRunId])
@@ -622,6 +635,7 @@ model Project {
   // TODO: drop PlatformCredential after all enactRegionSwitch call sites are migrated to PlatformToken
   platformCredentials  PlatformCredential[]
   platformTokens       PlatformToken[]
+  deployments          Deployment[]
 
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -717,10 +731,46 @@ model PlatformToken {
   lastError      String?   // Last error message from platform API (for UI display)
   failCount      Int       @default(0) // Consecutive auth failures before INVALID
 
+  // Back-relation from Deployment (when this token is claimed by a specific deployment)
+  deployment Deployment?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([projectId, platform])
+  // Intentionally NOT unique([projectId, platform]) — a project can have multiple deployments
+  // (e.g. two Render services) each with their own token. Integrity is enforced by
+  // Deployment.platformTokenId @unique (one token can't be claimed by two Deployments).
+  @@index([projectId, platform])
   @@index([projectId, status])
   @@index([status])
+}
+
+// ─── Deployments (NEW — sub-entity of Project for multi-deployment support) ───
+
+model Deployment {
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  role          DeploymentRole @default(OTHER)
+  // User-facing label, shown when platform alone can't distinguish (e.g. "Render (Frontend)" vs "Render (Backend)")
+  label         String?
+
+  // Deployment location — source of truth for this deployment's region/provider
+  region        String?
+  provider      CloudProvider?
+  isDeployed    Boolean  @default(false)
+  deploymentUrl String?
+
+  // One-to-one link to the PlatformToken used for live collection on this deployment.
+  // @unique ensures one token can't be double-counted across two deployments.
+  platformTokenId String?       @unique
+  platformToken   PlatformToken? @relation(fields: [platformTokenId], references: [id], onDelete: SetNull)
+
+  emissionRecords EmissionRecord[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
 }

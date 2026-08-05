@@ -110,7 +110,21 @@ export default function ProjectDetailScreen() {
   }
 
   const { project, idleInstances, oversizedInstances, carbonTrend, history7d, history30d, totalMonthKg, apiKeys, greenerRegion, isStale, instances, checklist, estimateAssumptions, top3Regions } = data;
+  const deployments: any[] = data.deployments || [];
   const chartData = chartDays === '7d' ? history7d : history30d;
+
+  const ROLE_COLORS: Record<string, string> = {
+    FRONTEND: '#60a5fa',
+    BACKEND:  '#c084fc',
+    FULLSTACK: '#2dd4bf',
+    OTHER:    colors.textMuted,
+  };
+  const ROLE_LABELS: Record<string, string> = {
+    FRONTEND: 'Frontend',
+    BACKEND: 'Backend',
+    FULLSTACK: 'Fullstack',
+    OTHER: 'Other',
+  };
 
   const getEquivalent = (kg: number) => {
     const kmDriven = (kg * 4.3).toFixed(1);
@@ -183,6 +197,7 @@ export default function ProjectDetailScreen() {
 
         {!project.isDeployed ? (
           <View>
+            {/* ... unchanged pre-deployment views ... */}
             <View style={styles.panel}>
               <Text style={styles.panelTitle}>Estimate Assumptions</Text>
               {estimateAssumptions?.reasoning && (
@@ -232,7 +247,8 @@ export default function ProjectDetailScreen() {
             </View>
           </View>
         ) : (
-          <View style={styles.statsGrid}>
+          <>
+            <View style={styles.statsGrid}>
             <View style={styles.statCard}>
               <View style={styles.statHeader}>
                 <MaterialIcons name="co2" size={16} color={colors.textMuted} />
@@ -275,6 +291,44 @@ export default function ProjectDetailScreen() {
               </View>
             </View>
           </View>
+
+          {/* Deployment Cards */}
+          <View style={styles.panel}>
+            <Text style={styles.panelTitle}>Deployments ({deployments.length})</Text>
+            {deployments.length === 0 ? (
+              <Text style={{ color: colors.textMuted, fontSize: 13, fontStyle: 'italic' }}>No deployments yet.</Text>
+            ) : (
+              deployments.map((dep: any) => {
+                const roleColor = ROLE_COLORS[dep.role] ?? colors.textMuted;
+                const roleLabel = ROLE_LABELS[dep.role] ?? 'Other';
+                const depLabel = dep.label ?? dep.role;
+                const platformName = dep.platformToken?.platform ?? null;
+                return (
+                  <View key={dep.id} style={{ backgroundColor: colors.surfaceContainer, borderRadius: 10, padding: 12, marginBottom: 10 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4, flexWrap: 'wrap' }}>
+                      <View style={{ backgroundColor: roleColor + '22', borderRadius: 4, paddingHorizontal: 7, paddingVertical: 2 }}>
+                        <Text style={{ color: roleColor, fontSize: 10, fontWeight: 'bold' }}>{roleLabel.toUpperCase()}</Text>
+                      </View>
+                      <Text style={{ color: colors.textBody, fontWeight: '600', fontSize: 14 }}>{depLabel}</Text>
+                      {platformName && (
+                        <View style={{ backgroundColor: colors.background, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}>
+                          <Text style={{ color: colors.textMuted, fontSize: 10 }}>{platformName}</Text>
+                        </View>
+                      )}
+                    </View>
+                    <Text style={{ color: colors.textMuted, fontSize: 12 }}>
+                      {dep.region ? dep.region : 'Region not yet detected'}
+                      {dep.provider ? ` • ${dep.provider}` : ''}
+                    </Text>
+                    <Text style={{ color: colors.primary, fontSize: 13, marginTop: 4 }}>
+                      {(dep.totalMonthKg || 0).toFixed(2)} kg CO₂ this month
+                    </Text>
+                  </View>
+                );
+              })
+            )}
+          </View>
+          </>
         )}
 
         {project.isDeployed && chartData?.length > 0 && (

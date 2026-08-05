@@ -64,6 +64,19 @@ export const adminApi = {
     return fetchClient(`/admin/projects/${id}/disconnect`, { method: 'POST' });
   },
 
+  addDeployment: async (projectId: string, payload: { role?: string; label?: string }): Promise<any> => {
+    return fetchClient(`/admin/projects/${projectId}/deployments`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  deleteDeployment: async (projectId: string, deploymentId: string): Promise<any> => {
+    return fetchClient(`/admin/projects/${projectId}/deployments/${deploymentId}`, {
+      method: 'DELETE',
+    });
+  },
+
   getProjectStats: async (id: string): Promise<any> => {
     return fetchClient(`/admin/projects/${id}/stats`, { method: 'GET' });
   },

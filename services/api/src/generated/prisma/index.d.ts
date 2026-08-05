@@ -128,6 +128,11 @@ export type PlatformCredential = $Result.DefaultSelection<Prisma.$PlatformCreden
  * 
  */
 export type PlatformToken = $Result.DefaultSelection<Prisma.$PlatformTokenPayload>
+/**
+ * Model Deployment
+ * 
+ */
+export type Deployment = $Result.DefaultSelection<Prisma.$DeploymentPayload>
 
 /**
  * Enums
@@ -332,6 +337,16 @@ export const PlatformTokenStatus: {
 
 export type PlatformTokenStatus = (typeof PlatformTokenStatus)[keyof typeof PlatformTokenStatus]
 
+
+export const DeploymentRole: {
+  FRONTEND: 'FRONTEND',
+  BACKEND: 'BACKEND',
+  FULLSTACK: 'FULLSTACK',
+  OTHER: 'OTHER'
+};
+
+export type DeploymentRole = (typeof DeploymentRole)[keyof typeof DeploymentRole]
+
 }
 
 export type CloudProvider = $Enums.CloudProvider
@@ -413,6 +428,10 @@ export const PlatformType: typeof $Enums.PlatformType
 export type PlatformTokenStatus = $Enums.PlatformTokenStatus
 
 export const PlatformTokenStatus: typeof $Enums.PlatformTokenStatus
+
+export type DeploymentRole = $Enums.DeploymentRole
+
+export const DeploymentRole: typeof $Enums.DeploymentRole
 
 /**
  * ##  Prisma Client ʲˢ
@@ -766,6 +785,16 @@ export class PrismaClient<
     * ```
     */
   get platformToken(): Prisma.PlatformTokenDelegate<ExtArgs>;
+
+  /**
+   * `prisma.deployment`: Exposes CRUD operations for the **Deployment** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Deployments
+    * const deployments = await prisma.deployment.findMany()
+    * ```
+    */
+  get deployment(): Prisma.DeploymentDelegate<ExtArgs>;
 }
 
 export namespace Prisma {
@@ -1229,7 +1258,8 @@ export namespace Prisma {
     TeamMember: 'TeamMember',
     ChatHistory: 'ChatHistory',
     PlatformCredential: 'PlatformCredential',
-    PlatformToken: 'PlatformToken'
+    PlatformToken: 'PlatformToken',
+    Deployment: 'Deployment'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1245,7 +1275,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "mobileUser" | "calculation" | "session" | "apiKey" | "featureFlag" | "remoteConfig" | "auditLog" | "notification" | "userNotification" | "pushToken" | "region" | "instanceType" | "provider" | "agentRun" | "emissionRecord" | "user" | "project" | "profile" | "verificationToken" | "teamMember" | "chatHistory" | "platformCredential" | "platformToken"
+      modelProps: "mobileUser" | "calculation" | "session" | "apiKey" | "featureFlag" | "remoteConfig" | "auditLog" | "notification" | "userNotification" | "pushToken" | "region" | "instanceType" | "provider" | "agentRun" | "emissionRecord" | "user" | "project" | "profile" | "verificationToken" | "teamMember" | "chatHistory" | "platformCredential" | "platformToken" | "deployment"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2859,6 +2889,76 @@ export namespace Prisma {
           }
         }
       }
+      Deployment: {
+        payload: Prisma.$DeploymentPayload<ExtArgs>
+        fields: Prisma.DeploymentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DeploymentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeploymentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DeploymentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeploymentPayload>
+          }
+          findFirst: {
+            args: Prisma.DeploymentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeploymentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DeploymentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeploymentPayload>
+          }
+          findMany: {
+            args: Prisma.DeploymentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeploymentPayload>[]
+          }
+          create: {
+            args: Prisma.DeploymentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeploymentPayload>
+          }
+          createMany: {
+            args: Prisma.DeploymentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DeploymentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeploymentPayload>[]
+          }
+          delete: {
+            args: Prisma.DeploymentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeploymentPayload>
+          }
+          update: {
+            args: Prisma.DeploymentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeploymentPayload>
+          }
+          deleteMany: {
+            args: Prisma.DeploymentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DeploymentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.DeploymentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeploymentPayload>
+          }
+          aggregate: {
+            args: Prisma.DeploymentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDeployment>
+          }
+          groupBy: {
+            args: Prisma.DeploymentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DeploymentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DeploymentCountArgs<ExtArgs>
+            result: $Utils.Optional<DeploymentCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -3109,6 +3209,7 @@ export namespace Prisma {
     apiKeys: number
     platformCredentials: number
     platformTokens: number
+    deployments: number
   }
 
   export type ProjectCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3117,6 +3218,7 @@ export namespace Prisma {
     apiKeys?: boolean | ProjectCountOutputTypeCountApiKeysArgs
     platformCredentials?: boolean | ProjectCountOutputTypeCountPlatformCredentialsArgs
     platformTokens?: boolean | ProjectCountOutputTypeCountPlatformTokensArgs
+    deployments?: boolean | ProjectCountOutputTypeCountDeploymentsArgs
   }
 
   // Custom InputTypes
@@ -3163,6 +3265,44 @@ export namespace Prisma {
    */
   export type ProjectCountOutputTypeCountPlatformTokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PlatformTokenWhereInput
+  }
+
+  /**
+   * ProjectCountOutputType without action
+   */
+  export type ProjectCountOutputTypeCountDeploymentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeploymentWhereInput
+  }
+
+
+  /**
+   * Count Type DeploymentCountOutputType
+   */
+
+  export type DeploymentCountOutputType = {
+    emissionRecords: number
+  }
+
+  export type DeploymentCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    emissionRecords?: boolean | DeploymentCountOutputTypeCountEmissionRecordsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * DeploymentCountOutputType without action
+   */
+  export type DeploymentCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeploymentCountOutputType
+     */
+    select?: DeploymentCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * DeploymentCountOutputType without action
+   */
+  export type DeploymentCountOutputTypeCountEmissionRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EmissionRecordWhereInput
   }
 
 
@@ -18002,6 +18142,7 @@ export namespace Prisma {
     id: string | null
     agentRunId: string | null
     projectId: string | null
+    deploymentId: string | null
     instanceId: string | null
     instanceType: string | null
     provider: $Enums.CloudProvider | null
@@ -18024,6 +18165,7 @@ export namespace Prisma {
     id: string | null
     agentRunId: string | null
     projectId: string | null
+    deploymentId: string | null
     instanceId: string | null
     instanceType: string | null
     provider: $Enums.CloudProvider | null
@@ -18046,6 +18188,7 @@ export namespace Prisma {
     id: number
     agentRunId: number
     projectId: number
+    deploymentId: number
     instanceId: number
     instanceType: number
     provider: number
@@ -18090,6 +18233,7 @@ export namespace Prisma {
     id?: true
     agentRunId?: true
     projectId?: true
+    deploymentId?: true
     instanceId?: true
     instanceType?: true
     provider?: true
@@ -18112,6 +18256,7 @@ export namespace Prisma {
     id?: true
     agentRunId?: true
     projectId?: true
+    deploymentId?: true
     instanceId?: true
     instanceType?: true
     provider?: true
@@ -18134,6 +18279,7 @@ export namespace Prisma {
     id?: true
     agentRunId?: true
     projectId?: true
+    deploymentId?: true
     instanceId?: true
     instanceType?: true
     provider?: true
@@ -18243,6 +18389,7 @@ export namespace Prisma {
     id: string
     agentRunId: string | null
     projectId: string | null
+    deploymentId: string | null
     instanceId: string
     instanceType: string
     provider: $Enums.CloudProvider
@@ -18284,6 +18431,7 @@ export namespace Prisma {
     id?: boolean
     agentRunId?: boolean
     projectId?: boolean
+    deploymentId?: boolean
     instanceId?: boolean
     instanceType?: boolean
     provider?: boolean
@@ -18301,12 +18449,14 @@ export namespace Prisma {
     recommendation?: boolean
     timestamp?: boolean
     project?: boolean | EmissionRecord$projectArgs<ExtArgs>
+    deployment?: boolean | EmissionRecord$deploymentArgs<ExtArgs>
   }, ExtArgs["result"]["emissionRecord"]>
 
   export type EmissionRecordSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     agentRunId?: boolean
     projectId?: boolean
+    deploymentId?: boolean
     instanceId?: boolean
     instanceType?: boolean
     provider?: boolean
@@ -18324,12 +18474,14 @@ export namespace Prisma {
     recommendation?: boolean
     timestamp?: boolean
     project?: boolean | EmissionRecord$projectArgs<ExtArgs>
+    deployment?: boolean | EmissionRecord$deploymentArgs<ExtArgs>
   }, ExtArgs["result"]["emissionRecord"]>
 
   export type EmissionRecordSelectScalar = {
     id?: boolean
     agentRunId?: boolean
     projectId?: boolean
+    deploymentId?: boolean
     instanceId?: boolean
     instanceType?: boolean
     provider?: boolean
@@ -18350,20 +18502,24 @@ export namespace Prisma {
 
   export type EmissionRecordInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     project?: boolean | EmissionRecord$projectArgs<ExtArgs>
+    deployment?: boolean | EmissionRecord$deploymentArgs<ExtArgs>
   }
   export type EmissionRecordIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     project?: boolean | EmissionRecord$projectArgs<ExtArgs>
+    deployment?: boolean | EmissionRecord$deploymentArgs<ExtArgs>
   }
 
   export type $EmissionRecordPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "EmissionRecord"
     objects: {
       project: Prisma.$ProjectPayload<ExtArgs> | null
+      deployment: Prisma.$DeploymentPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       agentRunId: string | null
       projectId: string | null
+      deploymentId: string | null
       instanceId: string
       instanceType: string
       provider: $Enums.CloudProvider
@@ -18745,6 +18901,7 @@ export namespace Prisma {
   export interface Prisma__EmissionRecordClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     project<T extends EmissionRecord$projectArgs<ExtArgs> = {}>(args?: Subset<T, EmissionRecord$projectArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
+    deployment<T extends EmissionRecord$deploymentArgs<ExtArgs> = {}>(args?: Subset<T, EmissionRecord$deploymentArgs<ExtArgs>>): Prisma__DeploymentClient<$Result.GetResult<Prisma.$DeploymentPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -18777,6 +18934,7 @@ export namespace Prisma {
     readonly id: FieldRef<"EmissionRecord", 'String'>
     readonly agentRunId: FieldRef<"EmissionRecord", 'String'>
     readonly projectId: FieldRef<"EmissionRecord", 'String'>
+    readonly deploymentId: FieldRef<"EmissionRecord", 'String'>
     readonly instanceId: FieldRef<"EmissionRecord", 'String'>
     readonly instanceType: FieldRef<"EmissionRecord", 'String'>
     readonly provider: FieldRef<"EmissionRecord", 'CloudProvider'>
@@ -19123,6 +19281,21 @@ export namespace Prisma {
      */
     include?: ProjectInclude<ExtArgs> | null
     where?: ProjectWhereInput
+  }
+
+  /**
+   * EmissionRecord.deployment
+   */
+  export type EmissionRecord$deploymentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deployment
+     */
+    select?: DeploymentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeploymentInclude<ExtArgs> | null
+    where?: DeploymentWhereInput
   }
 
   /**
@@ -20494,6 +20667,7 @@ export namespace Prisma {
     apiKeys?: boolean | Project$apiKeysArgs<ExtArgs>
     platformCredentials?: boolean | Project$platformCredentialsArgs<ExtArgs>
     platformTokens?: boolean | Project$platformTokensArgs<ExtArgs>
+    deployments?: boolean | Project$deploymentsArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["project"]>
 
@@ -20545,6 +20719,7 @@ export namespace Prisma {
     apiKeys?: boolean | Project$apiKeysArgs<ExtArgs>
     platformCredentials?: boolean | Project$platformCredentialsArgs<ExtArgs>
     platformTokens?: boolean | Project$platformTokensArgs<ExtArgs>
+    deployments?: boolean | Project$deploymentsArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ProjectIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -20560,6 +20735,7 @@ export namespace Prisma {
       apiKeys: Prisma.$ApiKeyPayload<ExtArgs>[]
       platformCredentials: Prisma.$PlatformCredentialPayload<ExtArgs>[]
       platformTokens: Prisma.$PlatformTokenPayload<ExtArgs>[]
+      deployments: Prisma.$DeploymentPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -20949,6 +21125,7 @@ export namespace Prisma {
     apiKeys<T extends Project$apiKeysArgs<ExtArgs> = {}>(args?: Subset<T, Project$apiKeysArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "findMany"> | Null>
     platformCredentials<T extends Project$platformCredentialsArgs<ExtArgs> = {}>(args?: Subset<T, Project$platformCredentialsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlatformCredentialPayload<ExtArgs>, T, "findMany"> | Null>
     platformTokens<T extends Project$platformTokensArgs<ExtArgs> = {}>(args?: Subset<T, Project$platformTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlatformTokenPayload<ExtArgs>, T, "findMany"> | Null>
+    deployments<T extends Project$deploymentsArgs<ExtArgs> = {}>(args?: Subset<T, Project$deploymentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeploymentPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -21410,6 +21587,26 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: PlatformTokenScalarFieldEnum | PlatformTokenScalarFieldEnum[]
+  }
+
+  /**
+   * Project.deployments
+   */
+  export type Project$deploymentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deployment
+     */
+    select?: DeploymentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeploymentInclude<ExtArgs> | null
+    where?: DeploymentWhereInput
+    orderBy?: DeploymentOrderByWithRelationInput | DeploymentOrderByWithRelationInput[]
+    cursor?: DeploymentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DeploymentScalarFieldEnum | DeploymentScalarFieldEnum[]
   }
 
   /**
@@ -26470,6 +26667,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     project?: boolean | ProjectDefaultArgs<ExtArgs>
+    deployment?: boolean | PlatformToken$deploymentArgs<ExtArgs>
   }, ExtArgs["result"]["platformToken"]>
 
   export type PlatformTokenSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -26503,6 +26701,7 @@ export namespace Prisma {
 
   export type PlatformTokenInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     project?: boolean | ProjectDefaultArgs<ExtArgs>
+    deployment?: boolean | PlatformToken$deploymentArgs<ExtArgs>
   }
   export type PlatformTokenIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     project?: boolean | ProjectDefaultArgs<ExtArgs>
@@ -26512,6 +26711,7 @@ export namespace Prisma {
     name: "PlatformToken"
     objects: {
       project: Prisma.$ProjectPayload<ExtArgs>
+      deployment: Prisma.$DeploymentPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -26890,6 +27090,7 @@ export namespace Prisma {
   export interface Prisma__PlatformTokenClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     project<T extends ProjectDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProjectDefaultArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    deployment<T extends PlatformToken$deploymentArgs<ExtArgs> = {}>(args?: Subset<T, PlatformToken$deploymentArgs<ExtArgs>>): Prisma__DeploymentClient<$Result.GetResult<Prisma.$DeploymentPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -27248,6 +27449,21 @@ export namespace Prisma {
   }
 
   /**
+   * PlatformToken.deployment
+   */
+  export type PlatformToken$deploymentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deployment
+     */
+    select?: DeploymentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeploymentInclude<ExtArgs> | null
+    where?: DeploymentWhereInput
+  }
+
+  /**
    * PlatformToken without action
    */
   export type PlatformTokenDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -27259,6 +27475,1058 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: PlatformTokenInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Deployment
+   */
+
+  export type AggregateDeployment = {
+    _count: DeploymentCountAggregateOutputType | null
+    _min: DeploymentMinAggregateOutputType | null
+    _max: DeploymentMaxAggregateOutputType | null
+  }
+
+  export type DeploymentMinAggregateOutputType = {
+    id: string | null
+    projectId: string | null
+    role: $Enums.DeploymentRole | null
+    label: string | null
+    region: string | null
+    provider: $Enums.CloudProvider | null
+    isDeployed: boolean | null
+    deploymentUrl: string | null
+    platformTokenId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DeploymentMaxAggregateOutputType = {
+    id: string | null
+    projectId: string | null
+    role: $Enums.DeploymentRole | null
+    label: string | null
+    region: string | null
+    provider: $Enums.CloudProvider | null
+    isDeployed: boolean | null
+    deploymentUrl: string | null
+    platformTokenId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DeploymentCountAggregateOutputType = {
+    id: number
+    projectId: number
+    role: number
+    label: number
+    region: number
+    provider: number
+    isDeployed: number
+    deploymentUrl: number
+    platformTokenId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type DeploymentMinAggregateInputType = {
+    id?: true
+    projectId?: true
+    role?: true
+    label?: true
+    region?: true
+    provider?: true
+    isDeployed?: true
+    deploymentUrl?: true
+    platformTokenId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DeploymentMaxAggregateInputType = {
+    id?: true
+    projectId?: true
+    role?: true
+    label?: true
+    region?: true
+    provider?: true
+    isDeployed?: true
+    deploymentUrl?: true
+    platformTokenId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DeploymentCountAggregateInputType = {
+    id?: true
+    projectId?: true
+    role?: true
+    label?: true
+    region?: true
+    provider?: true
+    isDeployed?: true
+    deploymentUrl?: true
+    platformTokenId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type DeploymentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Deployment to aggregate.
+     */
+    where?: DeploymentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Deployments to fetch.
+     */
+    orderBy?: DeploymentOrderByWithRelationInput | DeploymentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DeploymentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Deployments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Deployments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Deployments
+    **/
+    _count?: true | DeploymentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DeploymentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DeploymentMaxAggregateInputType
+  }
+
+  export type GetDeploymentAggregateType<T extends DeploymentAggregateArgs> = {
+        [P in keyof T & keyof AggregateDeployment]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDeployment[P]>
+      : GetScalarType<T[P], AggregateDeployment[P]>
+  }
+
+
+
+
+  export type DeploymentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeploymentWhereInput
+    orderBy?: DeploymentOrderByWithAggregationInput | DeploymentOrderByWithAggregationInput[]
+    by: DeploymentScalarFieldEnum[] | DeploymentScalarFieldEnum
+    having?: DeploymentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DeploymentCountAggregateInputType | true
+    _min?: DeploymentMinAggregateInputType
+    _max?: DeploymentMaxAggregateInputType
+  }
+
+  export type DeploymentGroupByOutputType = {
+    id: string
+    projectId: string
+    role: $Enums.DeploymentRole
+    label: string | null
+    region: string | null
+    provider: $Enums.CloudProvider | null
+    isDeployed: boolean
+    deploymentUrl: string | null
+    platformTokenId: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: DeploymentCountAggregateOutputType | null
+    _min: DeploymentMinAggregateOutputType | null
+    _max: DeploymentMaxAggregateOutputType | null
+  }
+
+  type GetDeploymentGroupByPayload<T extends DeploymentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DeploymentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DeploymentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DeploymentGroupByOutputType[P]>
+            : GetScalarType<T[P], DeploymentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DeploymentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    projectId?: boolean
+    role?: boolean
+    label?: boolean
+    region?: boolean
+    provider?: boolean
+    isDeployed?: boolean
+    deploymentUrl?: boolean
+    platformTokenId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    platformToken?: boolean | Deployment$platformTokenArgs<ExtArgs>
+    emissionRecords?: boolean | Deployment$emissionRecordsArgs<ExtArgs>
+    _count?: boolean | DeploymentCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["deployment"]>
+
+  export type DeploymentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    projectId?: boolean
+    role?: boolean
+    label?: boolean
+    region?: boolean
+    provider?: boolean
+    isDeployed?: boolean
+    deploymentUrl?: boolean
+    platformTokenId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    platformToken?: boolean | Deployment$platformTokenArgs<ExtArgs>
+  }, ExtArgs["result"]["deployment"]>
+
+  export type DeploymentSelectScalar = {
+    id?: boolean
+    projectId?: boolean
+    role?: boolean
+    label?: boolean
+    region?: boolean
+    provider?: boolean
+    isDeployed?: boolean
+    deploymentUrl?: boolean
+    platformTokenId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type DeploymentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    platformToken?: boolean | Deployment$platformTokenArgs<ExtArgs>
+    emissionRecords?: boolean | Deployment$emissionRecordsArgs<ExtArgs>
+    _count?: boolean | DeploymentCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type DeploymentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    platformToken?: boolean | Deployment$platformTokenArgs<ExtArgs>
+  }
+
+  export type $DeploymentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Deployment"
+    objects: {
+      project: Prisma.$ProjectPayload<ExtArgs>
+      platformToken: Prisma.$PlatformTokenPayload<ExtArgs> | null
+      emissionRecords: Prisma.$EmissionRecordPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      projectId: string
+      role: $Enums.DeploymentRole
+      label: string | null
+      region: string | null
+      provider: $Enums.CloudProvider | null
+      isDeployed: boolean
+      deploymentUrl: string | null
+      platformTokenId: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["deployment"]>
+    composites: {}
+  }
+
+  type DeploymentGetPayload<S extends boolean | null | undefined | DeploymentDefaultArgs> = $Result.GetResult<Prisma.$DeploymentPayload, S>
+
+  type DeploymentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<DeploymentFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: DeploymentCountAggregateInputType | true
+    }
+
+  export interface DeploymentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Deployment'], meta: { name: 'Deployment' } }
+    /**
+     * Find zero or one Deployment that matches the filter.
+     * @param {DeploymentFindUniqueArgs} args - Arguments to find a Deployment
+     * @example
+     * // Get one Deployment
+     * const deployment = await prisma.deployment.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DeploymentFindUniqueArgs>(args: SelectSubset<T, DeploymentFindUniqueArgs<ExtArgs>>): Prisma__DeploymentClient<$Result.GetResult<Prisma.$DeploymentPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one Deployment that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {DeploymentFindUniqueOrThrowArgs} args - Arguments to find a Deployment
+     * @example
+     * // Get one Deployment
+     * const deployment = await prisma.deployment.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DeploymentFindUniqueOrThrowArgs>(args: SelectSubset<T, DeploymentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DeploymentClient<$Result.GetResult<Prisma.$DeploymentPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first Deployment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeploymentFindFirstArgs} args - Arguments to find a Deployment
+     * @example
+     * // Get one Deployment
+     * const deployment = await prisma.deployment.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DeploymentFindFirstArgs>(args?: SelectSubset<T, DeploymentFindFirstArgs<ExtArgs>>): Prisma__DeploymentClient<$Result.GetResult<Prisma.$DeploymentPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first Deployment that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeploymentFindFirstOrThrowArgs} args - Arguments to find a Deployment
+     * @example
+     * // Get one Deployment
+     * const deployment = await prisma.deployment.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DeploymentFindFirstOrThrowArgs>(args?: SelectSubset<T, DeploymentFindFirstOrThrowArgs<ExtArgs>>): Prisma__DeploymentClient<$Result.GetResult<Prisma.$DeploymentPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more Deployments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeploymentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Deployments
+     * const deployments = await prisma.deployment.findMany()
+     * 
+     * // Get first 10 Deployments
+     * const deployments = await prisma.deployment.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const deploymentWithIdOnly = await prisma.deployment.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DeploymentFindManyArgs>(args?: SelectSubset<T, DeploymentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeploymentPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a Deployment.
+     * @param {DeploymentCreateArgs} args - Arguments to create a Deployment.
+     * @example
+     * // Create one Deployment
+     * const Deployment = await prisma.deployment.create({
+     *   data: {
+     *     // ... data to create a Deployment
+     *   }
+     * })
+     * 
+     */
+    create<T extends DeploymentCreateArgs>(args: SelectSubset<T, DeploymentCreateArgs<ExtArgs>>): Prisma__DeploymentClient<$Result.GetResult<Prisma.$DeploymentPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many Deployments.
+     * @param {DeploymentCreateManyArgs} args - Arguments to create many Deployments.
+     * @example
+     * // Create many Deployments
+     * const deployment = await prisma.deployment.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DeploymentCreateManyArgs>(args?: SelectSubset<T, DeploymentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Deployments and returns the data saved in the database.
+     * @param {DeploymentCreateManyAndReturnArgs} args - Arguments to create many Deployments.
+     * @example
+     * // Create many Deployments
+     * const deployment = await prisma.deployment.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Deployments and only return the `id`
+     * const deploymentWithIdOnly = await prisma.deployment.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DeploymentCreateManyAndReturnArgs>(args?: SelectSubset<T, DeploymentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeploymentPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a Deployment.
+     * @param {DeploymentDeleteArgs} args - Arguments to delete one Deployment.
+     * @example
+     * // Delete one Deployment
+     * const Deployment = await prisma.deployment.delete({
+     *   where: {
+     *     // ... filter to delete one Deployment
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DeploymentDeleteArgs>(args: SelectSubset<T, DeploymentDeleteArgs<ExtArgs>>): Prisma__DeploymentClient<$Result.GetResult<Prisma.$DeploymentPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one Deployment.
+     * @param {DeploymentUpdateArgs} args - Arguments to update one Deployment.
+     * @example
+     * // Update one Deployment
+     * const deployment = await prisma.deployment.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DeploymentUpdateArgs>(args: SelectSubset<T, DeploymentUpdateArgs<ExtArgs>>): Prisma__DeploymentClient<$Result.GetResult<Prisma.$DeploymentPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more Deployments.
+     * @param {DeploymentDeleteManyArgs} args - Arguments to filter Deployments to delete.
+     * @example
+     * // Delete a few Deployments
+     * const { count } = await prisma.deployment.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DeploymentDeleteManyArgs>(args?: SelectSubset<T, DeploymentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Deployments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeploymentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Deployments
+     * const deployment = await prisma.deployment.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DeploymentUpdateManyArgs>(args: SelectSubset<T, DeploymentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Deployment.
+     * @param {DeploymentUpsertArgs} args - Arguments to update or create a Deployment.
+     * @example
+     * // Update or create a Deployment
+     * const deployment = await prisma.deployment.upsert({
+     *   create: {
+     *     // ... data to create a Deployment
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Deployment we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DeploymentUpsertArgs>(args: SelectSubset<T, DeploymentUpsertArgs<ExtArgs>>): Prisma__DeploymentClient<$Result.GetResult<Prisma.$DeploymentPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of Deployments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeploymentCountArgs} args - Arguments to filter Deployments to count.
+     * @example
+     * // Count the number of Deployments
+     * const count = await prisma.deployment.count({
+     *   where: {
+     *     // ... the filter for the Deployments we want to count
+     *   }
+     * })
+    **/
+    count<T extends DeploymentCountArgs>(
+      args?: Subset<T, DeploymentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DeploymentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Deployment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeploymentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DeploymentAggregateArgs>(args: Subset<T, DeploymentAggregateArgs>): Prisma.PrismaPromise<GetDeploymentAggregateType<T>>
+
+    /**
+     * Group by Deployment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeploymentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DeploymentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DeploymentGroupByArgs['orderBy'] }
+        : { orderBy?: DeploymentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DeploymentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDeploymentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Deployment model
+   */
+  readonly fields: DeploymentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Deployment.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DeploymentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    project<T extends ProjectDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProjectDefaultArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    platformToken<T extends Deployment$platformTokenArgs<ExtArgs> = {}>(args?: Subset<T, Deployment$platformTokenArgs<ExtArgs>>): Prisma__PlatformTokenClient<$Result.GetResult<Prisma.$PlatformTokenPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
+    emissionRecords<T extends Deployment$emissionRecordsArgs<ExtArgs> = {}>(args?: Subset<T, Deployment$emissionRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmissionRecordPayload<ExtArgs>, T, "findMany"> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Deployment model
+   */ 
+  interface DeploymentFieldRefs {
+    readonly id: FieldRef<"Deployment", 'String'>
+    readonly projectId: FieldRef<"Deployment", 'String'>
+    readonly role: FieldRef<"Deployment", 'DeploymentRole'>
+    readonly label: FieldRef<"Deployment", 'String'>
+    readonly region: FieldRef<"Deployment", 'String'>
+    readonly provider: FieldRef<"Deployment", 'CloudProvider'>
+    readonly isDeployed: FieldRef<"Deployment", 'Boolean'>
+    readonly deploymentUrl: FieldRef<"Deployment", 'String'>
+    readonly platformTokenId: FieldRef<"Deployment", 'String'>
+    readonly createdAt: FieldRef<"Deployment", 'DateTime'>
+    readonly updatedAt: FieldRef<"Deployment", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Deployment findUnique
+   */
+  export type DeploymentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deployment
+     */
+    select?: DeploymentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeploymentInclude<ExtArgs> | null
+    /**
+     * Filter, which Deployment to fetch.
+     */
+    where: DeploymentWhereUniqueInput
+  }
+
+  /**
+   * Deployment findUniqueOrThrow
+   */
+  export type DeploymentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deployment
+     */
+    select?: DeploymentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeploymentInclude<ExtArgs> | null
+    /**
+     * Filter, which Deployment to fetch.
+     */
+    where: DeploymentWhereUniqueInput
+  }
+
+  /**
+   * Deployment findFirst
+   */
+  export type DeploymentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deployment
+     */
+    select?: DeploymentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeploymentInclude<ExtArgs> | null
+    /**
+     * Filter, which Deployment to fetch.
+     */
+    where?: DeploymentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Deployments to fetch.
+     */
+    orderBy?: DeploymentOrderByWithRelationInput | DeploymentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Deployments.
+     */
+    cursor?: DeploymentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Deployments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Deployments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Deployments.
+     */
+    distinct?: DeploymentScalarFieldEnum | DeploymentScalarFieldEnum[]
+  }
+
+  /**
+   * Deployment findFirstOrThrow
+   */
+  export type DeploymentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deployment
+     */
+    select?: DeploymentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeploymentInclude<ExtArgs> | null
+    /**
+     * Filter, which Deployment to fetch.
+     */
+    where?: DeploymentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Deployments to fetch.
+     */
+    orderBy?: DeploymentOrderByWithRelationInput | DeploymentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Deployments.
+     */
+    cursor?: DeploymentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Deployments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Deployments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Deployments.
+     */
+    distinct?: DeploymentScalarFieldEnum | DeploymentScalarFieldEnum[]
+  }
+
+  /**
+   * Deployment findMany
+   */
+  export type DeploymentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deployment
+     */
+    select?: DeploymentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeploymentInclude<ExtArgs> | null
+    /**
+     * Filter, which Deployments to fetch.
+     */
+    where?: DeploymentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Deployments to fetch.
+     */
+    orderBy?: DeploymentOrderByWithRelationInput | DeploymentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Deployments.
+     */
+    cursor?: DeploymentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Deployments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Deployments.
+     */
+    skip?: number
+    distinct?: DeploymentScalarFieldEnum | DeploymentScalarFieldEnum[]
+  }
+
+  /**
+   * Deployment create
+   */
+  export type DeploymentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deployment
+     */
+    select?: DeploymentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeploymentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Deployment.
+     */
+    data: XOR<DeploymentCreateInput, DeploymentUncheckedCreateInput>
+  }
+
+  /**
+   * Deployment createMany
+   */
+  export type DeploymentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Deployments.
+     */
+    data: DeploymentCreateManyInput | DeploymentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Deployment createManyAndReturn
+   */
+  export type DeploymentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deployment
+     */
+    select?: DeploymentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many Deployments.
+     */
+    data: DeploymentCreateManyInput | DeploymentCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeploymentIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Deployment update
+   */
+  export type DeploymentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deployment
+     */
+    select?: DeploymentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeploymentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Deployment.
+     */
+    data: XOR<DeploymentUpdateInput, DeploymentUncheckedUpdateInput>
+    /**
+     * Choose, which Deployment to update.
+     */
+    where: DeploymentWhereUniqueInput
+  }
+
+  /**
+   * Deployment updateMany
+   */
+  export type DeploymentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Deployments.
+     */
+    data: XOR<DeploymentUpdateManyMutationInput, DeploymentUncheckedUpdateManyInput>
+    /**
+     * Filter which Deployments to update
+     */
+    where?: DeploymentWhereInput
+  }
+
+  /**
+   * Deployment upsert
+   */
+  export type DeploymentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deployment
+     */
+    select?: DeploymentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeploymentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Deployment to update in case it exists.
+     */
+    where: DeploymentWhereUniqueInput
+    /**
+     * In case the Deployment found by the `where` argument doesn't exist, create a new Deployment with this data.
+     */
+    create: XOR<DeploymentCreateInput, DeploymentUncheckedCreateInput>
+    /**
+     * In case the Deployment was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DeploymentUpdateInput, DeploymentUncheckedUpdateInput>
+  }
+
+  /**
+   * Deployment delete
+   */
+  export type DeploymentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deployment
+     */
+    select?: DeploymentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeploymentInclude<ExtArgs> | null
+    /**
+     * Filter which Deployment to delete.
+     */
+    where: DeploymentWhereUniqueInput
+  }
+
+  /**
+   * Deployment deleteMany
+   */
+  export type DeploymentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Deployments to delete
+     */
+    where?: DeploymentWhereInput
+  }
+
+  /**
+   * Deployment.platformToken
+   */
+  export type Deployment$platformTokenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlatformToken
+     */
+    select?: PlatformTokenSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlatformTokenInclude<ExtArgs> | null
+    where?: PlatformTokenWhereInput
+  }
+
+  /**
+   * Deployment.emissionRecords
+   */
+  export type Deployment$emissionRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmissionRecord
+     */
+    select?: EmissionRecordSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmissionRecordInclude<ExtArgs> | null
+    where?: EmissionRecordWhereInput
+    orderBy?: EmissionRecordOrderByWithRelationInput | EmissionRecordOrderByWithRelationInput[]
+    cursor?: EmissionRecordWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EmissionRecordScalarFieldEnum | EmissionRecordScalarFieldEnum[]
+  }
+
+  /**
+   * Deployment without action
+   */
+  export type DeploymentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Deployment
+     */
+    select?: DeploymentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeploymentInclude<ExtArgs> | null
   }
 
 
@@ -27578,6 +28846,7 @@ export namespace Prisma {
     id: 'id',
     agentRunId: 'agentRunId',
     projectId: 'projectId',
+    deploymentId: 'deploymentId',
     instanceId: 'instanceId',
     instanceType: 'instanceType',
     provider: 'provider',
@@ -27720,6 +28989,23 @@ export namespace Prisma {
   };
 
   export type PlatformTokenScalarFieldEnum = (typeof PlatformTokenScalarFieldEnum)[keyof typeof PlatformTokenScalarFieldEnum]
+
+
+  export const DeploymentScalarFieldEnum: {
+    id: 'id',
+    projectId: 'projectId',
+    role: 'role',
+    label: 'label',
+    region: 'region',
+    provider: 'provider',
+    isDeployed: 'isDeployed',
+    deploymentUrl: 'deploymentUrl',
+    platformTokenId: 'platformTokenId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type DeploymentScalarFieldEnum = (typeof DeploymentScalarFieldEnum)[keyof typeof DeploymentScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -28122,6 +29408,20 @@ export namespace Prisma {
    * Reference to a field of type 'PlatformTokenStatus[]'
    */
   export type ListEnumPlatformTokenStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlatformTokenStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'DeploymentRole'
+   */
+  export type EnumDeploymentRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DeploymentRole'>
+    
+
+
+  /**
+   * Reference to a field of type 'DeploymentRole[]'
+   */
+  export type ListEnumDeploymentRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DeploymentRole[]'>
     
   /**
    * Deep Input Types
@@ -29623,6 +30923,7 @@ export namespace Prisma {
     id?: StringFilter<"EmissionRecord"> | string
     agentRunId?: StringNullableFilter<"EmissionRecord"> | string | null
     projectId?: StringNullableFilter<"EmissionRecord"> | string | null
+    deploymentId?: StringNullableFilter<"EmissionRecord"> | string | null
     instanceId?: StringFilter<"EmissionRecord"> | string
     instanceType?: StringFilter<"EmissionRecord"> | string
     provider?: EnumCloudProviderFilter<"EmissionRecord"> | $Enums.CloudProvider
@@ -29640,12 +30941,14 @@ export namespace Prisma {
     recommendation?: StringNullableFilter<"EmissionRecord"> | string | null
     timestamp?: DateTimeFilter<"EmissionRecord"> | Date | string
     project?: XOR<ProjectNullableRelationFilter, ProjectWhereInput> | null
+    deployment?: XOR<DeploymentNullableRelationFilter, DeploymentWhereInput> | null
   }
 
   export type EmissionRecordOrderByWithRelationInput = {
     id?: SortOrder
     agentRunId?: SortOrderInput | SortOrder
     projectId?: SortOrderInput | SortOrder
+    deploymentId?: SortOrderInput | SortOrder
     instanceId?: SortOrder
     instanceType?: SortOrder
     provider?: SortOrder
@@ -29663,6 +30966,7 @@ export namespace Prisma {
     recommendation?: SortOrderInput | SortOrder
     timestamp?: SortOrder
     project?: ProjectOrderByWithRelationInput
+    deployment?: DeploymentOrderByWithRelationInput
   }
 
   export type EmissionRecordWhereUniqueInput = Prisma.AtLeast<{
@@ -29672,6 +30976,7 @@ export namespace Prisma {
     NOT?: EmissionRecordWhereInput | EmissionRecordWhereInput[]
     agentRunId?: StringNullableFilter<"EmissionRecord"> | string | null
     projectId?: StringNullableFilter<"EmissionRecord"> | string | null
+    deploymentId?: StringNullableFilter<"EmissionRecord"> | string | null
     instanceId?: StringFilter<"EmissionRecord"> | string
     instanceType?: StringFilter<"EmissionRecord"> | string
     provider?: EnumCloudProviderFilter<"EmissionRecord"> | $Enums.CloudProvider
@@ -29689,12 +30994,14 @@ export namespace Prisma {
     recommendation?: StringNullableFilter<"EmissionRecord"> | string | null
     timestamp?: DateTimeFilter<"EmissionRecord"> | Date | string
     project?: XOR<ProjectNullableRelationFilter, ProjectWhereInput> | null
+    deployment?: XOR<DeploymentNullableRelationFilter, DeploymentWhereInput> | null
   }, "id">
 
   export type EmissionRecordOrderByWithAggregationInput = {
     id?: SortOrder
     agentRunId?: SortOrderInput | SortOrder
     projectId?: SortOrderInput | SortOrder
+    deploymentId?: SortOrderInput | SortOrder
     instanceId?: SortOrder
     instanceType?: SortOrder
     provider?: SortOrder
@@ -29725,6 +31032,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"EmissionRecord"> | string
     agentRunId?: StringNullableWithAggregatesFilter<"EmissionRecord"> | string | null
     projectId?: StringNullableWithAggregatesFilter<"EmissionRecord"> | string | null
+    deploymentId?: StringNullableWithAggregatesFilter<"EmissionRecord"> | string | null
     instanceId?: StringWithAggregatesFilter<"EmissionRecord"> | string
     instanceType?: StringWithAggregatesFilter<"EmissionRecord"> | string
     provider?: EnumCloudProviderWithAggregatesFilter<"EmissionRecord"> | $Enums.CloudProvider
@@ -29854,6 +31162,7 @@ export namespace Prisma {
     apiKeys?: ApiKeyListRelationFilter
     platformCredentials?: PlatformCredentialListRelationFilter
     platformTokens?: PlatformTokenListRelationFilter
+    deployments?: DeploymentListRelationFilter
   }
 
   export type ProjectOrderByWithRelationInput = {
@@ -29880,6 +31189,7 @@ export namespace Prisma {
     apiKeys?: ApiKeyOrderByRelationAggregateInput
     platformCredentials?: PlatformCredentialOrderByRelationAggregateInput
     platformTokens?: PlatformTokenOrderByRelationAggregateInput
+    deployments?: DeploymentOrderByRelationAggregateInput
   }
 
   export type ProjectWhereUniqueInput = Prisma.AtLeast<{
@@ -29909,6 +31219,7 @@ export namespace Prisma {
     apiKeys?: ApiKeyListRelationFilter
     platformCredentials?: PlatformCredentialListRelationFilter
     platformTokens?: PlatformTokenListRelationFilter
+    deployments?: DeploymentListRelationFilter
   }, "id">
 
   export type ProjectOrderByWithAggregationInput = {
@@ -30315,6 +31626,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"PlatformToken"> | Date | string
     updatedAt?: DateTimeFilter<"PlatformToken"> | Date | string
     project?: XOR<ProjectRelationFilter, ProjectWhereInput>
+    deployment?: XOR<DeploymentNullableRelationFilter, DeploymentWhereInput> | null
   }
 
   export type PlatformTokenOrderByWithRelationInput = {
@@ -30330,11 +31642,11 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     project?: ProjectOrderByWithRelationInput
+    deployment?: DeploymentOrderByWithRelationInput
   }
 
   export type PlatformTokenWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    projectId_platform?: PlatformTokenProjectIdPlatformCompoundUniqueInput
     AND?: PlatformTokenWhereInput | PlatformTokenWhereInput[]
     OR?: PlatformTokenWhereInput[]
     NOT?: PlatformTokenWhereInput | PlatformTokenWhereInput[]
@@ -30349,7 +31661,8 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"PlatformToken"> | Date | string
     updatedAt?: DateTimeFilter<"PlatformToken"> | Date | string
     project?: XOR<ProjectRelationFilter, ProjectWhereInput>
-  }, "id" | "projectId_platform">
+    deployment?: XOR<DeploymentNullableRelationFilter, DeploymentWhereInput> | null
+  }, "id">
 
   export type PlatformTokenOrderByWithAggregationInput = {
     id?: SortOrder
@@ -30385,6 +31698,97 @@ export namespace Prisma {
     failCount?: IntWithAggregatesFilter<"PlatformToken"> | number
     createdAt?: DateTimeWithAggregatesFilter<"PlatformToken"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"PlatformToken"> | Date | string
+  }
+
+  export type DeploymentWhereInput = {
+    AND?: DeploymentWhereInput | DeploymentWhereInput[]
+    OR?: DeploymentWhereInput[]
+    NOT?: DeploymentWhereInput | DeploymentWhereInput[]
+    id?: StringFilter<"Deployment"> | string
+    projectId?: StringFilter<"Deployment"> | string
+    role?: EnumDeploymentRoleFilter<"Deployment"> | $Enums.DeploymentRole
+    label?: StringNullableFilter<"Deployment"> | string | null
+    region?: StringNullableFilter<"Deployment"> | string | null
+    provider?: EnumCloudProviderNullableFilter<"Deployment"> | $Enums.CloudProvider | null
+    isDeployed?: BoolFilter<"Deployment"> | boolean
+    deploymentUrl?: StringNullableFilter<"Deployment"> | string | null
+    platformTokenId?: StringNullableFilter<"Deployment"> | string | null
+    createdAt?: DateTimeFilter<"Deployment"> | Date | string
+    updatedAt?: DateTimeFilter<"Deployment"> | Date | string
+    project?: XOR<ProjectRelationFilter, ProjectWhereInput>
+    platformToken?: XOR<PlatformTokenNullableRelationFilter, PlatformTokenWhereInput> | null
+    emissionRecords?: EmissionRecordListRelationFilter
+  }
+
+  export type DeploymentOrderByWithRelationInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    role?: SortOrder
+    label?: SortOrderInput | SortOrder
+    region?: SortOrderInput | SortOrder
+    provider?: SortOrderInput | SortOrder
+    isDeployed?: SortOrder
+    deploymentUrl?: SortOrderInput | SortOrder
+    platformTokenId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    project?: ProjectOrderByWithRelationInput
+    platformToken?: PlatformTokenOrderByWithRelationInput
+    emissionRecords?: EmissionRecordOrderByRelationAggregateInput
+  }
+
+  export type DeploymentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    platformTokenId?: string
+    AND?: DeploymentWhereInput | DeploymentWhereInput[]
+    OR?: DeploymentWhereInput[]
+    NOT?: DeploymentWhereInput | DeploymentWhereInput[]
+    projectId?: StringFilter<"Deployment"> | string
+    role?: EnumDeploymentRoleFilter<"Deployment"> | $Enums.DeploymentRole
+    label?: StringNullableFilter<"Deployment"> | string | null
+    region?: StringNullableFilter<"Deployment"> | string | null
+    provider?: EnumCloudProviderNullableFilter<"Deployment"> | $Enums.CloudProvider | null
+    isDeployed?: BoolFilter<"Deployment"> | boolean
+    deploymentUrl?: StringNullableFilter<"Deployment"> | string | null
+    createdAt?: DateTimeFilter<"Deployment"> | Date | string
+    updatedAt?: DateTimeFilter<"Deployment"> | Date | string
+    project?: XOR<ProjectRelationFilter, ProjectWhereInput>
+    platformToken?: XOR<PlatformTokenNullableRelationFilter, PlatformTokenWhereInput> | null
+    emissionRecords?: EmissionRecordListRelationFilter
+  }, "id" | "platformTokenId">
+
+  export type DeploymentOrderByWithAggregationInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    role?: SortOrder
+    label?: SortOrderInput | SortOrder
+    region?: SortOrderInput | SortOrder
+    provider?: SortOrderInput | SortOrder
+    isDeployed?: SortOrder
+    deploymentUrl?: SortOrderInput | SortOrder
+    platformTokenId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: DeploymentCountOrderByAggregateInput
+    _max?: DeploymentMaxOrderByAggregateInput
+    _min?: DeploymentMinOrderByAggregateInput
+  }
+
+  export type DeploymentScalarWhereWithAggregatesInput = {
+    AND?: DeploymentScalarWhereWithAggregatesInput | DeploymentScalarWhereWithAggregatesInput[]
+    OR?: DeploymentScalarWhereWithAggregatesInput[]
+    NOT?: DeploymentScalarWhereWithAggregatesInput | DeploymentScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Deployment"> | string
+    projectId?: StringWithAggregatesFilter<"Deployment"> | string
+    role?: EnumDeploymentRoleWithAggregatesFilter<"Deployment"> | $Enums.DeploymentRole
+    label?: StringNullableWithAggregatesFilter<"Deployment"> | string | null
+    region?: StringNullableWithAggregatesFilter<"Deployment"> | string | null
+    provider?: EnumCloudProviderNullableWithAggregatesFilter<"Deployment"> | $Enums.CloudProvider | null
+    isDeployed?: BoolWithAggregatesFilter<"Deployment"> | boolean
+    deploymentUrl?: StringNullableWithAggregatesFilter<"Deployment"> | string | null
+    platformTokenId?: StringNullableWithAggregatesFilter<"Deployment"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"Deployment"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Deployment"> | Date | string
   }
 
   export type MobileUserCreateInput = {
@@ -32203,12 +33607,14 @@ export namespace Prisma {
     recommendation?: string | null
     timestamp?: Date | string
     project?: ProjectCreateNestedOneWithoutEmissionRecordsInput
+    deployment?: DeploymentCreateNestedOneWithoutEmissionRecordsInput
   }
 
   export type EmissionRecordUncheckedCreateInput = {
     id?: string
     agentRunId?: string | null
     projectId?: string | null
+    deploymentId?: string | null
     instanceId: string
     instanceType: string
     provider: $Enums.CloudProvider
@@ -32247,12 +33653,14 @@ export namespace Prisma {
     recommendation?: NullableStringFieldUpdateOperationsInput | string | null
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     project?: ProjectUpdateOneWithoutEmissionRecordsNestedInput
+    deployment?: DeploymentUpdateOneWithoutEmissionRecordsNestedInput
   }
 
   export type EmissionRecordUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     agentRunId?: NullableStringFieldUpdateOperationsInput | string | null
     projectId?: NullableStringFieldUpdateOperationsInput | string | null
+    deploymentId?: NullableStringFieldUpdateOperationsInput | string | null
     instanceId?: StringFieldUpdateOperationsInput | string
     instanceType?: StringFieldUpdateOperationsInput | string
     provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
@@ -32275,6 +33683,7 @@ export namespace Prisma {
     id?: string
     agentRunId?: string | null
     projectId?: string | null
+    deploymentId?: string | null
     instanceId: string
     instanceType: string
     provider: $Enums.CloudProvider
@@ -32318,6 +33727,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     agentRunId?: NullableStringFieldUpdateOperationsInput | string | null
     projectId?: NullableStringFieldUpdateOperationsInput | string | null
+    deploymentId?: NullableStringFieldUpdateOperationsInput | string | null
     instanceId?: StringFieldUpdateOperationsInput | string
     instanceType?: StringFieldUpdateOperationsInput | string
     provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
@@ -32459,6 +33869,7 @@ export namespace Prisma {
     apiKeys?: ApiKeyCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialCreateNestedManyWithoutProjectInput
     platformTokens?: PlatformTokenCreateNestedManyWithoutProjectInput
+    deployments?: DeploymentCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateInput = {
@@ -32484,6 +33895,7 @@ export namespace Prisma {
     apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialUncheckedCreateNestedManyWithoutProjectInput
     platformTokens?: PlatformTokenUncheckedCreateNestedManyWithoutProjectInput
+    deployments?: DeploymentUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUpdateInput = {
@@ -32509,6 +33921,7 @@ export namespace Prisma {
     apiKeys?: ApiKeyUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUpdateManyWithoutProjectNestedInput
     platformTokens?: PlatformTokenUpdateManyWithoutProjectNestedInput
+    deployments?: DeploymentUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateInput = {
@@ -32534,6 +33947,7 @@ export namespace Prisma {
     apiKeys?: ApiKeyUncheckedUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUncheckedUpdateManyWithoutProjectNestedInput
     platformTokens?: PlatformTokenUncheckedUpdateManyWithoutProjectNestedInput
+    deployments?: DeploymentUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateManyInput = {
@@ -32974,6 +34388,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     project: ProjectCreateNestedOneWithoutPlatformTokensInput
+    deployment?: DeploymentCreateNestedOneWithoutPlatformTokenInput
   }
 
   export type PlatformTokenUncheckedCreateInput = {
@@ -32988,6 +34403,7 @@ export namespace Prisma {
     failCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    deployment?: DeploymentUncheckedCreateNestedOneWithoutPlatformTokenInput
   }
 
   export type PlatformTokenUpdateInput = {
@@ -33002,6 +34418,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     project?: ProjectUpdateOneRequiredWithoutPlatformTokensNestedInput
+    deployment?: DeploymentUpdateOneWithoutPlatformTokenNestedInput
   }
 
   export type PlatformTokenUncheckedUpdateInput = {
@@ -33016,6 +34433,7 @@ export namespace Prisma {
     failCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deployment?: DeploymentUncheckedUpdateOneWithoutPlatformTokenNestedInput
   }
 
   export type PlatformTokenCreateManyInput = {
@@ -33055,6 +34473,106 @@ export namespace Prisma {
     lastVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastError?: NullableStringFieldUpdateOperationsInput | string | null
     failCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeploymentCreateInput = {
+    id?: string
+    role?: $Enums.DeploymentRole
+    label?: string | null
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    project: ProjectCreateNestedOneWithoutDeploymentsInput
+    platformToken?: PlatformTokenCreateNestedOneWithoutDeploymentInput
+    emissionRecords?: EmissionRecordCreateNestedManyWithoutDeploymentInput
+  }
+
+  export type DeploymentUncheckedCreateInput = {
+    id?: string
+    projectId: string
+    role?: $Enums.DeploymentRole
+    label?: string | null
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    platformTokenId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutDeploymentInput
+  }
+
+  export type DeploymentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: EnumDeploymentRoleFieldUpdateOperationsInput | $Enums.DeploymentRole
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneRequiredWithoutDeploymentsNestedInput
+    platformToken?: PlatformTokenUpdateOneWithoutDeploymentNestedInput
+    emissionRecords?: EmissionRecordUpdateManyWithoutDeploymentNestedInput
+  }
+
+  export type DeploymentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    role?: EnumDeploymentRoleFieldUpdateOperationsInput | $Enums.DeploymentRole
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    platformTokenId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutDeploymentNestedInput
+  }
+
+  export type DeploymentCreateManyInput = {
+    id?: string
+    projectId: string
+    role?: $Enums.DeploymentRole
+    label?: string | null
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    platformTokenId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeploymentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: EnumDeploymentRoleFieldUpdateOperationsInput | $Enums.DeploymentRole
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeploymentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    role?: EnumDeploymentRoleFieldUpdateOperationsInput | $Enums.DeploymentRole
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    platformTokenId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -34626,10 +36144,16 @@ export namespace Prisma {
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
+  export type DeploymentNullableRelationFilter = {
+    is?: DeploymentWhereInput | null
+    isNot?: DeploymentWhereInput | null
+  }
+
   export type EmissionRecordCountOrderByAggregateInput = {
     id?: SortOrder
     agentRunId?: SortOrder
     projectId?: SortOrder
+    deploymentId?: SortOrder
     instanceId?: SortOrder
     instanceType?: SortOrder
     provider?: SortOrder
@@ -34662,6 +36186,7 @@ export namespace Prisma {
     id?: SortOrder
     agentRunId?: SortOrder
     projectId?: SortOrder
+    deploymentId?: SortOrder
     instanceId?: SortOrder
     instanceType?: SortOrder
     provider?: SortOrder
@@ -34684,6 +36209,7 @@ export namespace Prisma {
     id?: SortOrder
     agentRunId?: SortOrder
     projectId?: SortOrder
+    deploymentId?: SortOrder
     instanceId?: SortOrder
     instanceType?: SortOrder
     provider?: SortOrder
@@ -34837,6 +36363,12 @@ export namespace Prisma {
     none?: PlatformTokenWhereInput
   }
 
+  export type DeploymentListRelationFilter = {
+    every?: DeploymentWhereInput
+    some?: DeploymentWhereInput
+    none?: DeploymentWhereInput
+  }
+
   export type AgentRunOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -34854,6 +36386,10 @@ export namespace Prisma {
   }
 
   export type PlatformTokenOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type DeploymentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -35122,11 +36658,6 @@ export namespace Prisma {
     not?: NestedEnumPlatformTokenStatusFilter<$PrismaModel> | $Enums.PlatformTokenStatus
   }
 
-  export type PlatformTokenProjectIdPlatformCompoundUniqueInput = {
-    projectId: string
-    platform: $Enums.PlatformType
-  }
-
   export type PlatformTokenCountOrderByAggregateInput = {
     id?: SortOrder
     projectId?: SortOrder
@@ -35195,6 +36726,70 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumPlatformTokenStatusFilter<$PrismaModel>
     _max?: NestedEnumPlatformTokenStatusFilter<$PrismaModel>
+  }
+
+  export type EnumDeploymentRoleFilter<$PrismaModel = never> = {
+    equals?: $Enums.DeploymentRole | EnumDeploymentRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.DeploymentRole[] | ListEnumDeploymentRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DeploymentRole[] | ListEnumDeploymentRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumDeploymentRoleFilter<$PrismaModel> | $Enums.DeploymentRole
+  }
+
+  export type PlatformTokenNullableRelationFilter = {
+    is?: PlatformTokenWhereInput | null
+    isNot?: PlatformTokenWhereInput | null
+  }
+
+  export type DeploymentCountOrderByAggregateInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    role?: SortOrder
+    label?: SortOrder
+    region?: SortOrder
+    provider?: SortOrder
+    isDeployed?: SortOrder
+    deploymentUrl?: SortOrder
+    platformTokenId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DeploymentMaxOrderByAggregateInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    role?: SortOrder
+    label?: SortOrder
+    region?: SortOrder
+    provider?: SortOrder
+    isDeployed?: SortOrder
+    deploymentUrl?: SortOrder
+    platformTokenId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DeploymentMinOrderByAggregateInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    role?: SortOrder
+    label?: SortOrder
+    region?: SortOrder
+    provider?: SortOrder
+    isDeployed?: SortOrder
+    deploymentUrl?: SortOrder
+    platformTokenId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumDeploymentRoleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DeploymentRole | EnumDeploymentRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.DeploymentRole[] | ListEnumDeploymentRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DeploymentRole[] | ListEnumDeploymentRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumDeploymentRoleWithAggregatesFilter<$PrismaModel> | $Enums.DeploymentRole
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDeploymentRoleFilter<$PrismaModel>
+    _max?: NestedEnumDeploymentRoleFilter<$PrismaModel>
   }
 
   export type CalculationCreateNestedManyWithoutUserInput = {
@@ -35494,6 +37089,12 @@ export namespace Prisma {
     connect?: ProjectWhereUniqueInput
   }
 
+  export type DeploymentCreateNestedOneWithoutEmissionRecordsInput = {
+    create?: XOR<DeploymentCreateWithoutEmissionRecordsInput, DeploymentUncheckedCreateWithoutEmissionRecordsInput>
+    connectOrCreate?: DeploymentCreateOrConnectWithoutEmissionRecordsInput
+    connect?: DeploymentWhereUniqueInput
+  }
+
   export type ProjectUpdateOneWithoutEmissionRecordsNestedInput = {
     create?: XOR<ProjectCreateWithoutEmissionRecordsInput, ProjectUncheckedCreateWithoutEmissionRecordsInput>
     connectOrCreate?: ProjectCreateOrConnectWithoutEmissionRecordsInput
@@ -35502,6 +37103,16 @@ export namespace Prisma {
     delete?: ProjectWhereInput | boolean
     connect?: ProjectWhereUniqueInput
     update?: XOR<XOR<ProjectUpdateToOneWithWhereWithoutEmissionRecordsInput, ProjectUpdateWithoutEmissionRecordsInput>, ProjectUncheckedUpdateWithoutEmissionRecordsInput>
+  }
+
+  export type DeploymentUpdateOneWithoutEmissionRecordsNestedInput = {
+    create?: XOR<DeploymentCreateWithoutEmissionRecordsInput, DeploymentUncheckedCreateWithoutEmissionRecordsInput>
+    connectOrCreate?: DeploymentCreateOrConnectWithoutEmissionRecordsInput
+    upsert?: DeploymentUpsertWithoutEmissionRecordsInput
+    disconnect?: DeploymentWhereInput | boolean
+    delete?: DeploymentWhereInput | boolean
+    connect?: DeploymentWhereUniqueInput
+    update?: XOR<XOR<DeploymentUpdateToOneWithWhereWithoutEmissionRecordsInput, DeploymentUpdateWithoutEmissionRecordsInput>, DeploymentUncheckedUpdateWithoutEmissionRecordsInput>
   }
 
   export type ProfileCreateNestedOneWithoutUserInput = {
@@ -35697,6 +37308,13 @@ export namespace Prisma {
     connect?: PlatformTokenWhereUniqueInput | PlatformTokenWhereUniqueInput[]
   }
 
+  export type DeploymentCreateNestedManyWithoutProjectInput = {
+    create?: XOR<DeploymentCreateWithoutProjectInput, DeploymentUncheckedCreateWithoutProjectInput> | DeploymentCreateWithoutProjectInput[] | DeploymentUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: DeploymentCreateOrConnectWithoutProjectInput | DeploymentCreateOrConnectWithoutProjectInput[]
+    createMany?: DeploymentCreateManyProjectInputEnvelope
+    connect?: DeploymentWhereUniqueInput | DeploymentWhereUniqueInput[]
+  }
+
   export type AgentRunUncheckedCreateNestedManyWithoutProjectInput = {
     create?: XOR<AgentRunCreateWithoutProjectInput, AgentRunUncheckedCreateWithoutProjectInput> | AgentRunCreateWithoutProjectInput[] | AgentRunUncheckedCreateWithoutProjectInput[]
     connectOrCreate?: AgentRunCreateOrConnectWithoutProjectInput | AgentRunCreateOrConnectWithoutProjectInput[]
@@ -35730,6 +37348,13 @@ export namespace Prisma {
     connectOrCreate?: PlatformTokenCreateOrConnectWithoutProjectInput | PlatformTokenCreateOrConnectWithoutProjectInput[]
     createMany?: PlatformTokenCreateManyProjectInputEnvelope
     connect?: PlatformTokenWhereUniqueInput | PlatformTokenWhereUniqueInput[]
+  }
+
+  export type DeploymentUncheckedCreateNestedManyWithoutProjectInput = {
+    create?: XOR<DeploymentCreateWithoutProjectInput, DeploymentUncheckedCreateWithoutProjectInput> | DeploymentCreateWithoutProjectInput[] | DeploymentUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: DeploymentCreateOrConnectWithoutProjectInput | DeploymentCreateOrConnectWithoutProjectInput[]
+    createMany?: DeploymentCreateManyProjectInputEnvelope
+    connect?: DeploymentWhereUniqueInput | DeploymentWhereUniqueInput[]
   }
 
   export type EnumDataSourceFieldUpdateOperationsInput = {
@@ -35814,6 +37439,20 @@ export namespace Prisma {
     deleteMany?: PlatformTokenScalarWhereInput | PlatformTokenScalarWhereInput[]
   }
 
+  export type DeploymentUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<DeploymentCreateWithoutProjectInput, DeploymentUncheckedCreateWithoutProjectInput> | DeploymentCreateWithoutProjectInput[] | DeploymentUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: DeploymentCreateOrConnectWithoutProjectInput | DeploymentCreateOrConnectWithoutProjectInput[]
+    upsert?: DeploymentUpsertWithWhereUniqueWithoutProjectInput | DeploymentUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: DeploymentCreateManyProjectInputEnvelope
+    set?: DeploymentWhereUniqueInput | DeploymentWhereUniqueInput[]
+    disconnect?: DeploymentWhereUniqueInput | DeploymentWhereUniqueInput[]
+    delete?: DeploymentWhereUniqueInput | DeploymentWhereUniqueInput[]
+    connect?: DeploymentWhereUniqueInput | DeploymentWhereUniqueInput[]
+    update?: DeploymentUpdateWithWhereUniqueWithoutProjectInput | DeploymentUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: DeploymentUpdateManyWithWhereWithoutProjectInput | DeploymentUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: DeploymentScalarWhereInput | DeploymentScalarWhereInput[]
+  }
+
   export type AgentRunUncheckedUpdateManyWithoutProjectNestedInput = {
     create?: XOR<AgentRunCreateWithoutProjectInput, AgentRunUncheckedCreateWithoutProjectInput> | AgentRunCreateWithoutProjectInput[] | AgentRunUncheckedCreateWithoutProjectInput[]
     connectOrCreate?: AgentRunCreateOrConnectWithoutProjectInput | AgentRunCreateOrConnectWithoutProjectInput[]
@@ -35884,6 +37523,20 @@ export namespace Prisma {
     deleteMany?: PlatformTokenScalarWhereInput | PlatformTokenScalarWhereInput[]
   }
 
+  export type DeploymentUncheckedUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<DeploymentCreateWithoutProjectInput, DeploymentUncheckedCreateWithoutProjectInput> | DeploymentCreateWithoutProjectInput[] | DeploymentUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: DeploymentCreateOrConnectWithoutProjectInput | DeploymentCreateOrConnectWithoutProjectInput[]
+    upsert?: DeploymentUpsertWithWhereUniqueWithoutProjectInput | DeploymentUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: DeploymentCreateManyProjectInputEnvelope
+    set?: DeploymentWhereUniqueInput | DeploymentWhereUniqueInput[]
+    disconnect?: DeploymentWhereUniqueInput | DeploymentWhereUniqueInput[]
+    delete?: DeploymentWhereUniqueInput | DeploymentWhereUniqueInput[]
+    connect?: DeploymentWhereUniqueInput | DeploymentWhereUniqueInput[]
+    update?: DeploymentUpdateWithWhereUniqueWithoutProjectInput | DeploymentUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: DeploymentUpdateManyWithWhereWithoutProjectInput | DeploymentUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: DeploymentScalarWhereInput | DeploymentScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutProfileInput = {
     create?: XOR<UserCreateWithoutProfileInput, UserUncheckedCreateWithoutProfileInput>
     connectOrCreate?: UserCreateOrConnectWithoutProfileInput
@@ -35946,6 +37599,18 @@ export namespace Prisma {
     connect?: ProjectWhereUniqueInput
   }
 
+  export type DeploymentCreateNestedOneWithoutPlatformTokenInput = {
+    create?: XOR<DeploymentCreateWithoutPlatformTokenInput, DeploymentUncheckedCreateWithoutPlatformTokenInput>
+    connectOrCreate?: DeploymentCreateOrConnectWithoutPlatformTokenInput
+    connect?: DeploymentWhereUniqueInput
+  }
+
+  export type DeploymentUncheckedCreateNestedOneWithoutPlatformTokenInput = {
+    create?: XOR<DeploymentCreateWithoutPlatformTokenInput, DeploymentUncheckedCreateWithoutPlatformTokenInput>
+    connectOrCreate?: DeploymentCreateOrConnectWithoutPlatformTokenInput
+    connect?: DeploymentWhereUniqueInput
+  }
+
   export type EnumPlatformTypeFieldUpdateOperationsInput = {
     set?: $Enums.PlatformType
   }
@@ -35960,6 +37625,102 @@ export namespace Prisma {
     upsert?: ProjectUpsertWithoutPlatformTokensInput
     connect?: ProjectWhereUniqueInput
     update?: XOR<XOR<ProjectUpdateToOneWithWhereWithoutPlatformTokensInput, ProjectUpdateWithoutPlatformTokensInput>, ProjectUncheckedUpdateWithoutPlatformTokensInput>
+  }
+
+  export type DeploymentUpdateOneWithoutPlatformTokenNestedInput = {
+    create?: XOR<DeploymentCreateWithoutPlatformTokenInput, DeploymentUncheckedCreateWithoutPlatformTokenInput>
+    connectOrCreate?: DeploymentCreateOrConnectWithoutPlatformTokenInput
+    upsert?: DeploymentUpsertWithoutPlatformTokenInput
+    disconnect?: DeploymentWhereInput | boolean
+    delete?: DeploymentWhereInput | boolean
+    connect?: DeploymentWhereUniqueInput
+    update?: XOR<XOR<DeploymentUpdateToOneWithWhereWithoutPlatformTokenInput, DeploymentUpdateWithoutPlatformTokenInput>, DeploymentUncheckedUpdateWithoutPlatformTokenInput>
+  }
+
+  export type DeploymentUncheckedUpdateOneWithoutPlatformTokenNestedInput = {
+    create?: XOR<DeploymentCreateWithoutPlatformTokenInput, DeploymentUncheckedCreateWithoutPlatformTokenInput>
+    connectOrCreate?: DeploymentCreateOrConnectWithoutPlatformTokenInput
+    upsert?: DeploymentUpsertWithoutPlatformTokenInput
+    disconnect?: DeploymentWhereInput | boolean
+    delete?: DeploymentWhereInput | boolean
+    connect?: DeploymentWhereUniqueInput
+    update?: XOR<XOR<DeploymentUpdateToOneWithWhereWithoutPlatformTokenInput, DeploymentUpdateWithoutPlatformTokenInput>, DeploymentUncheckedUpdateWithoutPlatformTokenInput>
+  }
+
+  export type ProjectCreateNestedOneWithoutDeploymentsInput = {
+    create?: XOR<ProjectCreateWithoutDeploymentsInput, ProjectUncheckedCreateWithoutDeploymentsInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutDeploymentsInput
+    connect?: ProjectWhereUniqueInput
+  }
+
+  export type PlatformTokenCreateNestedOneWithoutDeploymentInput = {
+    create?: XOR<PlatformTokenCreateWithoutDeploymentInput, PlatformTokenUncheckedCreateWithoutDeploymentInput>
+    connectOrCreate?: PlatformTokenCreateOrConnectWithoutDeploymentInput
+    connect?: PlatformTokenWhereUniqueInput
+  }
+
+  export type EmissionRecordCreateNestedManyWithoutDeploymentInput = {
+    create?: XOR<EmissionRecordCreateWithoutDeploymentInput, EmissionRecordUncheckedCreateWithoutDeploymentInput> | EmissionRecordCreateWithoutDeploymentInput[] | EmissionRecordUncheckedCreateWithoutDeploymentInput[]
+    connectOrCreate?: EmissionRecordCreateOrConnectWithoutDeploymentInput | EmissionRecordCreateOrConnectWithoutDeploymentInput[]
+    createMany?: EmissionRecordCreateManyDeploymentInputEnvelope
+    connect?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+  }
+
+  export type EmissionRecordUncheckedCreateNestedManyWithoutDeploymentInput = {
+    create?: XOR<EmissionRecordCreateWithoutDeploymentInput, EmissionRecordUncheckedCreateWithoutDeploymentInput> | EmissionRecordCreateWithoutDeploymentInput[] | EmissionRecordUncheckedCreateWithoutDeploymentInput[]
+    connectOrCreate?: EmissionRecordCreateOrConnectWithoutDeploymentInput | EmissionRecordCreateOrConnectWithoutDeploymentInput[]
+    createMany?: EmissionRecordCreateManyDeploymentInputEnvelope
+    connect?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+  }
+
+  export type EnumDeploymentRoleFieldUpdateOperationsInput = {
+    set?: $Enums.DeploymentRole
+  }
+
+  export type ProjectUpdateOneRequiredWithoutDeploymentsNestedInput = {
+    create?: XOR<ProjectCreateWithoutDeploymentsInput, ProjectUncheckedCreateWithoutDeploymentsInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutDeploymentsInput
+    upsert?: ProjectUpsertWithoutDeploymentsInput
+    connect?: ProjectWhereUniqueInput
+    update?: XOR<XOR<ProjectUpdateToOneWithWhereWithoutDeploymentsInput, ProjectUpdateWithoutDeploymentsInput>, ProjectUncheckedUpdateWithoutDeploymentsInput>
+  }
+
+  export type PlatformTokenUpdateOneWithoutDeploymentNestedInput = {
+    create?: XOR<PlatformTokenCreateWithoutDeploymentInput, PlatformTokenUncheckedCreateWithoutDeploymentInput>
+    connectOrCreate?: PlatformTokenCreateOrConnectWithoutDeploymentInput
+    upsert?: PlatformTokenUpsertWithoutDeploymentInput
+    disconnect?: PlatformTokenWhereInput | boolean
+    delete?: PlatformTokenWhereInput | boolean
+    connect?: PlatformTokenWhereUniqueInput
+    update?: XOR<XOR<PlatformTokenUpdateToOneWithWhereWithoutDeploymentInput, PlatformTokenUpdateWithoutDeploymentInput>, PlatformTokenUncheckedUpdateWithoutDeploymentInput>
+  }
+
+  export type EmissionRecordUpdateManyWithoutDeploymentNestedInput = {
+    create?: XOR<EmissionRecordCreateWithoutDeploymentInput, EmissionRecordUncheckedCreateWithoutDeploymentInput> | EmissionRecordCreateWithoutDeploymentInput[] | EmissionRecordUncheckedCreateWithoutDeploymentInput[]
+    connectOrCreate?: EmissionRecordCreateOrConnectWithoutDeploymentInput | EmissionRecordCreateOrConnectWithoutDeploymentInput[]
+    upsert?: EmissionRecordUpsertWithWhereUniqueWithoutDeploymentInput | EmissionRecordUpsertWithWhereUniqueWithoutDeploymentInput[]
+    createMany?: EmissionRecordCreateManyDeploymentInputEnvelope
+    set?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+    disconnect?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+    delete?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+    connect?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+    update?: EmissionRecordUpdateWithWhereUniqueWithoutDeploymentInput | EmissionRecordUpdateWithWhereUniqueWithoutDeploymentInput[]
+    updateMany?: EmissionRecordUpdateManyWithWhereWithoutDeploymentInput | EmissionRecordUpdateManyWithWhereWithoutDeploymentInput[]
+    deleteMany?: EmissionRecordScalarWhereInput | EmissionRecordScalarWhereInput[]
+  }
+
+  export type EmissionRecordUncheckedUpdateManyWithoutDeploymentNestedInput = {
+    create?: XOR<EmissionRecordCreateWithoutDeploymentInput, EmissionRecordUncheckedCreateWithoutDeploymentInput> | EmissionRecordCreateWithoutDeploymentInput[] | EmissionRecordUncheckedCreateWithoutDeploymentInput[]
+    connectOrCreate?: EmissionRecordCreateOrConnectWithoutDeploymentInput | EmissionRecordCreateOrConnectWithoutDeploymentInput[]
+    upsert?: EmissionRecordUpsertWithWhereUniqueWithoutDeploymentInput | EmissionRecordUpsertWithWhereUniqueWithoutDeploymentInput[]
+    createMany?: EmissionRecordCreateManyDeploymentInputEnvelope
+    set?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+    disconnect?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+    delete?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+    connect?: EmissionRecordWhereUniqueInput | EmissionRecordWhereUniqueInput[]
+    update?: EmissionRecordUpdateWithWhereUniqueWithoutDeploymentInput | EmissionRecordUpdateWithWhereUniqueWithoutDeploymentInput[]
+    updateMany?: EmissionRecordUpdateManyWithWhereWithoutDeploymentInput | EmissionRecordUpdateManyWithWhereWithoutDeploymentInput[]
+    deleteMany?: EmissionRecordScalarWhereInput | EmissionRecordScalarWhereInput[]
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -36596,6 +38357,23 @@ export namespace Prisma {
     _max?: NestedEnumPlatformTokenStatusFilter<$PrismaModel>
   }
 
+  export type NestedEnumDeploymentRoleFilter<$PrismaModel = never> = {
+    equals?: $Enums.DeploymentRole | EnumDeploymentRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.DeploymentRole[] | ListEnumDeploymentRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DeploymentRole[] | ListEnumDeploymentRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumDeploymentRoleFilter<$PrismaModel> | $Enums.DeploymentRole
+  }
+
+  export type NestedEnumDeploymentRoleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DeploymentRole | EnumDeploymentRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.DeploymentRole[] | ListEnumDeploymentRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DeploymentRole[] | ListEnumDeploymentRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumDeploymentRoleWithAggregatesFilter<$PrismaModel> | $Enums.DeploymentRole
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDeploymentRoleFilter<$PrismaModel>
+    _max?: NestedEnumDeploymentRoleFilter<$PrismaModel>
+  }
+
   export type CalculationCreateWithoutUserInput = {
     id?: string
     provider: $Enums.CloudProvider
@@ -37116,6 +38894,7 @@ export namespace Prisma {
     emissionRecords?: EmissionRecordCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialCreateNestedManyWithoutProjectInput
     platformTokens?: PlatformTokenCreateNestedManyWithoutProjectInput
+    deployments?: DeploymentCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutApiKeysInput = {
@@ -37140,6 +38919,7 @@ export namespace Prisma {
     emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialUncheckedCreateNestedManyWithoutProjectInput
     platformTokens?: PlatformTokenUncheckedCreateNestedManyWithoutProjectInput
+    deployments?: DeploymentUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutApiKeysInput = {
@@ -37180,6 +38960,7 @@ export namespace Prisma {
     emissionRecords?: EmissionRecordUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUpdateManyWithoutProjectNestedInput
     platformTokens?: PlatformTokenUpdateManyWithoutProjectNestedInput
+    deployments?: DeploymentUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutApiKeysInput = {
@@ -37204,6 +38985,7 @@ export namespace Prisma {
     emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUncheckedUpdateManyWithoutProjectNestedInput
     platformTokens?: PlatformTokenUncheckedUpdateManyWithoutProjectNestedInput
+    deployments?: DeploymentUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateWithoutAgentRunsInput = {
@@ -37228,6 +39010,7 @@ export namespace Prisma {
     apiKeys?: ApiKeyCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialCreateNestedManyWithoutProjectInput
     platformTokens?: PlatformTokenCreateNestedManyWithoutProjectInput
+    deployments?: DeploymentCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutAgentRunsInput = {
@@ -37252,6 +39035,7 @@ export namespace Prisma {
     apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialUncheckedCreateNestedManyWithoutProjectInput
     platformTokens?: PlatformTokenUncheckedCreateNestedManyWithoutProjectInput
+    deployments?: DeploymentUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutAgentRunsInput = {
@@ -37292,6 +39076,7 @@ export namespace Prisma {
     apiKeys?: ApiKeyUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUpdateManyWithoutProjectNestedInput
     platformTokens?: PlatformTokenUpdateManyWithoutProjectNestedInput
+    deployments?: DeploymentUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutAgentRunsInput = {
@@ -37316,6 +39101,7 @@ export namespace Prisma {
     apiKeys?: ApiKeyUncheckedUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUncheckedUpdateManyWithoutProjectNestedInput
     platformTokens?: PlatformTokenUncheckedUpdateManyWithoutProjectNestedInput
+    deployments?: DeploymentUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateWithoutEmissionRecordsInput = {
@@ -37340,6 +39126,7 @@ export namespace Prisma {
     apiKeys?: ApiKeyCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialCreateNestedManyWithoutProjectInput
     platformTokens?: PlatformTokenCreateNestedManyWithoutProjectInput
+    deployments?: DeploymentCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutEmissionRecordsInput = {
@@ -37364,11 +39151,45 @@ export namespace Prisma {
     apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialUncheckedCreateNestedManyWithoutProjectInput
     platformTokens?: PlatformTokenUncheckedCreateNestedManyWithoutProjectInput
+    deployments?: DeploymentUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutEmissionRecordsInput = {
     where: ProjectWhereUniqueInput
     create: XOR<ProjectCreateWithoutEmissionRecordsInput, ProjectUncheckedCreateWithoutEmissionRecordsInput>
+  }
+
+  export type DeploymentCreateWithoutEmissionRecordsInput = {
+    id?: string
+    role?: $Enums.DeploymentRole
+    label?: string | null
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    project: ProjectCreateNestedOneWithoutDeploymentsInput
+    platformToken?: PlatformTokenCreateNestedOneWithoutDeploymentInput
+  }
+
+  export type DeploymentUncheckedCreateWithoutEmissionRecordsInput = {
+    id?: string
+    projectId: string
+    role?: $Enums.DeploymentRole
+    label?: string | null
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    platformTokenId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeploymentCreateOrConnectWithoutEmissionRecordsInput = {
+    where: DeploymentWhereUniqueInput
+    create: XOR<DeploymentCreateWithoutEmissionRecordsInput, DeploymentUncheckedCreateWithoutEmissionRecordsInput>
   }
 
   export type ProjectUpsertWithoutEmissionRecordsInput = {
@@ -37404,6 +39225,7 @@ export namespace Prisma {
     apiKeys?: ApiKeyUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUpdateManyWithoutProjectNestedInput
     platformTokens?: PlatformTokenUpdateManyWithoutProjectNestedInput
+    deployments?: DeploymentUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutEmissionRecordsInput = {
@@ -37428,6 +39250,46 @@ export namespace Prisma {
     apiKeys?: ApiKeyUncheckedUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUncheckedUpdateManyWithoutProjectNestedInput
     platformTokens?: PlatformTokenUncheckedUpdateManyWithoutProjectNestedInput
+    deployments?: DeploymentUncheckedUpdateManyWithoutProjectNestedInput
+  }
+
+  export type DeploymentUpsertWithoutEmissionRecordsInput = {
+    update: XOR<DeploymentUpdateWithoutEmissionRecordsInput, DeploymentUncheckedUpdateWithoutEmissionRecordsInput>
+    create: XOR<DeploymentCreateWithoutEmissionRecordsInput, DeploymentUncheckedCreateWithoutEmissionRecordsInput>
+    where?: DeploymentWhereInput
+  }
+
+  export type DeploymentUpdateToOneWithWhereWithoutEmissionRecordsInput = {
+    where?: DeploymentWhereInput
+    data: XOR<DeploymentUpdateWithoutEmissionRecordsInput, DeploymentUncheckedUpdateWithoutEmissionRecordsInput>
+  }
+
+  export type DeploymentUpdateWithoutEmissionRecordsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: EnumDeploymentRoleFieldUpdateOperationsInput | $Enums.DeploymentRole
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneRequiredWithoutDeploymentsNestedInput
+    platformToken?: PlatformTokenUpdateOneWithoutDeploymentNestedInput
+  }
+
+  export type DeploymentUncheckedUpdateWithoutEmissionRecordsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    role?: EnumDeploymentRoleFieldUpdateOperationsInput | $Enums.DeploymentRole
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    platformTokenId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ProfileCreateWithoutUserInput = {
@@ -37483,6 +39345,7 @@ export namespace Prisma {
     apiKeys?: ApiKeyCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialCreateNestedManyWithoutProjectInput
     platformTokens?: PlatformTokenCreateNestedManyWithoutProjectInput
+    deployments?: DeploymentCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutUserInput = {
@@ -37507,6 +39370,7 @@ export namespace Prisma {
     apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialUncheckedCreateNestedManyWithoutProjectInput
     platformTokens?: PlatformTokenUncheckedCreateNestedManyWithoutProjectInput
+    deployments?: DeploymentUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutUserInput = {
@@ -37781,11 +39645,13 @@ export namespace Prisma {
     isOversized?: boolean
     recommendation?: string | null
     timestamp?: Date | string
+    deployment?: DeploymentCreateNestedOneWithoutEmissionRecordsInput
   }
 
   export type EmissionRecordUncheckedCreateWithoutProjectInput = {
     id?: string
     agentRunId?: string | null
+    deploymentId?: string | null
     instanceId: string
     instanceType: string
     provider: $Enums.CloudProvider
@@ -37905,6 +39771,7 @@ export namespace Prisma {
     failCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    deployment?: DeploymentCreateNestedOneWithoutPlatformTokenInput
   }
 
   export type PlatformTokenUncheckedCreateWithoutProjectInput = {
@@ -37918,6 +39785,7 @@ export namespace Prisma {
     failCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    deployment?: DeploymentUncheckedCreateNestedOneWithoutPlatformTokenInput
   }
 
   export type PlatformTokenCreateOrConnectWithoutProjectInput = {
@@ -37927,6 +39795,44 @@ export namespace Prisma {
 
   export type PlatformTokenCreateManyProjectInputEnvelope = {
     data: PlatformTokenCreateManyProjectInput | PlatformTokenCreateManyProjectInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DeploymentCreateWithoutProjectInput = {
+    id?: string
+    role?: $Enums.DeploymentRole
+    label?: string | null
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    platformToken?: PlatformTokenCreateNestedOneWithoutDeploymentInput
+    emissionRecords?: EmissionRecordCreateNestedManyWithoutDeploymentInput
+  }
+
+  export type DeploymentUncheckedCreateWithoutProjectInput = {
+    id?: string
+    role?: $Enums.DeploymentRole
+    label?: string | null
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    platformTokenId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutDeploymentInput
+  }
+
+  export type DeploymentCreateOrConnectWithoutProjectInput = {
+    where: DeploymentWhereUniqueInput
+    create: XOR<DeploymentCreateWithoutProjectInput, DeploymentUncheckedCreateWithoutProjectInput>
+  }
+
+  export type DeploymentCreateManyProjectInputEnvelope = {
+    data: DeploymentCreateManyProjectInput | DeploymentCreateManyProjectInput[]
     skipDuplicates?: boolean
   }
 
@@ -38029,6 +39935,7 @@ export namespace Prisma {
     id?: StringFilter<"EmissionRecord"> | string
     agentRunId?: StringNullableFilter<"EmissionRecord"> | string | null
     projectId?: StringNullableFilter<"EmissionRecord"> | string | null
+    deploymentId?: StringNullableFilter<"EmissionRecord"> | string | null
     instanceId?: StringFilter<"EmissionRecord"> | string
     instanceType?: StringFilter<"EmissionRecord"> | string
     provider?: EnumCloudProviderFilter<"EmissionRecord"> | $Enums.CloudProvider
@@ -38148,6 +40055,39 @@ export namespace Prisma {
     failCount?: IntFilter<"PlatformToken"> | number
     createdAt?: DateTimeFilter<"PlatformToken"> | Date | string
     updatedAt?: DateTimeFilter<"PlatformToken"> | Date | string
+  }
+
+  export type DeploymentUpsertWithWhereUniqueWithoutProjectInput = {
+    where: DeploymentWhereUniqueInput
+    update: XOR<DeploymentUpdateWithoutProjectInput, DeploymentUncheckedUpdateWithoutProjectInput>
+    create: XOR<DeploymentCreateWithoutProjectInput, DeploymentUncheckedCreateWithoutProjectInput>
+  }
+
+  export type DeploymentUpdateWithWhereUniqueWithoutProjectInput = {
+    where: DeploymentWhereUniqueInput
+    data: XOR<DeploymentUpdateWithoutProjectInput, DeploymentUncheckedUpdateWithoutProjectInput>
+  }
+
+  export type DeploymentUpdateManyWithWhereWithoutProjectInput = {
+    where: DeploymentScalarWhereInput
+    data: XOR<DeploymentUpdateManyMutationInput, DeploymentUncheckedUpdateManyWithoutProjectInput>
+  }
+
+  export type DeploymentScalarWhereInput = {
+    AND?: DeploymentScalarWhereInput | DeploymentScalarWhereInput[]
+    OR?: DeploymentScalarWhereInput[]
+    NOT?: DeploymentScalarWhereInput | DeploymentScalarWhereInput[]
+    id?: StringFilter<"Deployment"> | string
+    projectId?: StringFilter<"Deployment"> | string
+    role?: EnumDeploymentRoleFilter<"Deployment"> | $Enums.DeploymentRole
+    label?: StringNullableFilter<"Deployment"> | string | null
+    region?: StringNullableFilter<"Deployment"> | string | null
+    provider?: EnumCloudProviderNullableFilter<"Deployment"> | $Enums.CloudProvider | null
+    isDeployed?: BoolFilter<"Deployment"> | boolean
+    deploymentUrl?: StringNullableFilter<"Deployment"> | string | null
+    platformTokenId?: StringNullableFilter<"Deployment"> | string | null
+    createdAt?: DateTimeFilter<"Deployment"> | Date | string
+    updatedAt?: DateTimeFilter<"Deployment"> | Date | string
   }
 
   export type UserCreateWithoutProfileInput = {
@@ -38400,6 +40340,7 @@ export namespace Prisma {
     emissionRecords?: EmissionRecordCreateNestedManyWithoutProjectInput
     apiKeys?: ApiKeyCreateNestedManyWithoutProjectInput
     platformTokens?: PlatformTokenCreateNestedManyWithoutProjectInput
+    deployments?: DeploymentCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutPlatformCredentialsInput = {
@@ -38424,6 +40365,7 @@ export namespace Prisma {
     emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutProjectInput
     apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutProjectInput
     platformTokens?: PlatformTokenUncheckedCreateNestedManyWithoutProjectInput
+    deployments?: DeploymentUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutPlatformCredentialsInput = {
@@ -38464,6 +40406,7 @@ export namespace Prisma {
     emissionRecords?: EmissionRecordUpdateManyWithoutProjectNestedInput
     apiKeys?: ApiKeyUpdateManyWithoutProjectNestedInput
     platformTokens?: PlatformTokenUpdateManyWithoutProjectNestedInput
+    deployments?: DeploymentUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutPlatformCredentialsInput = {
@@ -38488,6 +40431,7 @@ export namespace Prisma {
     emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutProjectNestedInput
     apiKeys?: ApiKeyUncheckedUpdateManyWithoutProjectNestedInput
     platformTokens?: PlatformTokenUncheckedUpdateManyWithoutProjectNestedInput
+    deployments?: DeploymentUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateWithoutPlatformTokensInput = {
@@ -38512,6 +40456,7 @@ export namespace Prisma {
     emissionRecords?: EmissionRecordCreateNestedManyWithoutProjectInput
     apiKeys?: ApiKeyCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialCreateNestedManyWithoutProjectInput
+    deployments?: DeploymentCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutPlatformTokensInput = {
@@ -38536,11 +40481,45 @@ export namespace Prisma {
     emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutProjectInput
     apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutProjectInput
     platformCredentials?: PlatformCredentialUncheckedCreateNestedManyWithoutProjectInput
+    deployments?: DeploymentUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutPlatformTokensInput = {
     where: ProjectWhereUniqueInput
     create: XOR<ProjectCreateWithoutPlatformTokensInput, ProjectUncheckedCreateWithoutPlatformTokensInput>
+  }
+
+  export type DeploymentCreateWithoutPlatformTokenInput = {
+    id?: string
+    role?: $Enums.DeploymentRole
+    label?: string | null
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    project: ProjectCreateNestedOneWithoutDeploymentsInput
+    emissionRecords?: EmissionRecordCreateNestedManyWithoutDeploymentInput
+  }
+
+  export type DeploymentUncheckedCreateWithoutPlatformTokenInput = {
+    id?: string
+    projectId: string
+    role?: $Enums.DeploymentRole
+    label?: string | null
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutDeploymentInput
+  }
+
+  export type DeploymentCreateOrConnectWithoutPlatformTokenInput = {
+    where: DeploymentWhereUniqueInput
+    create: XOR<DeploymentCreateWithoutPlatformTokenInput, DeploymentUncheckedCreateWithoutPlatformTokenInput>
   }
 
   export type ProjectUpsertWithoutPlatformTokensInput = {
@@ -38576,6 +40555,7 @@ export namespace Prisma {
     emissionRecords?: EmissionRecordUpdateManyWithoutProjectNestedInput
     apiKeys?: ApiKeyUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUpdateManyWithoutProjectNestedInput
+    deployments?: DeploymentUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutPlatformTokensInput = {
@@ -38600,6 +40580,304 @@ export namespace Prisma {
     emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutProjectNestedInput
     apiKeys?: ApiKeyUncheckedUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUncheckedUpdateManyWithoutProjectNestedInput
+    deployments?: DeploymentUncheckedUpdateManyWithoutProjectNestedInput
+  }
+
+  export type DeploymentUpsertWithoutPlatformTokenInput = {
+    update: XOR<DeploymentUpdateWithoutPlatformTokenInput, DeploymentUncheckedUpdateWithoutPlatformTokenInput>
+    create: XOR<DeploymentCreateWithoutPlatformTokenInput, DeploymentUncheckedCreateWithoutPlatformTokenInput>
+    where?: DeploymentWhereInput
+  }
+
+  export type DeploymentUpdateToOneWithWhereWithoutPlatformTokenInput = {
+    where?: DeploymentWhereInput
+    data: XOR<DeploymentUpdateWithoutPlatformTokenInput, DeploymentUncheckedUpdateWithoutPlatformTokenInput>
+  }
+
+  export type DeploymentUpdateWithoutPlatformTokenInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: EnumDeploymentRoleFieldUpdateOperationsInput | $Enums.DeploymentRole
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneRequiredWithoutDeploymentsNestedInput
+    emissionRecords?: EmissionRecordUpdateManyWithoutDeploymentNestedInput
+  }
+
+  export type DeploymentUncheckedUpdateWithoutPlatformTokenInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    role?: EnumDeploymentRoleFieldUpdateOperationsInput | $Enums.DeploymentRole
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutDeploymentNestedInput
+  }
+
+  export type ProjectCreateWithoutDeploymentsInput = {
+    id?: string
+    name: string
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    sdkConnected?: boolean
+    agenticMode?: boolean
+    connectedAt?: Date | string | null
+    lastPingAt?: Date | string | null
+    configInitializedAt?: Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
+    carbonBudgetKg?: number | null
+    dataSource?: $Enums.DataSource
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutProjectsInput
+    agentRuns?: AgentRunCreateNestedManyWithoutProjectInput
+    emissionRecords?: EmissionRecordCreateNestedManyWithoutProjectInput
+    apiKeys?: ApiKeyCreateNestedManyWithoutProjectInput
+    platformCredentials?: PlatformCredentialCreateNestedManyWithoutProjectInput
+    platformTokens?: PlatformTokenCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectUncheckedCreateWithoutDeploymentsInput = {
+    id?: string
+    name: string
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    sdkConnected?: boolean
+    agenticMode?: boolean
+    connectedAt?: Date | string | null
+    lastPingAt?: Date | string | null
+    configInitializedAt?: Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
+    carbonBudgetKg?: number | null
+    dataSource?: $Enums.DataSource
+    userId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    agentRuns?: AgentRunUncheckedCreateNestedManyWithoutProjectInput
+    emissionRecords?: EmissionRecordUncheckedCreateNestedManyWithoutProjectInput
+    apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutProjectInput
+    platformCredentials?: PlatformCredentialUncheckedCreateNestedManyWithoutProjectInput
+    platformTokens?: PlatformTokenUncheckedCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectCreateOrConnectWithoutDeploymentsInput = {
+    where: ProjectWhereUniqueInput
+    create: XOR<ProjectCreateWithoutDeploymentsInput, ProjectUncheckedCreateWithoutDeploymentsInput>
+  }
+
+  export type PlatformTokenCreateWithoutDeploymentInput = {
+    id?: string
+    platform: $Enums.PlatformType
+    encryptedToken: string
+    projectSlug?: string | null
+    status?: $Enums.PlatformTokenStatus
+    lastVerifiedAt?: Date | string | null
+    lastError?: string | null
+    failCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    project: ProjectCreateNestedOneWithoutPlatformTokensInput
+  }
+
+  export type PlatformTokenUncheckedCreateWithoutDeploymentInput = {
+    id?: string
+    projectId: string
+    platform: $Enums.PlatformType
+    encryptedToken: string
+    projectSlug?: string | null
+    status?: $Enums.PlatformTokenStatus
+    lastVerifiedAt?: Date | string | null
+    lastError?: string | null
+    failCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PlatformTokenCreateOrConnectWithoutDeploymentInput = {
+    where: PlatformTokenWhereUniqueInput
+    create: XOR<PlatformTokenCreateWithoutDeploymentInput, PlatformTokenUncheckedCreateWithoutDeploymentInput>
+  }
+
+  export type EmissionRecordCreateWithoutDeploymentInput = {
+    id?: string
+    agentRunId?: string | null
+    instanceId: string
+    instanceType: string
+    provider: $Enums.CloudProvider
+    region: string
+    instanceName?: string | null
+    cpuUtilization: number
+    memoryUtilization?: number | null
+    networkInGb?: number | null
+    networkOutGb?: number | null
+    energyKwh: number
+    gridIntensity: number
+    carbonKg: number
+    isIdle?: boolean
+    isOversized?: boolean
+    recommendation?: string | null
+    timestamp?: Date | string
+    project?: ProjectCreateNestedOneWithoutEmissionRecordsInput
+  }
+
+  export type EmissionRecordUncheckedCreateWithoutDeploymentInput = {
+    id?: string
+    agentRunId?: string | null
+    projectId?: string | null
+    instanceId: string
+    instanceType: string
+    provider: $Enums.CloudProvider
+    region: string
+    instanceName?: string | null
+    cpuUtilization: number
+    memoryUtilization?: number | null
+    networkInGb?: number | null
+    networkOutGb?: number | null
+    energyKwh: number
+    gridIntensity: number
+    carbonKg: number
+    isIdle?: boolean
+    isOversized?: boolean
+    recommendation?: string | null
+    timestamp?: Date | string
+  }
+
+  export type EmissionRecordCreateOrConnectWithoutDeploymentInput = {
+    where: EmissionRecordWhereUniqueInput
+    create: XOR<EmissionRecordCreateWithoutDeploymentInput, EmissionRecordUncheckedCreateWithoutDeploymentInput>
+  }
+
+  export type EmissionRecordCreateManyDeploymentInputEnvelope = {
+    data: EmissionRecordCreateManyDeploymentInput | EmissionRecordCreateManyDeploymentInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ProjectUpsertWithoutDeploymentsInput = {
+    update: XOR<ProjectUpdateWithoutDeploymentsInput, ProjectUncheckedUpdateWithoutDeploymentsInput>
+    create: XOR<ProjectCreateWithoutDeploymentsInput, ProjectUncheckedCreateWithoutDeploymentsInput>
+    where?: ProjectWhereInput
+  }
+
+  export type ProjectUpdateToOneWithWhereWithoutDeploymentsInput = {
+    where?: ProjectWhereInput
+    data: XOR<ProjectUpdateWithoutDeploymentsInput, ProjectUncheckedUpdateWithoutDeploymentsInput>
+  }
+
+  export type ProjectUpdateWithoutDeploymentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    agenticMode?: BoolFieldUpdateOperationsInput | boolean
+    connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    configInitializedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
+    carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutProjectsNestedInput
+    agentRuns?: AgentRunUpdateManyWithoutProjectNestedInput
+    emissionRecords?: EmissionRecordUpdateManyWithoutProjectNestedInput
+    apiKeys?: ApiKeyUpdateManyWithoutProjectNestedInput
+    platformCredentials?: PlatformCredentialUpdateManyWithoutProjectNestedInput
+    platformTokens?: PlatformTokenUpdateManyWithoutProjectNestedInput
+  }
+
+  export type ProjectUncheckedUpdateWithoutDeploymentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sdkConnected?: BoolFieldUpdateOperationsInput | boolean
+    agenticMode?: BoolFieldUpdateOperationsInput | boolean
+    connectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    configInitializedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    projectProfile?: NullableJsonNullValueInput | InputJsonValue
+    carbonBudgetKg?: NullableFloatFieldUpdateOperationsInput | number | null
+    dataSource?: EnumDataSourceFieldUpdateOperationsInput | $Enums.DataSource
+    userId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agentRuns?: AgentRunUncheckedUpdateManyWithoutProjectNestedInput
+    emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutProjectNestedInput
+    apiKeys?: ApiKeyUncheckedUpdateManyWithoutProjectNestedInput
+    platformCredentials?: PlatformCredentialUncheckedUpdateManyWithoutProjectNestedInput
+    platformTokens?: PlatformTokenUncheckedUpdateManyWithoutProjectNestedInput
+  }
+
+  export type PlatformTokenUpsertWithoutDeploymentInput = {
+    update: XOR<PlatformTokenUpdateWithoutDeploymentInput, PlatformTokenUncheckedUpdateWithoutDeploymentInput>
+    create: XOR<PlatformTokenCreateWithoutDeploymentInput, PlatformTokenUncheckedCreateWithoutDeploymentInput>
+    where?: PlatformTokenWhereInput
+  }
+
+  export type PlatformTokenUpdateToOneWithWhereWithoutDeploymentInput = {
+    where?: PlatformTokenWhereInput
+    data: XOR<PlatformTokenUpdateWithoutDeploymentInput, PlatformTokenUncheckedUpdateWithoutDeploymentInput>
+  }
+
+  export type PlatformTokenUpdateWithoutDeploymentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    platform?: EnumPlatformTypeFieldUpdateOperationsInput | $Enums.PlatformType
+    encryptedToken?: StringFieldUpdateOperationsInput | string
+    projectSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPlatformTokenStatusFieldUpdateOperationsInput | $Enums.PlatformTokenStatus
+    lastVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    failCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneRequiredWithoutPlatformTokensNestedInput
+  }
+
+  export type PlatformTokenUncheckedUpdateWithoutDeploymentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    platform?: EnumPlatformTypeFieldUpdateOperationsInput | $Enums.PlatformType
+    encryptedToken?: StringFieldUpdateOperationsInput | string
+    projectSlug?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPlatformTokenStatusFieldUpdateOperationsInput | $Enums.PlatformTokenStatus
+    lastVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    failCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmissionRecordUpsertWithWhereUniqueWithoutDeploymentInput = {
+    where: EmissionRecordWhereUniqueInput
+    update: XOR<EmissionRecordUpdateWithoutDeploymentInput, EmissionRecordUncheckedUpdateWithoutDeploymentInput>
+    create: XOR<EmissionRecordCreateWithoutDeploymentInput, EmissionRecordUncheckedCreateWithoutDeploymentInput>
+  }
+
+  export type EmissionRecordUpdateWithWhereUniqueWithoutDeploymentInput = {
+    where: EmissionRecordWhereUniqueInput
+    data: XOR<EmissionRecordUpdateWithoutDeploymentInput, EmissionRecordUncheckedUpdateWithoutDeploymentInput>
+  }
+
+  export type EmissionRecordUpdateManyWithWhereWithoutDeploymentInput = {
+    where: EmissionRecordScalarWhereInput
+    data: XOR<EmissionRecordUpdateManyMutationInput, EmissionRecordUncheckedUpdateManyWithoutDeploymentInput>
   }
 
   export type CalculationCreateManyUserInput = {
@@ -38849,6 +41127,7 @@ export namespace Prisma {
     apiKeys?: ApiKeyUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUpdateManyWithoutProjectNestedInput
     platformTokens?: PlatformTokenUpdateManyWithoutProjectNestedInput
+    deployments?: DeploymentUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutUserInput = {
@@ -38873,6 +41152,7 @@ export namespace Prisma {
     apiKeys?: ApiKeyUncheckedUpdateManyWithoutProjectNestedInput
     platformCredentials?: PlatformCredentialUncheckedUpdateManyWithoutProjectNestedInput
     platformTokens?: PlatformTokenUncheckedUpdateManyWithoutProjectNestedInput
+    deployments?: DeploymentUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateManyWithoutUserInput = {
@@ -38930,6 +41210,7 @@ export namespace Prisma {
   export type EmissionRecordCreateManyProjectInput = {
     id?: string
     agentRunId?: string | null
+    deploymentId?: string | null
     instanceId: string
     instanceType: string
     provider: $Enums.CloudProvider
@@ -38987,6 +41268,19 @@ export namespace Prisma {
     lastVerifiedAt?: Date | string | null
     lastError?: string | null
     failCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeploymentCreateManyProjectInput = {
+    id?: string
+    role?: $Enums.DeploymentRole
+    label?: string | null
+    region?: string | null
+    provider?: $Enums.CloudProvider | null
+    isDeployed?: boolean
+    deploymentUrl?: string | null
+    platformTokenId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -39055,11 +41349,13 @@ export namespace Prisma {
     isOversized?: BoolFieldUpdateOperationsInput | boolean
     recommendation?: NullableStringFieldUpdateOperationsInput | string | null
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    deployment?: DeploymentUpdateOneWithoutEmissionRecordsNestedInput
   }
 
   export type EmissionRecordUncheckedUpdateWithoutProjectInput = {
     id?: StringFieldUpdateOperationsInput | string
     agentRunId?: NullableStringFieldUpdateOperationsInput | string | null
+    deploymentId?: NullableStringFieldUpdateOperationsInput | string | null
     instanceId?: StringFieldUpdateOperationsInput | string
     instanceType?: StringFieldUpdateOperationsInput | string
     provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
@@ -39081,6 +41377,7 @@ export namespace Prisma {
   export type EmissionRecordUncheckedUpdateManyWithoutProjectInput = {
     id?: StringFieldUpdateOperationsInput | string
     agentRunId?: NullableStringFieldUpdateOperationsInput | string | null
+    deploymentId?: NullableStringFieldUpdateOperationsInput | string | null
     instanceId?: StringFieldUpdateOperationsInput | string
     instanceType?: StringFieldUpdateOperationsInput | string
     provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
@@ -39200,6 +41497,7 @@ export namespace Prisma {
     failCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deployment?: DeploymentUpdateOneWithoutPlatformTokenNestedInput
   }
 
   export type PlatformTokenUncheckedUpdateWithoutProjectInput = {
@@ -39213,6 +41511,7 @@ export namespace Prisma {
     failCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deployment?: DeploymentUncheckedUpdateOneWithoutPlatformTokenNestedInput
   }
 
   export type PlatformTokenUncheckedUpdateManyWithoutProjectInput = {
@@ -39226,6 +41525,135 @@ export namespace Prisma {
     failCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeploymentUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: EnumDeploymentRoleFieldUpdateOperationsInput | $Enums.DeploymentRole
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    platformToken?: PlatformTokenUpdateOneWithoutDeploymentNestedInput
+    emissionRecords?: EmissionRecordUpdateManyWithoutDeploymentNestedInput
+  }
+
+  export type DeploymentUncheckedUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: EnumDeploymentRoleFieldUpdateOperationsInput | $Enums.DeploymentRole
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    platformTokenId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    emissionRecords?: EmissionRecordUncheckedUpdateManyWithoutDeploymentNestedInput
+  }
+
+  export type DeploymentUncheckedUpdateManyWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: EnumDeploymentRoleFieldUpdateOperationsInput | $Enums.DeploymentRole
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    region?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableEnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider | null
+    isDeployed?: BoolFieldUpdateOperationsInput | boolean
+    deploymentUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    platformTokenId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmissionRecordCreateManyDeploymentInput = {
+    id?: string
+    agentRunId?: string | null
+    projectId?: string | null
+    instanceId: string
+    instanceType: string
+    provider: $Enums.CloudProvider
+    region: string
+    instanceName?: string | null
+    cpuUtilization: number
+    memoryUtilization?: number | null
+    networkInGb?: number | null
+    networkOutGb?: number | null
+    energyKwh: number
+    gridIntensity: number
+    carbonKg: number
+    isIdle?: boolean
+    isOversized?: boolean
+    recommendation?: string | null
+    timestamp?: Date | string
+  }
+
+  export type EmissionRecordUpdateWithoutDeploymentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentRunId?: NullableStringFieldUpdateOperationsInput | string | null
+    instanceId?: StringFieldUpdateOperationsInput | string
+    instanceType?: StringFieldUpdateOperationsInput | string
+    provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
+    region?: StringFieldUpdateOperationsInput | string
+    instanceName?: NullableStringFieldUpdateOperationsInput | string | null
+    cpuUtilization?: FloatFieldUpdateOperationsInput | number
+    memoryUtilization?: NullableFloatFieldUpdateOperationsInput | number | null
+    networkInGb?: NullableFloatFieldUpdateOperationsInput | number | null
+    networkOutGb?: NullableFloatFieldUpdateOperationsInput | number | null
+    energyKwh?: FloatFieldUpdateOperationsInput | number
+    gridIntensity?: FloatFieldUpdateOperationsInput | number
+    carbonKg?: FloatFieldUpdateOperationsInput | number
+    isIdle?: BoolFieldUpdateOperationsInput | boolean
+    isOversized?: BoolFieldUpdateOperationsInput | boolean
+    recommendation?: NullableStringFieldUpdateOperationsInput | string | null
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneWithoutEmissionRecordsNestedInput
+  }
+
+  export type EmissionRecordUncheckedUpdateWithoutDeploymentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentRunId?: NullableStringFieldUpdateOperationsInput | string | null
+    projectId?: NullableStringFieldUpdateOperationsInput | string | null
+    instanceId?: StringFieldUpdateOperationsInput | string
+    instanceType?: StringFieldUpdateOperationsInput | string
+    provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
+    region?: StringFieldUpdateOperationsInput | string
+    instanceName?: NullableStringFieldUpdateOperationsInput | string | null
+    cpuUtilization?: FloatFieldUpdateOperationsInput | number
+    memoryUtilization?: NullableFloatFieldUpdateOperationsInput | number | null
+    networkInGb?: NullableFloatFieldUpdateOperationsInput | number | null
+    networkOutGb?: NullableFloatFieldUpdateOperationsInput | number | null
+    energyKwh?: FloatFieldUpdateOperationsInput | number
+    gridIntensity?: FloatFieldUpdateOperationsInput | number
+    carbonKg?: FloatFieldUpdateOperationsInput | number
+    isIdle?: BoolFieldUpdateOperationsInput | boolean
+    isOversized?: BoolFieldUpdateOperationsInput | boolean
+    recommendation?: NullableStringFieldUpdateOperationsInput | string | null
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmissionRecordUncheckedUpdateManyWithoutDeploymentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentRunId?: NullableStringFieldUpdateOperationsInput | string | null
+    projectId?: NullableStringFieldUpdateOperationsInput | string | null
+    instanceId?: StringFieldUpdateOperationsInput | string
+    instanceType?: StringFieldUpdateOperationsInput | string
+    provider?: EnumCloudProviderFieldUpdateOperationsInput | $Enums.CloudProvider
+    region?: StringFieldUpdateOperationsInput | string
+    instanceName?: NullableStringFieldUpdateOperationsInput | string | null
+    cpuUtilization?: FloatFieldUpdateOperationsInput | number
+    memoryUtilization?: NullableFloatFieldUpdateOperationsInput | number | null
+    networkInGb?: NullableFloatFieldUpdateOperationsInput | number | null
+    networkOutGb?: NullableFloatFieldUpdateOperationsInput | number | null
+    energyKwh?: FloatFieldUpdateOperationsInput | number
+    gridIntensity?: FloatFieldUpdateOperationsInput | number
+    carbonKg?: FloatFieldUpdateOperationsInput | number
+    isIdle?: BoolFieldUpdateOperationsInput | boolean
+    isOversized?: BoolFieldUpdateOperationsInput | boolean
+    recommendation?: NullableStringFieldUpdateOperationsInput | string | null
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 
@@ -39245,6 +41673,10 @@ export namespace Prisma {
      * @deprecated Use ProjectCountOutputTypeDefaultArgs instead
      */
     export type ProjectCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ProjectCountOutputTypeDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use DeploymentCountOutputTypeDefaultArgs instead
+     */
+    export type DeploymentCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = DeploymentCountOutputTypeDefaultArgs<ExtArgs>
     /**
      * @deprecated Use MobileUserDefaultArgs instead
      */
@@ -39337,6 +41769,10 @@ export namespace Prisma {
      * @deprecated Use PlatformTokenDefaultArgs instead
      */
     export type PlatformTokenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = PlatformTokenDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use DeploymentDefaultArgs instead
+     */
+    export type DeploymentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = DeploymentDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany

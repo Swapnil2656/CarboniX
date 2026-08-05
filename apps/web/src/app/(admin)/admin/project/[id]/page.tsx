@@ -28,6 +28,11 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
   const [migratingId, setMigratingId] = useState<string | null>(null);
   const [manualMigrateModal, setManualMigrateModal] = useState<{ open: boolean; record: any | null; targetRegion: string }>({ open: false, record: null, targetRegion: '' });
 
+  // Deployment management states
+  const [isDeletingDeployment, setIsDeletingDeployment] = useState<string | null>(null); // deploymentId being deleted
+  const [addDeploymentModal, setAddDeploymentModal] = useState<{ open: boolean; label: string; role: string }>({ open: false, label: '', role: 'OTHER' });
+  const [isAddingDeployment, setIsAddingDeployment] = useState(false);
+
   // Danger zone states
   const [confirmNameDisconnect, setConfirmNameDisconnect] = useState('');
   const [confirmNameDelete, setConfirmNameDelete] = useState('');
@@ -259,6 +264,49 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     }
   };
 
+  const handleDeleteDeployment = async (deploymentId: string, deploymentLabel: string) => {
+    if (!confirm(`Delete deployment "${deploymentLabel}"? Historical emission data will be preserved at the project level, but attribution to this deployment will be removed.`)) return;
+    try {
+      setIsDeletingDeployment(deploymentId);
+      await adminApi.deleteDeployment(params.id, deploymentId);
+      setData((prev: any) => ({
+        ...prev,
+        deployments: prev.deployments.filter((d: any) => d.id !== deploymentId),
+      }));
+    } catch (e: any) {
+      alert('Delete deployment failed: ' + e.message);
+    } finally {
+      setIsDeletingDeployment(null);
+    }
+  };
+
+  const handleAddDeployment = async () => {
+    if (!addDeploymentModal.label.trim()) {
+      alert('Please enter a label for the deployment.');
+      return;
+    }
+    try {
+      setIsAddingDeployment(true);
+      const res = await adminApi.addDeployment(params.id, {
+        role: addDeploymentModal.role,
+        label: addDeploymentModal.label.trim(),
+      });
+      if (res.success) {
+        setData((prev: any) => ({
+          ...prev,
+          deployments: [...(prev.deployments || []), { ...res.data, totalMonthKg: 0, platformToken: null }],
+        }));
+        setAddDeploymentModal({ open: false, label: '', role: 'OTHER' });
+      } else {
+        alert('Failed to add deployment: ' + (res.error || 'Unknown error'));
+      }
+    } catch (e: any) {
+      alert('Failed to add deployment: ' + e.message);
+    } finally {
+      setIsAddingDeployment(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -277,8 +325,16 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
   }
 
   const { project, idleInstances, oversizedInstances, carbonTrend, history7d, history30d, totalMonthKg, apiKeys, greenerRegion, isStale, instances, checklist, estimateAssumptions, top3Regions, manualInstructions } = data;
+  const deployments: any[] = data.deployments || [];
   const chartData = chartDays === '7d' ? history7d : history30d;
   const dataSource: 'NO_CREDS' | 'MOCK_DEMO' | 'LIVE' = project.dataSource || 'NO_CREDS';
+
+  const ROLE_LABELS: Record<string, { label: string; color: string }> = {
+    FRONTEND: { label: 'Frontend', color: 'bg-blue-500/15 text-blue-400 border-blue-500/30' },
+    BACKEND:  { label: 'Backend',  color: 'bg-purple-500/15 text-purple-400 border-purple-500/30' },
+    FULLSTACK: { label: 'Fullstack', color: 'bg-teal-500/15 text-teal-400 border-teal-500/30' },
+    OTHER:    { label: 'Other',    color: 'bg-surface-container-high text-on-surface-variant border-outline-variant' },
+  };
 
 
   // Real-world equivalents logic (copied from core)
@@ -399,6 +455,9 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
             {totalMonthKg?.toFixed(1) || 0} / {project.carbonBudgetKg || 100} kg
           </div>
         </div>
+        <div className="text-xs text-on-surface-variant mb-1">
+          Total across <span className="font-medium text-on-surface">{deployments.length}</span> deployment{deployments.length !== 1 ? 's' : ''}
+        </div>
         <div className="w-full bg-surface-container-highest rounded-full h-2.5 overflow-hidden">
           <div 
             className={`h-2.5 rounded-full ${totalMonthKg > (project.carbonBudgetKg || 100) ? 'bg-error' : totalMonthKg > (project.carbonBudgetKg || 100) * 0.8 ? 'bg-warning' : 'bg-primary'}`} 
@@ -406,6 +465,134 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
           ></div>
         </div>
       </div>
+
+      {/* ─── Deployment Cards ─────────────────────────────────────────────── */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-semibold text-on-surface">Deployments</h2>
+          <button
+            onClick={() => setAddDeploymentModal({ open: true, label: '', role: 'OTHER' })}
+            className="flex items-center gap-1.5 bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+          >
+            <span className="material-symbols-outlined text-[16px]">add</span>
+            Add Deployment
+          </button>
+        </div>
+
+        {deployments.length === 0 && (
+          <div className="text-sm text-on-surface-variant italic p-4 bg-surface-container rounded-lg border border-outline-variant">
+            No deployments yet. Click "Add Deployment" to get started.
+          </div>
+        )}
+
+        {deployments.map((dep: any) => {
+          const roleInfo = ROLE_LABELS[dep.role] ?? ROLE_LABELS.OTHER;
+          const depLabel = dep.label ?? dep.role;
+          const platformName = dep.platformToken?.platform ?? null;
+          const tokenStatus = dep.platformToken?.status ?? null;
+          return (
+            <div key={dep.id} className="bg-surface border border-outline-variant rounded-xl p-4 flex flex-col md:flex-row md:items-center gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap mb-1">
+                  <span className={`inline-flex items-center text-xs px-2 py-0.5 rounded-full border font-medium ${roleInfo.color}`}>
+                    {roleInfo.label}
+                  </span>
+                  <span className="font-medium text-on-surface truncate">{depLabel}</span>
+                  {platformName && (
+                    <span className="text-xs bg-surface-container-high text-on-surface-variant px-2 py-0.5 rounded border border-outline-variant">
+                      {platformName}
+                      {tokenStatus === 'ACTIVE' ? (
+                        <span className="ml-1 w-1.5 h-1.5 rounded-full bg-green-500 inline-block align-middle"></span>
+                      ) : tokenStatus ? (
+                        <span className="ml-1 w-1.5 h-1.5 rounded-full bg-error inline-block align-middle"></span>
+                      ) : null}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3 text-xs text-on-surface-variant flex-wrap">
+                  {dep.region && <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[13px]">location_on</span>{dep.region}</span>}
+                  {dep.provider && <span>{dep.provider}</span>}
+                  {!dep.region && !dep.provider && <span className="italic">Region & provider not yet detected</span>}
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="text-right">
+                  <div className="text-xs text-on-surface-variant">This month</div>
+                  <div className="font-mono font-semibold text-on-surface">{(dep.totalMonthKg || 0).toFixed(2)} kg</div>
+                </div>
+                <button
+                  onClick={() => handleDeleteDeployment(dep.id, depLabel)}
+                  disabled={isDeletingDeployment === dep.id}
+                  className="flex items-center gap-1 bg-error/10 hover:bg-error/20 text-error px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50"
+                  title="Disconnect this deployment"
+                >
+                  {isDeletingDeployment === dep.id ? (
+                    <span className="material-symbols-outlined text-[14px] animate-spin">refresh</span>
+                  ) : (
+                    <span className="material-symbols-outlined text-[14px]">link_off</span>
+                  )}
+                  Disconnect
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Add Deployment Modal */}
+      {addDeploymentModal.open && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-surface border border-outline-variant rounded-xl p-6 max-w-md w-full shadow-2xl">
+            <h3 className="text-lg font-semibold text-on-surface mb-1">Add Deployment</h3>
+            <p className="text-sm text-on-surface-variant mb-4">Create a new named deployment within this project. You can connect a platform token to it afterward in Project Settings.</p>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-label-caps text-on-surface-variant mb-1 block">Label</label>
+                <input
+                  type="text"
+                  placeholder='e.g. "Render (Backend)" or "Vercel (Frontend)"'
+                  value={addDeploymentModal.label}
+                  onChange={e => setAddDeploymentModal(m => ({ ...m, label: e.target.value }))}
+                  className="w-full bg-surface-container border border-outline-variant rounded-lg px-3 py-2 text-sm text-on-surface focus:border-primary outline-none"
+                />
+                <p className="text-xs text-on-surface-variant mt-1">This label appears in the platform connect UI when you have multiple deployments on the same platform (e.g. two Render services).</p>
+              </div>
+              <div>
+                <label className="text-xs font-label-caps text-on-surface-variant mb-1 block">Role</label>
+                <select
+                  value={addDeploymentModal.role}
+                  onChange={e => setAddDeploymentModal(m => ({ ...m, role: e.target.value }))}
+                  className="w-full bg-surface-container border border-outline-variant rounded-lg px-3 py-2 text-sm text-on-surface focus:border-primary outline-none"
+                >
+                  <option value="FRONTEND">Frontend</option>
+                  <option value="BACKEND">Backend</option>
+                  <option value="FULLSTACK">Fullstack</option>
+                  <option value="OTHER">Other</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setAddDeploymentModal({ open: false, label: '', role: 'OTHER' })}
+                className="px-4 py-2 text-sm font-medium text-on-surface hover:bg-surface-container-high rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddDeployment}
+                disabled={isAddingDeployment || !addDeploymentModal.label.trim()}
+                className="bg-primary hover:bg-primary/90 disabled:opacity-50 text-on-primary px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+              >
+                {isAddingDeployment ? (
+                  <><span className="material-symbols-outlined text-[16px] animate-spin">refresh</span> Creating...</>
+                ) : (
+                  'Create Deployment'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {!project.isDeployed ? (
         <div className="space-y-6">

@@ -206,11 +206,16 @@ export async function handleConnect(req: Request, res: Response) {
  */
 export async function handleConnectPlatformToken(req: AuthRequest, res: Response) {
   try {
-    const { projectId, platform, token, projectSlug } = req.body as {
+    const { projectId, platform, token, projectSlug, deploymentId, deploymentLabel, deploymentRole } = req.body as {
       projectId?: string;
       platform?: string;
       token?: string;
       projectSlug?: string;
+      // Optional: if provided, attach this token to a specific existing deployment
+      // If omitted, creates a new Deployment and attaches to it
+      deploymentId?: string;
+      deploymentLabel?: string;
+      deploymentRole?: string;
     };
 
     if (!projectId || !platform || !token) {
@@ -257,10 +262,10 @@ export async function handleConnectPlatformToken(req: AuthRequest, res: Response
       });
     }
 
-    // Upsert the platform token (one per project+platform combination)
-    await prisma.platformToken.upsert({
-      where: { projectId_platform: { projectId, platform: platform as any } },
-      create: {
+    // Create a new PlatformToken row (never upsert — unique constraint removed to support
+    // multi-deployment: two Render deployments on the same project each get their own token row)
+    const newToken = await prisma.platformToken.create({
+      data: {
         projectId,
         platform: platform as any,
         encryptedToken,
@@ -270,15 +275,46 @@ export async function handleConnectPlatformToken(req: AuthRequest, res: Response
         lastError: null,
         failCount: 0,
       },
-      update: {
-        encryptedToken,
-        projectSlug: projectSlug || null,
-        status: 'ACTIVE',
-        lastVerifiedAt: new Date(),
-        lastError: null,
-        failCount: 0,
-      },
     });
+
+    // Attach to the specified deployment (if provided), otherwise create a new one
+    let targetDeploymentId = deploymentId;
+    if (targetDeploymentId) {
+      // Attach to existing deployment — verify it belongs to this project
+      const existingDeployment = await prisma.deployment.findFirst({
+        where: { id: targetDeploymentId, projectId },
+      });
+      if (!existingDeployment) {
+        await prisma.platformToken.delete({ where: { id: newToken.id } });
+        return res.status(404).json({ success: false, error: 'Deployment not found for this project.' });
+      }
+      // If the deployment already has a token, reject to avoid silent overwrite
+      if (existingDeployment.platformTokenId) {
+        await prisma.platformToken.delete({ where: { id: newToken.id } });
+        return res.status(409).json({
+          success: false,
+          error: 'This deployment already has a platform token attached. Revoke it first, then reconnect.',
+        });
+      }
+      await prisma.deployment.update({
+        where: { id: targetDeploymentId },
+        data: { platformTokenId: newToken.id, isDeployed: true },
+      });
+    } else {
+      // No deploymentId provided — create a new Deployment for this token
+      const newDeployment = await prisma.deployment.create({
+        data: {
+          projectId,
+          role: (deploymentRole as any) ?? 'OTHER',
+          label: deploymentLabel ?? null,
+          provider: null,   // will be populated by collector on first run
+          isDeployed: true,
+          platformTokenId: newToken.id,
+        },
+      });
+      targetDeploymentId = newDeployment.id;
+      console.log(`[CONNECT] Created new Deployment ${newDeployment.id} for ${platform} token on project ${projectId}.`);
+    }
 
     // Set project dataSource to LIVE
     await prisma.project.update({
@@ -291,6 +327,7 @@ export async function handleConnectPlatformToken(req: AuthRequest, res: Response
     return res.json({
       success: true,
       platform,
+      deploymentId: targetDeploymentId,
       accountName: verifyResult.meta?.accountName,
       message: `${platform} account connected successfully. Real usage-based carbon data will be collected on the next hourly run.`,
     });
@@ -312,7 +349,7 @@ export async function handleConnectPlatformToken(req: AuthRequest, res: Response
 export async function handleRevokePlatformToken(req: AuthRequest, res: Response) {
   try {
     const { platform } = req.params;
-    const { projectId } = req.query as { projectId?: string };
+    const { projectId, deploymentId } = req.query as { projectId?: string; deploymentId?: string };
 
     if (!projectId || !platform) {
       return res.status(400).json({ success: false, error: 'Missing projectId query param or platform route param.' });
@@ -323,12 +360,33 @@ export async function handleRevokePlatformToken(req: AuthRequest, res: Response)
       return res.status(403).json({ success: false, error: 'Forbidden.' });
     }
 
-    // Delete the token
-    await prisma.platformToken.deleteMany({
-      where: { projectId, platform: platform as any },
-    });
+    if (deploymentId) {
+      // Deployment-scoped revoke: only remove the token attached to this specific deployment
+      // Avoids deleting all Render tokens when the user only wants to disconnect one of two Render deployments
+      const deployment = await prisma.deployment.findFirst({
+        where: { id: deploymentId, projectId },
+        include: { platformToken: true },
+      });
+      if (!deployment) {
+        return res.status(404).json({ success: false, error: 'Deployment not found.' });
+      }
+      if (deployment.platformToken) {
+        await prisma.platformToken.delete({ where: { id: deployment.platformToken.id } });
+        // Null out the deployment's token reference
+        await prisma.deployment.update({
+          where: { id: deploymentId },
+          data: { platformTokenId: null },
+        });
+      }
+    } else {
+      // Legacy: project+platform scoped — deletes ALL tokens for this platform on this project
+      // (preserved for backward compat with existing call sites that don't yet know the deploymentId)
+      await prisma.platformToken.deleteMany({
+        where: { projectId, platform: platform as any },
+      });
+    }
 
-    // Check if any active tokens remain
+    // Check if any active tokens remain across all deployments for this project
     const remaining = await prisma.platformToken.count({
       where: { projectId, status: 'ACTIVE' },
     });

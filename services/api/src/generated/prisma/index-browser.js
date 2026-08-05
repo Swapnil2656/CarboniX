@@ -382,6 +382,7 @@ exports.Prisma.EmissionRecordScalarFieldEnum = {
   id: 'id',
   agentRunId: 'agentRunId',
   projectId: 'projectId',
+  deploymentId: 'deploymentId',
   instanceId: 'instanceId',
   instanceType: 'instanceType',
   provider: 'provider',
@@ -495,6 +496,20 @@ exports.Prisma.PlatformTokenScalarFieldEnum = {
   lastVerifiedAt: 'lastVerifiedAt',
   lastError: 'lastError',
   failCount: 'failCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DeploymentScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  role: 'role',
+  label: 'label',
+  region: 'region',
+  provider: 'provider',
+  isDeployed: 'isDeployed',
+  deploymentUrl: 'deploymentUrl',
+  platformTokenId: 'platformTokenId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -668,6 +683,13 @@ exports.PlatformTokenStatus = exports.$Enums.PlatformTokenStatus = {
   REVOKED: 'REVOKED'
 };
 
+exports.DeploymentRole = exports.$Enums.DeploymentRole = {
+  FRONTEND: 'FRONTEND',
+  BACKEND: 'BACKEND',
+  FULLSTACK: 'FULLSTACK',
+  OTHER: 'OTHER'
+};
+
 exports.Prisma.ModelName = {
   MobileUser: 'MobileUser',
   Calculation: 'Calculation',
@@ -691,7 +713,8 @@ exports.Prisma.ModelName = {
   TeamMember: 'TeamMember',
   ChatHistory: 'ChatHistory',
   PlatformCredential: 'PlatformCredential',
-  PlatformToken: 'PlatformToken'
+  PlatformToken: 'PlatformToken',
+  Deployment: 'Deployment'
 };
 
 /**

@@ -22,6 +22,7 @@ const DOWNGRADE_MAP = {
 // ─── Zod schema for Nemotron output validation ────────────────────────────────
 const RecommendationSchema = zod_1.z.object({
     projectId: zod_1.z.string().optional(),
+    deploymentId: zod_1.z.string().optional(),
     instanceId: zod_1.z.string(),
     instanceName: zod_1.z.string(),
     currentType: zod_1.z.string(),

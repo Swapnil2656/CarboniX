@@ -25,6 +25,7 @@ const DOWNGRADE_MAP: Record<string, string> = {
 
 const RecommendationSchema = z.object({
   projectId:         z.string().optional(),
+  deploymentId:      z.string().optional(),
   instanceId:        z.string(),
   instanceName:      z.string(),
   currentType:       z.string(),
@@ -41,6 +42,7 @@ const RecommendationArraySchema = z.array(RecommendationSchema);
 
 export interface Recommendation {
   projectId?: string;
+  deploymentId?: string;  // deployment-scoped attribution; used by enactRegionSwitch
   instanceId: string;
   instanceName: string;
   currentType: string;

@@ -86,6 +86,14 @@ export const adminApi = {
     const response = await apiClient.get(`/admin/projects/${id}/stats`);
     return response.data;
   },
+  addDeployment: async (projectId: string, payload: { role?: string; label?: string }) => {
+    const response = await apiClient.post(`/admin/projects/${projectId}/deployments`, payload);
+    return response.data;
+  },
+  deleteDeployment: async (projectId: string, deploymentId: string) => {
+    const response = await apiClient.delete(`/admin/projects/${projectId}/deployments/${deploymentId}`);
+    return response.data;
+  },
   getApiKeys: async () => {
     const response = await apiClient.get('/admin/api-keys');
     return response.data;
