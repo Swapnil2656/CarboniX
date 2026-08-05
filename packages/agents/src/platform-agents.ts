@@ -9,7 +9,7 @@ export interface PlatformCredentialData {
 
 export interface EnactResult {
   success: boolean;
-  actionTaken: 'API_UPDATE' | 'PR_OPENED' | 'FAILED' | 'MANUAL_REQUIRED';
+  actionTaken: 'API_UPDATE' | 'PR_OPENED' | 'FAILED' | 'MANUAL_REQUIRED' | 'NOT_SUPPORTED';
   message: string;
   details?: any;
 }
@@ -39,7 +39,7 @@ export async function enactRegionSwitch(
         if (res.success) {
           return {
             success: true,
-            actionTaken: res.actionTaken || 'API_UPDATE',
+            actionTaken: (res.actionTaken === 'NOT_SUPPORTED' ? 'MANUAL_REQUIRED' : res.actionTaken) || 'API_UPDATE',
             message: res.message || `Successfully applied region change via ${cred.provider}`,
             details: res.details
           };

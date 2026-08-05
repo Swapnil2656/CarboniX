@@ -7,6 +7,8 @@ import { sendEmail } from '../../utils/email';
 import { platformRegistry } from '@carbonix/agents';
 import { calculateCarbon } from '@carbonix/core';
 import axios from 'axios';
+import { CloudProvider } from '@prisma/client';
+import { decryptToken } from '../../lib/platformTokenService';
 
 // Helper to resolve the IDs of all users/projects in the current user's team/tenant
 export async function resolveTenantContext(userId: string, userEmail: string) {
@@ -1092,18 +1094,55 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
 
     // Capability Labeling Logic
     let capabilityTier: 'AUTO_APPLY' | 'MANUAL_APPLY' | 'DATA_ONLY' | 'NOT_CONNECTED' = 'NOT_CONNECTED';
+    let manualInstructions: string[] | undefined = undefined;
     
-    if (project.dataSource !== 'NO_CREDS' && project.dataSource) {
-      if (['AWS', 'GCP', 'AZURE'].includes(project.dataSource)) {
+    // Determine the actual platform string
+    let currentPlatform: string | null = null;
+    let tokenRecord = null;
+    
+    if (project.dataSource === 'LIVE') {
+      tokenRecord = await prisma.platformToken.findFirst({ where: { projectId: project.id } });
+      if (tokenRecord) currentPlatform = tokenRecord.platform;
+    } else if (project.dataSource === 'MOCK_DEMO') {
+      currentPlatform = project.provider || 'AWS'; // Fallback for mock demos
+    }
+
+    if (currentPlatform) {
+      if (['AWS', 'GCP', 'AZURE'].includes(currentPlatform)) {
         // Raw cloud creds or Agent without local action path
         capabilityTier = 'DATA_ONLY';
       } else {
-        const adapter = platformRegistry.getAdapter(project.dataSource);
+        const adapter = platformRegistry.getAdapter(currentPlatform);
         if (adapter) {
-          if (adapter.capabilities.canSetRegion) {
+          let caps = adapter.capabilities;
+          if (adapter.checkDynamicCapabilities) {
+            if (tokenRecord) {
+              const decrypted = decryptToken(tokenRecord.encryptedToken);
+              caps = await adapter.checkDynamicCapabilities(decrypted, tokenRecord.projectSlug || undefined);
+            }
+          }
+
+          if (caps.canSetRegion) {
             capabilityTier = 'AUTO_APPLY';
           } else {
             capabilityTier = 'MANUAL_APPLY';
+            if (currentPlatform === 'RENDER') {
+              manualInstructions = [
+                "Region can only be set at service creation — it cannot be changed on an existing service.",
+                "Create a new Render service of the same type, selecting the target region at creation.",
+                "Copy environment variables/secrets to the new service (or reattach an existing Environment Group).",
+                "If a database is attached, note it's separately region-locked — migrating the database too (Render backup/restore or pg_dump/pg_restore) is a further, optional step for full latency benefit.",
+                "Test the new service on its temporary onrender.com URL before cutover.",
+                "Point your domain/DNS at the new service.",
+                "Once confirmed healthy, suspend/delete the old service."
+              ];
+            } else if (currentPlatform === 'NETLIFY') {
+              manualInstructions = [
+                "Function region selection requires a Pro or Enterprise plan — confirm your plan first.",
+                "If eligible: *Project configuration → Build & deploy → Continuous deployment → Functions region → Configure → select region → Save*, then trigger a redeploy (the setting doesn't apply retroactively).",
+                "Note this only affects serverless Functions execution region — static asset/CDN delivery is already global and unaffected by this setting."
+              ];
+            }
           }
         } else {
           // Connected to something we don't have a first-class adapter for yet
@@ -1119,7 +1158,18 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
       sdkConnected: !!project.lastPingAt
     };
 
-    const defaultProvider = project.provider?.toUpperCase() || 'AWS';
+    const PLATFORM_UNDERLYING_PROVIDER: Record<string, CloudProvider[]> = {
+      VERCEL: ['AWS'],
+      NETLIFY: ['AWS'],
+      RENDER: ['AWS', 'GCP'],
+      AWS: ['AWS'],
+      GCP: ['GCP'],
+      AZURE: ['AZURE'],
+    };
+
+    const ds = currentPlatform?.toUpperCase() || '';
+    const resolvedProviders = PLATFORM_UNDERLYING_PROVIDER[ds] || ['AWS'];
+    const defaultProvider = resolvedProviders[0];
     
     // Pick default instance based on provider
     let baseInstance = 't3.medium';
@@ -1182,7 +1232,7 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
     }
 
     const providerRegions = await prisma.region.findMany({
-      where: { provider: project.provider || 'AWS' }
+      where: { provider: { in: resolvedProviders } }
     });
     
     const instanceRow = await prisma.instanceType.findFirst({
@@ -1192,7 +1242,7 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
 
     const projectedRegions = await Promise.all(providerRegions.map(async reg => {
       const calcResult = await calculateCarbon({
-        provider: project.provider || 'AWS',
+        provider: reg.provider,
         region: reg.name,
         instanceType: estimateAssumptions.instanceType,
         instanceCount: 1,
@@ -1228,7 +1278,8 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
       instances: latestEmissions,
       checklist,
       estimateAssumptions,
-      top3Regions
+      top3Regions,
+      manualInstructions
     };
     res.json({ success: true, data: stats });
   } catch (error: any) {

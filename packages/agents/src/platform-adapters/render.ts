@@ -44,13 +44,21 @@ export class RenderAdapter implements PlatformAdapter {
 
   async applyRegion(token: string, projectRef: string, region: string): Promise<ApplyRegionResult> {
     // Render does not support changing a service's region after creation.
-    // Explicitly return NOT_SUPPORTED / requiresRedeploy: true as per the user requirements,
-    // avoiding dangerous automated delete/recreate actions.
+    // Explicitly return NOT_SUPPORTED / requiresRedeploy: true as per the user requirements.
     return {
       success: false,
       requiresRedeploy: true,
-      error: 'NOT_SUPPORTED',
-      message: 'Render services are immutable with respect to region. You must manually create a new service in the target region, migrate your config, update DNS, and decommission the old one.'
+      actionTaken: 'NOT_SUPPORTED',
+      message: 'Render services are immutable with respect to region. You must manually create a new service in the target region.',
+      manualInstructions: [
+        "Region can only be set at service creation — it cannot be changed on an existing service.",
+        "Create a new Render service of the same type, selecting the target region at creation.",
+        "Copy environment variables/secrets to the new service (or reattach an existing Environment Group).",
+        "If a database is attached, note it's separately region-locked — migrating the database too (Render backup/restore or pg_dump/pg_restore) is a further, optional step for full latency benefit.",
+        "Test the new service on its temporary onrender.com URL before cutover.",
+        "Point your domain/DNS at the new service.",
+        "Once confirmed healthy, suspend/delete the old service."
+      ]
     };
   }
 }

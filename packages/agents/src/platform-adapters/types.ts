@@ -14,9 +14,10 @@ export interface ApplyRegionResult {
   requiresRedeploy: boolean;
   error?: string;
   // If PR fallback is used
-  actionTaken?: 'API_UPDATE' | 'PR_OPENED' | 'FAILED';
+  actionTaken?: 'API_UPDATE' | 'PR_OPENED' | 'NOT_SUPPORTED' | 'FAILED';
   message?: string;
   details?: any;
+  manualInstructions?: string[];
 }
 
 export interface PlatformCapabilities {
@@ -27,6 +28,11 @@ export interface PlatformCapabilities {
 export interface PlatformAdapter {
   platform: string;
   capabilities: PlatformCapabilities;
+
+  /**
+   * Optionally fetches dynamic capabilities based on the account/plan state.
+   */
+  checkDynamicCapabilities?(token: string, projectRef?: string): Promise<PlatformCapabilities>;
 
   /**
    * Verifies if a token is valid for the given platform.

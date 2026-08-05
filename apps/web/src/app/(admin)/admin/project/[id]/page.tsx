@@ -276,7 +276,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     return <ErrorBanner message="Project not found." />;
   }
 
-  const { project, idleInstances, oversizedInstances, carbonTrend, history7d, history30d, totalMonthKg, apiKeys, greenerRegion, isStale, instances, checklist, estimateAssumptions, top3Regions } = data;
+  const { project, idleInstances, oversizedInstances, carbonTrend, history7d, history30d, totalMonthKg, apiKeys, greenerRegion, isStale, instances, checklist, estimateAssumptions, top3Regions, manualInstructions } = data;
   const chartData = chartDays === '7d' ? history7d : history30d;
   const dataSource: 'NO_CREDS' | 'MOCK_DEMO' | 'LIVE' = project.dataSource || 'NO_CREDS';
 

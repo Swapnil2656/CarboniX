@@ -32,9 +32,29 @@ async function main() {
   console.log('Seeding Regions...');
   await prisma.region.createMany({
     data: [
-      { provider: 'AWS', code: 'us-east-1', name: 'US East (N. Virginia)', country: 'US', continent: 'North America', gridIntensity: 393.2, lat: 38.13, lng: -78.45 },
-      { provider: 'GCP', code: 'europe-west1', name: 'Europe West (Belgium)', country: 'BE', continent: 'Europe', gridIntensity: 153.4, lat: 50.47, lng: 3.82 },
-      { provider: 'AZURE', code: 'eastus', name: 'East US (Virginia)', country: 'US', continent: 'North America', gridIntensity: 380.0, lat: 37.37, lng: -79.81 }
+      // AWS
+      { provider: 'AWS', code: 'us-east-1', name: 'US East (N. Virginia)', country: 'US', continent: 'North America', gridIntensity: 393.2, renewablePercentage: 12, lat: 38.13, lng: -78.45 },
+      { provider: 'AWS', code: 'us-west-2', name: 'US West (Oregon)', country: 'US', continent: 'North America', gridIntensity: 223.1, renewablePercentage: 80, lat: 45.83, lng: -119.70 },
+      { provider: 'AWS', code: 'eu-west-1', name: 'Europe (Ireland)', country: 'IE', continent: 'Europe', gridIntensity: 250.0, renewablePercentage: 50, lat: 53.33, lng: -6.25 },
+      { provider: 'AWS', code: 'eu-north-1', name: 'Europe (Stockholm)', country: 'SE', continent: 'Europe', gridIntensity: 12.0, renewablePercentage: 98, lat: 59.33, lng: 18.06 },
+      { provider: 'AWS', code: 'ap-south-1', name: 'Asia Pacific (Mumbai)', country: 'IN', continent: 'Asia', gridIntensity: 700.0, renewablePercentage: 15, lat: 19.08, lng: 72.88 },
+      { provider: 'AWS', code: 'sa-east-1', name: 'South America (São Paulo)', country: 'BR', continent: 'South America', gridIntensity: 120.0, renewablePercentage: 85, lat: -23.55, lng: -46.63 },
+      
+      // GCP
+      { provider: 'GCP', code: 'europe-west1', name: 'Europe West (Belgium)', country: 'BE', continent: 'Europe', gridIntensity: 153.4, renewablePercentage: 60, lat: 50.47, lng: 3.82 },
+      { provider: 'GCP', code: 'europe-north1', name: 'Europe North (Finland)', country: 'FI', continent: 'Europe', gridIntensity: 15.0, renewablePercentage: 95, lat: 60.57, lng: 27.19 },
+      { provider: 'GCP', code: 'us-central1', name: 'US Central (Iowa)', country: 'US', continent: 'North America', gridIntensity: 450.0, renewablePercentage: 20, lat: 41.26, lng: -95.86 },
+      { provider: 'GCP', code: 'us-west1', name: 'US West (Oregon)', country: 'US', continent: 'North America', gridIntensity: 80.0, renewablePercentage: 85, lat: 45.60, lng: -121.18 },
+      { provider: 'GCP', code: 'asia-east1', name: 'Asia East (Taiwan)', country: 'TW', continent: 'Asia', gridIntensity: 500.0, renewablePercentage: 10, lat: 24.05, lng: 120.51 },
+      { provider: 'GCP', code: 'southamerica-east1', name: 'South America East (Osasco)', country: 'BR', continent: 'South America', gridIntensity: 100.0, renewablePercentage: 80, lat: -23.53, lng: -46.79 },
+
+      // AZURE
+      { provider: 'AZURE', code: 'eastus', name: 'East US (Virginia)', country: 'US', continent: 'North America', gridIntensity: 380.0, renewablePercentage: 15, lat: 37.37, lng: -79.81 },
+      { provider: 'AZURE', code: 'westus2', name: 'West US 2 (Washington)', country: 'US', continent: 'North America', gridIntensity: 210.0, renewablePercentage: 60, lat: 47.23, lng: -119.85 },
+      { provider: 'AZURE', code: 'northeurope', name: 'North Europe (Ireland)', country: 'IE', continent: 'Europe', gridIntensity: 140.0, renewablePercentage: 70, lat: 53.33, lng: -6.25 },
+      { provider: 'AZURE', code: 'westeurope', name: 'West Europe (Netherlands)', country: 'NL', continent: 'Europe', gridIntensity: 180.0, renewablePercentage: 50, lat: 52.37, lng: 4.90 },
+      { provider: 'AZURE', code: 'japaneast', name: 'Japan East (Tokyo)', country: 'JP', continent: 'Asia', gridIntensity: 500.0, renewablePercentage: 10, lat: 35.68, lng: 139.77 },
+      { provider: 'AZURE', code: 'brazilsouth', name: 'Brazil South (São Paulo)', country: 'BR', continent: 'South America', gridIntensity: 110.0, renewablePercentage: 80, lat: -23.55, lng: -46.63 }
     ]
   });
 
