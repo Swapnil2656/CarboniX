@@ -85,7 +85,7 @@ export default async function LandingPage() {
           </div>
           
           <a
-            href="https://github.com/Swapnil2656/CarboniX/releases/download/latest/carbonix.apk"
+            href="/carbonix.apk"
             className="bg-primary-container text-on-primary-fixed px-2xl py-lg rounded-full font-bold text-body-lg hover:opacity-90 transition-all flex items-center gap-md shadow-lg shadow-primary-container/20 hover:shadow-primary-container/40"
           >
             <span className="material-symbols-outlined text-[24px]">android</span>

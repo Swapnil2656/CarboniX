@@ -7,6 +7,7 @@ import Slider from '@react-native-community/slider';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Animated } from 'react-native';
 
 import { colors } from '../../src/theme/colors';
 import { carbonApi, referenceApi } from '../../src/services/api/endpoints';
@@ -276,21 +277,25 @@ export default function EstimateScreen() {
     );
   };
 
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  const topBarBg = scrollY.interpolate({
+    inputRange: [0, 80],
+    outputRange: ['rgba(20, 20, 20, 0)', 'rgba(20, 20, 20, 1)'],
+    extrapolate: 'clamp'
+  });
+
   if (showResults) {
     return (
       <View style={styles.container}>
-        <LinearGradient
-          colors={[colors.primary + '25', 'transparent']}
-          style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 280 }}
-        />
-        <View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top, borderBottomWidth: 0 }]}>
+        <Animated.View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top, backgroundColor: topBarBg, position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, borderBottomWidth: 0 }]}>
           <View style={styles.topBarLeft}>
             <Image source={require('../../assets/carbonix-logo.png')} style={styles.logoImage} />
             <Text style={styles.logo}>CarboniX</Text>
           </View>
-        </View>
+        </Animated.View>
 
-        <ScrollView ref={scrollRef} contentContainerStyle={styles.resultContent} showsVerticalScrollIndicator={false}>
+        <Animated.ScrollView ref={scrollRef} contentContainerStyle={[styles.resultContent, { paddingTop: 56 + insets.top + 24 }]} showsVerticalScrollIndicator={false} onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })} scrollEventThrottle={16}>
           <View style={styles.subNav}>
             <TouchableOpacity style={styles.subNavLeft} onPress={handleReset}>
               <MaterialIcons name="arrow-back" size={24} color={colors.textHeader} />
@@ -304,25 +309,32 @@ export default function EstimateScreen() {
             <MaterialIcons name="refresh" size={24} color={colors.background} />
             <Text style={[styles.primaryBtnText, { color: colors.background }]}>New Estimate</Text>
           </TouchableOpacity>
-        </ScrollView>
+        </Animated.ScrollView>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={[colors.primary + '25', 'transparent']}
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 280 }}
-      />
-      <View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top, borderBottomWidth: 0 }]}>
+      <Animated.View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top, backgroundColor: topBarBg, position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, borderBottomWidth: 0 }]}>
         <View style={styles.topBarLeft}>
           <Image source={require('../../assets/carbonix-logo.png')} style={styles.logoImage} />
           <Text style={styles.logo}>CarboniX</Text>
         </View>
-      </View>
+        </Animated.View>
 
-      <ScrollView ref={scrollRef} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <Animated.ScrollView 
+        ref={scrollRef} 
+        contentContainerStyle={[styles.content, { paddingTop: 56 + insets.top + 24 }]} 
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })}
+        scrollEventThrottle={16}
+      >
+        <LinearGradient
+          colors={[colors.primary + '25', 'transparent']}
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 280 + 56 + insets.top }}
+        />
         
         {/* Mode Toggle */}
         <View style={styles.segmentControl}>
@@ -490,7 +502,7 @@ export default function EstimateScreen() {
           </Text>
         </TouchableOpacity>
 
-      </ScrollView>
+      </Animated.ScrollView>
     </View>
   );
 }

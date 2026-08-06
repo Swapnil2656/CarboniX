@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions } from 'react-native';
-import { Tabs, Redirect, useRouter } from 'expo-router';
+import { Tabs, Redirect, useRouter, usePathname } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Constants from 'expo-constants';
@@ -164,6 +164,7 @@ export default function TabLayout() {
   const isLoading = useAuthStore(state => state.isLoading);
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const pathname = usePathname();
 
   const [aiBotVisible, setAiBotVisible] = useState(false);
 
@@ -214,13 +215,15 @@ export default function TabLayout() {
         <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
       </Tabs>
 
-      {/* Floating Action Button for AI Bot */}
-      <TouchableOpacity 
-        style={[styles.fab, { bottom: TAB_HEIGHT + Math.max(insets.bottom, 0) + 16 }]}
-        onPress={() => setAiBotVisible(true)}
-      >
-        <FontAwesome5 name="robot" size={24} color="#131313" />
-      </TouchableOpacity>
+      {/* Floating Action Button for AI Bot (hidden on settings tab) */}
+      {pathname !== '/settings' && (
+        <TouchableOpacity 
+          style={[styles.fab, { bottom: TAB_HEIGHT + Math.max(insets.bottom, 0) + 16 }]}
+          onPress={() => setAiBotVisible(true)}
+        >
+          <FontAwesome5 name="robot" size={24} color="#131313" />
+        </TouchableOpacity>
+      )}
       
       <AiBotModal 
         visible={aiBotVisible} 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity, Image, Alert, Linking, TextInput, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
@@ -6,6 +6,7 @@ import { Picker } from '@react-native-picker/picker';
 import * as SecureStore from 'expo-secure-store';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Animated } from 'react-native';
 
 import { colors } from '../../src/theme/colors';
 import { useAuthStore } from '../../src/stores/auth.store';
@@ -71,22 +72,34 @@ export default function SettingsScreen() {
       console.error('Error saving setting', e);
     }
   };
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  const topBarBg = scrollY.interpolate({
+    inputRange: [0, 80],
+    outputRange: ['rgba(20, 20, 20, 0)', 'rgba(20, 20, 20, 1)'],
+    extrapolate: 'clamp'
+  });
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={[colors.primary + '25', 'transparent']}
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 280 }}
-      />
       {/* TopBar */}
-      <View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top }]}>
+      <Animated.View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top, backgroundColor: topBarBg, position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 }]}>
         <View style={styles.topBarLeft}>
           <Image source={require('../../assets/carbonix-logo.png')} style={styles.logoImage} />
           <Text style={styles.logo}>CarboniX</Text>
         </View>
-      </View>
+      </Animated.View>
 
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+      <Animated.ScrollView 
+        contentContainerStyle={[styles.content, { paddingTop: 56 + insets.top + 24 }]}
+        showsVerticalScrollIndicator={false}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })}
+        scrollEventThrottle={16}
+      >
+        <LinearGradient
+          colors={[colors.primary + '25', 'transparent']}
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 280 + 56 + insets.top }}
+        />
         
         {/* Profile Card */}
         <View style={styles.profileCard}>
@@ -183,7 +196,7 @@ export default function SettingsScreen() {
           <Text style={styles.footerText}>CarboniX Mobile v1.2.4</Text>
         </View>
 
-      </ScrollView>
+      </Animated.ScrollView>
     </View>
   );
 }

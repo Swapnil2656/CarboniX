@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator, Dimensions, Alert, Modal } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator, Dimensions, Alert, Modal, Animated } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
@@ -140,16 +140,18 @@ export default function DashboardScreen() {
   };
   const unit = useLbs ? 'lbs CO₂' : 'kg CO₂';
 
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  const topBarBg = scrollY.interpolate({
+    inputRange: [0, 80],
+    outputRange: ['rgba(20, 20, 20, 0)', 'rgba(20, 20, 20, 1)'], // Fades to #141414
+    extrapolate: 'clamp'
+  });
+
   return (
     <View style={styles.container}>
-      {/* Spotify-style top gradient fade */}
-      <LinearGradient
-        colors={[colors.primary + '25', 'transparent']}
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 280 }}
-      />
-      
-      {/* TopAppBar */}
-      <View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top }]}>
+      {/* TopAppBar - now absolute and animated */}
+      <Animated.View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top, backgroundColor: topBarBg, position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 }]}>
         <View style={styles.topBarLeft}>
           <Image source={require('../../assets/carbonix-logo.png')} style={styles.logoImage} />
           <Text style={styles.logo}>CarboniX</Text>
@@ -157,9 +159,19 @@ export default function DashboardScreen() {
         <TouchableOpacity style={styles.iconBtn} onPress={() => { refetch(); Alert.alert('Reloading', 'Dashboard data has been refreshed.'); }}>
           <MaterialIcons name="refresh" size={24} color={isRefetching ? colors.primary : colors.textMuted} />
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <Animated.ScrollView 
+        contentContainerStyle={[styles.content, { paddingTop: 56 + insets.top + 24 }]} 
+        showsVerticalScrollIndicator={false}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })}
+        scrollEventThrottle={16}
+      >
+        {/* Spotify-style top gradient fade - now inside scrollview so it scrolls up */}
+        <LinearGradient
+          colors={[colors.primary + '25', 'transparent']}
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 280 + 56 + insets.top }}
+        />
 
         {/* Header */}
         <View style={styles.header}>
@@ -322,7 +334,7 @@ export default function DashboardScreen() {
 
           </>
         )}
-      </ScrollView>
+      </Animated.ScrollView>
 
       {/* Analysis Modal */}
       <Modal visible={!!analysisResult} transparent animationType="fade">

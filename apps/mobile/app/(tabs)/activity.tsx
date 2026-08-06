@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image, ActivityIndicator, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { Animated } from 'react-native';
 
 import { colors } from '../../src/theme/colors';
 import { adminApi } from '../../src/services/api/endpoints';
@@ -59,15 +60,18 @@ export default function HistoryScreen() {
     item.resource?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.actorEmail?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  const topBarBg = scrollY.interpolate({
+    inputRange: [0, 80],
+    outputRange: ['rgba(20, 20, 20, 0)', 'rgba(20, 20, 20, 1)'],
+    extrapolate: 'clamp'
+  });
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={[colors.primary + '25', 'transparent']}
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 280 }}
-      />
       {/* TopAppBar */}
-      <View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top }]}>
+      <Animated.View style={[styles.topBar, { paddingTop: insets.top, height: 56 + insets.top, backgroundColor: topBarBg, position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 }]}>
         <View style={styles.topBarLeft}>
           <Image source={require('../../assets/carbonix-logo.png')} style={styles.logoImage} />
           <Text style={styles.logo}>CarboniX</Text>
@@ -75,9 +79,18 @@ export default function HistoryScreen() {
         <TouchableOpacity style={styles.iconBtn} onPress={() => Alert.alert('Export', 'History data exported successfully as CSV.')}>
           <MaterialIcons name="ios-share" size={22} color={colors.primary} />
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <Animated.ScrollView 
+        contentContainerStyle={[styles.content, { paddingTop: 56 + insets.top + 24 }]}
+        showsVerticalScrollIndicator={false}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })}
+        scrollEventThrottle={16}
+      >
+        <LinearGradient
+          colors={[colors.primary + '25', 'transparent']}
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 280 + 56 + insets.top }}
+        />
         
         {/* Header Section */}
         <View style={styles.header}>
@@ -152,7 +165,7 @@ export default function HistoryScreen() {
             })
           )}
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
     </View>
   );
 }
