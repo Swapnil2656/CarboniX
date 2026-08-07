@@ -342,18 +342,23 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
 
   const chartData = chartDays === '7d' ? activeAnalytics.history7d : activeAnalytics.history30d;
 
-  const platformKeys = deployments
+  const platformKeys = (activeAnalytics?.deployments || deployments)
     .filter((d: any) => d.platformToken)
     .map((d: any) => ({
       id: d.platformToken.id,
       name: `${d.platformToken.platform} Token (PaaS)`,
       status: d.platformToken.status,
       prefix: '****',
-      lastUsedAt: d.platformToken.updatedAt,
+      lastUsedAt: d.platformToken.updatedAt || d.platformToken.createdAt,
       isPlatformToken: true
     }));
 
-  const allKeys = [...(apiKeys || []), ...platformKeys];
+  const normalKeys = (apiKeys || []).map((k: any) => ({
+    ...k,
+    status: k.isRevoked ? 'REVOKED' : 'ACTIVE'
+  }));
+
+  const allKeys = [...normalKeys, ...platformKeys];
   const activePaaSDeployments = deployments.filter((d: any) => d.platformToken && d.platformToken.status === 'ACTIVE');
   const hasActivePaaS = activePaaSDeployments.length > 0;
   
@@ -453,7 +458,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
       {/* Floating Project Settings Button (below global admin header) */}
       <Link
         href={`/admin/project/${params.id}/settings`}
-        className="fixed top-[260px] right-6 z-40 w-10 h-10 rounded-full flex items-center justify-center bg-surface border border-outline-variant shadow-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
+        className="fixed top-[260px] right-6 z-10 w-10 h-10 rounded-full flex items-center justify-center bg-surface border border-outline-variant shadow-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
         title="Project Settings"
       >
         <span className="material-symbols-outlined text-[20px]">tune</span>
@@ -814,7 +819,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
             <StatCard
               title="Today's Carbon"
               value={`${Number(activeAnalytics.carbonTrend?.todayKg || 0).toFixed(2)} kg`}
@@ -830,6 +835,11 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
               title="Idle Instances"
               value={activeAnalytics.idleInstances?.toString() || '0'}
               icon="snooze"
+            />
+            <StatCard
+              title="Redeploys (30d)"
+              value={activeAnalytics.deployCount?.toString() || '0'}
+              icon="update"
             />
             <div className={`border rounded-xl p-5 ${isStale ? 'bg-error/5 border-error/30' : 'bg-surface border-outline-variant'}`}>
               <div className="text-sm font-label-caps text-on-surface-variant mb-2">{hasActivePaaS && !project.lastPingAt ? `${connectedPlatforms} Sync` : 'SDK Status'}</div>
@@ -1038,7 +1048,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                   </div>
                   <div className="text-xs text-on-surface-variant mt-1">
                     {key.isPlatformToken 
-                      ? `Token Masked • Connected: ${new Date(key.lastUsedAt).toLocaleDateString()}` 
+                      ? `Token Masked • Connected: ${key.lastUsedAt ? new Date(key.lastUsedAt).toLocaleDateString() : 'Unknown'}` 
                       : `Prefix: ${key.prefix} • Last Used: ${key.lastUsedAt ? new Date(key.lastUsedAt).toLocaleDateString() : 'Never'}`
                     }
                   </div>

@@ -1078,12 +1078,15 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
         if (val.sum / val.count < 5) idleInstancesCount++;
       }
 
+      const deployCount = new Set(emissionsArr.map(e => e.instanceId)).size;
+
       return {
         history30d,
         history7d,
         carbonTrend: { todayKg, yesterdayKg, trendPercent, isNew },
         totalMonthKg,
-        idleInstances: idleInstancesCount
+        idleInstances: idleInstancesCount,
+        deployCount
       };
     };
 

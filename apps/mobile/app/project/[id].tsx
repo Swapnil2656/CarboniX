@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert, TextInput, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -7,6 +7,8 @@ import { colors } from '../../src/theme/colors';
 import { adminApi, agentsApi } from '../../src/services/api/endpoints';
 import { LineChart } from 'react-native-chart-kit';
 
+const POLL_INTERVAL_MS = 30_000; // live refresh every 30 seconds
+
 export default function ProjectDetailScreen() {
   const { id } = useLocalSearchParams();
   const insets = useSafeAreaInsets();
@@ -14,6 +16,8 @@ export default function ProjectDetailScreen() {
 
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [activeTab, setActiveTab] = useState<string>('OVERALL');
   const [chartDays, setChartDays] = useState<'7d' | '30d'>('7d');
   
   const [confirmNameDisconnect, setConfirmNameDisconnect] = useState('');
@@ -21,26 +25,30 @@ export default function ProjectDetailScreen() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const fetchStats = async (silent = false) => {
+    try {
+      if (!silent) setLoading(true);
+      const res = await adminApi.getProjectStats(id as string);
+      if (res.success) {
+        setData(res.data);
+        setLastUpdated(new Date());
+      }
+    } catch (_) {
+      // silent failure on background polls
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        setLoading(true);
-        const res = await adminApi.getProjectStats(id as string);
-        if (res.success) {
-          setData(res.data);
-        } else {
-          Alert.alert('Error', res.error || 'Failed to fetch project stats');
-        }
-      } catch (err: any) {
-        Alert.alert('Error', err.message || 'Internal error');
-      } finally {
-        setLoading(false);
-      }
+    if (!id) return;
+    fetchStats(false);
+    pollingRef.current = setInterval(() => fetchStats(true), POLL_INTERVAL_MS);
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
     };
-    if (id) {
-      fetchStats();
-    }
   }, [id]);
 
   const handleDelete = async () => {
@@ -109,8 +117,31 @@ export default function ProjectDetailScreen() {
     );
   }
 
-  const { project, idleInstances, oversizedInstances, carbonTrend, history7d, history30d, totalMonthKg, apiKeys, greenerRegion, isStale, instances, checklist, estimateAssumptions, top3Regions } = data;
+  const { project, oversizedInstances, apiKeys, isStale, instances, checklist, estimateAssumptions, top3Regions } = data;
   const deployments: any[] = data.deployments || [];
+
+  // Compute per-tab analytics (mirrors web dashboard logic)
+  const overallAnalytics = {
+    carbonTrend: data.carbonTrend,
+    history7d: data.history7d,
+    history30d: data.history30d,
+    totalMonthKg: data.totalMonthKg,
+    idleInstances: data.idleInstances,
+    deployCount: data.deployCount,
+  };
+
+  const activeDeployment = activeTab === 'OVERALL' ? null : deployments.find((d: any) => d.id === activeTab);
+  const activeAnalytics = activeDeployment
+    ? (activeDeployment.analytics || overallAnalytics)
+    : overallAnalytics;
+
+  const carbonTrend = activeAnalytics.carbonTrend;
+  const history7d = activeAnalytics.history7d || [];
+  const history30d = activeAnalytics.history30d || [];
+  const totalMonthKg = activeAnalytics.totalMonthKg || 0;
+  const idleInstances = activeAnalytics.idleInstances || 0;
+  const deployCount = activeAnalytics.deployCount || 0;
+
   const chartData = chartDays === '7d' ? history7d : history30d;
 
   const platformKeys = deployments
@@ -120,11 +151,16 @@ export default function ProjectDetailScreen() {
       name: `${d.platformToken.platform} Token (PaaS)`,
       status: d.platformToken.status,
       prefix: '****',
-      lastUsedAt: d.platformToken.updatedAt,
+      lastUsedAt: d.platformToken.updatedAt || d.platformToken.createdAt,
       isPlatformToken: true
     }));
 
-  const allKeys = [...(apiKeys || []), ...platformKeys];
+  const normalKeys = (apiKeys || []).map((k: any) => ({
+    ...k,
+    status: k.isRevoked ? 'REVOKED' : 'ACTIVE'
+  }));
+
+  const allKeys = [...normalKeys, ...platformKeys];
 
   const ROLE_COLORS: Record<string, string> = {
     FRONTEND: '#60a5fa',
@@ -132,11 +168,23 @@ export default function ProjectDetailScreen() {
     FULLSTACK: '#2dd4bf',
     OTHER:    colors.textMuted,
   };
+  
   const ROLE_LABELS: Record<string, string> = {
     FRONTEND: 'Frontend',
     BACKEND: 'Backend',
     FULLSTACK: 'Fullstack',
     OTHER: 'Other',
+  };
+
+  const getTabLabel = (dep: any) => {
+    const platform = dep.platformToken?.platform;
+    if (platform === 'VERCEL' || platform === 'NETLIFY') return 'Frontend';
+    if (platform === 'RAILWAY' || platform === 'RENDER') return 'Backend';
+    const role = dep.role?.toUpperCase();
+    if (role === 'FRONTEND') return 'Frontend';
+    if (role === 'BACKEND') return 'Backend';
+    if (role === 'DATABASE') return 'Database';
+    return 'Fullstack';
   };
 
   const getEquivalent = (kg: number) => {
@@ -159,9 +207,16 @@ export default function ProjectDetailScreen() {
           <MaterialIcons name="arrow-back" size={24} color={colors.textBody} />
           <Text style={styles.backText}>Back</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.settingsBtn} onPress={() => router.push({ pathname: '/project-settings' as any, params: { id } })}>
-          <MaterialIcons name="settings" size={24} color={colors.textBody} />
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          {lastUpdated && (
+            <Text style={{ color: colors.textMuted, fontSize: 10 }}>
+              {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </Text>
+          )}
+          <TouchableOpacity style={styles.settingsBtn} onPress={() => router.push({ pathname: '/project-settings' as any, params: { id } })}>
+            <MaterialIcons name="tune" size={22} color={colors.textBody} />
+          </TouchableOpacity>
+        </View>
       </View>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         
@@ -273,7 +328,37 @@ export default function ProjectDetailScreen() {
           </View>
         ) : (
           <>
-            <View style={styles.statsGrid}>
+            {/* Deployment Tabs */}
+          {deployments.length > 0 && (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }}>
+              <View style={{ flexDirection: 'row', gap: 8, paddingVertical: 4 }}>
+                <TouchableOpacity
+                  onPress={() => setActiveTab('OVERALL')}
+                  style={[
+                    styles.tabBtn,
+                    activeTab === 'OVERALL' && styles.tabBtnActive
+                  ]}
+                >
+                  <Text style={[styles.tabBtnText, activeTab === 'OVERALL' && styles.tabBtnTextActive]}>Fullstack</Text>
+                </TouchableOpacity>
+                {deployments.map((dep: any) => {
+                  const label = getTabLabel(dep);
+                  const isActive = activeTab === dep.id;
+                  return (
+                    <TouchableOpacity
+                      key={dep.id}
+                      onPress={() => setActiveTab(dep.id)}
+                      style={[styles.tabBtn, isActive && styles.tabBtnActive]}
+                    >
+                      <Text style={[styles.tabBtnText, isActive && styles.tabBtnTextActive]}>{label}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </ScrollView>
+          )}
+
+          <View style={styles.statsGrid}>
             <View style={styles.statCard}>
               <View style={styles.statHeader}>
                 <MaterialIcons name="co2" size={16} color={colors.textMuted} />
@@ -305,7 +390,15 @@ export default function ProjectDetailScreen() {
               <Text style={styles.statValue}>{idleInstances} / {oversizedInstances}</Text>
             </View>
 
-            <View style={[styles.statCard, isStale && { borderColor: colors.error, borderWidth: 1 }]}>
+            <View style={styles.statCard}>
+              <View style={styles.statHeader}>
+                <MaterialIcons name="update" size={16} color={colors.textMuted} />
+                <Text style={styles.statTitle}>Redeploys (30d)</Text>
+              </View>
+              <Text style={styles.statValue}>{deployCount}</Text>
+            </View>
+
+            <View style={[styles.statCard, { width: '100%' }, isStale && { borderColor: colors.error, borderWidth: 1 }]}>
               <View style={styles.statHeader}>
                 <MaterialIcons name="wifi" size={16} color={colors.textMuted} />
                 <Text style={styles.statTitle}>SDK Status</Text>
@@ -399,19 +492,19 @@ export default function ProjectDetailScreen() {
         <View style={styles.panel}>
           <Text style={styles.panelTitle}>Associated API Keys</Text>
           {allKeys?.length > 0 ? (
-            allKeys.map((key: any) => (
-              <View key={key.id} style={{ backgroundColor: colors.surfaceContainer, padding: 12, borderRadius: 8, marginBottom: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <View>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            allKeys.map((key: any, index: number) => (
+              <View key={key.id ? `${key.id}-${index}` : index.toString()} style={{ backgroundColor: colors.surfaceContainer, padding: 12, borderRadius: 8, marginBottom: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <View style={{ flex: 1 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                     <Text style={{ color: colors.textBody, fontWeight: 'bold' }}>{key.name}</Text>
                     {key.status !== 'ACTIVE' && (
-                      <View style={{ backgroundColor: 'rgba(248,113,113,0.1)', paddingHorizontal: 4, borderRadius: 4 }}>
+                      <View style={{ backgroundColor: 'rgba(248,113,113,0.1)', paddingHorizontal: 4, paddingVertical: 2, borderRadius: 4 }}>
                          <Text style={{ color: colors.error, fontSize: 10 }}>Revoked</Text>
                       </View>
                     )}
                   </View>
-                  <Text style={{ color: colors.textMuted, fontSize: 12 }}>
-                    {key.isPlatformToken ? `Token Masked • Connected: ${new Date(key.lastUsedAt).toLocaleDateString()}` : `Prefix: ${key.prefix} • Last Used: ${key.lastUsedAt ? new Date(key.lastUsedAt).toLocaleDateString() : 'Never'}`}
+                  <Text style={{ color: colors.textMuted, fontSize: 12, marginTop: 4 }}>
+                    {key.isPlatformToken ? `Token Masked • Connected: ${key.lastUsedAt ? new Date(key.lastUsedAt).toLocaleDateString() : 'Unknown'}` : `Prefix: ${key.prefix} • Last Used: ${key.lastUsedAt ? new Date(key.lastUsedAt).toLocaleDateString() : 'Never'}`}
                   </Text>
                 </View>
                 {!key.isPlatformToken ? (
@@ -506,6 +599,10 @@ const styles = StyleSheet.create({
   statHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   statTitle: { fontSize: 12, color: colors.textMuted, marginLeft: 6 },
   statValue: { fontSize: 20, fontWeight: 'bold', color: colors.textBody },
+  tabBtn: { paddingHorizontal: 16, paddingVertical: 7, borderRadius: 20, backgroundColor: colors.surfaceContainer, borderWidth: 1, borderColor: colors.surfaceContainerHigh },
+  tabBtnActive: { backgroundColor: colors.surface, borderColor: colors.primary },
+  tabBtnText: { fontSize: 13, color: colors.textMuted, fontWeight: '500' },
+  tabBtnTextActive: { color: colors.primary, fontWeight: '700' },
   dangerZone: { marginTop: 24, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(248, 113, 113, 0.3)' },
   dangerHeader: { backgroundColor: 'rgba(248, 113, 113, 0.1)', padding: 16, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: 'rgba(248, 113, 113, 0.2)' },
   dangerTitle: { color: colors.error, fontWeight: 'bold', fontSize: 16, marginLeft: 8 },
