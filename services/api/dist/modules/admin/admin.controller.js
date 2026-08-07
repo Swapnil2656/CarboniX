@@ -3,13 +3,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProjectStats = exports.disconnectProject = exports.deleteProject = exports.deleteAuditLog = exports.deleteNotification = exports.getAuditLogs = exports.getNotifications = exports.migrateEmission = exports.getEmissions = exports.removeTeamMember = exports.inviteUser = exports.syncTeamMembers = exports.getTeamMembers = exports.deleteApiKey = exports.revokeApiKey = exports.createApiKey = exports.getApiKeys = exports.toggleFeatureFlag = exports.getFeatureFlags = exports.getUsers = exports.getDashboard = void 0;
+exports.deleteDeployment = exports.addDeployment = exports.getProjectStats = exports.disconnectProject = exports.deleteProject = exports.deleteAuditLog = exports.deleteNotification = exports.getAuditLogs = exports.getNotifications = exports.migrateEmission = exports.getEmissions = exports.removeTeamMember = exports.inviteUser = exports.syncTeamMembers = exports.getTeamMembers = exports.deleteApiKey = exports.revokeApiKey = exports.createApiKey = exports.getApiKeys = exports.toggleFeatureFlag = exports.getFeatureFlags = exports.getUsers = exports.getDashboard = void 0;
 exports.resolveTenantContext = resolveTenantContext;
 const prisma_1 = require("../../lib/prisma");
 const crypto_1 = __importDefault(require("crypto"));
 const redis_1 = require("../../lib/redis");
 const email_1 = require("../../utils/email");
 const agents_1 = require("@carbonix/agents");
+const core_1 = require("@carbonix/core");
+const axios_1 = __importDefault(require("axios"));
+const platformTokenService_1 = require("../../lib/platformTokenService");
 // Helper to resolve the IDs of all users/projects in the current user's team/tenant
 async function resolveTenantContext(userId, userEmail) {
     const ownedProjects = await prisma_1.prisma.project.findMany({ select: { id: true }, where: { userId } });
@@ -780,7 +783,7 @@ const migrateEmission = async (req, res) => {
                 carbonKg: record.carbonKg * 0.6, // Simulate 40% carbon savings
                 isIdle: false,
                 isOversized: false,
-                recommendation: `Migrated to ${targetRegion}. Operations nominal.`
+                recommendation: null
             }
         });
         // Audit Log
@@ -911,9 +914,24 @@ const getProjectStats = async (req, res) => {
         const { projectIds } = await resolveTenantContext(req.user.id, req.user.email);
         if (!projectIds.includes(id))
             return res.status(403).json({ error: 'Forbidden' });
-        const project = await prisma_1.prisma.project.findUnique({ where: { id } });
+        const project = await prisma_1.prisma.project.findUnique({
+            where: { id },
+            include: {
+                deployments: {
+                    include: { platformToken: true },
+                    orderBy: { createdAt: 'asc' },
+                },
+            },
+        });
         if (!project)
             return res.status(404).json({ error: 'Project not found' });
+        // Auto-heal isDeployed state if there are active PaaS platform tokens or deployments
+        const hasActivePaaS = project.deployments.some(d => d.platformToken && d.platformToken.status === 'ACTIVE');
+        if (hasActivePaaS && !project.isDeployed) {
+            project.isDeployed = true;
+            // asynchronously persist this state fix to the DB
+            prisma_1.prisma.project.update({ where: { id: project.id }, data: { isDeployed: true } }).catch(console.error);
+        }
         // Fetch emissions for the last 30 days
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -927,61 +945,109 @@ const getProjectStats = async (req, res) => {
             where: { name: { in: uniqueTypes } }
         });
         const costMap = new Map(instanceTypes.map(t => [t.name, t.onDemandHourlyUsd || 0]));
-        // Pre-calculate intervals for all emissions based on actual ingestion time
-        const instanceLastSeen = new Map();
-        const emissionIntervals = new Map();
-        for (const r of emissions) {
-            const lastSeen = instanceLastSeen.get(r.instanceId);
-            let intervalHours = 1; // Default to 1 hour
-            if (lastSeen) {
-                const diffMs = r.timestamp.getTime() - lastSeen.getTime();
-                intervalHours = Math.min(diffMs / (1000 * 60 * 60), 24); // Cap at 24h
+        const computeAnalytics = (emissionsArr) => {
+            const instanceLastSeen = new Map();
+            const emissionIntervals = new Map();
+            for (const r of emissionsArr) {
+                const lastSeen = instanceLastSeen.get(r.instanceId);
+                let intervalHours = 1;
+                if (lastSeen) {
+                    const diffMs = r.timestamp.getTime() - lastSeen.getTime();
+                    intervalHours = Math.min(diffMs / (1000 * 60 * 60), 24);
+                }
+                emissionIntervals.set(r.id, intervalHours);
+                instanceLastSeen.set(r.instanceId, r.timestamp);
             }
-            emissionIntervals.set(r.id, intervalHours);
-            instanceLastSeen.set(r.instanceId, r.timestamp);
-        }
-        const history30d = Array.from({ length: 30 }).map((_, i) => {
-            const d = new Date();
-            d.setDate(d.getDate() - (29 - i));
-            const dayStr = d.toISOString().split('T')[0];
-            const dayRecords = emissions.filter(e => e.timestamp.toISOString().split('T')[0] === dayStr);
-            let dayCost = 0;
-            for (const r of dayRecords) {
-                const intervalHours = emissionIntervals.get(r.id) || 1;
-                dayCost += (costMap.get(r.instanceType) || 0) * intervalHours;
+            const earliestRecordDate = emissionsArr.length > 0
+                ? new Date(Math.min(...emissionsArr.map(e => e.timestamp.getTime())))
+                : null;
+            const earliestDateKey = earliestRecordDate ? earliestRecordDate.toISOString().split('T')[0] : null;
+            let history30d = Array.from({ length: 30 }).map((_, i) => {
+                const d = new Date();
+                d.setDate(d.getDate() - (29 - i));
+                const dayStr = d.toISOString().split('T')[0];
+                const dayRecords = emissionsArr.filter(e => e.timestamp.toISOString().split('T')[0] === dayStr);
+                let dayCost = 0;
+                for (const r of dayRecords) {
+                    const intervalHours = emissionIntervals.get(r.id) || 1;
+                    dayCost += (costMap.get(r.instanceType) || 0) * intervalHours;
+                }
+                return {
+                    date: dayStr,
+                    carbonKg: dayRecords.reduce((sum, r) => sum + r.carbonKg, 0),
+                    costUsd: dayCost
+                };
+            }).filter(h => !earliestDateKey || h.date >= earliestDateKey);
+            if (!earliestDateKey || history30d.length === 0) {
+                const todayStr = new Date().toISOString().split('T')[0];
+                history30d = [{ date: todayStr, carbonKg: 0, costUsd: 0 }];
             }
+            if (history30d.length === 1) {
+                const prevDay = new Date(history30d[0].date);
+                prevDay.setDate(prevDay.getDate() - 1);
+                history30d.unshift({
+                    date: prevDay.toISOString().split('T')[0],
+                    carbonKg: 0,
+                    costUsd: 0
+                });
+            }
+            let history7d = history30d.slice(-7);
+            const todayKg = history30d[history30d.length - 1]?.carbonKg || 0;
+            const yesterdayKg = history30d[history30d.length - 2]?.carbonKg || 0;
+            let trendPercent = null;
+            let isNew = false;
+            if (yesterdayKg > 0) {
+                trendPercent = ((todayKg - yesterdayKg) / yesterdayKg) * 100;
+            }
+            else if (todayKg > 0) {
+                isNew = true;
+            }
+            const monthStart = new Date();
+            monthStart.setDate(1);
+            monthStart.setHours(0, 0, 0, 0);
+            const mtdRecords = emissionsArr.filter(e => e.timestamp >= monthStart);
+            const totalMonthKg = mtdRecords.reduce((sum, r) => sum + r.carbonKg, 0);
+            const twentyFourHoursAgo = new Date();
+            twentyFourHoursAgo.setDate(twentyFourHoursAgo.getDate() - 1);
+            const recentEmissions = emissionsArr.filter(e => e.timestamp >= twentyFourHoursAgo);
+            const instanceAvgCpu = new Map();
+            for (const r of recentEmissions) {
+                const cur = instanceAvgCpu.get(r.instanceId) || { sum: 0, count: 0 };
+                instanceAvgCpu.set(r.instanceId, { sum: cur.sum + r.cpuUtilization, count: cur.count + 1 });
+            }
+            let idleInstancesCount = 0;
+            for (const [_, val] of instanceAvgCpu.entries()) {
+                if (val.sum / val.count < 5)
+                    idleInstancesCount++;
+            }
+            const deployCount = new Set(emissionsArr.map(e => e.instanceId)).size;
             return {
-                date: dayStr,
-                carbonKg: dayRecords.reduce((sum, r) => sum + r.carbonKg, 0),
-                costUsd: dayCost
+                history30d,
+                history7d,
+                carbonTrend: { todayKg, yesterdayKg, trendPercent, isNew },
+                totalMonthKg,
+                idleInstances: idleInstancesCount,
+                deployCount
+            };
+        };
+        const overallAnalytics = computeAnalytics(emissions);
+        // Group deployments with per-deployment analytics
+        const enrichedDeployments = project.deployments.map(d => {
+            const depEmissions = emissions.filter(e => e.deploymentId === d.id);
+            return {
+                ...d,
+                analytics: computeAnalytics(depEmissions)
             };
         });
-        const history7d = history30d.slice(-7);
-        const todayKg = history30d[history30d.length - 1].carbonKg;
-        const yesterdayKg = history30d[history30d.length - 2].carbonKg;
-        let trendPercent = null;
-        let isNew = false;
-        if (yesterdayKg > 0) {
-            trendPercent = ((todayKg - yesterdayKg) / yesterdayKg) * 100;
-        }
-        else if (todayKg > 0) {
-            isNew = true;
-        }
         // Budget check
-        const monthStart = new Date();
-        monthStart.setDate(1);
-        monthStart.setHours(0, 0, 0, 0);
-        const mtdRecords = emissions.filter(e => e.timestamp >= monthStart);
-        const totalMonthKg = mtdRecords.reduce((sum, r) => sum + r.carbonKg, 0);
-        if (project.carbonBudgetKg && totalMonthKg >= project.carbonBudgetKg * 0.8) {
-            // Check if we already alerted recently to prevent spam? (Simplifying for now)
+        if (project.carbonBudgetKg && overallAnalytics.totalMonthKg >= project.carbonBudgetKg * 0.8) {
             await prisma_1.prisma.userNotification.create({
                 data: {
                     userId: req.user.id,
-                    title: totalMonthKg >= project.carbonBudgetKg ? 'Carbon Budget Exceeded' : 'Carbon Budget Warning',
-                    body: `Project "${project.name}" monthly usage: ${totalMonthKg.toFixed(1)} / ${project.carbonBudgetKg} kg CO₂`,
+                    title: overallAnalytics.totalMonthKg >= project.carbonBudgetKg ? 'Carbon Budget Exceeded' : 'Carbon Budget Warning',
+                    body: `Project "${project.name}" monthly usage: ${overallAnalytics.totalMonthKg.toFixed(1)} / ${project.carbonBudgetKg} kg CO₂`,
                     type: 'BUDGET_ALERT',
-                    data: { projectId: project.id, usedKg: totalMonthKg, budgetKg: project.carbonBudgetKg }
+                    data: { projectId: project.id, usedKg: overallAnalytics.totalMonthKg, budgetKg: project.carbonBudgetKg }
                 }
             });
         }
@@ -1011,19 +1077,63 @@ const getProjectStats = async (req, res) => {
         });
         // Capability Labeling Logic
         let capabilityTier = 'NOT_CONNECTED';
-        if (project.dataSource !== 'NO_CREDS' && project.dataSource) {
-            if (['AWS', 'GCP', 'AZURE'].includes(project.dataSource)) {
+        let manualInstructions = undefined;
+        // Determine the actual platform string
+        let currentPlatform = null;
+        let tokenRecord = null;
+        if (project.dataSource === 'LIVE') {
+            // Deployment-scoped: find the token from whichever deployment has one.
+            // Return the first active one for backward-compat capability-tier logic.
+            // In a multi-deployment project, each deployment has its own token — this
+            // is only used for the single-platform capability tier check (which is per-project
+            // in the legacy UI; per-deployment tier is returned in the deployments array).
+            const activeDeploymentWithToken = project.deployments.find(d => d.platformToken && d.platformToken.status === 'ACTIVE');
+            if (activeDeploymentWithToken) {
+                tokenRecord = activeDeploymentWithToken.platformToken;
+                currentPlatform = activeDeploymentWithToken.platformToken.platform;
+            }
+        }
+        else if (project.dataSource === 'MOCK_DEMO') {
+            currentPlatform = project.provider || 'AWS'; // Fallback for mock demos
+        }
+        if (currentPlatform) {
+            if (['AWS', 'GCP', 'AZURE'].includes(currentPlatform)) {
                 // Raw cloud creds or Agent without local action path
                 capabilityTier = 'DATA_ONLY';
             }
             else {
-                const adapter = agents_1.platformRegistry.getAdapter(project.dataSource);
+                const adapter = agents_1.platformRegistry.getAdapter(currentPlatform);
                 if (adapter) {
-                    if (adapter.capabilities.canSetRegion) {
+                    let caps = adapter.capabilities;
+                    if (adapter.checkDynamicCapabilities) {
+                        if (tokenRecord) {
+                            const decrypted = (0, platformTokenService_1.decryptToken)(tokenRecord.encryptedToken);
+                            caps = await adapter.checkDynamicCapabilities(decrypted, tokenRecord.projectSlug || undefined);
+                        }
+                    }
+                    if (caps.canSetRegion) {
                         capabilityTier = 'AUTO_APPLY';
                     }
                     else {
                         capabilityTier = 'MANUAL_APPLY';
+                        if (currentPlatform === 'RENDER') {
+                            manualInstructions = [
+                                "Region can only be set at service creation — it cannot be changed on an existing service.",
+                                "Create a new Render service of the same type, selecting the target region at creation.",
+                                "Copy environment variables/secrets to the new service (or reattach an existing Environment Group).",
+                                "If a database is attached, note it's separately region-locked — migrating the database too (Render backup/restore or pg_dump/pg_restore) is a further, optional step for full latency benefit.",
+                                "Test the new service on its temporary onrender.com URL before cutover.",
+                                "Point your domain/DNS at the new service.",
+                                "Once confirmed healthy, suspend/delete the old service."
+                            ];
+                        }
+                        else if (currentPlatform === 'NETLIFY') {
+                            manualInstructions = [
+                                "Function region selection requires a Pro or Enterprise plan — confirm your plan first.",
+                                "If eligible: *Project configuration → Build & deploy → Continuous deployment → Functions region → Configure → select region → Save*, then trigger a redeploy (the setting doesn't apply retroactively).",
+                                "Note this only affects serverless Functions execution region — static asset/CDN delivery is already global and unaffected by this setting."
+                            ];
+                        }
                     }
                 }
                 else {
@@ -1032,27 +1142,224 @@ const getProjectStats = async (req, res) => {
                 }
             }
         }
+        const hasPaaS = project.deployments.some(d => d.platformToken && d.platformToken.status === 'ACTIVE');
+        const checklist = {
+            projectCreated: true,
+            apiKeyGenerated: apiKeys.length > 0 || hasPaaS,
+            configInitialized: !!project.configInitializedAt || hasPaaS,
+            sdkConnected: !!project.lastPingAt || hasPaaS
+        };
+        const PLATFORM_UNDERLYING_PROVIDER = {
+            VERCEL: ['AWS'],
+            NETLIFY: ['AWS'],
+            RENDER: ['AWS', 'GCP'],
+            AWS: ['AWS'],
+            GCP: ['GCP'],
+            AZURE: ['AZURE'],
+        };
+        const ds = currentPlatform?.toUpperCase() || '';
+        const resolvedProviders = PLATFORM_UNDERLYING_PROVIDER[ds] || ['AWS'];
+        const defaultProvider = resolvedProviders[0];
+        // Pick default instance based on provider
+        let baseInstance = 't3.medium';
+        let mlInstance = 'm5.xlarge'; // Fallback to a big CPU instance since g4dn isn't currently in core's JSON
+        if (defaultProvider === 'GCP') {
+            baseInstance = 'e2-medium';
+            mlInstance = 'e2-standard-8';
+        }
+        else if (defaultProvider === 'AZURE') {
+            baseInstance = 'Standard_B2s';
+            mlInstance = 'Standard_D8s_v3';
+        }
+        else {
+            // AWS
+            baseInstance = 't3.medium';
+            mlInstance = 'm5.xlarge';
+        }
+        let estimateAssumptions = {
+            instanceType: baseInstance,
+            cpuUtilization: 15,
+            runningHours: 730,
+            isGenericDefault: true,
+            reasoning: "No project profile detected — showing generic defaults. Run `npx @carbonix/cli init` for an estimate based on your actual project."
+        };
+        if (project.projectProfile) {
+            const profile = project.projectProfile;
+            if (profile.workloadClass === 'ml') {
+                estimateAssumptions.instanceType = mlInstance;
+                estimateAssumptions.cpuUtilization = 75;
+                estimateAssumptions.runningHours = 200;
+                estimateAssumptions.isGenericDefault = false;
+                estimateAssumptions.reasoning = `Detected an ML workload. Suggesting a larger instance (${mlInstance}) with high utilization (75%) but intermittent running hours (200 hrs/month) typical for training/inference.`;
+            }
+            else if (profile.workloadClass === 'web') {
+                estimateAssumptions.instanceType = baseInstance;
+                estimateAssumptions.cpuUtilization = 25;
+                estimateAssumptions.runningHours = 730;
+                estimateAssumptions.isGenericDefault = false;
+                estimateAssumptions.reasoning = `Detected a web workload. Suggesting a general-purpose instance (${baseInstance}) running 24/7 (730 hrs/month) with moderate utilization (25%).`;
+            }
+            if (process.env.NVIDIA_API_KEY && !estimateAssumptions.isGenericDefault) {
+                try {
+                    const nvRes = await axios_1.default.post('https://integrate.api.nvidia.com/v1/chat/completions', {
+                        model: 'meta/llama-3.1-405b-instruct',
+                        messages: [{
+                                role: 'user',
+                                content: `Write a 1-sentence reasoning (max 150 chars) for why a ${profile.runtime} ${profile.workloadClass} workload should be estimated using a ${estimateAssumptions.instanceType} instance at ${estimateAssumptions.cpuUtilization}% utilization for ${estimateAssumptions.runningHours} hours/month.`
+                            }],
+                        max_tokens: 100
+                    }, {
+                        headers: { 'Authorization': `Bearer ${process.env.NVIDIA_API_KEY}` },
+                        timeout: 3000
+                    });
+                    if (nvRes.data?.choices?.[0]?.message?.content) {
+                        estimateAssumptions.reasoning = nvRes.data.choices[0].message.content.trim();
+                    }
+                }
+                catch (e) { /* ignore timeout */ }
+            }
+        }
+        const providerRegions = await prisma_1.prisma.region.findMany({
+            where: { provider: { in: resolvedProviders } }
+        });
+        const instanceRow = await prisma_1.prisma.instanceType.findFirst({
+            where: { name: estimateAssumptions.instanceType }
+        });
+        const costPerHour = instanceRow?.onDemandHourlyUsd || 0.0416;
+        const projectedRegions = await Promise.all(providerRegions.map(async (reg) => {
+            const calcResult = await (0, core_1.calculateCarbon)({
+                provider: reg.provider,
+                region: reg.name,
+                instanceType: estimateAssumptions.instanceType,
+                instanceCount: 1,
+                hoursPerMonth: estimateAssumptions.runningHours,
+                cpuUtilization: estimateAssumptions.cpuUtilization / 100,
+                storageGb: 50
+            });
+            return {
+                ...reg,
+                projectedCarbonKg: calcResult.co2KgMonth,
+                costEstimateUsd: costPerHour * estimateAssumptions.runningHours
+            };
+        }));
+        const top3Regions = projectedRegions
+            .sort((a, b) => a.projectedCarbonKg - b.projectedCarbonKg)
+            .slice(0, 3);
+        // ─── Per-deployment emission rollup (for multi-deployment card list) ───────
+        const deploymentStats = await Promise.all(project.deployments.map(async (d) => {
+            const depEmissions = emissions.filter(e => e.deploymentId === d.id);
+            const depAnalytics = computeAnalytics(depEmissions);
+            return {
+                id: d.id,
+                role: d.role,
+                label: d.label,
+                region: d.region,
+                provider: d.provider,
+                isDeployed: d.isDeployed,
+                deploymentUrl: d.deploymentUrl,
+                platformToken: d.platformToken
+                    ? { platform: d.platformToken.platform, status: d.platformToken.status, projectSlug: d.platformToken.projectSlug }
+                    : null,
+                totalMonthKg: depAnalytics.totalMonthKg,
+                history30d: depAnalytics.history30d,
+                idleCount: latestEmissions.filter(e => e.deploymentId === d.id && e.isIdle).length,
+                oversizedCount: latestEmissions.filter(e => e.deploymentId === d.id && e.isOversized).length,
+                createdAt: d.createdAt,
+                analytics: depAnalytics // Full analytics payload for frontend tabs
+            };
+        }));
         const stats = {
             project: {
                 ...project,
                 capabilityTier
             },
-            idleInstances: latestEmissions.filter(e => e.isIdle).length,
+            deployments: deploymentStats,
             oversizedInstances: latestEmissions.filter(e => e.isOversized).length,
-            carbonTrend: { todayKg, trendPercent, isNew },
-            history7d,
-            history30d,
-            totalMonthKg,
+            ...overallAnalytics, // history7d, history30d, carbonTrend, totalMonthKg, idleInstances(from compute)
             apiKeys,
             greenerRegion,
             isStale,
-            instances: latestEmissions
+            instances: latestEmissions,
+            checklist,
+            estimateAssumptions,
+            top3Regions,
+            manualInstructions
         };
         res.json({ success: true, data: stats });
     }
     catch (error) {
         console.error('[getProjectStats] Internal server error:', error);
+        try {
+            require('fs').writeFileSync('/tmp/carbonix_error.log', error.stack || error.toString());
+        }
+        catch (e) { }
         res.status(500).json({ error: 'Internal server error' });
     }
 };
 exports.getProjectStats = getProjectStats;
+// ─── Deployment CRUD ──────────────────────────────────────────────────────────
+/**
+ * POST /admin/projects/:id/deployments
+ * Create a new Deployment for a project (label, role, optional platform connection).
+ */
+const addDeployment = async (req, res) => {
+    try {
+        const { id: projectId } = req.params;
+        const { projectIds } = await resolveTenantContext(req.user.id, req.user.email);
+        if (!projectIds.includes(projectId))
+            return res.status(403).json({ error: 'Forbidden' });
+        const { role, label } = req.body;
+        const deployment = await prisma_1.prisma.deployment.create({
+            data: {
+                projectId,
+                role: role ?? 'OTHER',
+                label: label ?? null,
+            },
+        });
+        return res.status(201).json({ success: true, data: deployment });
+    }
+    catch (error) {
+        console.error('[addDeployment]', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+exports.addDeployment = addDeployment;
+/**
+ * DELETE /admin/projects/:id/deployments/:deploymentId
+ * Disconnect (and optionally delete) a single deployment without affecting others.
+ */
+const deleteDeployment = async (req, res) => {
+    try {
+        const { id: projectId, deploymentId } = req.params;
+        const { projectIds } = await resolveTenantContext(req.user.id, req.user.email);
+        if (!projectIds.includes(projectId))
+            return res.status(403).json({ error: 'Forbidden' });
+        const deployment = await prisma_1.prisma.deployment.findFirst({
+            where: { id: deploymentId, projectId },
+            include: { platformToken: true },
+        });
+        if (!deployment)
+            return res.status(404).json({ error: 'Deployment not found' });
+        // Delete associated platform token first (FK constraint)
+        if (deployment.platformToken) {
+            await prisma_1.prisma.platformToken.delete({ where: { id: deployment.platformToken.id } });
+        }
+        // Null-out deploymentId on emission records (preserve history, remove attribution)
+        await prisma_1.prisma.emissionRecord.updateMany({
+            where: { deploymentId },
+            data: { deploymentId: null },
+        });
+        await prisma_1.prisma.deployment.delete({ where: { id: deploymentId } });
+        // If no active tokens remain, reset dataSource
+        const remaining = await prisma_1.prisma.platformToken.count({ where: { projectId, status: 'ACTIVE' } });
+        if (remaining === 0) {
+            await prisma_1.prisma.project.update({ where: { id: projectId }, data: { dataSource: 'NO_CREDS' } });
+        }
+        return res.json({ success: true, message: 'Deployment deleted. Historical emission data preserved at project level.' });
+    }
+    catch (error) {
+        console.error('[deleteDeployment]', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+exports.deleteDeployment = deleteDeployment;

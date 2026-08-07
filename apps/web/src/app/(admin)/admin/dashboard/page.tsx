@@ -213,14 +213,14 @@ export default function DashboardPage() {
           />
           <StatCard
             title="Avg CO₂ Intensity"
-            value={loading ? '-' : `${stats?.avgCo2Kg || 0} g/kWh`}
+            value={loading ? '-' : `${stats?.avgGridIntensity || 0} g/kWh`}
             icon="co2"
             trend={{ value: 1.4, direction: 'down' }}
             isLoading={loading}
           />
           <StatCard
             title="Carbon Saved"
-            value={loading ? '-' : `${stats?.avgCo2Kg ? (stats.avgCo2Kg * 0.1).toFixed(1) : 0} kg`}
+            value={loading ? '-' : `${stats?.carbonSaved || 0} kg`}
             icon="eco"
             trend={{ value: 8.7, direction: 'up' }}
             isLoading={loading}

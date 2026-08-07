@@ -8,6 +8,7 @@ import * as SecureStore from 'expo-secure-store';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../../src/theme/colors';
 import { carbonApi, adminApi } from '../../src/services/api/endpoints';
+import Svg, { Path, Circle } from 'react-native-svg';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CHART_WIDTH = SCREEN_WIDTH - 72; // padding + panel padding
@@ -42,38 +43,47 @@ const getProviderIcon = (provider: string) => {
 
 function WeeklySparkline({ data }: { data: { date: string; co2Kg: number }[] }) {
   if (!data || data.length === 0) return null;
-  const maxCo2 = Math.max(...data.map(d => d.co2Kg), 1);
-  const barWidth = (CHART_WIDTH - (data.length - 1) * 4) / data.length;
+  const maxCo2 = Math.max(...data.map(d => d.co2Kg), 0.1);
+  const minCo2 = Math.min(...data.map(d => d.co2Kg));
+  const range = maxCo2 - minCo2 || 1;
+  
+  const height = 64;
+  const paddingX = 10;
+  const paddingY = 10;
+  
+  const points = data.map((d, i) => {
+    const x = paddingX + (i * ((CHART_WIDTH - paddingX * 2) / Math.max(data.length - 1, 1)));
+    const y = height - paddingY - (((d.co2Kg - minCo2) / range) * (height - paddingY * 2));
+    return { x, y, value: d.co2Kg };
+  });
+
+  const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
 
   return (
     <View style={sparklineStyles.container}>
-      <View style={sparklineStyles.barsRow}>
+      <Svg width={CHART_WIDTH} height={height}>
+        <Path
+          d={path}
+          fill="none"
+          stroke={colors.primary}
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        {points.map((p, i) => (
+          <Circle key={i} cx={p.x} cy={p.y} r={p.value > 0 ? 4 : 3} fill="#141414" stroke={colors.primary} strokeWidth={2} />
+        ))}
+      </Svg>
+      <View style={sparklineStyles.labelsRow}>
         {data.map((d, i) => {
-          const height = Math.max((d.co2Kg / maxCo2) * 60, 3);
-          const isActive = d.co2Kg > 0;
+          const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+          const dayName = days[new Date(d.date).getDay()] || '';
           return (
-            <View key={i} style={sparklineStyles.barWrapper}>
-              <View
-                style={[
-                  sparklineStyles.bar,
-                  {
-                    height,
-                    width: barWidth,
-                    backgroundColor: isActive ? colors.primary : '#2A2A2A',
-                    opacity: isActive ? 0.6 + (d.co2Kg / maxCo2) * 0.4 : 0.3,
-                  },
-                ]}
-              />
-            </View>
+            <Text key={i} style={[sparklineStyles.label, { width: CHART_WIDTH / data.length, textAlign: 'center' }]}>
+              {dayName}
+            </Text>
           );
         })}
-      </View>
-      <View style={sparklineStyles.labelsRow}>
-        {data.map((d, i) => (
-          <Text key={i} style={[sparklineStyles.label, { width: barWidth, textAlign: 'center' }]}>
-            {new Date(d.date).toLocaleDateString('en-US', { weekday: 'short' })}
-          </Text>
-        ))}
       </View>
     </View>
   );
@@ -198,7 +208,10 @@ export default function DashboardScreen() {
                   <MaterialIcons name="co2" size={16} color={colors.textMuted} />
                   <Text style={styles.statTitle}>Avg CO₂ Intensity</Text>
                 </View>
-                <Text style={styles.statValue}>{dashboard?.avgCo2Kg || 0} g/kWh</Text>
+                <Text style={styles.statValue}>
+                  {dashboard?.avgGridIntensity || 0}
+                  <Text style={styles.statUnit}> g/kWh</Text>
+                </Text>
               </View>
 
               <View style={styles.statCard}>
@@ -206,8 +219,9 @@ export default function DashboardScreen() {
                   <MaterialIcons name="eco" size={16} color={colors.textMuted} />
                   <Text style={styles.statTitle}>Carbon Saved</Text>
                 </View>
-                <Text style={styles.statValue}>
-                  {dashboard?.avgCo2Kg ? (dashboard.avgCo2Kg * 0.1).toFixed(1) : '0'} kg
+                <Text style={[styles.statValue, { color: '#50FA7B' }]}>
+                  {dashboard?.carbonSaved || 0}
+                  <Text style={styles.statUnit}> {useLbs ? 'lbs' : 'kg'}</Text>
                 </Text>
               </View>
 

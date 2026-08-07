@@ -98,8 +98,15 @@ export class DenoDeployAdapter implements PlatformAdapter {
         requiresRedeploy: false,
         actionTaken: 'API_UPDATE'
       };
-    } catch (error: any) {
-      return { success: false, requiresRedeploy: false, error: error.message };
+    } catch (e: any) {
+      if (e.name === 'PlatformQuotaError' || e.name === 'PlatformAuthError' || e.name === 'PlatformTransientError') {
+        throw e;
+      }
+      return {
+        success: false,
+        requiresRedeploy: false,
+        error: e.message
+      };
     }
   }
 }

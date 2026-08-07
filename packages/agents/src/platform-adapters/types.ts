@@ -13,6 +13,8 @@ export interface ApplyRegionResult {
   success: boolean;
   requiresRedeploy: boolean;
   error?: string;
+  errorCategory?: 'AUTH' | 'QUOTA' | 'TRANSIENT' | 'UNSUPPORTED' | 'OTHER';
+  fallbackRequired?: boolean;
   // If PR fallback is used
   actionTaken?: 'API_UPDATE' | 'PR_OPENED' | 'NOT_SUPPORTED' | 'FAILED';
   message?: string;

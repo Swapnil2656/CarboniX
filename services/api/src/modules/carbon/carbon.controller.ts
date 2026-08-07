@@ -200,11 +200,11 @@ export const recommend = async (req: Request, res: Response) => {
     );
 
     if (recommendation.recommendedRegion) {
-      if (input.recordId) {
+      if ((input as any).recordId) {
         try {
           // Attempt to persist the recommendation so it survives page reloads
           await prisma.emissionRecord.update({
-            where: { id: input.recordId },
+            where: { id: (input as any).recordId },
             data: { recommendation: recommendation.recommendation }
           });
         } catch (e) {

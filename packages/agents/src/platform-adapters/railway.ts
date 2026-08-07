@@ -75,6 +75,9 @@ export class RailwayAdapter implements PlatformAdapter {
         message: `Successfully updated Railway environment region to ${region} via GraphQL API.`
       };
     } catch (e: any) {
+      if (e.name === 'PlatformQuotaError' || e.name === 'PlatformAuthError' || e.name === 'PlatformTransientError') {
+        throw e;
+      }
       return {
         success: false,
         requiresRedeploy: false,

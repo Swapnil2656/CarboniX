@@ -335,18 +335,23 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     return <ErrorBanner message="Project not found." />;
   }
 
-  const { project, idleInstances, oversizedInstances, carbonTrend, history7d, history30d, totalMonthKg, apiKeys, greenerRegion, isStale, instances, checklist, estimateAssumptions, top3Regions, manualInstructions } = data;
+  const { project, idleInstances, oversizedInstances, deployCount, carbonTrend, history7d, history30d, totalMonthKg, apiKeys, greenerRegion, isStale, instances, checklist, estimateAssumptions, top3Regions, manualInstructions } = data;
   const deployments: any[] = data.deployments || [];
 
   const activeAnalytics = activeTab === 'OVERALL'
-    ? { carbonTrend, history7d, history30d, idleInstances, totalMonthKg }
+    ? { carbonTrend, history7d, history30d, idleInstances, deployCount, totalMonthKg }
     : (deployments.find((d: any) => d.id === activeTab)?.analytics || {
         carbonTrend: { todayKg: 0, yesterdayKg: 0, trendPercent: null, isNew: true },
         history7d: [],
         history30d: [],
         idleInstances: 0,
+        deployCount: 0,
         totalMonthKg: 0
       });
+
+  const activeOversized = activeTab === 'OVERALL'
+    ? oversizedInstances
+    : (deployments.find((d: any) => d.id === activeTab)?.oversizedCount || 0);
 
   const chartData = chartDays === '7d' ? activeAnalytics.history7d : activeAnalytics.history30d;
 
@@ -840,8 +845,8 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
               icon="payments"
             />
             <StatCard
-              title="Idle Instances"
-              value={activeAnalytics.idleInstances?.toString() || '0'}
+              title="Idle / Oversized"
+              value={`${activeAnalytics.idleInstances || 0} / ${activeOversized || 0}`}
               icon="snooze"
             />
             <StatCard

@@ -3,7 +3,9 @@ import { AuthRequest } from '../../middleware/auth.middleware';
 import { prisma } from '../../lib/prisma';
 import { resolveTenantContext } from '../admin/admin.controller';
 import { ChatMessage, Role, callNvidiaApi } from '@carbonix/core';
+import { platformRegistry } from '@carbonix/agents';
 import { Expo } from 'expo-server-sdk';
+import { decryptToken } from '../../lib/platformTokenService';
 import * as crypto from 'crypto';
 
 const expo = new Expo();
@@ -56,6 +58,8 @@ const tools = [
         properties: {
           projectId: { type: 'string', description: 'The ID of the project to update.' },
           region: { type: 'string', description: 'The new region code (e.g., us-east-1, eu-west-1).' },
+          deploymentId: { type: 'string', description: 'Optional. Target a specific deployment within the project.' },
+          applyToAll: { type: 'boolean', description: 'Optional. Set to true if switching every deployment in the project.' },
         },
         required: ['projectId', 'region'],
       }
@@ -120,7 +124,7 @@ async function executeTool(name: string, args: any, adminUserId: string, adminUs
       return JSON.stringify(projects);
     }
     case 'switchProjectRegion': {
-      const { projectId, region } = args;
+      const { projectId, region, deploymentId, applyToAll } = args;
       
       const { projectIds, teamUserIds } = await resolveTenantContext(adminUserId, adminUserEmail);
       if (!projectIds.includes(projectId)) {
@@ -130,40 +134,119 @@ async function executeTool(name: string, args: any, adminUserId: string, adminUs
       const oldProject = await prisma.project.findUnique({ where: { id: projectId } });
       if (!oldProject) throw new Error('Project not found');
 
-      const project = await prisma.project.update({
-        where: { id: projectId },
-        data: { region },
+      // 1. Fetch targeted deployments
+      const deployments = await prisma.deployment.findMany({
+        where: {
+          projectId,
+          ...(deploymentId && !applyToAll ? { id: deploymentId } : {})
+        },
+        include: { platformToken: true }
       });
 
-      await prisma.auditLog.create({
-        data: {
-          actorId: adminUserId,
-          actorEmail: 'system@carbonix.ai',
-          actorRole: 'SYSTEM',
-          action: 'PROJECT_REGION_SWITCH',
-          resource: 'project',
-          resourceId: projectId,
-          before: { region: oldProject.region },
-          after: { region },
-          ip: 'AI Agent (Mobile)',
-          userAgent: 'CarboniX Mobile',
+      if (deployments.length === 0) {
+        throw new Error('No deployments found matching the criteria.');
+      }
+
+      const results = [];
+      let anySuccess = false;
+
+      // 2. Process each deployment
+      for (const deployment of deployments) {
+        if (deployment.platformToken) {
+          try {
+            const token = decryptToken(deployment.platformToken.encryptedToken);
+            const adapter = platformRegistry.getAdapter(deployment.platformToken.platform);
+            if (adapter && adapter.capabilities.canSetRegion) {
+              const res = await adapter.applyRegion(token, deployment.platformToken.projectSlug || deployment.label || '', region);
+              if (res.success || res.requiresRedeploy) {
+                // Update DB since it worked
+                await prisma.deployment.update({
+                  where: { id: deployment.id },
+                  data: { region }
+                });
+                anySuccess = true;
+                results.push(`[REAL] Deployment '${deployment.label || deployment.id}' region switched to ${region} via ${deployment.platformToken.platform}.`);
+              } else {
+                results.push(`[FAILED] Deployment '${deployment.label || deployment.id}' failed: ${res.error}`);
+              }
+            } else {
+              results.push(`[FAILED] No capable adapter for ${deployment.platformToken.platform}.`);
+            }
+          } catch (e: any) {
+            if (e.name === 'PlatformQuotaError') {
+              try {
+                const prompt = `The user's cloud provider (${deployment.platformToken.platform}) rejected an automated region migration to ${region} due to exhausted quota/credits (HTTP 402/429). Please generate a short JSON/YAML/IaC configuration snippet that the user can manually copy-paste into their repository (e.g., vercel.json, railway.json, netlify.toml) to force the deployment to region ${region}. Only output the snippet.`;
+                const fallbackResponse = await callNvidiaApi(
+                  NVIDIA_API_KEY!, 
+                  'meta/llama-3.1-70b-instruct', 
+                  'You are an expert DevOps engineer. Provide only the config snippet requested.', 
+                  [{ role: 'user', content: prompt }]
+                );
+                const snippet = fallbackResponse?.choices?.[0]?.message?.content || 'No snippet generated.';
+                results.push(`[FAILED] Quota exceeded on ${deployment.platformToken.platform}. Fallback instructions:\\nTo manually migrate to ${region}, apply this config:\\n${snippet}`);
+              } catch (fallbackErr) {
+                results.push(`[FAILED] Quota exceeded on ${deployment.platformToken.platform}. Fallback generation also failed.`);
+              }
+            } else if (e.name === 'PlatformAuthError') {
+              results.push(`[FAILED] Authentication failed for ${deployment.platformToken.platform}. Please reconnect your integration on the settings page.`);
+              await prisma.platformToken.update({ 
+                where: { id: deployment.platformToken.id }, 
+                data: { status: 'INVALID', lastError: e.message }
+              });
+            } else if (e.name === 'PlatformTransientError') {
+              results.push(`[FAILED] Transient error on ${deployment.platformToken.platform}. Please try again later.`);
+            } else {
+              results.push(`[ERROR] Failed to switch '${deployment.label || deployment.id}': ${e.message}`);
+            }
+          }
+        } else {
+          // Simulation fallback for deployments lacking a real token
+          await prisma.deployment.update({
+            where: { id: deployment.id },
+            data: { region }
+          });
+          anySuccess = true;
+          results.push(`[SIMULATED] Deployment '${deployment.label || deployment.id}' region switched to ${region} (No physical platform token).`);
         }
-      });
+      }
 
-      await prisma.notification.create({
-        data: {
-          title: 'Project Region Changed',
-          body: `Project '${project.name}' was switched from ${oldProject.region || 'unknown'} to ${region} to optimize carbon emissions.`,
-          type: 'TARGETED',
-          status: 'SENT',
-          targetAudience: 'CUSTOM',
-          targetUserIds: teamUserIds,
-          createdBy: adminUserId,
-        }
-      });
+      if (anySuccess) {
+        await prisma.project.update({
+          where: { id: projectId },
+          data: { region }
+        });
 
-      // Removed redis cache invalidation as redis is not available in the API utils
-      return `Successfully switched project '${project.name}' to region '${region}'.`;
+        const actionLog = results.join('\\n');
+
+        await prisma.auditLog.create({
+          data: {
+            actorId: adminUserId,
+            actorEmail: 'system@carbonix.ai',
+            actorRole: 'SYSTEM',
+            action: 'PROJECT_REGION_SWITCH',
+            resource: 'project',
+            resourceId: projectId,
+            before: { region: oldProject.region },
+            after: { region, results: actionLog },
+            ip: 'AI Agent',
+            userAgent: 'CarboniX Backend',
+          }
+        });
+
+        await prisma.notification.create({
+          data: {
+            title: 'Project Region Changed',
+            body: `Project '${oldProject.name}' region changed to ${region}. Details:\\n${actionLog}`,
+            type: 'TARGETED',
+            status: 'SENT',
+            targetAudience: 'CUSTOM',
+            targetUserIds: teamUserIds,
+            createdBy: adminUserId,
+          }
+        });
+      }
+
+      return `Execution complete:\\n${results.join('\\n')}`;
     }
     case 'pushMobileNotification': {
       const { userId, title, body } = args;

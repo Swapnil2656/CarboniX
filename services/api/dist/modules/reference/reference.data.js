@@ -67,6 +67,83 @@ exports.regions = [
         gridIntensity: 38,
         pue: 1.1,
         isPopular: false
+    },
+    {
+        id: 'region-gcp-2',
+        provider: 'GCP',
+        code: 'us-central1',
+        name: 'Iowa',
+        country: 'US',
+        continent: 'North America',
+        gridIntensity: 350,
+        pue: 1.1,
+        isPopular: true
+    },
+    {
+        id: 'region-gcp-3',
+        provider: 'GCP',
+        code: 'asia-south1',
+        name: 'Mumbai',
+        country: 'IN',
+        continent: 'Asia',
+        gridIntensity: 700,
+        pue: 1.1,
+        isPopular: false
+    },
+    {
+        id: 'region-azure-1',
+        provider: 'AZURE',
+        code: 'northeurope',
+        name: 'Ireland',
+        country: 'IE',
+        continent: 'Europe',
+        gridIntensity: 300,
+        pue: 1.125,
+        isPopular: true
+    },
+    {
+        id: 'region-azure-2',
+        provider: 'AZURE',
+        code: 'swedencentral',
+        name: 'Sweden',
+        country: 'SE',
+        continent: 'Europe',
+        gridIntensity: 15,
+        pue: 1.125,
+        isPopular: false
+    },
+    {
+        id: 'region-azure-3',
+        provider: 'AZURE',
+        code: 'westus2',
+        name: 'Washington',
+        country: 'US',
+        continent: 'North America',
+        gridIntensity: 150,
+        pue: 1.125,
+        isPopular: true
+    },
+    {
+        id: 'region-aws-6',
+        provider: 'AWS',
+        code: 'ap-southeast-1',
+        name: 'Singapore',
+        country: 'SG',
+        continent: 'Asia',
+        gridIntensity: 408,
+        pue: 1.2,
+        isPopular: true
+    },
+    {
+        id: 'region-aws-7',
+        provider: 'AWS',
+        code: 'eu-central-1',
+        name: 'Frankfurt',
+        country: 'DE',
+        continent: 'Europe',
+        gridIntensity: 338,
+        pue: 1.2,
+        isPopular: true
     }
 ];
 exports.instanceTypes = [

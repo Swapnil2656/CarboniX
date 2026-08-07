@@ -93,6 +93,8 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
     let percentUsed = Math.round((totalCo2ThisMonth / budgetLimitKg) * 100);
 
     let webProjects: any[] = [];
+    let avgGridIntensity = 0;
+    let carbonSaved = 0;
     
     // Auth might be passing a User ID (from web) or MobileUser ID
     let webUser = await prisma.user.findUnique({
@@ -126,8 +128,13 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
         }
       });
 
+      let totalGridIntensity = 0;
+      let telemetryCount = 0;
+
       telemetryRecords.forEach(record => {
         totalCo2AllTime += record.carbonKg;
+        totalGridIntensity += record.gridIntensity;
+        telemetryCount++;
         
         if (record.timestamp >= currentMonthStart) {
           totalCo2ThisMonth += record.carbonKg;
@@ -142,6 +149,19 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
           }
         }
       });
+      
+      avgGridIntensity = telemetryCount > 0 ? Math.round(totalGridIntensity / telemetryCount) : 0;
+      
+      const auditLogs = await prisma.auditLog.findMany({
+        where: { actorId: userId, action: 'EMISSION_MIGRATE' }
+      });
+      
+      carbonSaved = auditLogs.reduce((acc, log: any) => {
+        if (log.before?.carbonKg && log.after?.carbonKg) {
+           return acc + (log.before.carbonKg - log.after.carbonKg);
+        }
+        return acc;
+      }, 0);
       
       // Recompute percentUsed and changePercent since totalCo2ThisMonth changed
       percentUsed = Math.round((totalCo2ThisMonth / budgetLimitKg) * 100);
@@ -186,7 +206,6 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
     const earliestDateKey = earliestRecordDate ? earliestRecordDate.toISOString().split('T')[0] : null;
 
     let weeklySparkline = Array.from(weeklySparklineMap.entries())
-      .filter(([date]) => !earliestDateKey || date >= earliestDateKey)
       .map(([date, co2Kg]) => ({
         date,
         co2Kg
@@ -223,6 +242,8 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
           percentUsed,
           isOverBudget: percentUsed > 100
         },
+        avgGridIntensity,
+        carbonSaved: Number(carbonSaved.toFixed(1)),
         activeProjects: webProjects,
         activeConfigurations: Array.from(activeConfigsMap.values()),
         weeklySparkline,

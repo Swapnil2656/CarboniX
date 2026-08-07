@@ -16,6 +16,8 @@ router.get('/users', admin_controller_1.getUsers);
 router.delete('/projects/:id', admin_controller_1.deleteProject);
 router.post('/projects/:id/disconnect', admin_controller_1.disconnectProject);
 router.get('/projects/:id/stats', admin_controller_1.getProjectStats);
+router.post('/projects/:id/deployments', admin_controller_1.addDeployment);
+router.delete('/projects/:id/deployments/:deploymentId', admin_controller_1.deleteDeployment);
 router.delete('/users/:id', admin_controller_1.removeTeamMember);
 router.post('/users/sync', admin_controller_1.syncTeamMembers);
 router.post('/users/invite', admin_controller_1.inviteUser);

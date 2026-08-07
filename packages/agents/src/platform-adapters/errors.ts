@@ -13,3 +13,11 @@ export class PlatformTransientError extends Error {
     this.name = 'PlatformTransientError';
   }
 }
+
+/** Thrown on quota/credit exhaustion or rate limits (402, 429) */
+export class PlatformQuotaError extends Error {
+  constructor(platform: string, detail: string) {
+    super(`[PlatformCollector] Quota/Rate limit error on ${platform}: ${detail}`);
+    this.name = 'PlatformQuotaError';
+  }
+}

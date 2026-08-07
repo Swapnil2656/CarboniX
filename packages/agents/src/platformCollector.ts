@@ -1,9 +1,9 @@
 import { calculateCarbon } from '@carbonix/core';
 import type { EmissionRecordData } from './collector';
 import { platformRegistry } from './platform-adapters/registry';
-import { PlatformAuthError, PlatformTransientError } from './platform-adapters/errors';
+import { PlatformAuthError, PlatformTransientError, PlatformQuotaError } from './platform-adapters/errors';
 
-export { PlatformAuthError, PlatformTransientError };
+export { PlatformAuthError, PlatformTransientError, PlatformQuotaError };
 
 // ─── Grid intensity fallback map (gCO₂/kWh) ─────────────────────────────────
 const REGION_GRID_INTENSITY: Record<string, number> = {

@@ -162,6 +162,7 @@ export default function ProjectDetailScreen() {
   const totalMonthKg = activeAnalytics.totalMonthKg || 0;
   const idleInstances = activeAnalytics.idleInstances || 0;
   const deployCount = activeAnalytics.deployCount || 0;
+  const currentOversized = activeDeployment ? (activeDeployment.oversizedCount || 0) : oversizedInstances;
 
   const chartData = chartDays === '7d' ? history7d : history30d;
 
@@ -408,7 +409,7 @@ export default function ProjectDetailScreen() {
                 <MaterialIcons name="snooze" size={16} color={colors.textMuted} />
                 <Text style={styles.statTitle}>Idle / Oversized</Text>
               </View>
-              <Text style={styles.statValue}>{idleInstances} / {oversizedInstances}</Text>
+              <Text style={styles.statValue}>{idleInstances} / {currentOversized}</Text>
             </View>
 
             <View style={styles.statCard}>

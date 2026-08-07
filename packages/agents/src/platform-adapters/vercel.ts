@@ -84,6 +84,9 @@ export class VercelAdapter implements PlatformAdapter {
         };
       }
     } catch (e: any) {
+      if (e.name === 'PlatformQuotaError' || e.name === 'PlatformAuthError' || e.name === 'PlatformTransientError') {
+        throw e;
+      }
       return {
         success: false,
         requiresRedeploy: false,

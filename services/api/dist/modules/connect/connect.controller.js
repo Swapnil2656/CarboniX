@@ -185,7 +185,7 @@ async function handleConnect(req, res) {
  */
 async function handleConnectPlatformToken(req, res) {
     try {
-        const { projectId, platform, token, projectSlug } = req.body;
+        const { projectId, platform, token, projectSlug, deploymentId, deploymentLabel, deploymentRole } = req.body;
         if (!projectId || !platform || !token) {
             return res.status(400).json({
                 success: false,
@@ -225,10 +225,10 @@ async function handleConnectPlatformToken(req, res) {
                 error: 'Server configuration error: TOKEN_ENCRYPTION_KEY is not set. Contact the administrator.',
             });
         }
-        // Upsert the platform token (one per project+platform combination)
-        await prisma_1.prisma.platformToken.upsert({
-            where: { projectId_platform: { projectId, platform: platform } },
-            create: {
+        // Create a new PlatformToken row (never upsert — unique constraint removed to support
+        // multi-deployment: two Render deployments on the same project each get their own token row)
+        const newToken = await prisma_1.prisma.platformToken.create({
+            data: {
                 projectId,
                 platform: platform,
                 encryptedToken,
@@ -238,24 +238,66 @@ async function handleConnectPlatformToken(req, res) {
                 lastError: null,
                 failCount: 0,
             },
-            update: {
-                encryptedToken,
-                projectSlug: projectSlug || null,
-                status: 'ACTIVE',
-                lastVerifiedAt: new Date(),
-                lastError: null,
-                failCount: 0,
-            },
         });
-        // Set project dataSource to LIVE
+        // Attach to the specified deployment (if provided), otherwise create a new one
+        let targetDeploymentId = deploymentId;
+        if (targetDeploymentId) {
+            // Attach to existing deployment — verify it belongs to this project
+            const existingDeployment = await prisma_1.prisma.deployment.findFirst({
+                where: { id: targetDeploymentId, projectId },
+            });
+            if (!existingDeployment) {
+                await prisma_1.prisma.platformToken.delete({ where: { id: newToken.id } });
+                return res.status(404).json({ success: false, error: 'Deployment not found for this project.' });
+            }
+            // If the deployment already has a token, reject to avoid silent overwrite
+            if (existingDeployment.platformTokenId) {
+                await prisma_1.prisma.platformToken.delete({ where: { id: newToken.id } });
+                return res.status(409).json({
+                    success: false,
+                    error: 'This deployment already has a platform token attached. Revoke it first, then reconnect.',
+                });
+            }
+            await prisma_1.prisma.deployment.update({
+                where: { id: targetDeploymentId },
+                data: { platformTokenId: newToken.id, isDeployed: true },
+            });
+        }
+        else {
+            let newRole = deploymentRole ?? 'OTHER';
+            if (!deploymentRole) {
+                if (['VERCEL', 'NETLIFY', 'CLOUDFLARE_PAGES'].includes(platform))
+                    newRole = 'FRONTEND';
+                if (['RENDER', 'RAILWAY', 'HEROKU', 'SUPABASE'].includes(platform))
+                    newRole = 'BACKEND';
+            }
+            // No deploymentId provided — create a new Deployment for this token
+            const newDeployment = await prisma_1.prisma.deployment.create({
+                data: {
+                    projectId,
+                    role: newRole,
+                    label: deploymentLabel ?? null,
+                    provider: null, // will be populated by collector on first run
+                    isDeployed: true,
+                    platformTokenId: newToken.id,
+                },
+            });
+            targetDeploymentId = newDeployment.id;
+            console.log(`[CONNECT] Created new Deployment ${newDeployment.id} for ${platform} token on project ${projectId}.`);
+        }
+        // Set project dataSource to LIVE and mark as deployed
         await prisma_1.prisma.project.update({
             where: { id: projectId },
-            data: { dataSource: 'LIVE' },
+            data: {
+                dataSource: 'LIVE',
+                isDeployed: true
+            },
         });
         console.log(`[CONNECT] ✓ ${platform} token verified and saved for project "${project.name}" (${projectId}). dataSource = LIVE.`);
         return res.json({
             success: true,
             platform,
+            deploymentId: targetDeploymentId,
             accountName: verifyResult.meta?.accountName,
             message: `${platform} account connected successfully. Real usage-based carbon data will be collected on the next hourly run.`,
         });
@@ -275,7 +317,7 @@ async function handleConnectPlatformToken(req, res) {
 async function handleRevokePlatformToken(req, res) {
     try {
         const { platform } = req.params;
-        const { projectId } = req.query;
+        const { projectId, deploymentId } = req.query;
         if (!projectId || !platform) {
             return res.status(400).json({ success: false, error: 'Missing projectId query param or platform route param.' });
         }
@@ -283,11 +325,33 @@ async function handleRevokePlatformToken(req, res) {
         if (!project || project.userId !== req.user.id) {
             return res.status(403).json({ success: false, error: 'Forbidden.' });
         }
-        // Delete the token
-        await prisma_1.prisma.platformToken.deleteMany({
-            where: { projectId, platform: platform },
-        });
-        // Check if any active tokens remain
+        if (deploymentId) {
+            // Deployment-scoped revoke: only remove the token attached to this specific deployment
+            // Avoids deleting all Render tokens when the user only wants to disconnect one of two Render deployments
+            const deployment = await prisma_1.prisma.deployment.findFirst({
+                where: { id: deploymentId, projectId },
+                include: { platformToken: true },
+            });
+            if (!deployment) {
+                return res.status(404).json({ success: false, error: 'Deployment not found.' });
+            }
+            if (deployment.platformToken) {
+                await prisma_1.prisma.platformToken.delete({ where: { id: deployment.platformToken.id } });
+                // Null out the deployment's token reference
+                await prisma_1.prisma.deployment.update({
+                    where: { id: deploymentId },
+                    data: { platformTokenId: null },
+                });
+            }
+        }
+        else {
+            // Legacy: project+platform scoped — deletes ALL tokens for this platform on this project
+            // (preserved for backward compat with existing call sites that don't yet know the deploymentId)
+            await prisma_1.prisma.platformToken.deleteMany({
+                where: { projectId, platform: platform },
+            });
+        }
+        // Check if any active tokens remain across all deployments for this project
         const remaining = await prisma_1.prisma.platformToken.count({
             where: { projectId, status: 'ACTIVE' },
         });
@@ -313,39 +377,16 @@ async function handleRevokePlatformToken(req, res) {
 async function handleGetPlatforms(req, res) {
     try {
         const platforms = agents_1.platformRegistry.getAllPlatforms().map(p => {
-            let icon = 'cloud';
-            let description = `Connect via ${p} Access Token`;
-            let needsProjectSlug = true;
-            let docsUrl = '#';
-            if (p === 'VERCEL') {
-                icon = 'change_history';
-                docsUrl = 'https://vercel.com/account/tokens';
-            }
-            if (p === 'NETLIFY') {
-                icon = 'diamond';
-                docsUrl = 'https://app.netlify.com/user/applications#personal-access-tokens';
-            }
-            if (p === 'RAILWAY') {
-                icon = 'train';
-                docsUrl = 'https://docs.railway.app/reference/public-api#project-tokens';
-                needsProjectSlug = false;
-            }
-            if (p === 'RENDER') {
-                icon = 'cloud';
-                docsUrl = 'https://dashboard.render.com/user/settings#api-keys';
-                needsProjectSlug = false;
-            }
-            if (p === 'SUPABASE') {
-                icon = 'database';
-                docsUrl = 'https://supabase.com/dashboard/account/tokens';
-            }
+            const metadata = agents_1.platformRegistry.getMetadata(p);
             return {
                 id: p,
-                name: p.charAt(0) + p.slice(1).toLowerCase(),
-                icon,
-                description,
-                docsUrl,
-                needsProjectSlug
+                name: metadata?.displayName || (p.charAt(0) + p.slice(1).toLowerCase()),
+                icon: metadata?.icon || 'cloud',
+                description: `Connect via ${p} Access Token`,
+                docsUrl: metadata?.docsUrl || '#',
+                needsProjectSlug: p !== 'RAILWAY' && p !== 'RENDER', // Special casing this since it's not strictly metadata for the platform UI per se, or we could add it to metadata later
+                category: metadata?.category || 'BACKEND',
+                regionSwitchSupport: metadata?.regionSwitchSupport || 'NOT_SUPPORTED',
             };
         });
         return res.status(200).json({ success: true, data: platforms });

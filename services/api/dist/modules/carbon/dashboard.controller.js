@@ -78,24 +78,62 @@ const getDashboard = async (req, res) => {
             changeDirection = 'up';
         }
         // 5. Get budget info and active web projects
-        const user = await prisma_1.prisma.mobileUser.findUnique({ where: { id: userId } });
-        const budgetLimitKg = user?.carbonBudgetKg || 100;
-        const percentUsed = Math.round((totalCo2ThisMonth / budgetLimitKg) * 100);
+        const mobileUser = await prisma_1.prisma.mobileUser.findUnique({ where: { id: userId } });
+        const budgetLimitKg = mobileUser?.carbonBudgetKg || 100;
+        let percentUsed = Math.round((totalCo2ThisMonth / budgetLimitKg) * 100);
         let webProjects = [];
-        if (user?.email) {
-            const webUser = await prisma_1.prisma.user.findUnique({
-                where: { email: user.email },
+        // Auth might be passing a User ID (from web) or MobileUser ID
+        let webUser = await prisma_1.prisma.user.findUnique({
+            where: { id: userId },
+            include: { projects: true } // or filter active ones
+        });
+        if (!webUser && mobileUser?.email) {
+            webUser = await prisma_1.prisma.user.findUnique({
+                where: { email: mobileUser.email },
                 include: { projects: true }
             });
-            if (webUser?.projects) {
-                webProjects = webUser.projects.map(p => ({
-                    id: p.id,
-                    name: p.name,
-                    region: p.region,
-                    sdkConnected: p.sdkConnected,
-                    connectedAt: p.connectedAt,
-                    lastPingAt: p.lastPingAt
-                }));
+        }
+        if (webUser?.projects) {
+            webProjects = webUser.projects.map(p => ({
+                id: p.id,
+                name: p.name,
+                region: p.region,
+                sdkConnected: p.sdkConnected,
+                connectedAt: p.connectedAt,
+                lastPingAt: p.lastPingAt
+            }));
+            // Fetch telemetry data for the user's projects to add to overall stats and sparkline
+            const projectIds = webUser.projects.map(p => p.id);
+            const telemetryRecords = await prisma_1.prisma.emissionRecord.findMany({
+                where: {
+                    projectId: { in: projectIds },
+                    timestamp: { gte: lastMonthStart }
+                }
+            });
+            telemetryRecords.forEach(record => {
+                totalCo2AllTime += record.carbonKg;
+                if (record.timestamp >= currentMonthStart) {
+                    totalCo2ThisMonth += record.carbonKg;
+                }
+                else if (record.timestamp >= lastMonthStart && record.timestamp < currentMonthStart) {
+                    totalCo2LastMonth += record.carbonKg;
+                }
+                if (record.timestamp >= sevenDaysAgo) {
+                    const dateKey = record.timestamp.toISOString().split('T')[0];
+                    if (weeklySparklineMap.has(dateKey)) {
+                        weeklySparklineMap.set(dateKey, weeklySparklineMap.get(dateKey) + record.carbonKg);
+                    }
+                }
+            });
+            // Recompute percentUsed and changePercent since totalCo2ThisMonth changed
+            percentUsed = Math.round((totalCo2ThisMonth / budgetLimitKg) * 100);
+            if (totalCo2LastMonth > 0) {
+                changePercent = ((totalCo2ThisMonth - totalCo2LastMonth) / totalCo2LastMonth) * 100;
+                changeDirection = changePercent > 0 ? 'up' : changePercent < 0 ? 'down' : 'same';
+            }
+            else if (totalCo2ThisMonth > 0) {
+                changePercent = 100;
+                changeDirection = 'up';
             }
         }
         // 7. Get recent alerts
@@ -104,10 +142,42 @@ const getDashboard = async (req, res) => {
             orderBy: { createdAt: 'desc' },
             take: 5
         });
-        const weeklySparkline = Array.from(weeklySparklineMap.entries()).map(([date, co2Kg]) => ({
+        let earliestRecordDate = null;
+        if (allCalculations.length > 0) {
+            earliestRecordDate = allCalculations[allCalculations.length - 1].createdAt;
+        }
+        // Check if webUser is defined before checking its projects
+        if (webUser?.projects) {
+            // Find earliest telemetry if available
+            // Note: telemetryRecords is local to the block above, so we have to do it differently, 
+            // or we can just query the absolute earliest telemetry record for these projects
+            const projectIds = webUser.projects.map(p => p.id);
+            const earliestTelemetry = await prisma_1.prisma.emissionRecord.findFirst({
+                where: { projectId: { in: projectIds } },
+                orderBy: { timestamp: 'asc' }
+            });
+            if (earliestTelemetry) {
+                if (!earliestRecordDate || earliestTelemetry.timestamp < earliestRecordDate) {
+                    earliestRecordDate = earliestTelemetry.timestamp;
+                }
+            }
+        }
+        const earliestDateKey = earliestRecordDate ? earliestRecordDate.toISOString().split('T')[0] : null;
+        let weeklySparkline = Array.from(weeklySparklineMap.entries())
+            .filter(([date]) => !earliestDateKey || date >= earliestDateKey)
+            .map(([date, co2Kg]) => ({
             date,
             co2Kg
         }));
+        if (!earliestDateKey || weeklySparkline.length === 0) {
+            const todayKey = now.toISOString().split('T')[0];
+            weeklySparkline = [{ date: todayKey, co2Kg: 0 }];
+        }
+        if (weeklySparkline.length === 1) {
+            const prevDay = new Date(weeklySparkline[0].date);
+            prevDay.setDate(prevDay.getDate() - 1);
+            weeklySparkline.unshift({ date: prevDay.toISOString().split('T')[0], co2Kg: 0 });
+        }
         res.json({
             success: true,
             data: {

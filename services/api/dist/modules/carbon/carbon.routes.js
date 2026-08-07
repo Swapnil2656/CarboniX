@@ -16,6 +16,7 @@ router.post('/recommend', hybrid_middleware_1.authenticateHybrid, carbon_control
 router.post('/calculate-emissions', carbon_controller_1.calculateEmissions);
 // CLI Integration Endpoints
 router.post('/verify-key', apiKey_middleware_1.authenticateApiKey, carbon_controller_1.verifyKey);
+router.post('/init', apiKey_middleware_1.authenticateApiKey, carbon_controller_1.initProject);
 router.post('/telemetry/ingest', apiKey_middleware_1.authenticateApiKey, carbon_controller_1.ingestTelemetry);
 router.get('/history', auth_middleware_1.authenticate, history_controller_1.getHistory);
 router.delete('/history/:id', auth_middleware_1.authenticate, history_controller_1.deleteCalculation);

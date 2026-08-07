@@ -1,4 +1,4 @@
-import { PlatformAuthError, PlatformTransientError } from './errors';
+import { PlatformAuthError, PlatformTransientError, PlatformQuotaError } from './errors';
 
 export async function fetchT(url: string, init: RequestInit, platform: string, timeoutMs = 10_000): Promise<Response> {
   const ctrl = new AbortController();
@@ -15,6 +15,9 @@ export async function fetchT(url: string, init: RequestInit, platform: string, t
 
   if (res.status === 401 || res.status === 403) {
     throw new PlatformAuthError(platform, `HTTP ${res.status} from ${url}`);
+  }
+  if (res.status === 402 || res.status === 429) {
+    throw new PlatformQuotaError(platform, `HTTP ${res.status} from ${url}`);
   }
   if (res.status >= 500) {
     throw new PlatformTransientError(platform, `HTTP ${res.status} from ${url}`);

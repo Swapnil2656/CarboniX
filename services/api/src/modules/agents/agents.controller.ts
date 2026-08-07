@@ -11,7 +11,8 @@ import { runCollector } from '@carbonix/agents';
 import { runAnalyst } from '@carbonix/agents';
 import { runGateAgent } from '@carbonix/agents';
 import { runReporter } from '@carbonix/agents';
-import { runOrchestrator, Recommendation } from '@carbonix/agents';
+import { runOrchestrator, Recommendation, platformRegistry } from '@carbonix/agents';
+import { decryptToken } from '../../lib/platformTokenService';
 
 const USE_MOCK = process.env.USE_MOCK_AGENTS === 'true';
 const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY || '';
@@ -480,9 +481,47 @@ export const triggerOrchestrator = async (req: Request, res: Response) => {
       return res.json({ success: true, data: { message: 'Nothing to orchestrate.' } });
     }
 
-    // ── Step 3: Run the Orchestrator (Blue/Green migrations) ─────────────
+    // ── Step 3: Run the Orchestrator with Physical Region Switch ─────────
     const maxConcurrent = parseInt(req.body?.maxConcurrent) || 3;
-    const result = await runOrchestrator(recommendations, maxConcurrent);
+    
+    const applyRegionFn = async (instanceId: string, targetRegion: string) => {
+      try {
+        const deployment = await prisma.deployment.findFirst({
+          where: { OR: [{ label: instanceId }, { id: instanceId }] },
+          include: { project: true, platformToken: true }
+        });
+
+        if (!deployment || !deployment.platformToken) {
+          return { success: false, error: `No valid PlatformToken found for deployment: ${instanceId}` };
+        }
+
+        const token = decryptToken(deployment.platformToken.encryptedToken);
+        const adapter = platformRegistry.getAdapter(deployment.platformToken.platform);
+        
+        if (!adapter) {
+          return { success: false, error: `No adapter found for platform: ${deployment.platformToken.platform}` };
+        }
+
+        const result = await adapter.applyRegion(
+          token, 
+          deployment.platformToken.projectSlug || deployment.project.name, 
+          targetRegion
+        );
+
+        if (result.success) {
+          await prisma.deployment.update({
+            where: { id: deployment.id },
+            data: { region: targetRegion }
+          });
+        }
+
+        return result;
+      } catch (err: any) {
+        return { success: false, error: err.message };
+      }
+    };
+
+    const result = await runOrchestrator(recommendations, applyRegionFn, maxConcurrent);
 
     // ── Step 4: Persist the orchestration run ────────────────────────────
     await prisma.agentRun.update({

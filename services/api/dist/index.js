@@ -207,7 +207,7 @@ node_cron_1.default.schedule('0 * * * *', async () => {
                     durationMs: Date.now() - startTime,
                 },
             });
-            allRecords.push(...projectRecords);
+            allRecords.push(...projectRecords.map(r => ({ ...r, projectId: project.id })));
             console.log(`[CRON] Collected ${projectRecords.length} records for "${project.name}" [${project.dataSource}]`);
         }
         catch (projectErr) {
@@ -240,34 +240,43 @@ node_cron_1.default.schedule('0 * * * *', async () => {
             },
         });
         console.log(`[CRON] Analyst done: ${analystResult.summary}`);
-        // ─── Agentic region switches — now reads from PlatformToken (new) first, falls back to legacy PlatformCredential ──
+        // ─── Agentic region switches — per-deployment, correctly attributed ──────────
         const agenticProjects = projects.filter(p => p.agenticMode);
         for (const project of agenticProjects) {
-            const migrationRec = analystResult.recommendations.find(r => r.recommendedAction === 'MIGRATE_REGION');
-            if (!migrationRec)
-                continue;
-            console.log(`[CRON] Agentic Action: Enacting region switch for project ${project.name}...`);
-            try {
-                // Prefer PlatformToken (new, encrypted) over PlatformCredential (legacy, plaintext)
-                const platformCreds = project.platformTokens.length > 0
-                    ? project.platformTokens
-                        .filter(pt => pt.status === 'ACTIVE')
-                        .map(pt => ({
-                        provider: pt.platform,
-                        token: (() => { try {
-                            return (0, platformTokenService_1.decryptToken)(pt.encryptedToken);
-                        }
-                        catch {
-                            return '';
-                        } })()
-                    }))
-                        .filter(c => c.token)
-                    : project.platformCredentials.map(c => ({ provider: c.provider, token: c.token }));
-                const result = await (0, agents_1.enactRegionSwitch)(project.id, project.name, migrationRec, platformCreds);
-                console.log(`[CRON] Platform action result:`, result.message);
-            }
-            catch (e) {
-                console.error(`[CRON] Failed to enact platform action for ${project.name}:`, e);
+            // Fetch the project's deployments with their platform tokens
+            const deployments = await prisma_1.prisma.deployment.findMany({
+                where: { projectId: project.id },
+                include: { platformToken: true },
+            });
+            for (const deployment of deployments) {
+                // Find a MIGRATE_REGION recommendation attributed to this specific deployment
+                const migrationRec = analystResult.recommendations
+                    .filter(r => r.projectId === project.id && r.deploymentId === deployment.id)
+                    .find(r => r.recommendedAction === 'MIGRATE_REGION');
+                if (!migrationRec)
+                    continue;
+                // Only act if this deployment has an active platform token
+                if (!deployment.platformToken || deployment.platformToken.status !== 'ACTIVE') {
+                    console.log(`[CRON] Agentic: Deployment ${deployment.id} (${deployment.label ?? deployment.role}) has no active token — skipping region switch.`);
+                    continue;
+                }
+                let plainToken;
+                try {
+                    plainToken = (0, platformTokenService_1.decryptToken)(deployment.platformToken.encryptedToken);
+                }
+                catch (decErr) {
+                    console.error(`[CRON] Cannot decrypt token for deployment ${deployment.id}: ${decErr.message}`);
+                    continue;
+                }
+                const deploymentLabel = deployment.label ?? `${deployment.platformToken.platform} (${deployment.role})`;
+                console.log(`[CRON] Agentic Action: Enacting region switch for deployment "${deploymentLabel}" (${deployment.id})...`);
+                try {
+                    const result = await (0, agents_1.enactRegionSwitch)(deployment.id, deploymentLabel, migrationRec, { provider: deployment.platformToken.platform, token: plainToken });
+                    console.log(`[CRON] Platform action result for ${deploymentLabel}:`, result.message);
+                }
+                catch (e) {
+                    console.error(`[CRON] Failed to enact platform action for deployment ${deployment.id}:`, e);
+                }
             }
         }
     }

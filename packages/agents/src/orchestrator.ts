@@ -1,19 +1,12 @@
 /**
  * CarboniX Orchestrator Agent
  *
- * Executes Zero-Downtime Blue/Green migrations for cloud instances that
+ * Execute physical region switches for cloud instances that
  * have been flagged by the Analyst Agent for region migration.
  *
  * Strategy:
- *  1. PROVISION  — Spin up a "Green" (new) instance in the target region.
- *  2. HEALTH_CHECK — Wait for the Green instance to pass a health check.
- *  3. TRAFFIC_SHIFT — Update the Load Balancer / DNS to route traffic to Green.
- *  4. DRAIN & VERIFY — Confirm the old "Blue" instance receives zero traffic.
- *  5. TERMINATE — Safely destroy the old Blue instance.
- *
- * NOTE: Phase 7 runs in Simulation Mode — the logic and execution logs are
- * fully real, but cloud provider SDK calls (AWS/GCP API) are mocked until
- * cloud credentials are attached in production.
+ *  1. Execute applyRegionFn which interfaces with physical platform adapters (Vercel, Railway, etc).
+ *  2. Track success/failures.
  */
 
 import { Recommendation } from './analyst';
@@ -48,9 +41,10 @@ export interface MigrationPlan {
   reductionPercent: number;
   reasoning: string;
   steps: MigrationStep[];
-  finalStatus: 'COMPLETE' | 'FAILED';
+  finalStatus: 'COMPLETE' | 'FAILED' | 'FALLBACK_REQUIRED';
   totalDurationMs: number;
   carbonSavedKg: number;
+  errorCategory?: string;
 }
 
 export interface OrchestratorResult {
@@ -58,20 +52,14 @@ export interface OrchestratorResult {
   totalMigrations: number;
   successfulMigrations: number;
   failedMigrations: number;
+  fallbackMigrations?: number;
   totalCarbonSavedKg: number;
   summary: string;
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+export type ApplyRegionFn = (instanceId: string, targetRegion: string) => Promise<{ success: boolean; error?: string; requiresRedeploy?: boolean; fallbackRequired?: boolean; errorCategory?: string }>;
 
-/**
- * Simulate a latency-bearing async operation (mocks real cloud API calls).
- * In production, this would be replaced by actual AWS/GCP SDK calls.
- */
-async function simulateCloudCall(minMs = 200, maxMs = 800): Promise<void> {
-  const delay = Math.floor(Math.random() * (maxMs - minMs) + minMs);
-  return new Promise(resolve => setTimeout(resolve, delay));
-}
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /**
  * Extracts the source region from the recommendation's reasoning string.
@@ -101,9 +89,9 @@ function getBestTargetRegion(sourceRegion: string): string {
   return REGION_TO_CLEAN[sourceRegion] ?? 'eu-north-1';
 }
 
-// ─── Blue/Green Migration Executor ───────────────────────────────────────────
+// ─── Migration Executor ───────────────────────────────────────────────────
 
-async function executeBlueGreenMigration(rec: Recommendation): Promise<MigrationPlan> {
+async function executeMigration(rec: Recommendation, applyRegionFn: ApplyRegionFn): Promise<MigrationPlan> {
   const steps: MigrationStep[] = [];
   const sourceRegion = extractSourceRegion(rec);
   const targetRegion = getBestTargetRegion(sourceRegion);
@@ -120,65 +108,36 @@ async function executeBlueGreenMigration(rec: Recommendation): Promise<Migration
   };
 
   try {
-    // ── Step 1: PROVISION ──────────────────────────────────────────────────
     const s1 = Date.now();
-    await simulateCloudCall(300, 700);
-    const greenInstanceId = `i-green-${rec.instanceId.replace('i-', '')}-${Date.now().toString(36)}`;
-    addStep(
-      'PROVISIONING',
-      `[SIMULATION] Provisioned new GREEN instance "${greenInstanceId}" (${rec.currentType}) in ${targetRegion}. ` +
-      `Grid intensity: 8 gCO₂/kWh vs ${sourceRegion}'s dirty grid.`,
-      true,
-      s1
-    );
+    addStep('PROVISIONING', `[EXECUTING] Initiating region switch for "${rec.instanceId}" to ${targetRegion}. Grid intensity: 8 gCO₂/kWh vs ${sourceRegion}'s dirty grid.`, true, s1);
 
-    // ── Step 2: HEALTH CHECK ───────────────────────────────────────────────
     const s2 = Date.now();
-    await simulateCloudCall(400, 900);
-    // Simulate a 95% pass rate — occasionally fail to demonstrate resilience
-    const healthPassed = Math.random() > 0.05;
-    if (!healthPassed) {
-      addStep('HEALTH_CHECK', `[SIMULATION] GREEN instance "${greenInstanceId}" failed health check (HTTP 503). Rolling back — BLUE instance "${rec.instanceId}" remains active.`, false, s2);
-      throw new Error('Health check failed — Blue instance preserved.');
+    const result = await applyRegionFn(rec.instanceId, targetRegion);
+
+    if (!result.success) {
+      addStep(result.fallbackRequired ? 'FALLBACK' : 'FAILED', `[${result.fallbackRequired ? 'FALLBACK' : 'FAILED'}] Region switch failed: ${result.error || 'Unknown error'}. Category: ${result.errorCategory || 'Unknown'}`, false, s2);
+      return {
+        instanceId: rec.instanceId,
+        instanceName: rec.instanceName,
+        currentType: rec.currentType,
+        sourceRegion,
+        targetRegion,
+        currentCarbonKg: rec.currentCarbonKg,
+        projectedCarbonKg: rec.projectedCarbonKg,
+        reductionPercent: rec.reductionPercent,
+        reasoning: rec.reasoning,
+        steps,
+        finalStatus: result.fallbackRequired ? 'FALLBACK_REQUIRED' : 'FAILED',
+        totalDurationMs: Date.now() - overallStart,
+        carbonSavedKg: 0,
+        errorCategory: result.errorCategory
+      };
     }
-    addStep(
-      'HEALTH_CHECK',
-      `[SIMULATION] GREEN instance "${greenInstanceId}" passed health check (HTTP 200, latency: ${Math.floor(Math.random() * 50 + 10)}ms). Safe to shift traffic.`,
-      true,
-      s2
-    );
 
-    // ── Step 3: TRAFFIC SHIFT ──────────────────────────────────────────────
-    const s3 = Date.now();
-    await simulateCloudCall(200, 500);
-    addStep(
-      'TRAFFIC_SHIFTING',
-      `[SIMULATION] Load Balancer updated. Traffic weight: GREEN ${greenInstanceId} = 100%, BLUE ${rec.instanceId} = 0%. DNS TTL flushed.`,
-      true,
-      s3
-    );
-
-    // ── Step 4: DRAIN & VERIFY ─────────────────────────────────────────────
-    const s4 = Date.now();
-    await simulateCloudCall(300, 600);
-    addStep(
-      'DRAINING',
-      `[SIMULATION] BLUE instance "${rec.instanceId}" drained. Active connections: 0. Verified zero in-flight requests — safe to terminate.`,
-      true,
-      s4
-    );
-
-    // ── Step 5: TERMINATE ──────────────────────────────────────────────────
-    const s5 = Date.now();
-    await simulateCloudCall(100, 300);
+    addStep('TRAFFIC_SHIFTING', `[SUCCESS] Region switch applied successfully to ${targetRegion}.${result.requiresRedeploy ? ' Redeployment triggered.' : ''}`, true, s2);
+    
     const carbonSaved = rec.currentCarbonKg - rec.projectedCarbonKg;
-    addStep(
-      'TERMINATING',
-      `[SIMULATION] BLUE instance "${rec.instanceId}" in ${sourceRegion} terminated. ` +
-      `Carbon saving locked in: ${carbonSaved.toFixed(2)} kg CO₂/month.`,
-      true,
-      s5
-    );
+    addStep('COMPLETE', `[COMPLETE] Migration finished. Carbon saving locked in: ${carbonSaved.toFixed(2)} kg CO₂/month.`, true, Date.now());
 
     return {
       instanceId: rec.instanceId,
@@ -195,8 +154,8 @@ async function executeBlueGreenMigration(rec: Recommendation): Promise<Migration
       totalDurationMs: Date.now() - overallStart,
       carbonSavedKg: carbonSaved,
     };
-
   } catch (err: any) {
+    addStep('FAILED', `[FAILED] Region switch failed: ${err.message}`, false, Date.now());
     return {
       instanceId: rec.instanceId,
       instanceName: rec.instanceName,
@@ -211,6 +170,7 @@ async function executeBlueGreenMigration(rec: Recommendation): Promise<Migration
       finalStatus: 'FAILED',
       totalDurationMs: Date.now() - overallStart,
       carbonSavedKg: 0,
+      errorCategory: 'SYSTEM_ERROR'
     };
   }
 }
@@ -223,10 +183,12 @@ async function executeBlueGreenMigration(rec: Recommendation): Promise<Migration
  * @param recommendations  - Array from the Analyst Agent. Only MIGRATE_REGION
  *                           actions are executed; TERMINATE/DOWNGRADE are skipped
  *                           (those are handled by the Analyst Agent itself).
+ * @param applyRegionFn    - The callback to trigger the physical infrastructure change.
  * @param maxConcurrent    - How many migrations to run in parallel (default: 3).
  */
 export async function runOrchestrator(
   recommendations: Recommendation[],
+  applyRegionFn: ApplyRegionFn,
   maxConcurrent = 3
 ): Promise<OrchestratorResult> {
 
@@ -255,7 +217,7 @@ export async function runOrchestrator(
   const results: MigrationPlan[] = [];
   for (let i = 0; i < targets.length; i += maxConcurrent) {
     const batch = targets.slice(i, i + maxConcurrent);
-    const batchResults = await Promise.all(batch.map(executeBlueGreenMigration));
+    const batchResults = await Promise.all(batch.map(rec => executeMigration(rec, applyRegionFn)));
     results.push(...batchResults);
   }
 
@@ -270,8 +232,8 @@ export async function runOrchestrator(
     failedMigrations: failed.length,
     totalCarbonSavedKg: parseFloat(totalSaved.toFixed(2)),
     summary:
-      `Orchestrator completed ${successful.length}/${results.length} Blue/Green migrations. ` +
+      `Orchestrator completed ${successful.length}/${results.length} physical region migrations. ` +
       `Carbon locked in: ${totalSaved.toFixed(2)} kg CO₂/month. ` +
-      (failed.length > 0 ? `${failed.length} migration(s) rolled back safely (Blue instance preserved).` : 'Zero rollbacks.'),
+      (failed.length > 0 ? `${failed.length} migration(s) failed.` : 'Zero rollbacks.'),
   };
 }

@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ingestTelemetry = exports.verifyKey = exports.calculateEmissions = exports.recommend = exports.compare = exports.calculate = void 0;
+exports.ingestTelemetry = exports.initProject = exports.verifyKey = exports.calculateEmissions = exports.recommend = exports.compare = exports.calculate = void 0;
 const carbon_engine_1 = require("./carbon.engine");
 const prisma_1 = require("../../lib/prisma");
 const carbon_service_1 = require("./services/carbon.service");
@@ -209,11 +209,22 @@ const recommend = async (req, res) => {
         // Get the recommendation from the engine (scoped to the requested provider)
         const recommendation = await (0, carbon_engine_1.getRecommendation)(input.provider, input.region, baseResult.co2KgMonth, baseResult.totalFinalEnergyKwh);
         if (recommendation.recommendedRegion) {
-            res.json({
+            if (input.recordId) {
+                try {
+                    // Attempt to persist the recommendation so it survives page reloads
+                    await prisma_1.prisma.emissionRecord.update({
+                        where: { id: input.recordId },
+                        data: { recommendation: recommendation.recommendation }
+                    });
+                }
+                catch (e) {
+                    console.error("Failed to save recommendation to record:", e);
+                }
+            }
+            return res.json({
                 success: true,
                 data: {
                     recommended: {
-                        provider: input.provider,
                         region: recommendation.recommendedRegion,
                         co2KgMonth: recommendation.recommendedCo2Kg,
                         savingsKg: Math.max(0, baseResult.co2KgMonth - (recommendation.recommendedCo2Kg || 0)),
@@ -319,6 +330,28 @@ const verifyKey = async (req, res) => {
     }
 };
 exports.verifyKey = verifyKey;
+const initProject = async (req, res) => {
+    try {
+        if (req.apiKey) {
+            const { projectName, projectProfile } = req.body || {};
+            const projectId = await resolveProjectForApiKey(req.apiKey, projectName);
+            if (projectId) {
+                await prisma_1.prisma.project.update({
+                    where: { id: projectId },
+                    data: {
+                        configInitializedAt: new Date(),
+                        projectProfile: projectProfile || {}
+                    }
+                });
+            }
+        }
+        res.json({ success: true, message: 'Project initialized' });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+};
+exports.initProject = initProject;
 const ingestTelemetry = async (req, res) => {
     try {
         const { instanceId, instanceType, provider, region, cpuUtilization, storageGb, projectName } = req.body;
@@ -337,19 +370,80 @@ const ingestTelemetry = async (req, res) => {
         const result = await (0, carbon_engine_1.calculateCarbon)(input);
         // Update the project's sdkConnected status
         let resolvedProjectId = null;
+        let resolvedDeploymentId = null;
         if (req.apiKey) {
             resolvedProjectId = await resolveProjectForApiKey(req.apiKey, projectName);
             if (resolvedProjectId) {
                 const now = new Date();
-                const existingProject = await prisma_1.prisma.project.findUnique({ where: { id: resolvedProjectId } });
-                await prisma_1.prisma.project.update({
+                const existingProject = await prisma_1.prisma.project.findUnique({
                     where: { id: resolvedProjectId },
-                    data: {
-                        sdkConnected: true,
-                        lastPingAt: now,
-                        connectedAt: existingProject?.connectedAt || now
-                    }
+                    include: { deployments: { include: { platformToken: true } } }
                 });
+                if (existingProject) {
+                    await prisma_1.prisma.project.update({
+                        where: { id: resolvedProjectId },
+                        data: {
+                            sdkConnected: true,
+                            lastPingAt: now,
+                            connectedAt: existingProject.connectedAt || now
+                        }
+                    });
+                    if (projectName) {
+                        const upperName = projectName.toUpperCase();
+                        // Try matching by platform first (for PaaS integrations)
+                        const targetPlatform = upperName.startsWith('VERCEL') ? 'VERCEL'
+                            : upperName.startsWith('RAILWAY') ? 'RAILWAY'
+                                : upperName.startsWith('RENDER') ? 'RENDER'
+                                    : upperName.startsWith('NETLIFY') ? 'NETLIFY'
+                                        : null;
+                        if (targetPlatform) {
+                            const matchingDeployment = existingProject.deployments.find((d) => d.platformToken?.platform === targetPlatform);
+                            if (matchingDeployment) {
+                                resolvedDeploymentId = matchingDeployment.id;
+                            }
+                        }
+                        // If no platform match, try matching by role if project name contains hints
+                        if (!resolvedDeploymentId && existingProject.deployments.length > 0) {
+                            const roleHint = upperName.includes('FRONT') ? 'FRONTEND'
+                                : upperName.includes('BACK') || upperName.includes('API') ? 'BACKEND'
+                                    : null;
+                            if (roleHint) {
+                                const matchingDeployment = existingProject.deployments.find((d) => d.role === roleHint);
+                                if (matchingDeployment) {
+                                    resolvedDeploymentId = matchingDeployment.id;
+                                }
+                            }
+                        }
+                        // Fallback: If still no match and there's exactly one deployment, or one "OTHER" deployment, use it
+                        if (!resolvedDeploymentId && existingProject.deployments.length > 0) {
+                            const emptyDeployments = existingProject.deployments.filter((d) => !d.region || d.region === 'Unknown');
+                            if (emptyDeployments.length > 0) {
+                                resolvedDeploymentId = emptyDeployments[0].id;
+                            }
+                            else {
+                                resolvedDeploymentId = existingProject.deployments[0].id;
+                            }
+                        }
+                    }
+                    // Update Project Region as a fallback
+                    await prisma_1.prisma.project.update({
+                        where: { id: existingProject.id },
+                        data: {
+                            region: input.region,
+                            provider: input.provider.toUpperCase(),
+                        }
+                    });
+                    // Update Deployment Region
+                    if (resolvedDeploymentId) {
+                        await prisma_1.prisma.deployment.update({
+                            where: { id: resolvedDeploymentId },
+                            data: {
+                                region: input.region,
+                                provider: input.provider.toUpperCase(),
+                            }
+                        });
+                    }
+                }
             }
         }
         // Create the EmissionRecord
@@ -361,6 +455,7 @@ const ingestTelemetry = async (req, res) => {
                 region: input.region,
                 instanceName: projectName,
                 projectId: resolvedProjectId, // Set the real tenant link
+                deploymentId: resolvedDeploymentId,
                 cpuUtilization: input.cpuUtilization,
                 energyKwh: result.totalFinalEnergyKwh,
                 gridIntensity: result.gridIntensity,
