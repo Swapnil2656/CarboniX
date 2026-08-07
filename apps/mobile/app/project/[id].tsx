@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert, TextInput, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { colors } from '../../src/theme/colors';
 import { adminApi, agentsApi } from '../../src/services/api/endpoints';
 import { LineChart } from 'react-native-chart-kit';
@@ -42,14 +42,16 @@ export default function ProjectDetailScreen() {
     }
   };
 
-  useEffect(() => {
-    if (!id) return;
-    fetchStats(false);
-    pollingRef.current = setInterval(() => fetchStats(true), POLL_INTERVAL_MS);
-    return () => {
-      if (pollingRef.current) clearInterval(pollingRef.current);
-    };
-  }, [id]);
+  useFocusEffect(
+    useCallback(() => {
+      if (!id) return;
+      fetchStats(false);
+      pollingRef.current = setInterval(() => fetchStats(true), POLL_INTERVAL_MS);
+      return () => {
+        if (pollingRef.current) clearInterval(pollingRef.current);
+      };
+    }, [id])
+  );
 
   const handleDelete = async () => {
     if (confirmNameDelete !== data?.project?.name) {
@@ -96,6 +98,25 @@ export default function ProjectDetailScreen() {
       setIsExporting(false);
     }
   };
+
+  const handleRevokeKey = async (keyId: string) => {
+    Alert.alert('Revoke API Key', 'Are you sure you want to revoke this API key?', [
+      { text: 'Cancel', style: 'cancel' },
+      { 
+        text: 'Revoke', 
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await adminApi.revokeApiKey(keyId);
+            fetchStats(true);
+          } catch (e: any) {
+            Alert.alert('Error', 'Failed to revoke key: ' + e.message);
+          }
+        }
+      }
+    ]);
+  };
+
 
   if (loading) {
     return (
@@ -157,7 +178,7 @@ export default function ProjectDetailScreen() {
 
   const normalKeys = (apiKeys || []).map((k: any) => ({
     ...k,
-    status: k.isRevoked ? 'REVOKED' : 'ACTIVE'
+    status: k.status
   }));
 
   const allKeys = [...normalKeys, ...platformKeys];
@@ -467,7 +488,7 @@ export default function ProjectDetailScreen() {
                 labels: chartData.map((d: any, i: number) => (i % (chartDays === '30d' ? 5 : 1) === 0 ? d.date.substring(5) : '')),
                 datasets: [{ data: chartData.map((d: any) => d.carbonKg) }]
               }}
-              width={Dimensions.get('window').width - 40}
+              width={Dimensions.get('window').width - 70}
               height={220}
               yAxisSuffix="kg"
               chartConfig={{
@@ -508,7 +529,11 @@ export default function ProjectDetailScreen() {
                   </Text>
                 </View>
                 {!key.isPlatformToken ? (
-                  <TouchableOpacity style={{ backgroundColor: 'rgba(248,113,113,0.1)', padding: 6, borderRadius: 6 }}>
+                  <TouchableOpacity 
+                    style={{ backgroundColor: 'rgba(248,113,113,0.1)', padding: 6, borderRadius: 6, opacity: key.status === 'ACTIVE' ? 1 : 0.5 }}
+                    disabled={key.status !== 'ACTIVE'}
+                    onPress={() => handleRevokeKey(key.id)}
+                  >
                     <Text style={{ color: colors.error, fontSize: 12 }}>Revoke</Text>
                   </TouchableOpacity>
                 ) : (

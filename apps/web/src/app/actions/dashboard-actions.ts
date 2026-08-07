@@ -35,6 +35,7 @@ export async function getProjects(page = 1, pageSize = 5) {
       orderBy: { createdAt: 'desc' },
       skip: (page - 1) * pageSize,
       take: pageSize,
+      include: { deployments: true }
     });
 
     // Convert all Date fields to ISO strings so it's safe for Client Components
@@ -44,6 +45,12 @@ export async function getProjects(page = 1, pageSize = 5) {
       updatedAt: p.updatedAt.toISOString(),
       connectedAt: p.connectedAt?.toISOString() ?? null,
       lastPingAt: p.lastPingAt?.toISOString() ?? null,
+      configInitializedAt: p.configInitializedAt?.toISOString() ?? null,
+      deployments: p.deployments?.map(d => ({
+        ...d,
+        createdAt: d.createdAt.toISOString(),
+        updatedAt: d.updatedAt.toISOString(),
+      })) || [],
     }));
 
     const resultPayload = {

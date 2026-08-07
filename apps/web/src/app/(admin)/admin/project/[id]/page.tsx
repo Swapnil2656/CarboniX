@@ -68,10 +68,18 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
   const handleAnalyze = async (record: any) => {
     setAnalyzingId(record.id);
     try {
+      let overrideProvider = record.provider;
+      const instName = (record.instanceName || '').toUpperCase();
+      if (instName.includes('VERCEL')) overrideProvider = 'VERCEL';
+      else if (instName.includes('RAILWAY')) overrideProvider = 'RAILWAY';
+      else if (instName.includes('RENDER')) overrideProvider = 'RENDER';
+      else if (instName.includes('NETLIFY')) overrideProvider = 'NETLIFY';
+
       const payload = {
+        recordId: record.id,
         projectName: record.instanceName || 'CarboniX',
         instanceType: record.instanceType,
-        provider: record.provider,
+        provider: overrideProvider,
         region: record.region,
         cpuUtilization: record.cpuUtilization,
         storageGb: 20
@@ -355,7 +363,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
 
   const normalKeys = (apiKeys || []).map((k: any) => ({
     ...k,
-    status: k.isRevoked ? 'REVOKED' : 'ACTIVE'
+    status: k.status
   }));
 
   const allKeys = [...normalKeys, ...platformKeys];
@@ -947,7 +955,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                         <td className="py-4 px-4 text-right">
                           <button
                             onClick={() => handleAnalyze(record)}
-                            disabled={analyzingId === record.id || record.isOptimized}
+                            disabled={analyzingId === record.id}
                             className="bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 flex items-center gap-1 ml-auto"
                           >
                             {analyzingId === record.id ? (
@@ -969,29 +977,33 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                                   {record.recommendation}
                                 </div>
                               </div>
-                              {record._recommendedRegion && !record.isOptimized && (
-                                <div className="flex items-center gap-2">
-                                  <button
-                                    onClick={() => handleAutoMigrate(record.id, record._recommendedRegion)}
-                                    disabled={migratingId === record.id}
-                                    className="bg-primary hover:bg-primary-dark text-on-primary px-3 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 flex items-center gap-1"
-                                  >
-                                    {migratingId === record.id ? (
-                                      <span className="material-symbols-outlined text-sm animate-spin">refresh</span>
-                                    ) : (
-                                      <span className="material-symbols-outlined text-sm">flight_takeoff</span>
-                                    )}
-                                    Auto Migrate
-                                  </button>
-                                  <button
-                                    onClick={() => setManualMigrateModal({ open: true, record, targetRegion: record._recommendedRegion })}
-                                    className="bg-surface-container-high hover:bg-surface-bright border border-outline-variant text-on-surface px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
-                                  >
-                                    <span className="material-symbols-outlined text-sm">settings</span>
-                                    Manual
-                                  </button>
-                                </div>
-                              )}
+                              {(() => {
+                                const targetRegionMatch = record.recommendation.match(/Move to ([\w-]+)|Switch to ([\w-]+)/);
+                                const targetRegion = record._recommendedRegion || (targetRegionMatch ? targetRegionMatch[1] || targetRegionMatch[2] : null);
+                                return targetRegion && !record.isOptimized ? (
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      onClick={() => handleAutoMigrate(record.id, targetRegion)}
+                                      disabled={migratingId === record.id}
+                                      className="bg-primary hover:bg-primary-dark text-on-primary px-3 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 flex items-center gap-1"
+                                    >
+                                      {migratingId === record.id ? (
+                                        <span className="material-symbols-outlined text-sm animate-spin">refresh</span>
+                                      ) : (
+                                        <span className="material-symbols-outlined text-sm">flight_takeoff</span>
+                                      )}
+                                      Auto Migrate
+                                    </button>
+                                    <button
+                                      onClick={() => setManualMigrateModal({ open: true, record, targetRegion })}
+                                      className="bg-surface-container-high hover:bg-surface-bright border border-outline-variant text-on-surface px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                                    >
+                                      <span className="material-symbols-outlined text-sm">settings</span>
+                                      Manual
+                                    </button>
+                                  </div>
+                                ) : null;
+                              })()}
                             </div>
                           </td>
                         </tr>

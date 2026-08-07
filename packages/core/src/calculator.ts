@@ -45,12 +45,16 @@ export async function calculateCarbon(input: CalculationInput): Promise<Calculat
   };
   const actualProvider = underlyingProviderMap[provider] || provider;
 
-  const instance = instanceCoefficients.find(
+  let instance = instanceCoefficients.find(
     (i) => i.name === input.instanceType && i.provider === actualProvider
   );
 
   if (!instance) {
-    throw new Error(`Instance type ${input.instanceType} not found for provider ${provider}`);
+    // Fallback to the first available instance for the actual provider to avoid crashing PaaS estimations
+    instance = instanceCoefficients.find((i) => i.provider === actualProvider);
+    if (!instance) {
+      throw new Error(`Instance type ${input.instanceType} not found for provider ${provider}`);
+    }
   }
 
   const cpuTdpWatts = instance.cpuTdpWatts;

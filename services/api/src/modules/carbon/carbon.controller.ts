@@ -200,11 +200,22 @@ export const recommend = async (req: Request, res: Response) => {
     );
 
     if (recommendation.recommendedRegion) {
-      res.json({ 
+      if (input.recordId) {
+        try {
+          // Attempt to persist the recommendation so it survives page reloads
+          await prisma.emissionRecord.update({
+            where: { id: input.recordId },
+            data: { recommendation: recommendation.recommendation }
+          });
+        } catch (e) {
+          console.error("Failed to save recommendation to record:", e);
+        }
+      }
+
+      return res.json({ 
         success: true, 
         data: {
           recommended: {
-              provider: input.provider,
               region: recommendation.recommendedRegion,
               co2KgMonth: recommendation.recommendedCo2Kg,
               savingsKg: Math.max(0, baseResult.co2KgMonth - (recommendation.recommendedCo2Kg || 0)),
@@ -373,6 +384,8 @@ export const ingestTelemetry = async (req: ApiKeyRequest, res: Response) => {
           
           if (projectName) {
             const upperName = projectName.toUpperCase();
+            
+            // Try matching by platform first (for PaaS integrations)
             const targetPlatform = upperName.startsWith('VERCEL') ? 'VERCEL' 
                                  : upperName.startsWith('RAILWAY') ? 'RAILWAY'
                                  : upperName.startsWith('RENDER') ? 'RENDER'
@@ -384,6 +397,49 @@ export const ingestTelemetry = async (req: ApiKeyRequest, res: Response) => {
                 resolvedDeploymentId = matchingDeployment.id;
               }
             }
+
+            // If no platform match, try matching by role if project name contains hints
+            if (!resolvedDeploymentId && existingProject.deployments.length > 0) {
+              const roleHint = upperName.includes('FRONT') ? 'FRONTEND' 
+                             : upperName.includes('BACK') || upperName.includes('API') ? 'BACKEND' 
+                             : null;
+              if (roleHint) {
+                const matchingDeployment = existingProject.deployments.find((d: any) => d.role === roleHint);
+                if (matchingDeployment) {
+                  resolvedDeploymentId = matchingDeployment.id;
+                }
+              }
+            }
+
+            // Fallback: If still no match and there's exactly one deployment, or one "OTHER" deployment, use it
+            if (!resolvedDeploymentId && existingProject.deployments.length > 0) {
+              const emptyDeployments = existingProject.deployments.filter((d: any) => !d.region || d.region === 'Unknown');
+              if (emptyDeployments.length > 0) {
+                resolvedDeploymentId = emptyDeployments[0].id;
+              } else {
+                resolvedDeploymentId = existingProject.deployments[0].id;
+              }
+            }
+          }
+
+          // Update Project Region as a fallback
+          await prisma.project.update({
+            where: { id: existingProject.id },
+            data: {
+              region: input.region,
+              provider: input.provider.toUpperCase() as any,
+            }
+          });
+
+          // Update Deployment Region
+          if (resolvedDeploymentId) {
+            await prisma.deployment.update({
+              where: { id: resolvedDeploymentId },
+              data: {
+                region: input.region,
+                provider: input.provider.toUpperCase() as any,
+              }
+            });
           }
         }
       }

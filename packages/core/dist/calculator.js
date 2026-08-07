@@ -21,9 +21,13 @@ async function calculateCarbon(input) {
         RAILWAY: 'GCP'
     };
     const actualProvider = underlyingProviderMap[provider] || provider;
-    const instance = instance_coefficients_json_1.default.find((i) => i.name === input.instanceType && i.provider === actualProvider);
+    let instance = instance_coefficients_json_1.default.find((i) => i.name === input.instanceType && i.provider === actualProvider);
     if (!instance) {
-        throw new Error(`Instance type ${input.instanceType} not found for provider ${provider}`);
+        // Fallback to the first available instance for the actual provider to avoid crashing PaaS estimations
+        instance = instance_coefficients_json_1.default.find((i) => i.provider === actualProvider);
+        if (!instance) {
+            throw new Error(`Instance type ${input.instanceType} not found for provider ${provider}`);
+        }
     }
     const cpuTdpWatts = instance.cpuTdpWatts;
     const memoryGb = input.ramGb || instance.memoryGb;

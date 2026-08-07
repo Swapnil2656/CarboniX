@@ -108,6 +108,33 @@ enum GridIntensitySource {
   CCF_DEFAULT
 }
 
+enum DataSource {
+  NO_CREDS   // No platform token connected — never collect or show real data
+  MOCK_DEMO  // Demo/mock data explicitly acknowledged — always badge as demo
+  LIVE       // Verified platform token present — real usage-based collection
+}
+
+enum PlatformType {
+  VERCEL
+  NETLIFY
+  RAILWAY
+  RENDER
+}
+
+enum PlatformTokenStatus {
+  ACTIVE   // Last verification passed
+  INVALID  // 401/403 from platform API — user must reconnect
+  EXPIRED  // Token has an expiry and it has passed
+  REVOKED  // Manually revoked by user
+}
+
+enum DeploymentRole {
+  FRONTEND
+  BACKEND
+  FULLSTACK
+  OTHER
+}
+
 // ─── Mobile Users ───────────────────────────────────────────
 
 model MobileUser {
@@ -127,6 +154,16 @@ model MobileUser {
   theme                String         @default("dark") // light | dark | system
   notificationsEnabled Boolean        @default(true)
   defaultProvider      CloudProvider?
+  weeklyDigestEnabled  Boolean        @default(true)
+  budgetAlertEnabled   Boolean        @default(true)
+  greenTipsEnabled     Boolean        @default(true)
+  carbonBudgetKg       Float          @default(100) // Monthly CO₂ budget in kg
+  preferredUnit        String         @default("kg") // "kg" or "lbs"
+  defaultRegion        String? // e.g., "ap-south-1"
+
+  // Profile fields (for Settings > Profile)
+  avatarUrl String?
+  bio       String?
 
   // Status
   status    MobileUserStatus @default(ACTIVE)
@@ -366,6 +403,21 @@ model Notification {
   updatedAt DateTime @updatedAt
 }
 
+model UserNotification {
+  id     String  @id @default(cuid())
+  userId String
+  title  String
+  body   String
+  type   String // "HIGH_EMISSION" | "BUDGET_ALERT" | "GREEN_TIP" | "WEEKLY_DIGEST" | "SYSTEM"
+  data   Json? // Optional payload (e.g., calculationId, region)
+  isRead Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, isRead])
+}
+
 // ─── Push Tokens ────────────────────────────────────────────
 
 model PushToken {
@@ -449,6 +501,7 @@ enum AgentType {
   ANALYST
   CICD_GATE
   REPORTER
+  ORCHESTRATOR
 }
 
 enum AgentRunStatus {
@@ -459,6 +512,8 @@ enum AgentRunStatus {
 
 model AgentRun {
   id          String         @id @default(cuid())
+  projectId   String?
+  project     Project?       @relation(fields: [projectId], references: [id], onDelete: Cascade)
   agentType   AgentType
   status      AgentRunStatus @default(RUNNING)
   triggeredBy String         @default("cron") // "cron" | "manual" | "webhook"
@@ -483,6 +538,13 @@ model AgentRun {
 model EmissionRecord {
   id         String  @id @default(cuid())
   agentRunId String? // Links to the AgentRun that created this
+  projectId  String?
+  project    Project?    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // Deployment attribution — source of truth for per-deployment breakdown
+  // Kept alongside projectId (denormalized) for simple project-level rollup queries
+  deploymentId String?
+  deployment   Deployment? @relation(fields: [deploymentId], references: [id], onDelete: SetNull)
 
   // Instance identification
   instanceId   String // e.g., "i-0abc123def" or mock ID
@@ -510,6 +572,7 @@ model EmissionRecord {
   timestamp DateTime @default(now())
 
   @@index([region, timestamp(sort: Desc)])
+  @@index([deploymentId, timestamp(sort: Desc)])
   @@index([isIdle])
   @@index([isOversized])
   @@index([agentRunId])
@@ -547,30 +610,55 @@ model Project {
   id           String    @id @default(cuid())
   name         String
   region       String?
+  provider     CloudProvider?
+  isDeployed   Boolean   @default(false)
+  deploymentUrl String?
   sdkConnected Boolean   @default(false)
+  agenticMode  Boolean   @default(false)
   connectedAt  DateTime?
   lastPingAt   DateTime?
   configInitializedAt DateTime?
   projectProfile      Json?
+  carbonBudgetKg Float?  @default(100) // Monthly CO₂ budget in kg
+
+  // Data source state — never silently blend mock and real data
+  dataSource   DataSource @default(NO_CREDS)
+
   userId       String
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  apiKeys      ApiKey[]
+
+  agentRuns            AgentRun[]
+  emissionRecords      EmissionRecord[]
+  apiKeys              ApiKey[]
+  // TODO: drop PlatformCredential after all enactRegionSwitch call sites are migrated to PlatformToken
+  platformCredentials  PlatformCredential[]
+  platformTokens       PlatformToken[]
+  deployments          Deployment[]
+
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
   @@index([userId])
+  @@index([dataSource])
 }
 
 // Created automatically on signup. Add app-specific profile fields here.
 model Profile {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   fullName    String?
   avatarUrl   String?
   phoneNumber String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  // Notification Preferences
+  emailAlerts     Boolean @default(true)
+  pushAlerts      Boolean @default(false)
+  thresholdAlerts Boolean @default(true)
+  expoPushToken   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model VerificationToken {
@@ -579,6 +667,23 @@ model VerificationToken {
   expires DateTime
   userId  String
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── Team Members ─────────────────────────────────────────────
+
+model TeamMember {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  role         String
+  projectId    String
+  projectName  String
+  co2Emissions Float
+  location     String
+  status       String   @default("ACTIVE")
+  aiSuggestion String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 // ─── AI Chat History ──────────────────────────────────────────
@@ -590,4 +695,80 @@ model ChatHistory {
   messages  Json     @default("[]")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// ─── Platform Credentials (LEGACY — kept for enactRegionSwitch backward-compat) ────
+// TODO: migrate enactRegionSwitch to read from PlatformToken, then drop this model
+
+model PlatformCredential {
+  id           String        @id @default(cuid())
+  projectId    String
+  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  provider     CloudProvider // e.g. VERCEL, NETLIFY, AWS
+  token        String        // The API token or Installation ID (plaintext — legacy)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@unique([projectId, provider])
+}
+
+// ─── Platform Tokens (NEW — encrypted, with status tracking) ───────────────────
+
+model PlatformToken {
+  id        String            @id @default(cuid())
+  projectId String
+  project   Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  platform       PlatformType        // VERCEL | NETLIFY | RAILWAY | RENDER
+  encryptedToken String              // AES-256-GCM encrypted; key in TOKEN_ENCRYPTION_KEY env
+  projectSlug    String?             // Platform project slug/ID for scoping API calls
+  status         PlatformTokenStatus @default(ACTIVE)
+
+  // Verification tracking
+  lastVerifiedAt DateTime?
+  lastError      String?   // Last error message from platform API (for UI display)
+  failCount      Int       @default(0) // Consecutive auth failures before INVALID
+
+  // Back-relation from Deployment (when this token is claimed by a specific deployment)
+  deployment Deployment?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Intentionally NOT unique([projectId, platform]) — a project can have multiple deployments
+  // (e.g. two Render services) each with their own token. Integrity is enforced by
+  // Deployment.platformTokenId @unique (one token can't be claimed by two Deployments).
+  @@index([projectId, platform])
+  @@index([projectId, status])
+  @@index([status])
+}
+
+// ─── Deployments (NEW — sub-entity of Project for multi-deployment support) ───
+
+model Deployment {
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  role          DeploymentRole @default(OTHER)
+  // User-facing label, shown when platform alone can't distinguish (e.g. "Render (Frontend)" vs "Render (Backend)")
+  label         String?
+
+  // Deployment location — source of truth for this deployment's region/provider
+  region        String?
+  provider      CloudProvider?
+  isDeployed    Boolean  @default(false)
+  deploymentUrl String?
+
+  // One-to-one link to the PlatformToken used for live collection on this deployment.
+  // @unique ensures one token can't be double-counted across two deployments.
+  platformTokenId String?       @unique
+  platformToken   PlatformToken? @relation(fields: [platformTokenId], references: [id], onDelete: SetNull)
+
+  emissionRecords EmissionRecord[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
 }

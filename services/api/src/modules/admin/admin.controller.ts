@@ -853,7 +853,7 @@ export const migrateEmission = async (req: AuthRequest, res: Response) => {
         carbonKg: record.carbonKg * 0.6, // Simulate 40% carbon savings
         isIdle: false,
         isOversized: false,
-        recommendation: `Migrated to ${targetRegion}. Operations nominal.`
+        recommendation: null
       }
     });
 
@@ -1031,7 +1031,12 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
         instanceLastSeen.set(r.instanceId, r.timestamp);
       }
 
-      const history30d = Array.from({ length: 30 }).map((_, i) => {
+      const earliestRecordDate = emissionsArr.length > 0 
+        ? new Date(Math.min(...emissionsArr.map(e => e.timestamp.getTime()))) 
+        : null;
+      const earliestDateKey = earliestRecordDate ? earliestRecordDate.toISOString().split('T')[0] : null;
+
+      let history30d = Array.from({ length: 30 }).map((_, i) => {
         const d = new Date();
         d.setDate(d.getDate() - (29 - i));
         const dayStr = d.toISOString().split('T')[0];
@@ -1046,8 +1051,24 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
           carbonKg: dayRecords.reduce((sum, r) => sum + r.carbonKg, 0),
           costUsd: dayCost
         };
-      });
-      const history7d = history30d.slice(-7);
+      }).filter(h => !earliestDateKey || h.date >= earliestDateKey);
+
+      if (!earliestDateKey || history30d.length === 0) {
+        const todayStr = new Date().toISOString().split('T')[0];
+        history30d = [{ date: todayStr, carbonKg: 0, costUsd: 0 }];
+      }
+
+      if (history30d.length === 1) {
+        const prevDay = new Date(history30d[0].date);
+        prevDay.setDate(prevDay.getDate() - 1);
+        history30d.unshift({
+          date: prevDay.toISOString().split('T')[0],
+          carbonKg: 0,
+          costUsd: 0
+        });
+      }
+
+      let history7d = history30d.slice(-7);
 
       const todayKg = history30d[history30d.length - 1]?.carbonKg || 0;
       const yesterdayKg = history30d[history30d.length - 2]?.carbonKg || 0;

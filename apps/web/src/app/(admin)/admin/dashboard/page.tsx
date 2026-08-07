@@ -57,28 +57,46 @@ export default function DashboardPage() {
   const [selectedProject, setSelectedProject] = useState('all');
   const router = useRouter();
 
-  const handleAnalyze = async (project: Project) => {
-    if (!project.region || project.region === 'Not detected yet') {
+  const handleAnalyze = async (project: any) => {
+    const hasDeployments = project.deployments && project.deployments.length > 0;
+    if (!hasDeployments && (!project.region || project.region === 'Not detected yet')) {
       alert("Project is not fully deployed yet. Waiting for region detection.");
       return;
     }
     setAnalyzingProjectId(project.id);
     try {
       const emRes = await adminApi.getEmissions('All', 'All', project.id);
+      let payload;
+      
       if (!emRes.records || emRes.records.length === 0) {
-        alert("Not enough data yet to analyze. Wait for telemetry.");
-        setAnalyzingProjectId(null);
-        return;
+        // If no telemetry, but we have deployments, we can estimate based on deployments
+        if (hasDeployments) {
+          const mainDep = project.deployments.find((d: any) => d.role === 'FRONTEND') || project.deployments[0];
+          payload = {
+            projectName: project.name,
+            instanceType: 't3.medium',
+            provider: mainDep.provider || 'VERCEL',
+            region: mainDep.region || 'sfo1',
+            cpuUtilization: 0.2,
+            storageGb: 20
+          };
+        } else {
+          alert("Not enough data yet to analyze. Wait for telemetry.");
+          setAnalyzingProjectId(null);
+          return;
+        }
+      } else {
+        const latest = emRes.records[0];
+        payload = {
+          projectName: project.name,
+          instanceType: latest.instanceType || 't3.medium',
+          provider: latest.provider || project.provider || 'aws',
+          region: latest.region || project.region || 'us-east-1',
+          cpuUtilization: latest.cpuUtilization || 0.2,
+          storageGb: 20
+        };
       }
-      const latest = emRes.records[0];
-      const payload = {
-        projectName: project.name,
-        instanceType: latest.instanceType || 't3.medium',
-        provider: latest.provider || project.provider || 'aws',
-        region: latest.region || project.region || 'us-east-1',
-        cpuUtilization: latest.cpuUtilization || 0.2,
-        storageGb: 20
-      };
+      
       const res = await carbonApi.recommend(payload);
       if (res.success && res.data?.recommended) {
         setAnalysisResult({ project, currentRegion: payload.region, currentProvider: payload.provider, recommendation: res.data.recommended });
@@ -285,13 +303,20 @@ export default function DashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {projects.map((p) => (
+                {projects.map((p) => {
+                  const hasDeployments = p.deployments && p.deployments.length > 0;
+                  const displayRegion = hasDeployments
+                    ? p.deployments.map((d: any) => `${d.role === 'FRONTEND' ? 'Frontend' : d.role === 'BACKEND' ? 'Backend' : 'Other'}: ${d.region || 'Unknown'}`).join(' | ')
+                    : (p.region || 'Not detected yet');
+                  const isAnalyzeDisabled = analyzingProjectId === p.id || (!hasDeployments && (!p.region || p.region === 'Not detected yet'));
+
+                  return (
                   <tr key={p.id} className="border-b border-outline-variant/30 hover:bg-surface-container-low/50 transition-colors">
                     <td className="py-4 text-sm text-on-surface-variant font-code truncate max-w-[120px]">{p.id}</td>
                     <td className="py-4 text-sm font-medium text-on-surface">{p.name}</td>
                     <td className="py-4 text-sm">
                       <span className="bg-surface-container border border-outline-variant text-on-surface-variant px-2 py-1 rounded text-xs">
-                        {p.region || 'Not detected yet'}
+                        {displayRegion}
                       </span>
                     </td>
                     <td className="py-4 text-sm">
@@ -316,15 +341,16 @@ export default function DashboardPage() {
                       </button>
                       <button
                         onClick={() => handleAnalyze(p)}
-                        disabled={analyzingProjectId === p.id || !p.region || p.region === 'Not detected yet'}
-                        title={!p.region || p.region === 'Not detected yet' ? "Waiting for deployment region" : "Analyze carbon impact"}
+                        disabled={isAnalyzeDisabled}
+                        title={isAnalyzeDisabled ? "Waiting for deployment region" : "Analyze carbon impact"}
                         className="bg-surface-container-high hover:bg-outline-variant text-on-surface px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border border-outline-variant disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {analyzingProjectId === p.id ? 'Analyzing...' : 'Analyze'}
                       </button>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
             
