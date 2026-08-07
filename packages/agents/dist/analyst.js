@@ -64,7 +64,7 @@ Each recommendation object must have exactly these fields:
             let data;
             try {
                 const prompt = extraInstruction ? `${SYSTEM_PROMPT}\n\n${extraInstruction}` : SYSTEM_PROMPT;
-                data = await (0, core_1.callNvidiaApi)(apiKey, 'mistralai/mistral-nemotron', prompt, history);
+                data = await (0, core_1.callNvidiaApi)(apiKey, 'meta/llama-3.1-70b-instruct', prompt, history);
             }
             finally {
                 clearTimeout(timeoutTimer);

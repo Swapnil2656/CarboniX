@@ -301,7 +301,7 @@ export const chat = async (req: AuthRequest, res: Response) => {
       return res.json({ success: true, text: "AI features are currently disabled. Please configure NVIDIA_API_KEY on the server to enable CarboniX Assistant.", updatedHistory });
     }
 
-    let aiData = await callNvidiaApi(NVIDIA_API_KEY, 'mistralai/mistral-nemotron', SYSTEM_PROMPT, updatedHistory, tools);
+    let aiData = await callNvidiaApi(NVIDIA_API_KEY, 'meta/llama-3.1-70b-instruct', SYSTEM_PROMPT, updatedHistory, tools);
     let aiMessage = aiData?.choices?.[0]?.message;
     
     if (!aiMessage) {
@@ -358,7 +358,7 @@ export const chat = async (req: AuthRequest, res: Response) => {
 
       // Fetch the next turn from AI
       try {
-        aiData = await callNvidiaApi(NVIDIA_API_KEY, 'mistralai/mistral-nemotron', SYSTEM_PROMPT, updatedHistory, tools);
+        aiData = await callNvidiaApi(NVIDIA_API_KEY, 'meta/llama-3.1-70b-instruct', SYSTEM_PROMPT, updatedHistory, tools);
         aiMessage = aiData?.choices?.[0]?.message;
         if (!aiMessage) break;
       } catch (aiError: any) {

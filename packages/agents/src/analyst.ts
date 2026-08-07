@@ -102,7 +102,7 @@ Each recommendation object must have exactly these fields:
         const prompt = extraInstruction ? `${SYSTEM_PROMPT}\n\n${extraInstruction}` : SYSTEM_PROMPT;
         data = await callNvidiaApi(
           apiKey,
-          'mistralai/mistral-nemotron',
+          'meta/llama-3.1-70b-instruct',
           prompt,
           history
         );
