@@ -113,6 +113,19 @@ export default function ProjectDetailScreen() {
   const deployments: any[] = data.deployments || [];
   const chartData = chartDays === '7d' ? history7d : history30d;
 
+  const platformKeys = deployments
+    .filter((d: any) => d.platformToken)
+    .map((d: any) => ({
+      id: d.platformToken.id,
+      name: `${d.platformToken.platform} Token (PaaS)`,
+      status: d.platformToken.status,
+      prefix: '****',
+      lastUsedAt: d.platformToken.updatedAt,
+      isPlatformToken: true
+    }));
+
+  const allKeys = [...(apiKeys || []), ...platformKeys];
+
   const ROLE_COLORS: Record<string, string> = {
     FRONTEND: '#60a5fa',
     BACKEND:  '#c084fc',
@@ -229,6 +242,18 @@ export default function ProjectDetailScreen() {
                 <MaterialIcons name={checklist?.sdkConnected ? "check-circle" : "radio-button-unchecked"} size={18} color={checklist?.sdkConnected ? colors.primary : colors.textBody} />
                 <Text style={{ color: colors.textBody, marginLeft: 8 }}>Telemetry Flowing</Text>
               </View>
+              
+              {!checklist?.apiKeyGenerated && (
+                <View style={{ marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: colors.surfaceContainerHigh }}>
+                  <TouchableOpacity 
+                    style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(80, 250, 123, 0.1)', paddingVertical: 8, paddingHorizontal: 12, borderRadius: 20, alignSelf: 'flex-start' }}
+                    onPress={() => router.push(`/project-settings?id=${id}`)}
+                  >
+                    <Text style={{ color: colors.primary, fontSize: 13, fontWeight: '500', marginRight: 4 }}>Go to project settings</Text>
+                    <MaterialIcons name="arrow-forward" size={16} color={colors.primary} />
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
 
             <View style={styles.panel}>
@@ -301,8 +326,8 @@ export default function ProjectDetailScreen() {
               deployments.map((dep: any) => {
                 const roleColor = ROLE_COLORS[dep.role] ?? colors.textMuted;
                 const roleLabel = ROLE_LABELS[dep.role] ?? 'Other';
-                const depLabel = dep.label ?? dep.role;
                 const platformName = dep.platformToken?.platform ?? null;
+                const depLabel = dep.label || platformName || dep.role;
                 return (
                   <View key={dep.id} style={{ backgroundColor: colors.surfaceContainer, borderRadius: 10, padding: 12, marginBottom: 10 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4, flexWrap: 'wrap' }}>
@@ -373,16 +398,34 @@ export default function ProjectDetailScreen() {
 
         <View style={styles.panel}>
           <Text style={styles.panelTitle}>Associated API Keys</Text>
-          {apiKeys?.length > 0 ? (
-            apiKeys.map((key: any) => (
+          {allKeys?.length > 0 ? (
+            allKeys.map((key: any) => (
               <View key={key.id} style={{ backgroundColor: colors.surfaceContainer, padding: 12, borderRadius: 8, marginBottom: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <View>
-                  <Text style={{ color: colors.textBody, fontWeight: 'bold' }}>{key.name}</Text>
-                  <Text style={{ color: colors.textMuted, fontSize: 12 }}>Prefix: {key.prefix}</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Text style={{ color: colors.textBody, fontWeight: 'bold' }}>{key.name}</Text>
+                    {key.status !== 'ACTIVE' && (
+                      <View style={{ backgroundColor: 'rgba(248,113,113,0.1)', paddingHorizontal: 4, borderRadius: 4 }}>
+                         <Text style={{ color: colors.error, fontSize: 10 }}>Revoked</Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text style={{ color: colors.textMuted, fontSize: 12 }}>
+                    {key.isPlatformToken ? `Token Masked • Connected: ${new Date(key.lastUsedAt).toLocaleDateString()}` : `Prefix: ${key.prefix} • Last Used: ${key.lastUsedAt ? new Date(key.lastUsedAt).toLocaleDateString() : 'Never'}`}
+                  </Text>
                 </View>
-                <TouchableOpacity style={{ backgroundColor: 'rgba(248,113,113,0.1)', padding: 6, borderRadius: 6 }}>
-                  <Text style={{ color: colors.error, fontSize: 12 }}>Revoke</Text>
-                </TouchableOpacity>
+                {!key.isPlatformToken ? (
+                  <TouchableOpacity style={{ backgroundColor: 'rgba(248,113,113,0.1)', padding: 6, borderRadius: 6 }}>
+                    <Text style={{ color: colors.error, fontSize: 12 }}>Revoke</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity 
+                    style={{ backgroundColor: colors.surfaceContainerHigh, padding: 6, borderRadius: 6 }}
+                    onPress={() => router.push({ pathname: '/project-settings' as any, params: { id } })}
+                  >
+                    <Text style={{ color: colors.textBody, fontSize: 12 }}>Manage</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             ))
           ) : (

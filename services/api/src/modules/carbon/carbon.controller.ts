@@ -351,19 +351,41 @@ export const ingestTelemetry = async (req: ApiKeyRequest, res: Response) => {
     
     // Update the project's sdkConnected status
     let resolvedProjectId: string | null = null;
+    let resolvedDeploymentId: string | null = null;
     if (req.apiKey) {
       resolvedProjectId = await resolveProjectForApiKey(req.apiKey, projectName);
       if (resolvedProjectId) {
         const now = new Date();
-        const existingProject = await prisma.project.findUnique({ where: { id: resolvedProjectId } });
-        await prisma.project.update({
+        const existingProject = await prisma.project.findUnique({ 
           where: { id: resolvedProjectId },
-          data: {
-            sdkConnected: true,
-            lastPingAt: now,
-            connectedAt: existingProject?.connectedAt || now
-          }
+          include: { deployments: { include: { platformToken: true } } }
         });
+        
+        if (existingProject) {
+          await prisma.project.update({
+            where: { id: resolvedProjectId },
+            data: {
+              sdkConnected: true,
+              lastPingAt: now,
+              connectedAt: existingProject.connectedAt || now
+            }
+          });
+          
+          if (projectName) {
+            const upperName = projectName.toUpperCase();
+            const targetPlatform = upperName.startsWith('VERCEL') ? 'VERCEL' 
+                                 : upperName.startsWith('RAILWAY') ? 'RAILWAY'
+                                 : upperName.startsWith('RENDER') ? 'RENDER'
+                                 : upperName.startsWith('NETLIFY') ? 'NETLIFY'
+                                 : null;
+            if (targetPlatform) {
+              const matchingDeployment = existingProject.deployments.find((d: any) => d.platformToken?.platform === targetPlatform);
+              if (matchingDeployment) {
+                resolvedDeploymentId = matchingDeployment.id;
+              }
+            }
+          }
+        }
       }
     }
 
@@ -376,6 +398,7 @@ export const ingestTelemetry = async (req: ApiKeyRequest, res: Response) => {
         region: input.region,
         instanceName: projectName,
         projectId: resolvedProjectId, // Set the real tenant link
+        deploymentId: resolvedDeploymentId,
         cpuUtilization: input.cpuUtilization,
         energyKwh: result.totalFinalEnergyKwh,
         gridIntensity: result.gridIntensity,

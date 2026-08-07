@@ -42,6 +42,9 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
   // Reporter State
   const [isExporting, setIsExporting] = useState(false);
 
+  // Tab State
+  const [activeTab, setActiveTab] = useState<string>('OVERALL');
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -326,7 +329,53 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
 
   const { project, idleInstances, oversizedInstances, carbonTrend, history7d, history30d, totalMonthKg, apiKeys, greenerRegion, isStale, instances, checklist, estimateAssumptions, top3Regions, manualInstructions } = data;
   const deployments: any[] = data.deployments || [];
-  const chartData = chartDays === '7d' ? history7d : history30d;
+
+  const activeAnalytics = activeTab === 'OVERALL'
+    ? { carbonTrend, history7d, history30d, idleInstances, totalMonthKg }
+    : (deployments.find((d: any) => d.id === activeTab)?.analytics || {
+        carbonTrend: { todayKg: 0, yesterdayKg: 0, trendPercent: null, isNew: true },
+        history7d: [],
+        history30d: [],
+        idleInstances: 0,
+        totalMonthKg: 0
+      });
+
+  const chartData = chartDays === '7d' ? activeAnalytics.history7d : activeAnalytics.history30d;
+
+  const platformKeys = deployments
+    .filter((d: any) => d.platformToken)
+    .map((d: any) => ({
+      id: d.platformToken.id,
+      name: `${d.platformToken.platform} Token (PaaS)`,
+      status: d.platformToken.status,
+      prefix: '****',
+      lastUsedAt: d.platformToken.updatedAt,
+      isPlatformToken: true
+    }));
+
+  const allKeys = [...(apiKeys || []), ...platformKeys];
+  const activePaaSDeployments = deployments.filter((d: any) => d.platformToken && d.platformToken.status === 'ACTIVE');
+  const hasActivePaaS = activePaaSDeployments.length > 0;
+  
+  const connectedPlatforms = Array.from(new Set(activePaaSDeployments.map((d: any) => d.platformToken.platform))).join(' & ');
+
+  let deploymentStatusLabel = 'Deployed';
+  if (project.isDeployed && deployments.length > 0) {
+     const hasFrontend = deployments.some((d: any) => d.role === 'FRONTEND' || d.platformToken?.platform === 'VERCEL' || d.platformToken?.platform === 'NETLIFY');
+     const hasBackend = deployments.some((d: any) => d.role === 'BACKEND' || d.platformToken?.platform === 'RENDER' || d.platformToken?.platform === 'RAILWAY');
+     const hasFullstack = deployments.some((d: any) => d.role === 'FULLSTACK');
+
+     if (hasFullstack || (hasFrontend && hasBackend)) {
+       deploymentStatusLabel = 'Fullstack Deployed';
+     } else if (hasFrontend) {
+       deploymentStatusLabel = 'Frontend Deployed';
+     } else if (hasBackend) {
+       deploymentStatusLabel = 'Backend Deployed';
+     } else if (deployments.length === 1 && deployments[0].platformToken) {
+       deploymentStatusLabel = `${deployments[0].platformToken.platform} Connected`;
+     }
+  }
+
   const dataSource: 'NO_CREDS' | 'MOCK_DEMO' | 'LIVE' = project.dataSource || 'NO_CREDS';
 
   const ROLE_LABELS: Record<string, { label: string; color: string }> = {
@@ -348,12 +397,12 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
   };
 
   const renderTrend = () => {
-    if (carbonTrend.isNew) {
+    if (activeAnalytics.carbonTrend?.isNew) {
       return { value: 0, direction: 'up', isNew: true };
     }
     return {
-      value: carbonTrend.trendPercent ? Math.round(Math.abs(carbonTrend.trendPercent)) : 0,
-      direction: carbonTrend.trendPercent >= 0 ? 'up' : 'down'
+      value: activeAnalytics.carbonTrend?.trendPercent ? Math.round(Math.abs(activeAnalytics.carbonTrend.trendPercent)) : 0,
+      direction: activeAnalytics.carbonTrend?.trendPercent >= 0 ? 'up' : 'down'
     };
   };
 
@@ -391,8 +440,13 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     }
   };
 
-  const paginatedInstances = localInstances.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-  const totalPages = Math.ceil(localInstances.length / itemsPerPage);
+  // Filter instances by active tab
+  const activeInstances = activeTab === 'OVERALL' 
+    ? localInstances 
+    : localInstances.filter(inst => inst.deploymentId === activeTab);
+
+  const paginatedInstances = activeInstances.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil(activeInstances.length / itemsPerPage);
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-12 relative min-h-screen animate-fade-in">
@@ -414,7 +468,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
             <h1 className="text-section-header text-on-surface flex items-center gap-2 flex-wrap">
               {project.name}
               {project.isDeployed ? (
-                <span className="bg-green-500/20 text-green-400 text-xs px-2 py-0.5 rounded border border-green-500/30">Deployed</span>
+                <span className="bg-green-500/20 text-green-400 text-xs px-2 py-0.5 rounded border border-green-500/30">{deploymentStatusLabel}</span>
               ) : (
                 <span className="bg-amber-500/20 text-amber-400 text-xs px-2 py-0.5 rounded border border-amber-500/30">Not Deployed</span>
               )}
@@ -487,9 +541,9 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
 
         {deployments.map((dep: any) => {
           const roleInfo = ROLE_LABELS[dep.role] ?? ROLE_LABELS.OTHER;
-          const depLabel = dep.label ?? dep.role;
           const platformName = dep.platformToken?.platform ?? null;
           const tokenStatus = dep.platformToken?.status ?? null;
+          const depLabel = dep.label || platformName || dep.role;
           return (
             <div key={dep.id} className="bg-surface border border-outline-variant rounded-xl p-4 flex flex-col md:flex-row md:items-center gap-4">
               <div className="flex-1 min-w-0">
@@ -518,7 +572,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
               <div className="flex items-center gap-4">
                 <div className="text-right">
                   <div className="text-xs text-on-surface-variant">This month</div>
-                  <div className="font-mono font-semibold text-on-surface">{(dep.totalMonthKg || 0).toFixed(2)} kg</div>
+                  <div className="font-mono font-semibold text-on-surface">{(dep.analytics?.totalMonthKg || 0).toFixed(2)} kg</div>
                 </div>
                 <button
                   onClick={() => handleDeleteDeployment(dep.id, depLabel)}
@@ -627,21 +681,29 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                   <span className={`material-symbols-outlined ${checklist?.apiKeyGenerated ? 'text-green-400' : ''}`}>
                     {checklist?.apiKeyGenerated ? 'check_circle' : 'radio_button_unchecked'}
                   </span>
-                  <span className="text-sm text-on-surface">API Key Generated</span>
+                  <span className="text-sm text-on-surface">{hasActivePaaS && (!apiKeys || apiKeys.length === 0) ? `${connectedPlatforms} Connected` : 'API Key Generated'}</span>
                 </div>
                 <div className={`flex items-center gap-3 ${!checklist?.configInitialized ? 'opacity-50' : ''}`}>
                   <span className={`material-symbols-outlined ${checklist?.configInitialized ? 'text-green-400' : ''}`}>
                     {checklist?.configInitialized ? 'check_circle' : 'radio_button_unchecked'}
                   </span>
-                  <span className="text-sm text-on-surface">Config Initialized (npx @carbonix/cli init)</span>
+                  <span className="text-sm text-on-surface">{hasActivePaaS && !project.configInitializedAt ? `Configuration Synced via ${connectedPlatforms}` : 'Config Initialized (npx @carbonix/cli init)'}</span>
                 </div>
                 <div className={`flex items-center gap-3 ${!checklist?.sdkConnected ? 'opacity-50' : ''}`}>
                   <span className={`material-symbols-outlined ${checklist?.sdkConnected ? 'text-green-400' : ''}`}>
                     {checklist?.sdkConnected ? 'check_circle' : 'radio_button_unchecked'}
                   </span>
-                  <span className="text-sm text-on-surface">Telemetry Flowing (Connected)</span>
+                  <span className="text-sm text-on-surface">{hasActivePaaS && !project.lastPingAt ? `${connectedPlatforms} Telemetry Active` : 'Telemetry Flowing (Connected)'}</span>
                 </div>
               </div>
+              {!checklist?.apiKeyGenerated && (
+                <div className="mt-6 pt-4 border-t border-outline-variant">
+                  <Link href={`/admin/project/${params.id}/settings`} className="bg-primary/10 text-primary px-4 py-2 rounded-full font-medium text-sm hover:bg-primary/20 transition-all inline-flex items-center gap-2">
+                    Go to project settings
+                    <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
 
@@ -715,25 +777,62 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
             </div>
           )}
 
+          {deployments.length > 0 && (
+            <div className="flex bg-surface-container rounded-lg p-1 w-max border border-outline-variant">
+              <button
+                onClick={() => setActiveTab('OVERALL')}
+                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === 'OVERALL'
+                    ? 'bg-surface text-on-surface shadow-sm border border-outline-variant/50'
+                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
+                }`}
+              >
+                Fullstack
+              </button>
+              {deployments.map((d: any) => {
+                let tabLabel = d.platformToken?.platform || d.role.toUpperCase();
+                if (tabLabel === 'VERCEL') tabLabel = 'Frontend';
+                if (tabLabel === 'RAILWAY') tabLabel = 'Backend';
+                if (tabLabel === 'DATABASE') tabLabel = 'Database';
+                if (tabLabel === 'RENDER') tabLabel = 'Backend';
+                if (tabLabel === 'NETLIFY') tabLabel = 'Frontend';
+
+                return (
+                  <button
+                    key={d.id}
+                    onClick={() => setActiveTab(d.id)}
+                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors capitalize ${
+                      activeTab === d.id
+                        ? 'bg-surface text-on-surface shadow-sm border border-outline-variant/50'
+                        : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
+                    }`}
+                  >
+                    {tabLabel}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard
               title="Today's Carbon"
-              value={`${Number(carbonTrend?.todayKg || 0).toFixed(2)} kg`}
+              value={`${Number(activeAnalytics.carbonTrend?.todayKg || 0).toFixed(2)} kg`}
               icon="co2"
-              trend={carbonTrend?.isNew ? undefined : renderTrend() as any}
+              trend={activeAnalytics.carbonTrend?.isNew ? undefined : renderTrend() as any}
             />
             <StatCard
               title="Est. Daily Cost"
-              value={`$${(history30d && history30d[history30d.length - 1]?.costUsd || 0).toFixed(2)}`}
+              value={`$${(activeAnalytics.history30d && activeAnalytics.history30d.length > 0 ? activeAnalytics.history30d[activeAnalytics.history30d.length - 1]?.costUsd || 0 : 0).toFixed(2)}`}
               icon="payments"
             />
             <StatCard
               title="Idle Instances"
-              value={idleInstances?.toString() || '0'}
+              value={activeAnalytics.idleInstances?.toString() || '0'}
               icon="snooze"
             />
             <div className={`border rounded-xl p-5 ${isStale ? 'bg-error/5 border-error/30' : 'bg-surface border-outline-variant'}`}>
-              <div className="text-sm font-label-caps text-on-surface-variant mb-2">SDK Status</div>
+              <div className="text-sm font-label-caps text-on-surface-variant mb-2">{hasActivePaaS && !project.lastPingAt ? `${connectedPlatforms} Sync` : 'SDK Status'}</div>
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${isStale ? 'bg-error' : 'bg-green-500 animate-pulse'}`}></div>
                 <div className="text-lg font-medium text-on-surface">
@@ -741,7 +840,11 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                 </div>
               </div>
               <p className="text-xs text-on-surface-variant mt-1">
-                Last Ping: {project.lastPingAt ? new Date(project.lastPingAt).toLocaleString() : 'Never'}
+                {hasActivePaaS && !project.lastPingAt ? (
+                  `Telemetry synced via ${connectedPlatforms}`
+                ) : (
+                  `Last Ping: ${project.lastPingAt ? new Date(project.lastPingAt).toLocaleString() : 'Never'}`
+                )}
               </p>
             </div>
           </div>
@@ -895,9 +998,9 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
             
             {totalPages > 1 && (
               <div className="px-5 py-4 border-t border-outline-variant bg-surface-container-low flex items-center justify-between">
-                <div className="text-xs text-on-surface-variant">
-                  Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, localInstances.length)} of {localInstances.length} instances
-                </div>
+                <div className="text-on-surface-variant">
+                Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, activeInstances.length)} of {activeInstances.length} instances
+              </div>
                 <div className="flex items-center gap-2">
                   <button 
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
@@ -924,21 +1027,34 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
       {/* API Keys */}
       <div className="bg-surface border border-outline-variant rounded-xl p-5">
         <h3 className="font-semibold text-on-surface mb-4">Associated API Keys</h3>
-        {apiKeys?.length > 0 ? (
+        {allKeys?.length > 0 ? (
           <div className="space-y-3">
-            {apiKeys.map((key: any) => (
+            {allKeys.map((key: any) => (
               <div key={key.id} className="flex items-center justify-between p-3 rounded-lg bg-surface-container-low border border-outline-variant">
                 <div>
                   <div className="font-medium text-on-surface flex items-center gap-2">
                     {key.name}
                     {key.status !== 'ACTIVE' && <Badge variant="error">Revoked</Badge>}
                   </div>
-                  <div className="text-xs text-on-surface-variant mt-1">Prefix: {key.prefix} • Last Used: {key.lastUsedAt ? new Date(key.lastUsedAt).toLocaleDateString() : 'Never'}</div>
+                  <div className="text-xs text-on-surface-variant mt-1">
+                    {key.isPlatformToken 
+                      ? `Token Masked • Connected: ${new Date(key.lastUsedAt).toLocaleDateString()}` 
+                      : `Prefix: ${key.prefix} • Last Used: ${key.lastUsedAt ? new Date(key.lastUsedAt).toLocaleDateString() : 'Never'}`
+                    }
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => handleRotateKey(key)} className="bg-surface-container-highest hover:bg-surface-bright px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">Rotate</button>
-                  <button onClick={() => handleRevokeKey(key.id)} disabled={key.status !== 'ACTIVE'} className="bg-error/10 text-error hover:bg-error/20 disabled:opacity-50 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">Revoke</button>
-                  <button onClick={() => handleDeleteKey(key.id)} className="bg-error/20 text-error hover:bg-error/30 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">Delete</button>
+                  {!key.isPlatformToken ? (
+                    <>
+                      <button onClick={() => handleRotateKey(key)} className="bg-surface-container-highest hover:bg-surface-bright px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">Rotate</button>
+                      <button onClick={() => handleRevokeKey(key.id)} disabled={key.status !== 'ACTIVE'} className="bg-error/10 text-error hover:bg-error/20 disabled:opacity-50 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">Revoke</button>
+                      <button onClick={() => handleDeleteKey(key.id)} className="bg-error/20 text-error hover:bg-error/30 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">Delete</button>
+                    </>
+                  ) : (
+                    <Link href={`/admin/project/${params.id}/settings`} className="bg-surface-container-highest hover:bg-surface-bright px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">
+                      Manage Settings
+                    </Link>
+                  )}
                 </div>
               </div>
             ))}

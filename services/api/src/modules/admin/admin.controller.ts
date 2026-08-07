@@ -994,6 +994,14 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
     });
     if (!project) return res.status(404).json({ error: 'Project not found' });
 
+    // Auto-heal isDeployed state if there are active PaaS platform tokens or deployments
+    const hasActivePaaS = project.deployments.some(d => d.platformToken && d.platformToken.status === 'ACTIVE');
+    if (hasActivePaaS && !project.isDeployed) {
+      project.isDeployed = true;
+      // asynchronously persist this state fix to the DB
+      prisma.project.update({ where: { id: project.id }, data: { isDeployed: true } }).catch(console.error);
+    }
+
     // Fetch emissions for the last 30 days
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -1009,65 +1017,96 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
     });
     const costMap = new Map(instanceTypes.map(t => [t.name, t.onDemandHourlyUsd || 0]));
 
-    // Pre-calculate intervals for all emissions based on actual ingestion time
-    const instanceLastSeen = new Map<string, Date>();
-    const emissionIntervals = new Map<string, number>();
-    
-    for (const r of emissions) {
-      const lastSeen = instanceLastSeen.get(r.instanceId);
-      let intervalHours = 1; // Default to 1 hour
-      if (lastSeen) {
-        const diffMs = r.timestamp.getTime() - lastSeen.getTime();
-        intervalHours = Math.min(diffMs / (1000 * 60 * 60), 24); // Cap at 24h
+    const computeAnalytics = (emissionsArr: any[]) => {
+      const instanceLastSeen = new Map<string, Date>();
+      const emissionIntervals = new Map<string, number>();
+      for (const r of emissionsArr) {
+        const lastSeen = instanceLastSeen.get(r.instanceId);
+        let intervalHours = 1;
+        if (lastSeen) {
+          const diffMs = r.timestamp.getTime() - lastSeen.getTime();
+          intervalHours = Math.min(diffMs / (1000 * 60 * 60), 24);
+        }
+        emissionIntervals.set(r.id, intervalHours);
+        instanceLastSeen.set(r.instanceId, r.timestamp);
       }
-      emissionIntervals.set(r.id, intervalHours);
-      instanceLastSeen.set(r.instanceId, r.timestamp);
-    }
 
-    const history30d = Array.from({ length: 30 }).map((_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() - (29 - i));
-      const dayStr = d.toISOString().split('T')[0];
-      const dayRecords = emissions.filter(e => e.timestamp.toISOString().split('T')[0] === dayStr);
-      let dayCost = 0;
-      for (const r of dayRecords) {
-        const intervalHours = emissionIntervals.get(r.id) || 1;
-        dayCost += (costMap.get(r.instanceType) || 0) * intervalHours;
+      const history30d = Array.from({ length: 30 }).map((_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (29 - i));
+        const dayStr = d.toISOString().split('T')[0];
+        const dayRecords = emissionsArr.filter(e => e.timestamp.toISOString().split('T')[0] === dayStr);
+        let dayCost = 0;
+        for (const r of dayRecords) {
+          const intervalHours = emissionIntervals.get(r.id) || 1;
+          dayCost += (costMap.get(r.instanceType) || 0) * intervalHours;
+        }
+        return {
+          date: dayStr,
+          carbonKg: dayRecords.reduce((sum, r) => sum + r.carbonKg, 0),
+          costUsd: dayCost
+        };
+      });
+      const history7d = history30d.slice(-7);
+
+      const todayKg = history30d[history30d.length - 1]?.carbonKg || 0;
+      const yesterdayKg = history30d[history30d.length - 2]?.carbonKg || 0;
+      let trendPercent = null;
+      let isNew = false;
+      if (yesterdayKg > 0) {
+        trendPercent = ((todayKg - yesterdayKg) / yesterdayKg) * 100;
+      } else if (todayKg > 0) {
+        isNew = true;
       }
+
+      const monthStart = new Date();
+      monthStart.setDate(1);
+      monthStart.setHours(0,0,0,0);
+      const mtdRecords = emissionsArr.filter(e => e.timestamp >= monthStart);
+      const totalMonthKg = mtdRecords.reduce((sum, r) => sum + r.carbonKg, 0);
+
+      const twentyFourHoursAgo = new Date();
+      twentyFourHoursAgo.setDate(twentyFourHoursAgo.getDate() - 1);
+      const recentEmissions = emissionsArr.filter(e => e.timestamp >= twentyFourHoursAgo);
+      const instanceAvgCpu = new Map<string, { sum: number, count: number }>();
+      for (const r of recentEmissions) {
+        const cur = instanceAvgCpu.get(r.instanceId) || { sum: 0, count: 0 };
+        instanceAvgCpu.set(r.instanceId, { sum: cur.sum + r.cpuUtilization, count: cur.count + 1 });
+      }
+      let idleInstancesCount = 0;
+      for (const [_, val] of instanceAvgCpu.entries()) {
+        if (val.sum / val.count < 5) idleInstancesCount++;
+      }
+
       return {
-        date: dayStr,
-        carbonKg: dayRecords.reduce((sum, r) => sum + r.carbonKg, 0),
-        costUsd: dayCost
+        history30d,
+        history7d,
+        carbonTrend: { todayKg, yesterdayKg, trendPercent, isNew },
+        totalMonthKg,
+        idleInstances: idleInstancesCount
+      };
+    };
+
+    const overallAnalytics = computeAnalytics(emissions);
+
+    // Group deployments with per-deployment analytics
+    const enrichedDeployments = project.deployments.map(d => {
+      const depEmissions = emissions.filter(e => e.deploymentId === d.id);
+      return {
+        ...d,
+        analytics: computeAnalytics(depEmissions)
       };
     });
-    const history7d = history30d.slice(-7);
-
-    const todayKg = history30d[history30d.length - 1].carbonKg;
-    const yesterdayKg = history30d[history30d.length - 2].carbonKg;
-    let trendPercent = null;
-    let isNew = false;
-    if (yesterdayKg > 0) {
-      trendPercent = ((todayKg - yesterdayKg) / yesterdayKg) * 100;
-    } else if (todayKg > 0) {
-      isNew = true;
-    }
 
     // Budget check
-    const monthStart = new Date();
-    monthStart.setDate(1);
-    monthStart.setHours(0,0,0,0);
-    const mtdRecords = emissions.filter(e => e.timestamp >= monthStart);
-    const totalMonthKg = mtdRecords.reduce((sum, r) => sum + r.carbonKg, 0);
-
-    if (project.carbonBudgetKg && totalMonthKg >= project.carbonBudgetKg * 0.8) {
-      // Check if we already alerted recently to prevent spam? (Simplifying for now)
+    if (project.carbonBudgetKg && overallAnalytics.totalMonthKg >= project.carbonBudgetKg * 0.8) {
       await prisma.userNotification.create({
         data: {
           userId: req.user!.id,
-          title: totalMonthKg >= project.carbonBudgetKg ? 'Carbon Budget Exceeded' : 'Carbon Budget Warning',
-          body: `Project "${project.name}" monthly usage: ${totalMonthKg.toFixed(1)} / ${project.carbonBudgetKg} kg CO₂`,
+          title: overallAnalytics.totalMonthKg >= project.carbonBudgetKg ? 'Carbon Budget Exceeded' : 'Carbon Budget Warning',
+          body: `Project "${project.name}" monthly usage: ${overallAnalytics.totalMonthKg.toFixed(1)} / ${project.carbonBudgetKg} kg CO₂`,
           type: 'BUDGET_ALERT',
-          data: { projectId: project.id, usedKg: totalMonthKg, budgetKg: project.carbonBudgetKg }
+          data: { projectId: project.id, usedKg: overallAnalytics.totalMonthKg, budgetKg: project.carbonBudgetKg }
         }
       });
     }
@@ -1169,11 +1208,12 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
       }
     }
 
+    const hasPaaS = project.deployments.some(d => d.platformToken && d.platformToken.status === 'ACTIVE');
     const checklist = {
       projectCreated: true,
-      apiKeyGenerated: apiKeys.length > 0,
-      configInitialized: !!project.configInitializedAt,
-      sdkConnected: !!project.lastPingAt
+      apiKeyGenerated: apiKeys.length > 0 || hasPaaS,
+      configInitialized: !!project.configInitializedAt || hasPaaS,
+      sdkConnected: !!project.lastPingAt || hasPaaS
     };
 
     const PLATFORM_UNDERLYING_PROVIDER: Record<string, CloudProvider[]> = {
@@ -1282,15 +1322,9 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
     // ─── Per-deployment emission rollup (for multi-deployment card list) ───────
     const deploymentStats = await Promise.all(
       project.deployments.map(async (d) => {
-        const depMtdRecords = mtdRecords.filter(e => e.deploymentId === d.id);
-        const depTotalKg = depMtdRecords.reduce((sum, e) => sum + e.carbonKg, 0);
-        const depHistory = history30d.map(day => ({
-          ...day,
-          // per-deployment carbon for this day (from full emissions)
-          carbonKg: emissions
-            .filter(e => e.deploymentId === d.id && e.timestamp.toISOString().split('T')[0] === day.date)
-            .reduce((sum, e) => sum + e.carbonKg, 0),
-        }));
+        const depEmissions = emissions.filter(e => e.deploymentId === d.id);
+        const depAnalytics = computeAnalytics(depEmissions);
+        
         return {
           id: d.id,
           role: d.role,
@@ -1302,11 +1336,12 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
           platformToken: d.platformToken
             ? { platform: d.platformToken.platform, status: d.platformToken.status, projectSlug: d.platformToken.projectSlug }
             : null,
-          totalMonthKg: depTotalKg,
-          history30d: depHistory,
+          totalMonthKg: depAnalytics.totalMonthKg,
+          history30d: depAnalytics.history30d,
           idleCount: latestEmissions.filter(e => e.deploymentId === d.id && e.isIdle).length,
           oversizedCount: latestEmissions.filter(e => e.deploymentId === d.id && e.isOversized).length,
           createdAt: d.createdAt,
+          analytics: depAnalytics // Full analytics payload for frontend tabs
         };
       })
     );
@@ -1317,12 +1352,8 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
         capabilityTier
       },
       deployments: deploymentStats,
-      idleInstances: latestEmissions.filter(e => e.isIdle).length,
       oversizedInstances: latestEmissions.filter(e => e.isOversized).length,
-      carbonTrend: { todayKg, trendPercent, isNew },
-      history7d,
-      history30d,
-      totalMonthKg,
+      ...overallAnalytics, // history7d, history30d, carbonTrend, totalMonthKg, idleInstances(from compute)
       apiKeys,
       greenerRegion,
       isStale,
@@ -1335,6 +1366,7 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
     res.json({ success: true, data: stats });
   } catch (error: any) {
     console.error('[getProjectStats] Internal server error:', error);
+    try { require('fs').writeFileSync('/tmp/carbonix_error.log', error.stack || error.toString()); } catch(e) {}
     res.status(500).json({ error: 'Internal server error' });
   }
 };

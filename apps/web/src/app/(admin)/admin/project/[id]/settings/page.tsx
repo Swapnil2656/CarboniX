@@ -74,10 +74,10 @@ export default function ProjectSettingsPage({ params }: { params: { id: string }
   };
 
   const connectedPlatforms = React.useMemo(() => {
-    if (!project?.platformTokens) return [];
-    return project.platformTokens
-      .filter((pt: any) => pt.status === 'ACTIVE')
-      .map((pt: any) => pt.platform as string);
+    if (!project?.deployments) return [];
+    return project.deployments
+      .filter((d: any) => d.platformToken && d.platformToken.status === 'ACTIVE')
+      .map((d: any) => d.platformToken.platform as string);
   }, [project]);
 
   // Set initial expanded state once platforms are fetched
@@ -204,14 +204,22 @@ export default function ProjectSettingsPage({ params }: { params: { id: string }
             </div>
           </div>
 
-          <div>
+          <div className="flex gap-2">
             {isConnected ? (
-              <button 
-                onClick={() => handleRevoke(platform.id)}
-                className="px-4 py-2 border border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-lg text-sm font-medium transition-colors"
-              >
-                Revoke
-              </button>
+              <>
+                <button 
+                  onClick={() => setSelectedPlatform(isSelected ? null : platform.id)}
+                  className="px-4 py-2 border border-outline-variant text-on-surface hover:bg-surface-container rounded-lg text-sm font-medium transition-colors"
+                >
+                  {isSelected ? 'Cancel Rotation' : 'Rotate Key'}
+                </button>
+                <button 
+                  onClick={() => handleRevoke(platform.id)}
+                  className="px-4 py-2 border border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Revoke
+                </button>
+              </>
             ) : (
               <button 
                 onClick={() => setSelectedPlatform(isSelected ? null : platform.id)}

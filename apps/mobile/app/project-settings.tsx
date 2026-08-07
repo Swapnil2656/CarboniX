@@ -39,9 +39,9 @@ export default function ProjectSettingsScreen() {
 
       if (projRes.success) {
         setProject(projRes.data.project);
-        const activePlatforms = (projRes.data.project.platformTokens || [])
-          .filter((pt: any) => pt.status === 'ACTIVE')
-          .map((pt: any) => pt.platform);
+        const activePlatforms = (projRes.data.project.deployments || [])
+          .filter((d: any) => d.platformToken && d.platformToken.status === 'ACTIVE')
+          .map((d: any) => d.platformToken.platform);
         setConnectedPlatforms(activePlatforms);
       } else {
         Alert.alert('Error', projRes.error || 'Failed to fetch project');
@@ -181,9 +181,17 @@ export default function ProjectSettingsScreen() {
                     </View>
 
                     {isConnected ? (
-                      <TouchableOpacity style={styles.revokeButton} onPress={() => handleRevoke(platform.id)}>
-                        <Text style={styles.revokeButtonText}>Revoke</Text>
-                      </TouchableOpacity>
+                      <View style={{ flexDirection: 'row', gap: 8 }}>
+                        <TouchableOpacity 
+                          style={[styles.cancelButton, { paddingHorizontal: 12 }]} 
+                          onPress={() => setSelectedPlatform(isSelected ? null : platform.id)}
+                        >
+                          <Text style={styles.cancelButtonText}>{isSelected ? 'Cancel' : 'Rotate'}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.revokeButton} onPress={() => handleRevoke(platform.id)}>
+                          <Text style={styles.revokeButtonText}>Revoke</Text>
+                        </TouchableOpacity>
+                      </View>
                     ) : (
                       <TouchableOpacity 
                         style={isSelected ? styles.cancelButton : styles.connectButton} 

@@ -301,11 +301,17 @@ export async function handleConnectPlatformToken(req: AuthRequest, res: Response
         data: { platformTokenId: newToken.id, isDeployed: true },
       });
     } else {
+      let newRole = deploymentRole ?? 'OTHER';
+      if (!deploymentRole) {
+        if (['VERCEL', 'NETLIFY', 'CLOUDFLARE_PAGES'].includes(platform as string)) newRole = 'FRONTEND';
+        if (['RENDER', 'RAILWAY', 'HEROKU', 'SUPABASE'].includes(platform as string)) newRole = 'BACKEND';
+      }
+
       // No deploymentId provided — create a new Deployment for this token
       const newDeployment = await prisma.deployment.create({
         data: {
           projectId,
-          role: (deploymentRole as any) ?? 'OTHER',
+          role: newRole as any,
           label: deploymentLabel ?? null,
           provider: null,   // will be populated by collector on first run
           isDeployed: true,
@@ -316,10 +322,13 @@ export async function handleConnectPlatformToken(req: AuthRequest, res: Response
       console.log(`[CONNECT] Created new Deployment ${newDeployment.id} for ${platform} token on project ${projectId}.`);
     }
 
-    // Set project dataSource to LIVE
+    // Set project dataSource to LIVE and mark as deployed
     await prisma.project.update({
       where: { id: projectId },
-      data: { dataSource: 'LIVE' },
+      data: { 
+        dataSource: 'LIVE',
+        isDeployed: true 
+      },
     });
 
     console.log(`[CONNECT] ✓ ${platform} token verified and saved for project "${project.name}" (${projectId}). dataSource = LIVE.`);
