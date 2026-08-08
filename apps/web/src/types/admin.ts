@@ -33,6 +33,8 @@ export interface DashboardData {
   topEndpoints: EndpointStat[];
   providerDistribution: ProviderDistribution[];
   liveApiStream: LiveApiEvent[];
+  avgGridIntensity?: number;
+  carbonSaved?: number;
 }
 
 // ─── Users / Device Assets ──────────────────────────────────────────────────

@@ -38,9 +38,18 @@ const RecommendationArraySchema = zod_1.z.array(RecommendationSchema);
  * Call Nvidia NIM API for intelligent recommendations
  */
 async function callNvidiaForRecommendations(records, apiKey) {
-    const SYSTEM_PROMPT = `You are CarboniX Analyst Agent — an AI carbon optimization advisor for cloud infrastructure.
+    const SYSTEM_PROMPT = `You are an expert Cloud Carbon Analyst AI (Nemotron Engine).
+Your goal is to reduce carbon emissions of cloud infrastructure by making specific, data-driven recommendations.
 
-Analyze these cloud infrastructure emission records and return ONLY a valid JSON array of optimization recommendations. No markdown, no explanation, ONLY the JSON array.
+For each instance provided, analyze its metrics (cpuUtilization, memoryUtilization, region, carbonKg).
+If the instance is idle (<5% CPU) or oversized (e.g., <20% CPU), recommend TERMINATE or DOWNGRADE.
+If the instance is in a high-carbon region (e.g., ap-south-1 with 750 gCO2/kWh), recommend MIGRATE_REGION.
+
+CRITICAL: Your "reasoning" must NOT be generic. You MUST include specific metrics in your reasoning.
+Example: "Instance is running in ap-south-1 (750 gCO2/kWh). Migrating to eu-north-1 will reduce carbon by 4.5 kg."
+Example: "CPU utilization is only 12%. Downgrading will save 2.1 kg CO2/month."
+
+Return ONLY a valid JSON array of optimization recommendations. No markdown, no explanation, ONLY the JSON array.
 
 Each recommendation object must have exactly these fields:
 - instanceId (string)
@@ -53,7 +62,7 @@ Each recommendation object must have exactly these fields:
 - reasoning (string: one sentence)
 - priority (string: "HIGH", "MEDIUM", or "LOW")`;
     const history = [
-        { role: 'user', content: JSON.stringify(records.filter(r => r.isIdle || r.isOversized), null, 2) }
+        { role: 'user', content: JSON.stringify(records, null, 2) }
     ];
     /** One call attempt: returns parsed validated array or null on any failure */
     async function attempt(extraInstruction) {
@@ -180,12 +189,12 @@ async function runAnalyst(records, nvidiaApiKey) {
     const flaggedRecords = records.filter(r => r.isIdle || r.isOversized);
     let recommendations;
     // Try Nvidia first, fall back to rules
-    if (nvidiaApiKey && flaggedRecords.length > 0) {
+    if (nvidiaApiKey && records.length > 0) {
         const aiRecs = await callNvidiaForRecommendations(records, nvidiaApiKey);
-        recommendations = aiRecs || generateFallbackRecommendations(flaggedRecords);
+        recommendations = aiRecs || generateFallbackRecommendations(records);
     }
     else {
-        recommendations = generateFallbackRecommendations(flaggedRecords);
+        recommendations = generateFallbackRecommendations(records);
     }
     const totalCurrentKg = records.reduce((sum, r) => sum + r.carbonKg, 0);
     const totalSavingsKg = recommendations.reduce((sum, r) => sum + (r.currentCarbonKg - r.projectedCarbonKg), 0);

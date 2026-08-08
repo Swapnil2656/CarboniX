@@ -8,6 +8,8 @@ interface PlatformConfig {
   id: string;
   name: string;
   icon: string;
+  category?: string;
+  color: string;
   description: string;
   docsUrl: string;
   needsProjectSlug: boolean;
@@ -84,7 +86,7 @@ export default function ProjectSettingsPage({ params }: { params: { id: string }
   useEffect(() => {
     if (availablePlatforms.length > 0 && connectedPlatforms.length > 0) {
       const newExpanded = { FRONTEND: false, BACKEND: false, SELF_HOSTED: false };
-      connectedPlatforms.forEach(cp => {
+      connectedPlatforms.forEach((cp: string) => {
         const platform = availablePlatforms.find(p => p.id === cp);
         if (platform && platform.category) {
           newExpanded[platform.category as keyof typeof newExpanded] = true;

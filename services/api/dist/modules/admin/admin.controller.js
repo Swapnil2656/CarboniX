@@ -79,6 +79,15 @@ const getDashboard = async (req, res) => {
             _avg: { gridIntensity: true },
         });
         const avgCo2Kg = emissionStats._avg.gridIntensity ? Math.round(emissionStats._avg.gridIntensity) : 0;
+        const auditLogs = await prisma_1.prisma.auditLog.findMany({
+            where: { actorId: { in: teamUserIds }, action: 'EMISSION_MIGRATE' }
+        });
+        const carbonSaved = auditLogs.reduce((acc, log) => {
+            if (log.before?.carbonKg && log.after?.carbonKg) {
+                return acc + (log.before.carbonKg - log.after.carbonKg);
+            }
+            return acc;
+        }, 0);
         const sdkInstalls = await prisma_1.prisma.mobileUser.count();
         // Group emission records by provider
         const providerGroups = await prisma_1.prisma.emissionRecord.groupBy({
@@ -140,6 +149,8 @@ const getDashboard = async (req, res) => {
         const responseData = {
             totalApiCalls,
             activeSessions: activeSessions || 125, // fallback if no sessions
+            avgGridIntensity: avgCo2Kg,
+            carbonSaved,
             avgCo2Kg,
             sdkInstalls,
             apiCallsOverTime,
@@ -987,8 +998,8 @@ const getProjectStats = async (req, res) => {
                 prevDay.setDate(prevDay.getDate() - 1);
                 history30d.unshift({
                     date: prevDay.toISOString().split('T')[0],
-                    carbonKg: 0,
-                    costUsd: 0
+                    carbonKg: history30d[0].carbonKg,
+                    costUsd: history30d[0].costUsd
                 });
             }
             let history7d = history30d.slice(-7);
@@ -1068,7 +1079,10 @@ const getProjectStats = async (req, res) => {
                 }
             }
         }
-        const isStale = project.lastPingAt ? (new Date().getTime() - project.lastPingAt.getTime()) > 24 * 60 * 60 * 1000 : true;
+        let isStale = project.lastPingAt ? (new Date().getTime() - project.lastPingAt.getTime()) > 24 * 60 * 60 * 1000 : true;
+        if (hasActivePaaS) {
+            isStale = false; // PaaS is synced by cron hourly
+        }
         // Latest records for overview
         const latestEmissions = await prisma_1.prisma.emissionRecord.findMany({
             where: { projectId: id },

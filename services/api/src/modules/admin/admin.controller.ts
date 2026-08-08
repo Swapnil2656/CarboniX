@@ -87,6 +87,17 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
     });
     const avgCo2Kg = emissionStats._avg.gridIntensity ? Math.round(emissionStats._avg.gridIntensity) : 0;
     
+    const auditLogs = await prisma.auditLog.findMany({
+      where: { actorId: { in: teamUserIds }, action: 'EMISSION_MIGRATE' }
+    });
+    
+    const carbonSaved = auditLogs.reduce((acc, log: any) => {
+      if (log.before?.carbonKg && log.after?.carbonKg) {
+         return acc + (log.before.carbonKg - log.after.carbonKg);
+      }
+      return acc;
+    }, 0);
+
     const sdkInstalls = await prisma.mobileUser.count();
 
     // Group emission records by provider
@@ -153,6 +164,8 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
     const responseData = {
       totalApiCalls,
       activeSessions: activeSessions || 125, // fallback if no sessions
+      avgGridIntensity: avgCo2Kg,
+      carbonSaved,
       avgCo2Kg,
       sdkInstalls,
       apiCallsOverTime,
@@ -1058,7 +1071,7 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
         history30d = [{ date: todayStr, carbonKg: 0, costUsd: 0 }];
       }
 
-      if (history30d.length === 1) {
+      if (history30d.length > 0 && history30d.length < 30) {
         const prevDay = new Date(history30d[0].date);
         prevDay.setDate(prevDay.getDate() - 1);
         history30d.unshift({
@@ -1154,7 +1167,10 @@ export const getProjectStats = async (req: AuthRequest, res: Response) => {
        }
     }
 
-    const isStale = project.lastPingAt ? (new Date().getTime() - project.lastPingAt.getTime()) > 24 * 60 * 60 * 1000 : true;
+    let isStale = project.lastPingAt ? (new Date().getTime() - project.lastPingAt.getTime()) > 24 * 60 * 60 * 1000 : true;
+    if (hasActivePaaS) {
+      isStale = false; // PaaS is synced by cron hourly
+    }
 
     // Latest records for overview
     const latestEmissions = await prisma.emissionRecord.findMany({

@@ -20,6 +20,7 @@ interface Project {
   connectedAt: string | null;
   lastPingAt: string | null;
   createdAt: string;
+  deployments?: any[];
 }
 
 // ─── Pre-deployment estimate (shown before SDK connection) ──────────────────
@@ -306,7 +307,7 @@ export default function DashboardPage() {
                 {projects.map((p) => {
                   const hasDeployments = p.deployments && p.deployments.length > 0;
                   const displayRegion = hasDeployments
-                    ? p.deployments.map((d: any) => `${d.role === 'FRONTEND' ? 'Frontend' : d.role === 'BACKEND' ? 'Backend' : 'Other'}: ${d.region || 'Unknown'}`).join(' | ')
+                    ? (p.deployments || []).map((d: any) => `${d.role === 'FRONTEND' ? 'Frontend' : d.role === 'BACKEND' ? 'Backend' : 'Other'}: ${d.region || 'Unknown'}`).join(' | ')
                     : (p.region || 'Not detected yet');
                   const isAnalyzeDisabled = analyzingProjectId === p.id || (!hasDeployments && (!p.region || p.region === 'Not detected yet'));
 

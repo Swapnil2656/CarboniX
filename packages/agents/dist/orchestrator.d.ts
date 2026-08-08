@@ -9,7 +9,7 @@
  *  2. Track success/failures.
  */
 import { Recommendation } from './analyst';
-export type MigrationStatus = 'PROVISIONING' | 'HEALTH_CHECK' | 'TRAFFIC_SHIFTING' | 'DRAINING' | 'TERMINATING' | 'COMPLETE' | 'FAILED';
+export type MigrationStatus = 'PROVISIONING' | 'HEALTH_CHECK' | 'TRAFFIC_SHIFTING' | 'DRAINING' | 'TERMINATING' | 'COMPLETE' | 'FALLBACK' | 'FAILED';
 export interface MigrationStep {
     step: MigrationStatus;
     timestamp: string;

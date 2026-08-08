@@ -13,6 +13,7 @@ const agents_2 = require("@carbonix/agents");
 const agents_3 = require("@carbonix/agents");
 const agents_4 = require("@carbonix/agents");
 const agents_5 = require("@carbonix/agents");
+const platformTokenService_1 = require("../../lib/platformTokenService");
 const USE_MOCK = process.env.USE_MOCK_AGENTS === 'true';
 const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY || '';
 const CARBON_BUDGET = parseFloat(process.env.CARBON_BUDGET_KG_DAY || '10');
@@ -133,7 +134,8 @@ const triggerCollector = async (req, res) => {
         });
     }
     catch (error) {
-        res.status(500).json({ success: false, error: 'Internal server error' });
+        console.error('Error in triggerCollector:', error);
+        res.status(500).json({ success: false, error: 'Internal server error', details: error.message });
     }
 };
 exports.triggerCollector = triggerCollector;
@@ -143,9 +145,14 @@ exports.triggerCollector = triggerCollector;
 const triggerAnalyst = async (req, res) => {
     try {
         const startTime = Date.now();
+        const projectId = req.query.projectId;
         // Get latest emission records
+        const collectorRunWhere = { agentType: 'COLLECTOR', status: 'SUCCESS' };
+        if (projectId) {
+            collectorRunWhere.projectId = projectId;
+        }
         const latestCollectorRun = await prisma_1.prisma.agentRun.findFirst({
-            where: { agentType: 'COLLECTOR', status: 'SUCCESS' },
+            where: collectorRunWhere,
             orderBy: { createdAt: 'desc' },
         });
         if (!latestCollectorRun) {
@@ -154,8 +161,12 @@ const triggerAnalyst = async (req, res) => {
                 error: 'No collector data found. Run the Collector Agent first.',
             });
         }
+        const whereClause = { agentRunId: latestCollectorRun.id };
+        if (projectId) {
+            whereClause.projectId = projectId;
+        }
         const records = await prisma_1.prisma.emissionRecord.findMany({
-            where: { agentRunId: latestCollectorRun.id },
+            where: whereClause,
         });
         // Create AgentRun
         const agentRun = await prisma_1.prisma.agentRun.create({
@@ -163,6 +174,7 @@ const triggerAnalyst = async (req, res) => {
                 agentType: 'ANALYST',
                 status: 'RUNNING',
                 triggeredBy: 'manual',
+                projectId: projectId || null,
             },
         });
         // Run the analyst
@@ -221,7 +233,8 @@ const triggerAnalyst = async (req, res) => {
         });
     }
     catch (error) {
-        res.status(500).json({ success: false, error: 'Internal server error' });
+        console.error('Error in triggerAnalyst:', error);
+        res.status(500).json({ success: false, error: 'Internal server error', details: error.message });
     }
 };
 exports.triggerAnalyst = triggerAnalyst;
@@ -403,11 +416,17 @@ const triggerOrchestrator = async (req, res) => {
                 agentType: 'ORCHESTRATOR',
                 status: 'RUNNING',
                 triggeredBy: req.user?.id ? 'manual' : 'api',
+                projectId: req.query.projectId || null,
             },
         });
         // ── Step 2: Fetch latest Analyst recommendations from DB ─────────────
+        const projectId = req.query.projectId;
+        const analystRunWhere = { agentType: 'ANALYST', status: 'SUCCESS' };
+        if (projectId) {
+            analystRunWhere.projectId = projectId;
+        }
         const latestAnalystRun = await prisma_1.prisma.agentRun.findFirst({
-            where: { agentType: 'ANALYST', status: 'SUCCESS' },
+            where: analystRunWhere,
             orderBy: { createdAt: 'desc' },
         });
         if (!latestAnalystRun || !latestAnalystRun.details) {
@@ -440,9 +459,40 @@ const triggerOrchestrator = async (req, res) => {
             });
             return res.json({ success: true, data: { message: 'Nothing to orchestrate.' } });
         }
-        // ── Step 3: Run the Orchestrator (Blue/Green migrations) ─────────────
+        // ── Step 3: Run the Orchestrator with Physical Region Switch ─────────
         const maxConcurrent = parseInt(req.body?.maxConcurrent) || 3;
-        const result = await (0, agents_5.runOrchestrator)(recommendations, maxConcurrent);
+        const applyRegionFn = async (instanceId, targetRegion) => {
+            try {
+                const deployment = await prisma_1.prisma.deployment.findFirst({
+                    where: { OR: [{ label: instanceId }, { id: instanceId }] },
+                    include: { project: true, platformToken: true }
+                });
+                if (!deployment || !deployment.platformToken) {
+                    return { success: false, error: `No valid PlatformToken found for deployment: ${instanceId}` };
+                }
+                const token = (0, platformTokenService_1.decryptToken)(deployment.platformToken.encryptedToken);
+                const adapter = agents_5.platformRegistry.getAdapter(deployment.platformToken.platform);
+                if (!adapter) {
+                    return { success: false, error: `No adapter found for platform: ${deployment.platformToken.platform}` };
+                }
+                const result = await adapter.applyRegion(token, deployment.platformToken.projectSlug || deployment.project.name, targetRegion);
+                if (result.success) {
+                    await prisma_1.prisma.deployment.update({
+                        where: { id: deployment.id },
+                        data: { region: targetRegion }
+                    });
+                }
+                return result;
+            }
+            catch (err) {
+                return { success: false, error: err.message };
+            }
+        };
+        let filteredRecommendations = recommendations;
+        if (req.query.instanceId) {
+            filteredRecommendations = recommendations.filter(r => r.instanceId === req.query.instanceId);
+        }
+        const result = await (0, agents_5.runOrchestrator)(filteredRecommendations, applyRegionFn, maxConcurrent);
         // ── Step 4: Persist the orchestration run ────────────────────────────
         await prisma_1.prisma.agentRun.update({
             where: { id: agentRun.id },

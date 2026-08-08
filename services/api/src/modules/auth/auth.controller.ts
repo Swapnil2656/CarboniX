@@ -36,9 +36,10 @@ export const register = async (req: Request, res: Response) => {
     });
 
     const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '30d' });
-
     res.json({ success: true, data: { user: { id: user.id, name: user.userName, email: user.email }, token } });
   } catch (error: any) {
+    console.error('Registration Error:', error);
+    require('fs').writeFileSync('/tmp/carbonix_auth_err.log', error.stack || error.message || String(error));
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };

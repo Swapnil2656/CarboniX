@@ -82,26 +82,52 @@ const getDashboard = async (req, res) => {
         const budgetLimitKg = mobileUser?.carbonBudgetKg || 100;
         let percentUsed = Math.round((totalCo2ThisMonth / budgetLimitKg) * 100);
         let webProjects = [];
+        let avgGridIntensity = 0;
+        let carbonSaved = 0;
         // Auth might be passing a User ID (from web) or MobileUser ID
         let webUser = await prisma_1.prisma.user.findUnique({
             where: { id: userId },
-            include: { projects: true } // or filter active ones
+            include: {
+                projects: {
+                    include: {
+                        deployments: {
+                            orderBy: { createdAt: 'desc' },
+                            take: 1
+                        }
+                    }
+                }
+            }
         });
         if (!webUser && mobileUser?.email) {
             webUser = await prisma_1.prisma.user.findUnique({
                 where: { email: mobileUser.email },
-                include: { projects: true }
+                include: {
+                    projects: {
+                        include: {
+                            deployments: {
+                                orderBy: { createdAt: 'desc' },
+                                take: 1
+                            }
+                        }
+                    }
+                }
             });
         }
         if (webUser?.projects) {
-            webProjects = webUser.projects.map(p => ({
-                id: p.id,
-                name: p.name,
-                region: p.region,
-                sdkConnected: p.sdkConnected,
-                connectedAt: p.connectedAt,
-                lastPingAt: p.lastPingAt
-            }));
+            webProjects = webUser.projects.map(p => {
+                const hasDeployments = p.deployments && p.deployments.length > 0;
+                const displayRegion = hasDeployments && p.deployments[0].region
+                    ? p.deployments[0].region
+                    : p.region;
+                return {
+                    id: p.id,
+                    name: p.name,
+                    region: displayRegion,
+                    sdkConnected: p.sdkConnected,
+                    connectedAt: p.connectedAt,
+                    lastPingAt: p.lastPingAt
+                };
+            });
             // Fetch telemetry data for the user's projects to add to overall stats and sparkline
             const projectIds = webUser.projects.map(p => p.id);
             const telemetryRecords = await prisma_1.prisma.emissionRecord.findMany({
@@ -110,8 +136,12 @@ const getDashboard = async (req, res) => {
                     timestamp: { gte: lastMonthStart }
                 }
             });
+            let totalGridIntensity = 0;
+            let telemetryCount = 0;
             telemetryRecords.forEach(record => {
                 totalCo2AllTime += record.carbonKg;
+                totalGridIntensity += record.gridIntensity;
+                telemetryCount++;
                 if (record.timestamp >= currentMonthStart) {
                     totalCo2ThisMonth += record.carbonKg;
                 }
@@ -125,6 +155,16 @@ const getDashboard = async (req, res) => {
                     }
                 }
             });
+            avgGridIntensity = telemetryCount > 0 ? Math.round(totalGridIntensity / telemetryCount) : 0;
+            const auditLogs = await prisma_1.prisma.auditLog.findMany({
+                where: { actorId: userId, action: 'EMISSION_MIGRATE' }
+            });
+            carbonSaved = auditLogs.reduce((acc, log) => {
+                if (log.before?.carbonKg && log.after?.carbonKg) {
+                    return acc + (log.before.carbonKg - log.after.carbonKg);
+                }
+                return acc;
+            }, 0);
             // Recompute percentUsed and changePercent since totalCo2ThisMonth changed
             percentUsed = Math.round((totalCo2ThisMonth / budgetLimitKg) * 100);
             if (totalCo2LastMonth > 0) {
@@ -164,7 +204,6 @@ const getDashboard = async (req, res) => {
         }
         const earliestDateKey = earliestRecordDate ? earliestRecordDate.toISOString().split('T')[0] : null;
         let weeklySparkline = Array.from(weeklySparklineMap.entries())
-            .filter(([date]) => !earliestDateKey || date >= earliestDateKey)
             .map(([date, co2Kg]) => ({
             date,
             co2Kg
@@ -198,6 +237,8 @@ const getDashboard = async (req, res) => {
                     percentUsed,
                     isOverBudget: percentUsed > 100
                 },
+                avgGridIntensity,
+                carbonSaved: Number(carbonSaved.toFixed(1)),
                 activeProjects: webProjects,
                 activeConfigurations: Array.from(activeConfigsMap.values()),
                 weeklySparkline,

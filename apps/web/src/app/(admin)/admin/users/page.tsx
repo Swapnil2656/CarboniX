@@ -136,7 +136,7 @@ export default function UsersPage() {
   const currentUserList = filteredUsers.filter(u => u.role === 'USER' || u.role === 'ADMIN');
   const teamList = filteredUsers.filter(u => u.role !== 'USER' && u.role !== 'ADMIN');
 
-  const renderTableRows = (usersList: typeof filteredUsers) => {
+  const renderTableRows = (usersList: typeof filteredUsers, showActions: boolean = true) => {
     if (loading) {
       return Array(3).fill(0).map((_, i) => (
         <tr key={i}>
@@ -146,6 +146,7 @@ export default function UsersPage() {
           <td className="px-6 py-4"><Skeleton className="h-6 w-16" /></td>
           <td className="px-6 py-4"><Skeleton className="h-6 w-16" /></td>
           <td className="px-6 py-4"><Skeleton className="h-6 w-20" /></td>
+          {showActions && <td className="px-6 py-4"><Skeleton className="h-6 w-8" /></td>}
         </tr>
       ));
     }
@@ -153,7 +154,7 @@ export default function UsersPage() {
     if (usersList.length === 0) {
       return (
         <tr>
-          <td colSpan={6} className="px-6 py-8 text-center text-on-surface-variant">
+          <td colSpan={showActions ? 6 : 5} className="px-6 py-8 text-center text-on-surface-variant">
             No records found.
           </td>
         </tr>
@@ -187,7 +188,8 @@ export default function UsersPage() {
             {user.status}
           </Badge>
         </td>
-        <td className="px-6 py-4 text-right relative action-menu-container">
+        {showActions && (
+          <td className="px-6 py-4 text-right relative action-menu-container">
           <button 
             onClick={() => setOpenMenuId(openMenuId === user.id ? null : user.id)}
             className="text-on-surface-variant hover:text-on-surface p-1 rounded-full hover:bg-surface-container transition-colors"
@@ -223,6 +225,7 @@ export default function UsersPage() {
             </div>
           )}
         </td>
+        )}
       </tr>
     ));
   };
@@ -302,7 +305,7 @@ export default function UsersPage() {
 
       {/* My Footprint Section */}
       <h2 className="text-lg font-display font-medium text-on-surface mt-2 mb-[-12px]">My Footprint</h2>
-      <div className="glass-card rounded-xl border border-outline-variant relative">
+      <div className="glass-card rounded-xl border border-outline-variant relative z-20">
         <div className="w-full">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -312,11 +315,10 @@ export default function UsersPage() {
                 <th className="px-6 py-4 text-xs font-label-caps text-on-surface-variant">Location</th>
                 <th className="px-6 py-4 text-xs font-label-caps text-on-surface-variant">Avg CO₂</th>
                 <th className="px-6 py-4 text-xs font-label-caps text-on-surface-variant">Status</th>
-                <th className="px-6 py-4 text-xs font-label-caps text-on-surface-variant text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant">
-              {renderTableRows(currentUserList)}
+              {renderTableRows(currentUserList, false)}
             </tbody>
           </table>
         </div>
@@ -324,7 +326,7 @@ export default function UsersPage() {
 
       {/* Team Data Table */}
       <h2 className="text-lg font-display font-medium text-on-surface mt-2 mb-[-12px]">Team Developers</h2>
-      <div className="glass-card rounded-xl border border-outline-variant relative">
+      <div className="glass-card rounded-xl border border-outline-variant relative z-10">
         <div className="w-full">
           <table className="w-full text-left border-collapse">
             <thead>

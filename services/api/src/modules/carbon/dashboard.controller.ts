@@ -99,25 +99,50 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
     // Auth might be passing a User ID (from web) or MobileUser ID
     let webUser = await prisma.user.findUnique({
       where: { id: userId },
-      include: { projects: true } // or filter active ones
+      include: { 
+        projects: {
+          include: {
+            deployments: {
+              orderBy: { createdAt: 'desc' },
+              take: 1
+            }
+          }
+        } 
+      }
     });
 
     if (!webUser && mobileUser?.email) {
       webUser = await prisma.user.findUnique({
         where: { email: mobileUser.email },
-        include: { projects: true }
+        include: { 
+          projects: {
+            include: {
+              deployments: {
+                orderBy: { createdAt: 'desc' },
+                take: 1
+              }
+            }
+          } 
+        }
       });
     }
 
     if (webUser?.projects) {
-      webProjects = webUser.projects.map(p => ({
-        id: p.id,
-        name: p.name,
-        region: p.region,
-        sdkConnected: p.sdkConnected,
-        connectedAt: p.connectedAt,
-        lastPingAt: p.lastPingAt
-      }));
+      webProjects = webUser.projects.map(p => {
+        const hasDeployments = p.deployments && p.deployments.length > 0;
+        const displayRegion = hasDeployments && p.deployments[0].region 
+          ? p.deployments[0].region 
+          : p.region;
+
+        return {
+          id: p.id,
+          name: p.name,
+          region: displayRegion,
+          sdkConnected: p.sdkConnected,
+          connectedAt: p.connectedAt,
+          lastPingAt: p.lastPingAt
+        };
+      });
 
       // Fetch telemetry data for the user's projects to add to overall stats and sparkline
       const projectIds = webUser.projects.map(p => p.id);
@@ -209,14 +234,15 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
       .map(([date, co2Kg]) => ({
         date,
         co2Kg
-      }));
+      }))
+      .filter(h => !earliestDateKey || h.date >= earliestDateKey);
 
     if (!earliestDateKey || weeklySparkline.length === 0) {
       const todayKey = now.toISOString().split('T')[0];
       weeklySparkline = [{ date: todayKey, co2Kg: 0 }];
     }
 
-    if (weeklySparkline.length === 1) {
+    if (weeklySparkline.length > 0 && weeklySparkline.length < 7) {
       const prevDay = new Date(weeklySparkline[0].date);
       prevDay.setDate(prevDay.getDate() - 1);
       weeklySparkline.unshift({ date: prevDay.toISOString().split('T')[0], co2Kg: 0 });

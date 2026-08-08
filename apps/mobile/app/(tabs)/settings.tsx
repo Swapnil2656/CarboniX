@@ -120,7 +120,7 @@ export default function SettingsScreen() {
             </Text>
           </View>
           <View style={styles.ratingBadge}>
-            <Text style={styles.ratingText}>{profile?.carbonRating || 'A'}</Text>
+            <Text style={styles.ratingText}>Active</Text>
           </View>
         </View>
 
@@ -280,9 +280,9 @@ const styles = StyleSheet.create({
     color: '#888',
   },
   ratingBadge: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    paddingHorizontal: 12,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: 'rgba(80, 250, 123, 0.1)',
     borderWidth: 1,
     borderColor: '#50FA7B',
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
   },
   ratingText: {
     fontFamily: 'Inter-Bold',
-    fontSize: 20,
+    fontSize: 14,
     color: '#50FA7B',
   },
   panel: {

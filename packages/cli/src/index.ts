@@ -106,6 +106,17 @@ async function detectEntryFile(cwd: string): Promise<string | null> {
   try {
     const pkg = JSON.parse(await fs.readFile(path.join(cwd, 'package.json'), 'utf-8'));
     if (pkg.main && await fileExists(path.join(cwd, pkg.main))) return pkg.main;
+    // Next.js auto-detection
+    const deps = { ...(pkg.dependencies || {}), ...(pkg.devDependencies || {}) };
+    if (deps['next']) {
+      if (await fileExists(path.join(cwd, 'src', 'instrumentation.ts'))) return 'src/instrumentation.ts';
+      if (await fileExists(path.join(cwd, 'instrumentation.ts'))) return 'instrumentation.ts';
+      // Create it if missing
+      const isSrc = await fileExists(path.join(cwd, 'src'));
+      const target = isSrc ? 'src/instrumentation.ts' : 'instrumentation.ts';
+      await fs.writeFile(path.join(cwd, target), 'export function register() {}\n');
+      return target;
+    }
   } catch (_) {}
   for (const c of ENTRY_FILE_CANDIDATES) {
     if (await fileExists(path.join(cwd, c))) return c;
@@ -163,7 +174,8 @@ function detectProvider(envVars: Record<string, string>): string {
   if (process.env.RENDER               || envVars.RENDER)                return 'render';
   if (process.env.GOOGLE_CLOUD_PROJECT || envVars.GOOGLE_CLOUD_PROJECT)  return 'gcp';
   if (process.env.ARM_REGION           || envVars.ARM_REGION || process.env.AZURE_REGION || envVars.AZURE_REGION) return 'azure';
-  return 'aws';
+  if (process.env.AWS_EXECUTION_ENV    || envVars.AWS_EXECUTION_ENV || process.env.AWS_REGION || envVars.AWS_REGION) return 'aws';
+  return 'local';
 }
 
 async function detectProjectProfile(cwd: string): Promise<Record<string, string>> {
@@ -265,7 +277,7 @@ program
     process.stdout.write(pc.gray('  [2/5] Detecting environment... '));
     const envVars = await detectEnvVars(cwd);
     const provider = detectProvider(envVars);
-    const region = envVars.AWS_REGION || envVars.GCP_REGION || envVars.AZURE_REGION || process.env.AWS_REGION || 'ap-south-1';
+    const region = envVars.AWS_REGION || envVars.GCP_REGION || envVars.AZURE_REGION || process.env.AWS_REGION || 'local-dev';
     const instanceId = envVars.INSTANCE_ID || os.hostname();
     const instanceType = envVars.INSTANCE_TYPE || 't3.medium';
     const projectName = envVars.APP_NAME || (() => {
@@ -352,24 +364,63 @@ program
     }
 
     // ── Success Banner ────────────────────────────────────────────────────────
+    
+    const padRight = (str: string, len: number) => {
+      const stripped = str.replace(/\x1B\[\d+m/g, '').replace(/🌿/g, '  ').replace(/✅/g, '  '); 
+      const diff = len - stripped.length;
+      return str + ' '.repeat(Math.max(0, diff));
+    };
+
     console.log('');
     console.log(pc.green('  ┌─────────────────────────────────────────────────────┐'));
-    console.log(pc.green('  │') + pc.bold('  🌿 CarboniX initialized successfully!              ') + pc.green('│'));
+    console.log(pc.green('  │') + padRight(pc.bold('  🌿 CarboniX initialized successfully!'), 53) + pc.green('│'));
     console.log(pc.green('  ├─────────────────────────────────────────────────────┤'));
-    console.log(pc.green('  │') + `  Provider : ${pc.cyan(provider.padEnd(10))} Region : ${pc.cyan(region.padEnd(16))}` + pc.green('  │'));
-    console.log(pc.green('  │') + `  Project  : ${pc.white(projectName.substring(0, 37).padEnd(39))}` + pc.green('│'));
+    console.log(pc.green('  │') + padRight(`  Provider : ${pc.cyan(provider)}    Region : ${pc.cyan(region)}`, 53) + pc.green('│'));
+    console.log(pc.green('  │') + padRight(`  Project  : ${pc.white(projectName.substring(0, 37))}`, 53) + pc.green('│'));
     console.log(pc.green('  ├─────────────────────────────────────────────────────┤'));
-    console.log(pc.green('  │') + pc.gray('  ✅  .carbonixrc                                     ') + pc.green('│'));
-    console.log(pc.green('  │') + pc.gray('  ✅  carbonix.config.js                              ') + pc.green('│'));
-    console.log(pc.green('  │') + pc.gray('  ✅  carbonix-telemetry.js                           ') + pc.green('│'));
+    console.log(pc.green('  │') + padRight(pc.gray('  ✅  .carbonixrc'), 53) + pc.green('│'));
+    console.log(pc.green('  │') + padRight(pc.gray('  ✅  carbonix.config.js'), 53) + pc.green('│'));
+    console.log(pc.green('  │') + padRight(pc.gray('  ✅  carbonix-telemetry.js'), 53) + pc.green('│'));
     console.log(pc.green('  ├─────────────────────────────────────────────────────┤'));
-    console.log(pc.green('  │') + pc.white('  Next steps:                                        ') + pc.green('│'));
-    console.log(pc.green('  │') + pc.gray('  › Start your server — live data flows to Dashboard ') + pc.green('│'));
-    console.log(pc.green('  │') + pc.gray('  › npx @carbonix/cli status   — check live status   ') + pc.green('│'));
-    console.log(pc.green('  │') + pc.gray('  › npx @carbonix/cli analyze  — AI region optimizer ') + pc.green('│'));
+    console.log(pc.green('  │') + padRight(pc.white('  Next steps:'), 53) + pc.green('│'));
+    console.log(pc.green('  │') + padRight(pc.gray('  › Start your server — live data flows to Dashboard'), 53) + pc.green('│'));
+    console.log(pc.green('  │') + padRight(pc.gray('  › npx @carbonix/cli status   — check live status'), 53) + pc.green('│'));
+    console.log(pc.green('  │') + padRight(pc.gray('  › npx @carbonix/cli analyze  — AI region optimizer'), 53) + pc.green('│'));
     console.log(pc.green('  └─────────────────────────────────────────────────────┘'));
     console.log(pc.gray('  Tip: Run "npm install -g @carbonix/cli" to use the "carbonix" command anywhere.'));
     console.log('');
+    
+    // ── Continuous Tracking Loop ──────────────────────────────────────────────
+    console.log(pc.cyan('  🛰️  Tracking project telemetry... (Press Ctrl+C to exit)'));
+    let trackingSpinIdx = 0;
+    const spinner = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+    
+    const interval = setInterval(async () => {
+      try {
+        const res = await axios.get(`${baseUrl}/api/v1/carbon/dashboard?projectName=${projectName}`, {
+          headers: { 'Authorization': `Bearer ${apiKey}` },
+          timeout: 4000
+        });
+        
+        // Check if there are active projects with sdkConnected
+        const proj = res.data?.activeProjects?.find((p: any) => p.name === projectName);
+        if (proj && proj.sdkConnected) {
+          process.stdout.write(`\r  ${pc.green('✅')} Live telemetry connected! Provider: ${pc.cyan(proj.provider || provider)}, Region: ${pc.cyan(proj.region || region)}                \n`);
+          console.log(pc.gray(`     Last ping: ${new Date(proj.lastPingAt).toLocaleTimeString()}`));
+        } else {
+          process.stdout.write(`\r  ${pc.cyan(spinner[trackingSpinIdx++ % spinner.length])} Waiting for deployment & telemetry... Provider: ${provider}, Region: ${region}`);
+        }
+      } catch (e) {
+        process.stdout.write(`\r  ${pc.yellow(spinner[trackingSpinIdx++ % spinner.length])} Connection error, retrying...                                      `);
+      }
+    }, 2000);
+    
+    // Allow process to be killed cleanly
+    process.on('SIGINT', () => {
+      clearInterval(interval);
+      console.log(pc.gray('\n  Tracking stopped.'));
+      process.exit(0);
+    });
   });
 
 // ─── status ───────────────────────────────────────────────────────────────────

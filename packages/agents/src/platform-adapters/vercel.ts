@@ -69,11 +69,47 @@ export class VercelAdapter implements PlatformAdapter {
       }, this.platform);
 
       if (res.ok) {
+        // Find latest deployment to redeploy
+        let redeployMsg = '';
+        try {
+          const depsRes = await fetchT(`https://api.vercel.com/v6/deployments?projectId=${encodeURIComponent(projectRef)}&limit=1`, {
+            headers: { Authorization: `Bearer ${token}` }
+          }, this.platform);
+          
+          if (depsRes.ok) {
+            const depsData = await depsRes.json();
+            if (depsData.deployments && depsData.deployments.length > 0) {
+              const latestId = depsData.deployments[0].uid;
+              
+              const redeployRes = await fetchT(`https://api.vercel.com/v13/deployments`, {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  name: projectRef,
+                  deploymentId: latestId,
+                  meta: { action: 'carbonix-region-switch' }
+                })
+              }, this.platform);
+              
+              if (redeployRes.ok) {
+                redeployMsg = ' Redeployment triggered successfully.';
+              } else {
+                redeployMsg = ' Failed to trigger redeployment.';
+              }
+            }
+          }
+        } catch (e) {
+          redeployMsg = ' Failed to trigger redeployment.';
+        }
+
         return {
           success: true,
-          requiresRedeploy: true, // Vercel applies it on next deployment
+          requiresRedeploy: false, // We triggered it automatically
           actionTaken: 'API_UPDATE',
-          message: `Successfully updated Vercel project region to ${targetRegion} via API.`
+          message: `Successfully updated Vercel project region to ${targetRegion} via API.${redeployMsg}`
         };
       } else {
         const errData = await res.json().catch(() => ({}));

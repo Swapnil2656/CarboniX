@@ -20,6 +20,7 @@ export type MigrationStatus =
   | 'DRAINING'
   | 'TERMINATING'
   | 'COMPLETE'
+  | 'FALLBACK'
   | 'FAILED';
 
 export interface MigrationStep {
@@ -134,7 +135,7 @@ async function executeMigration(rec: Recommendation, applyRegionFn: ApplyRegionF
       };
     }
 
-    addStep('TRAFFIC_SHIFTING', `[SUCCESS] Region switch applied successfully to ${targetRegion}.${result.requiresRedeploy ? ' Redeployment triggered.' : ''}`, true, s2);
+    addStep('TRAFFIC_SHIFTING', `[SUCCESS] ${(result as any).message || `Region switch applied successfully to ${targetRegion}.`}`, true, s2);
     
     const carbonSaved = rec.currentCarbonKg - rec.projectedCarbonKg;
     addStep('COMPLETE', `[COMPLETE] Migration finished. Carbon saving locked in: ${carbonSaved.toFixed(2)} kg CO₂/month.`, true, Date.now());

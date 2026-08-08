@@ -28,15 +28,15 @@ export const StatCard: React.FC<StatCardProps> = ({ title, value, icon, trend, i
   
   return (
     <div className="glass-card p-6 rounded-xl flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-surface-container-high text-primary">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-surface-container-high text-primary">
             <span className="material-symbols-outlined">{icon}</span>
           </div>
-          <h3 className="text-on-surface-variant font-medium">{title}</h3>
+          <h3 className="text-on-surface-variant font-medium truncate" title={title}>{title}</h3>
         </div>
         {trend && (
-          <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+          <div className={`flex-shrink-0 flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
             isPositiveTrend 
               ? 'bg-[rgba(80,250,123,0.15)] text-[#50FA7B]' 
               : 'bg-[rgba(248,113,113,0.15)] text-[#f87171]'

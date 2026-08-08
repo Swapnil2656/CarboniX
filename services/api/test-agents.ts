@@ -13,8 +13,8 @@ async function main() {
     // 1. Get the first deployment that has a platform token (we know there's a Vercel one for Taskflow)
     const deployment = await prisma.deployment.findFirst({
       where: {
-        platformTokenId: {
-          not: null
+        platformToken: {
+          platform: 'VERCEL'
         }
       },
       include: {

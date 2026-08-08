@@ -184,6 +184,18 @@ export const agentsApi = {
       method: 'POST',
     });
   },
+  triggerOrchestrator: async (projectId: string, instanceId?: string): Promise<any> => {
+    let url = `/agents/trigger/orchestrator?projectId=${projectId}`;
+    if (instanceId) {
+      url += `&instanceId=${encodeURIComponent(instanceId)}`;
+    }
+    return fetchClient(url, { method: 'POST' });
+  },
+  triggerAnalyst: async (projectId: string): Promise<any> => {
+    return fetchClient(`/agents/trigger/analyst?projectId=${projectId}`, {
+      method: 'POST',
+    });
+  },
 };
 
 // ─── Connect Endpoints ───────────────────────────────────────────────────────

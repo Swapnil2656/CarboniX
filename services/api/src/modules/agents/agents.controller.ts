@@ -143,7 +143,8 @@ export const triggerCollector = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: 'Internal server error' });
+    console.error('Error in triggerCollector:', error);
+    res.status(500).json({ success: false, error: 'Internal server error', details: error.message });
   }
 };
 
@@ -154,9 +155,16 @@ export const triggerAnalyst = async (req: Request, res: Response) => {
   try {
     const startTime = Date.now();
 
+    const projectId = req.query.projectId as string | undefined;
+
     // Get latest emission records
+    const collectorRunWhere: any = { agentType: 'COLLECTOR', status: 'SUCCESS' };
+    if (projectId) {
+      collectorRunWhere.projectId = projectId;
+    }
+
     const latestCollectorRun = await prisma.agentRun.findFirst({
-      where: { agentType: 'COLLECTOR', status: 'SUCCESS' },
+      where: collectorRunWhere,
       orderBy: { createdAt: 'desc' },
     });
 
@@ -167,8 +175,13 @@ export const triggerAnalyst = async (req: Request, res: Response) => {
       });
     }
 
+    const whereClause: any = { agentRunId: latestCollectorRun.id };
+    if (projectId) {
+      whereClause.projectId = projectId;
+    }
+
     const records = await prisma.emissionRecord.findMany({
-      where: { agentRunId: latestCollectorRun.id },
+      where: whereClause,
     });
 
     // Create AgentRun
@@ -177,6 +190,7 @@ export const triggerAnalyst = async (req: Request, res: Response) => {
         agentType: 'ANALYST',
         status: 'RUNNING',
         triggeredBy: 'manual',
+        projectId: projectId || null,
       },
     });
 
@@ -241,7 +255,8 @@ export const triggerAnalyst = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: 'Internal server error' });
+    console.error('Error in triggerAnalyst:', error);
+    res.status(500).json({ success: false, error: 'Internal server error', details: error.message });
   }
 };
 
@@ -439,12 +454,19 @@ export const triggerOrchestrator = async (req: Request, res: Response) => {
         agentType: 'ORCHESTRATOR',
         status: 'RUNNING',
         triggeredBy: (req as any).user?.id ? 'manual' : 'api',
+        projectId: (req.query.projectId as string) || null,
       },
     });
 
     // ── Step 2: Fetch latest Analyst recommendations from DB ─────────────
+    const projectId = req.query.projectId as string | undefined;
+    const analystRunWhere: any = { agentType: 'ANALYST', status: 'SUCCESS' };
+    if (projectId) {
+      analystRunWhere.projectId = projectId;
+    }
+
     const latestAnalystRun = await prisma.agentRun.findFirst({
-      where: { agentType: 'ANALYST', status: 'SUCCESS' },
+      where: analystRunWhere,
       orderBy: { createdAt: 'desc' },
     });
 
@@ -521,7 +543,12 @@ export const triggerOrchestrator = async (req: Request, res: Response) => {
       }
     };
 
-    const result = await runOrchestrator(recommendations, applyRegionFn, maxConcurrent);
+    let filteredRecommendations = recommendations;
+    if (req.query.instanceId) {
+      filteredRecommendations = recommendations.filter(r => r.instanceId === req.query.instanceId);
+    }
+
+    const result = await runOrchestrator(filteredRecommendations, applyRegionFn, maxConcurrent);
 
     // ── Step 4: Persist the orchestration run ────────────────────────────
     await prisma.agentRun.update({

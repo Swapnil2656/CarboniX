@@ -24,8 +24,10 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
   const [localInstances, setLocalInstances] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const [analyzingId, setAnalyzingId] = useState<string | null>(null);
-  const [migratingId, setMigratingId] = useState<string | null>(null);
+  const [isGlobalAnalyzing, setIsGlobalAnalyzing] = useState(false);
+  const [globalMigrating, setGlobalMigrating] = useState(false);
+  const [migratingInstance, setMigratingInstance] = useState<string | null>(null);
+  const [globalRecommendation, setGlobalRecommendation] = useState<any>(null);
   const [manualMigrateModal, setManualMigrateModal] = useState<{ open: boolean; record: any | null; targetRegion: string }>({ open: false, record: null, targetRegion: '' });
 
   // Deployment management states
@@ -65,76 +67,79 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     fetchStats();
   }, [params.id]);
 
-  const handleAnalyze = async (record: any) => {
-    setAnalyzingId(record.id);
+  const handleGlobalAnalyze = async () => {
+    setIsGlobalAnalyzing(true);
+    setGlobalRecommendation(null);
     try {
-      let overrideProvider = record.provider;
-      const instName = (record.instanceName || '').toUpperCase();
-      if (instName.includes('VERCEL')) overrideProvider = 'VERCEL';
-      else if (instName.includes('RAILWAY')) overrideProvider = 'RAILWAY';
-      else if (instName.includes('RENDER')) overrideProvider = 'RENDER';
-      else if (instName.includes('NETLIFY')) overrideProvider = 'NETLIFY';
-
-      const payload = {
-        recordId: record.id,
-        projectName: record.instanceName || 'CarboniX',
-        instanceType: record.instanceType,
-        provider: overrideProvider,
-        region: record.region,
-        cpuUtilization: record.cpuUtilization,
-        storageGb: 20
-      };
-      const res = await carbonApi.recommend(payload);
+      const res = await agentsApi.triggerAnalyst(params.id);
       
-      setLocalInstances((prev) => 
-        prev.map((r) => {
-          if (r.id === record.id) {
-            const recObj = res.data?.recommended;
-            const recMessage = recObj 
-              ? `AI: ${recObj.message || `Move to ${recObj.region}`}` 
-              : 'Already in an optimal region.';
-            return {
-              ...r,
-              recommendation: recMessage,
-              _recommendedRegion: recObj?.region,
-              _recommendedCarbonKg: recObj?.projectedCarbonKg
-            };
-          }
-          return r;
-        })
-      );
+      if (res.success && res.data) {
+        setGlobalRecommendation(res.data);
+      } else {
+        alert(res.error || 'No recommendations generated.');
+      }
     } catch (err) {
       console.error(err);
       alert('Failed to analyze: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
-      setAnalyzingId(null);
+      setIsGlobalAnalyzing(false);
     }
   };
 
-  const handleAutoMigrate = async (recordId: string, targetRegion: string) => {
-    setMigratingId(recordId);
+  const handleGlobalMigrate = async () => {
+    if (!globalRecommendation || !globalRecommendation.recommendations || globalRecommendation.recommendations.length === 0) return;
+    setGlobalMigrating(true);
     try {
-      await adminApi.migrateEmission(recordId, targetRegion);
-      setLocalInstances((prev) => 
-        prev.map((r) => {
-          if (r.id === recordId) {
-            return {
-              ...r,
-              region: targetRegion,
-              carbonKg: r._recommendedCarbonKg || (r.carbonKg * 0.7),
-              isOptimized: true,
-              recommendation: 'Optimized via Auto Migrate',
-              _recommendedRegion: undefined
-            };
-          }
-          return r;
-        })
-      );
+      const res = await agentsApi.triggerOrchestrator(params.id);
+      if (res.success) {
+        setGlobalRecommendation({
+          ...globalRecommendation,
+          recommendations: [],
+          summary: 'All recommended migrations successfully orchestrated.',
+        });
+        
+        // Refresh stats
+        const statsRes = await adminApi.getProjectStats(params.id);
+        if (statsRes.success) {
+          setData(statsRes.data);
+          setLocalInstances(statsRes.data.instances || []);
+        }
+      } else {
+        alert(res.error || 'Failed to orchestrate migrations.');
+      }
     } catch (err) {
       console.error(err);
       alert('Migration failed: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
-      setMigratingId(null);
+      setGlobalMigrating(false);
+    }
+  };
+
+  const handleInstanceMigrate = async (instanceId: string) => {
+    if (!globalRecommendation || !globalRecommendation.recommendations) return;
+    setMigratingInstance(instanceId);
+    try {
+      const res = await agentsApi.triggerOrchestrator(params.id, instanceId);
+      if (res.success) {
+        setGlobalRecommendation({
+          ...globalRecommendation,
+          recommendations: globalRecommendation.recommendations.filter((r: any) => r.instanceId !== instanceId),
+        });
+        
+        // Refresh stats
+        const statsRes = await adminApi.getProjectStats(params.id);
+        if (statsRes.success) {
+          setData(statsRes.data);
+          setLocalInstances(statsRes.data.instances || []);
+        }
+      } else {
+        alert(res.error || 'Failed to orchestrate migration.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Migration failed: ' + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      setMigratingInstance(null);
     }
   };
 
@@ -832,7 +837,12 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <StatCard
+              title="Overall Carbon"
+              value={`${Number(activeAnalytics.totalMonthKg || 0).toFixed(2)} kg`}
+              icon="public"
+            />
             <StatCard
               title="Today's Carbon"
               value={`${Number(activeAnalytics.carbonTrend?.todayKg || 0).toFixed(2)} kg`}
@@ -909,10 +919,96 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
             </div>
           </div>
 
+          {/* Global AI Recommendation Card */}
+          {globalRecommendation && (
+            <div className="bg-primary/5 border border-primary/20 rounded-xl p-5 relative overflow-hidden mb-6">
+              <div className="absolute top-0 left-0 w-1 h-full bg-primary"></div>
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                  <div className="flex items-start gap-3">
+                    <span className="material-symbols-outlined text-primary text-2xl">auto_awesome</span>
+                    <div>
+                      <h4 className="text-on-surface font-semibold mb-1">AI Analyst Recommendation</h4>
+                      <p className="text-sm text-primary-light max-w-2xl font-medium">
+                        {globalRecommendation.summary}
+                      </p>
+                      
+                      {globalRecommendation.totalSavingsKg > 0 && (
+                        <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/20 text-success text-xs font-semibold">
+                          <span className="material-symbols-outlined text-[14px]">eco</span>
+                          Save {globalRecommendation.totalSavingsKg.toFixed(2)} kg CO₂e
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {globalRecommendation.recommendations?.some((r: any) => r.recommendedAction === 'MIGRATE_REGION') && (
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={handleGlobalMigrate}
+                        disabled={globalMigrating}
+                        className="bg-primary hover:bg-primary-dark text-on-primary px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-primary/20 shrink-0"
+                      >
+                        {globalMigrating ? (
+                          <span className="material-symbols-outlined text-sm animate-spin">refresh</span>
+                        ) : (
+                          <span className="material-symbols-outlined text-sm">flight_takeoff</span>
+                        )}
+                        Auto Migrate Recommended
+                      </button>
+                    </div>
+                  )}
+                </div>
+                
+                {globalRecommendation.recommendations?.length > 0 && (
+                  <div className="mt-2 pl-9">
+                    <div className="space-y-3">
+                      {globalRecommendation.recommendations.map((rec: any, idx: number) => (
+                        <div key={idx} className="flex items-start gap-2 text-sm">
+                          <span className="material-symbols-outlined text-on-surface-variant text-base mt-0.5">subdirectory_arrow_right</span>
+                          <div>
+                            <span className="font-medium text-on-surface mr-2">{rec.instanceId}:</span>
+                            <span className="text-on-surface-variant">{rec.reasoning}</span>
+                            {rec.targetRegion && (
+                              <span className="ml-2 text-[10px] border border-outline-variant rounded px-2 py-0.5 bg-transparent text-inherit">
+                                Target: {rec.targetRegion}
+                              </span>
+                            )}
+                            {rec.recommendedAction && (
+                              <button
+                                onClick={() => handleInstanceMigrate(rec.instanceId)}
+                                disabled={migratingInstance === rec.instanceId || globalMigrating}
+                                className="ml-3 text-xs bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1 rounded transition-colors disabled:opacity-50"
+                              >
+                                {migratingInstance === rec.instanceId ? 'Applying...' : (rec.recommendedAction === 'MIGRATE_REGION' ? 'Migrate' : 'Apply')}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Instances Table */}
           <div className="bg-surface border border-outline-variant rounded-xl overflow-hidden relative">
-            <div className="px-5 py-4 border-b border-outline-variant bg-surface-container-low">
-              <h3 className="font-semibold text-on-surface">Tracked Instances</h3>
+            <div className="px-5 py-4 border-b border-outline-variant bg-surface-container-low flex items-center justify-between">
+              <h3 className="font-semibold text-on-surface">Recent Telemetry Logs</h3>
+              
+              <button
+                onClick={handleGlobalAnalyze}
+                disabled={isGlobalAnalyzing || localInstances.length === 0}
+                className="bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {isGlobalAnalyzing ? (
+                  <span className="material-symbols-outlined text-sm animate-spin">refresh</span>
+                ) : (
+                  <span className="material-symbols-outlined text-sm">auto_awesome</span>
+                )}
+                Run AI Analysis
+              </button>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
@@ -923,7 +1019,6 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                     <th className="py-3 px-4 text-right">CPU Util</th>
                     <th className="py-3 px-4 text-right">Carbon (kg)</th>
                     <th className="py-3 px-4 text-center">Status</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="text-sm divide-y divide-outline-variant">
@@ -957,62 +1052,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                             <Badge variant="success" className="uppercase text-[10px]">OPTIMAL</Badge>
                           )}
                         </td>
-                        <td className="py-4 px-4 text-right">
-                          <button
-                            onClick={() => handleAnalyze(record)}
-                            disabled={analyzingId === record.id}
-                            className="bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 flex items-center gap-1 ml-auto"
-                          >
-                            {analyzingId === record.id ? (
-                              <span className="material-symbols-outlined text-sm animate-spin">refresh</span>
-                            ) : (
-                              <span className="material-symbols-outlined text-sm">auto_awesome</span>
-                            )}
-                            Analyze
-                          </button>
-                        </td>
                       </tr>
-                      {record.recommendation && (
-                        <tr className="bg-primary/5 border-t-0">
-                          <td colSpan={6} className="py-3 px-4">
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                              <div className="flex items-start gap-2">
-                                <span className="material-symbols-outlined text-primary text-sm mt-0.5">tips_and_updates</span>
-                                <div className="text-sm text-primary-light">
-                                  {record.recommendation}
-                                </div>
-                              </div>
-                              {(() => {
-                                const targetRegionMatch = record.recommendation.match(/Move to ([\w-]+)|Switch to ([\w-]+)/);
-                                const targetRegion = record._recommendedRegion || (targetRegionMatch ? targetRegionMatch[1] || targetRegionMatch[2] : null);
-                                return targetRegion && !record.isOptimized ? (
-                                  <div className="flex items-center gap-2">
-                                    <button
-                                      onClick={() => handleAutoMigrate(record.id, targetRegion)}
-                                      disabled={migratingId === record.id}
-                                      className="bg-primary hover:bg-primary-dark text-on-primary px-3 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 flex items-center gap-1"
-                                    >
-                                      {migratingId === record.id ? (
-                                        <span className="material-symbols-outlined text-sm animate-spin">refresh</span>
-                                      ) : (
-                                        <span className="material-symbols-outlined text-sm">flight_takeoff</span>
-                                      )}
-                                      Auto Migrate
-                                    </button>
-                                    <button
-                                      onClick={() => setManualMigrateModal({ open: true, record, targetRegion })}
-                                      className="bg-surface-container-high hover:bg-surface-bright border border-outline-variant text-on-surface px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
-                                    >
-                                      <span className="material-symbols-outlined text-sm">settings</span>
-                                      Manual
-                                    </button>
-                                  </div>
-                                ) : null;
-                              })()}
-                            </div>
-                          </td>
-                        </tr>
-                      )}
                     </React.Fragment>
                   )) : (
                     <tr>

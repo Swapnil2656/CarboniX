@@ -371,10 +371,11 @@ export const chat = async (req: AuthRequest, res: Response) => {
   try {
     const adminUserId = req.user!.id;
     const adminUserEmail = req.user!.email;
-    const { message, history } = req.body;
+    const { message } = req.body;
+    const history = req.body.history || [];
     
-    if (!message || !history) {
-      return res.status(400).json({ success: false, error: 'Message and history are required.' });
+    if (!message) {
+      return res.status(400).json({ success: false, error: 'Message is required.' });
     }
 
     const updatedHistory: ChatMessage[] = [...history, { role: 'user', content: message }];
