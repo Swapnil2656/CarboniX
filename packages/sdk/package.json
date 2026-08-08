@@ -1,6 +1,6 @@
 {
   "name": "carbonix",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Official Node.js SDK for CarboniX — cloud carbon footprint tracking, AI recommendations, and live telemetry ingestion.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

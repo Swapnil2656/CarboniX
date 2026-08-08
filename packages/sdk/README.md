@@ -3,6 +3,8 @@
 The official Node.js SDK for [CarboniX](https://github.com/Swapnil2656/CarboniX).  
 Track your cloud carbon footprint, get AI-powered green-region recommendations, and push live server telemetry — all in one package.
 
+**Version 1.1.0 Updates**: Now includes a resilient AI Chat fallback mechanism, strictly validated calculation structures, and integration with the 49-point Agentic testing framework.
+
 ---
 
 ## Installation

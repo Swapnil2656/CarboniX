@@ -44,8 +44,7 @@ export default async function LandingPage() {
               </h1>
               <p className="font-body-lg text-body-lg text-on-surface-variant mb-xl max-w-[540px]">
                 Quantify, monitor, and gate your infrastructure&apos;s environmental impact
-                directly in the IDE and CI/CD pipelines. Industrial-grade carbon
-                intelligence for modern dev teams.
+                directly in the IDE and CI/CD pipelines. Now backed by a highly resilient AI Chat engine and a verified 49-point Agentic Testing Suite.
               </p>
               <div className="flex justify-center gap-md flex-wrap">
                 <Link

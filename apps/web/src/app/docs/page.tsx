@@ -67,6 +67,16 @@ export default function DocsPage() {
         <li><strong>Auth Layer</strong>: Validates session tokens issued by the Next.js frontend (NextAuth).</li>
         <li><strong>Historical Data</strong>: Stores and retrieves historical carbon tracking data for the dashboard visualizations.</li>
       </ul>
+
+      <h2 className="text-section-header mt-3xl mb-md border-t border-outline-variant/30 pt-xl">System Resilience & Testing</h2>
+      <p className="mb-md">
+        CarboniX is verified by a comprehensive <strong>49-point Agentic Testing Suite</strong> that ensures all backend services, agent triggers, and external integrations operate flawlessly.
+      </p>
+      <ul className="list-disc pl-md space-y-xs mb-xl">
+        <li><strong>AI Chat Fallbacks</strong>: The AI controller gracefully handles missing history parameters and implements timeouts (e.g., catching 60-second timeouts from the NVIDIA NIM LLM) to prevent service crashes.</li>
+        <li><strong>Calculation Payloads</strong>: The Carbon Engine requires precise <code>CalculationInput</code> structures, rigorously validated to prevent faulty carbon mathematics.</li>
+        <li><strong>Auth Constraints</strong>: The database layer utilizes strict Prisma constraints (like unique usernames and emails) which the testing suite verifies with timestamped mock data.</li>
+      </ul>
     </>
   );
 }

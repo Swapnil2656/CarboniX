@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { Navbar } from '@/app/components/Navbar';
-import { AtomCursor } from '@/app/components/AtomCursor';
 import { auth } from '@/auth';
 
 export default async function DocsLayout({ children }: { children: React.ReactNode }) {
@@ -17,7 +16,6 @@ export default async function DocsLayout({ children }: { children: React.ReactNo
 
   return (
     <>
-      <AtomCursor />
       <div className="bg-black text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-fixed min-h-screen flex flex-col">
         <Navbar session={session} />
 
