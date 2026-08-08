@@ -65,6 +65,7 @@ There is no "Cost Explorer for Carbon." To estimate emissions today, developers 
 ## 📽️ Demo & Deliverables
 
 - 🌐 **Deployment Link:** [https://carboni-x-web.vercel.app/](https://carboni-x-web.vercel.app/)
+- 📱 **Mobile App (APK):** [Download carbonix.apk](https://github.com/Swapnil2656/CarboniX/releases/download/latest/carbonix.apk)
 - 🎥 **Demo Video:** [https://youtu.be/g9Vp8AfioaI?si=Xq21hiGzcl3pSfIp](https://youtu.be/g9Vp8AfioaI?si=Xq21hiGzcl3pSfIp)
 - 📑 **Pitch Deck:** [CarboniX Pitch Deck](https://docs.google.com/presentation/d/1AnHulp2uGV1DwLrNzMM-6yqe5xKhx-r8/edit?usp=drivesdk&ouid=104539531271698617658&rtpof=true&sd=true)
 
