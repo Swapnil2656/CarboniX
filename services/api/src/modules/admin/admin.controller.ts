@@ -244,10 +244,8 @@ export const getUsers = async (req: AuthRequest, res: Response) => {
           updatedAt: u.updatedAt
         });
       } else {
-        const existing = mergedMap.get(u.email);
-        if (existing.status === 'PENDING') {
-          existing.status = 'ACTIVE';
-        }
+        // Keep the original TeamMember status instead of auto-upgrading to ACTIVE
+        // so that they must explicitly accept the invitation.
       }
     });
 

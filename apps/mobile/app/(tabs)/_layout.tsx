@@ -141,7 +141,6 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
         if (route.name === 'estimate') iconName = 'calculate';
         if (route.name === 'console') iconName = 'dashboard';
         if (route.name === 'activity') iconName = 'history';
-        if (route.name === 'docs') iconName = 'menu-book';
         if (route.name === 'settings') iconName = 'settings';
 
         return (
@@ -267,7 +266,6 @@ export default function TabLayout() {
         <Tabs.Screen name="console" options={{ title: 'Dashboard' }} />
         <Tabs.Screen name="estimate" options={{ title: 'Estimate' }} />
         <Tabs.Screen name="activity" options={{ title: 'Activity' }} />
-        <Tabs.Screen name="docs" options={{ title: 'Docs' }} />
         <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
       </Tabs>
 
