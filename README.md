@@ -65,7 +65,7 @@ There is no "Cost Explorer for Carbon." To estimate emissions today, developers 
 ## 📽️ Demo & Deliverables
 
 - 🌐 **Web Dashboard:** [https://carboni-x-web.vercel.app/](https://carboni-x-web.vercel.app/)
-- ⚙️ **Backend API (Railway):** `https://<YOUR-RAILWAY-URL>.up.railway.app/api/v1` (Replace with your actual Railway URL)
+- ⚙️ **Backend API (Railway):** `https://carbonix-production.up.railway.app/api/v1`
 - 📱 **Mobile App (APK):** [Download carbonix.apk](https://github.com/Swapnil2656/CarboniX/releases/download/latest/carbonix.apk)
 - 🎥 **Demo Video:** [https://youtu.be/g9Vp8AfioaI?si=Xq21hiGzcl3pSfIp](https://youtu.be/g9Vp8AfioaI?si=Xq21hiGzcl3pSfIp)
 - 📑 **Pitch Deck:** [CarboniX Pitch Deck](https://docs.google.com/presentation/d/1AnHulp2uGV1DwLrNzMM-6yqe5xKhx-r8/edit?usp=drivesdk&ouid=104539531271698617658&rtpof=true&sd=true)
