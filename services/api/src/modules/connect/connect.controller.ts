@@ -424,7 +424,7 @@ export async function handleRevokePlatformToken(req: AuthRequest, res: Response)
 
 export async function handleGetPlatforms(req: AuthRequest, res: Response) {
   try {
-    const platforms = platformRegistry.getAllPlatforms().map(p => {
+    const platforms = platformRegistry.getAllPlatforms().map((p: string) => {
       const metadata = platformRegistry.getMetadata(p);
       
       return {

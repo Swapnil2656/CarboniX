@@ -116,7 +116,7 @@ cron.schedule('0 * * * *', async () => {
               continue;
             }
 
-            const records = await withRetry(
+            const records = await withRetry<any[]>(
               () => collectFromPlatform({ platform: pt.platform, decryptedToken: plainToken, projectSlug: pt.projectSlug || undefined }),
               `${project.name}/${pt.platform}`
             );

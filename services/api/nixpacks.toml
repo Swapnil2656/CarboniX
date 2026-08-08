@@ -8,6 +8,8 @@ cmds = [
 
 [phases.build]
 cmds = [
+  "npm run build --workspace=packages/core",
+  "npm run build --workspace=packages/agents",
   "npm run build --workspace=services/api"
 ]
 
